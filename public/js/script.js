@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const observerOptions = {
             root: null,
             rootMargin: '0px',
-            threshold: 0.6
+            threshold: 0.4
         };
 
         const observerCallback = (entries) => {
@@ -66,5 +66,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const observer = new IntersectionObserver(observerCallback, observerOptions);
         sections.forEach(section => observer.observe(section));
+    }
+
+    const animatedElements = document.querySelectorAll('.animate-on-scroll');
+
+    if (animatedElements.length > 0) {
+        const animationObserverOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.4
+        };
+        const animationObserverCallback = (entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        };
+        const animationObserver = new IntersectionObserver(animationObserverCallback, animationObserverOptions);
+        animatedElements.forEach(el => {
+            animationObserver.observe(el);
+        });
     }
 });

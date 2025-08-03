@@ -8,8 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     
@@ -26,12 +25,27 @@
             <a href="/login" class="login">Login</a>
             <a href="/register" class="register">Register</a>
         </div>
+         <button class="hamburger-menu" id="hamburger-btn" aria-label="Buka menu">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </button>
     </header>
+
+    <div class="mobile-nav" id="mobile-nav">
+        <a href="#intro" class="mobile-link">Intro</a>
+        <a href="#populer" class="mobile-link">Populer</a>
+        <a href="#tentang" class="mobile-link">Tentang</a>
+        <div class="mobile-auth-buttons">
+            <a href="/login" class="login">Login</a>
+            <a href="/register" class="register">Register</a>
+        </div>
+    </div>
 
     <main>
         <section id="intro" class="main-section">
             <div class="intro-container">
-                <div class="intro-text">
+                <div class="intro-text animate-on-scroll">
                     <hr class="divider">
                     <p class="greeting">Selamat Datang Di</p>
                     <h1 class="main-headline">
@@ -39,7 +53,7 @@
                         <span class="line-akrab">AKRAB</span>
                     </h1>
                 </div>
-                <div class="intro-visual">
+                <div class="intro-visual animate-on-scroll delay-1">
                     <img class="intro-image-1" src="src/bg_landing_page.png" alt="Produk UMKM Banyuwangi">
                     <img class="intro-image-2" src="src/bg_landing_page.png" alt="Ilustrasi produk">
                     <div class="intro-desc">
@@ -51,7 +65,7 @@
 
         <section id="populer" class="main-section">
             <div class="product-grid">
-                <article class="product-card" 
+                <article class="product-card animate-on-scroll" 
                         data-store="Ardi Jaya"
                         data-title="Kaos Polos" 
                         data-price="Rp.50.000" 
@@ -64,7 +78,7 @@
                         <button class="view-product-btn">Lihat Produk</button>
                     </div>
                 </article>
-                <article class="product-card" 
+                <article class="product-card animate-on-scroll delay-1" 
                         data-store="Ardi Jaya"
                         data-title="Kaos Polos" 
                         data-price="Rp.50.000" 
@@ -77,7 +91,7 @@
                         <button class="view-product-btn">Lihat Produk</button>
                     </div>
                 </article>
-                <article class="product-card" 
+                <article class="product-card animate-on-scroll delay-2" 
                         data-store="Ardi Jaya"
                         data-title="Kaos Polos" 
                         data-price="Rp.50.000" 
@@ -90,7 +104,7 @@
                         <button class="view-product-btn">Lihat Produk</button>
                     </div>
                 </article>
-                <article class="product-card" 
+                <article class="product-card animate-on-scroll delay-3" 
                         data-store="Ardi Jaya"
                         data-title="Kaos Polos" 
                         data-price="Rp.50.000" 
@@ -103,7 +117,7 @@
                         <button class="view-product-btn">Lihat Produk</button>
                     </div>
                 </article>
-                <article class="product-card" 
+                <article class="product-card animate-on-scroll delay-4" 
                         data-store="Ardi Jaya"
                         data-title="Kaos Polos" 
                         data-price="Rp.50.000" 
@@ -116,7 +130,7 @@
                         <button class="view-product-btn">Lihat Produk</button>
                     </div>
                 </article>
-                <article class="product-card" 
+                <article class="product-card animate-on-scroll delay-5" 
                         data-store="Ardi Jaya"
                         data-title="Kaos Polos" 
                         data-price="Rp.50.000" 
@@ -129,7 +143,7 @@
                         <button class="view-product-btn">Lihat Produk</button>
                     </div>
                 </article>
-                <article class="product-card" 
+                <article class="product-card animate-on-scroll delay-6" 
                         data-store="Ardi Jaya"
                         data-title="Kaos Polos" 
                         data-price="Rp.50.000" 
@@ -142,7 +156,7 @@
                         <button class="view-product-btn">Lihat Produk</button>
                     </div>
                 </article>
-                <article class="product-card" 
+                <article class="product-card animate-on-scroll delay-7" 
                         data-store="Ardi Jaya"
                         data-title="Kaos Polos" 
                         data-price="Rp.50.000" 
@@ -160,7 +174,7 @@
         
         <section id="tentang" class="main-section">
             <div class="tentang-container">
-                <div class="tentang-left">
+                <div class="tentang-left animate-on-scroll">
                     <div class="tentang-title-block">
                         <p class="tentang-subtitle">Tentang Kami</p>
                         <h2 class="tentang-headline">
@@ -175,7 +189,7 @@
                         <p>Setiap produk yang kami jual bukan hanya barang, tapi cerita. Cerita tentang tradisi, inovasi, dan perjuangan para pelaku usaha kecil untuk terus tumbuh di tengah tantangan zaman.</p>
                     </div>
                 </div>
-                <div class="tentang-right">
+                <div class="tentang-right animate-on-scroll delay-1">
                     <div class="tentang-content-block">
                         <h3 class="tentang-content-title">CERITA KAMI</h3>
                         <p>Kami adalah komunitas pelaku usaha kecil dan menengah yang tergabung dalam Paguyuban UMKM AKRAB — singkatan dari Aksesoris, Kaos, Kerajinan, Batik, dan Kuliner. Berdiri dari semangat gotong royong, kami menghadirkan beragam produk lokal berkualitas yang lahir dari kreativitas dan tangan-tangan terampil warga Banyuwangi.</p>
@@ -252,6 +266,6 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="js/script.js"></script>
 </body>
 </html>

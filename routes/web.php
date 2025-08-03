@@ -1,10 +1,14 @@
 <?php
 
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\GuestController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+
+Route::get('/', [GuestController::class, 'index']);
 
 Route::get('/welcome', function () {
     return view('welcome');
@@ -20,4 +24,8 @@ Route::get('/register', function () {
 
 Route::get('/profile', function () {
     return view('profile');
+});
+
+Route::prefix('admin')->middleware('auth')->group(function () {
+    Route::get('/', [CompanyController::class, 'index']);
 });

@@ -39,6 +39,6 @@
             </div>
         </div>
     </div>
-    <script src="{{ asset('js/login.js') }}" defer></script>
+    <script src="{{ asset('js/auth/login.js') }}" defer></script>
 </body>
 </html>

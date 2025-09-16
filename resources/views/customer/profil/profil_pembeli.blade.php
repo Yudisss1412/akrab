@@ -283,5 +283,5 @@
 @endsection
 
 @push('scripts')
-  <script defer src="{{ asset('js/profil_pembeli.js') }}"></script>
+  <script defer src="{{ asset('js/customer/profil/profil_pembeli.js') }}"></script>
 @endpush

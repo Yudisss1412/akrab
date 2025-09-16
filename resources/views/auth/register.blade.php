@@ -52,6 +52,6 @@
         </div>
     </div>
     <!-- Pastikan path ke file JS sudah benar -->
-    <script src="{{ asset('js/register.js') }}" defer></script>
+    <script src="{{ asset('js/auth/register.js') }}" defer></script>
 </body>
 </html>

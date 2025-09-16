@@ -311,7 +311,7 @@
 @endsection
 
 @push('scripts')
-  <script defer src="{{ asset('js/keranjang.js') }}"></script>
+  <script defer src="{{ asset('js/customer/keranjang.js') }}"></script>
   <script>
     // Alert functions
     let alertTimeout;

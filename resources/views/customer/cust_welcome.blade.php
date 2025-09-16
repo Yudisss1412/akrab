@@ -109,6 +109,6 @@
     </div>
 
 
-    <script src="{{ asset('js/cust_welcome.js') }}"></script>
+    <script src="{{ asset('js/customer/cust_welcome.js') }}"></script>
 </body>
 </html>

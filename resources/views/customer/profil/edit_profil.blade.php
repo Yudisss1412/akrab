@@ -84,6 +84,6 @@
     <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
   </main>
 
-  <script src="{{ asset('js/edit_profil.js') }}"></script>
+  <script src="{{ asset('js/customer/profil/edit_profil.js') }}"></script>
 </body>
 </html>

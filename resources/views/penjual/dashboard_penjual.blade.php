@@ -142,6 +142,6 @@
     </div>
   </footer>
 
-  <script src="{{ asset('js/dashboard_penjual.js') }}"></script>
+  <script src="{{ asset('js/penjual/dashboard_penjual.js') }}"></script>
 </body>
 </html>

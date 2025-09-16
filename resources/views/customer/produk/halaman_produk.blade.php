@@ -88,7 +88,7 @@ footer { margin-top: 40px; }
     // Pastikan script produk pakai input navbar (ID sama seperti di cust_welcome)
     window.__AKRAB_SEARCH_INPUT_ID__ = 'navbar-search';
   </script>
-<script defer="" src="{{ asset('js/halaman_produk.js') }}?v=3"></script>
+<script defer="" src="{{ asset('js/customer/produk/halaman_produk.js') }}?v=3"></script>
 <footer class="footer">
 <div class="footer-copyright">
 <span>©</span> Akrab Banyuwangi

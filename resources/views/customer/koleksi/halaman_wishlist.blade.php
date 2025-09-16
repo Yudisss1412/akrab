@@ -43,5 +43,5 @@
 @endsection
 
 @push('scripts')
-  <script defer src="{{ asset('js/halaman_wishlist.js') }}"></script>
+  <script defer src="{{ asset('js/customer/koleksi/halaman_wishlist.js') }}"></script>
 @endpush

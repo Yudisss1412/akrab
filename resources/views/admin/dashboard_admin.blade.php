@@ -62,6 +62,6 @@
     </div>
   </footer>
 
-  <script src="{{ asset('js/dashboard_admin.js') }}"></script>
+  <script src="{{ asset('js/admin/dashboard_admin.js') }}"></script>
 </body>
 </html>

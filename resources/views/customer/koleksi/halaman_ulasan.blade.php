@@ -128,6 +128,6 @@
     </template>
   </main>
 
-  <script src="{{ asset('js/halaman_ulasan.js') }}"></script>
+  <script src="{{ asset('js/customer/koleksi/halaman_ulasan.js') }}"></script>
 </body>
 </html>

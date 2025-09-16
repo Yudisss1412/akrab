@@ -167,6 +167,6 @@
     </div>
   </footer>
 
-  <script src="{{ asset('js/profil_penjual.js') }}"></script>
+  <script src="{{ asset('js/penjual/profil_penjual.js') }}"></script>
 </body>
 </html>

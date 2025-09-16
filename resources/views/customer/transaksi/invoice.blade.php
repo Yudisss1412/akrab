@@ -172,6 +172,6 @@
     </section>
   </main>
 
-  <script src="{{ asset('js/invoice.js') }}"></script>
+  <script src="{{ asset('js/customer/transaksi/invoice.js') }}"></script>
 </body>
 </html>

@@ -126,5 +126,5 @@
 @endsection
 
 @push('scripts')
-  <script defer src="{{ asset('js/produk_detail.js') }}"></script>
+  <script defer src="{{ asset('js/customer/produk/produk_detail.js') }}"></script>
 @endpush

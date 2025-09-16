@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
         registerFormBox.style.transform = 'scale(0.9)';
 
         setTimeout(() => {
-            window.location.href = '/login'; 
+            window.location.href = '/cust_welcome'; 
         }, 500);
     });
 });

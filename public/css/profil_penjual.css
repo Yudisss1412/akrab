@@ -1,0 +1,317 @@
+/* ==========================================================================
+   THEME / TOKENS
+   ========================================================================== */
+:root{
+  --primary-color:         #a8d5c9;
+  --primary-color-dark:    #006E5C;
+  --secondary-color:       #FFFFFF;
+  --background-color:      #f8f9fa;
+  --border-color:          #e9ecef;
+
+  --text-dark:             #233138;
+  --text-muted:            #6c757d;
+
+  --radius-lg:             16px;
+  --radius-md:             12px;
+  --radius-sm:             8px;
+
+  --gap-lg:                1.5rem;
+  --gap-md:                1rem;
+  --gap-sm:                .5rem;
+
+  --btn-brd:               1.5px;
+}
+
+/* ==========================================================================
+   RESET & BASE
+   ========================================================================== */
+*{ box-sizing: border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  font-family: Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+  color: var(--text-dark);
+  background: var(--background-color);
+}
+
+/* ==========================================================================
+   HEADER (Navbar)
+   ========================================================================== */
+.header{
+  position: sticky; top:0; z-index:1000;
+  height:78px;
+  display:flex; align-items:center; justify-content:space-between;
+  background: var(--secondary-color);
+  border-bottom:1px solid var(--border-color);
+  padding: 0 2.2rem;
+}
+.header-left .logo{ height:54px; width:auto; display:block; }
+.header-center{ flex:1; display:flex; justify-content:center; padding:0 1rem; }
+
+.header-right .profile-ico{
+  display:grid; place-items:center;
+  width:40px; height:40px; border-radius:999px;
+  border:1px solid var(--border-color); background:#fff;
+  box-shadow: 0 8px 18px rgba(0,0,0,.06);
+}
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
+.footer{
+  width:100%;
+  background: var(--secondary-color);
+  border-top:1px solid var(--border-color);
+  min-height:56px;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.9rem 2rem;
+}
+.footer-copyright{ color:var(--primary-color-dark); font-size:12.5px; }
+.social-icons-container{ display:flex; align-items:center; justify-content:center; }
+.social-icons-background{
+  background: var(--primary-color-dark);
+  border-radius:999px;
+  height:36px; min-width:150px;
+  display:flex; align-items:center; justify-content:space-evenly;
+  padding:0 .6rem;
+}
+.social-icon{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:26px; height:26px; border-radius:50%;
+  color:#F5F5F5; text-decoration:none; font-weight:600; font-size:.86rem;
+}
+
+/* ==========================================================================
+   LAYOUT
+   ========================================================================== */
+.content{ padding: var(--gap-lg); }
+.card{
+  background:#fff;
+  border:1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--gap-md);
+}
+.card-title{ margin:0; font-size:1.15rem; }
+
+/* ==========================================================================
+   BUTTONS
+   ========================================================================== */
+.btn,
+a.btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  text-decoration:none; text-align:center;
+  border: var(--btn-brd) solid var(--primary-color-dark);
+  color: var(--primary-color-dark);
+  background:#fff;
+  padding:.55rem .9rem;
+  border-radius: var(--radius-sm);
+  cursor:pointer;
+}
+.btn-sm{ padding:.35rem .6rem; font-size:.9rem; }
+.btn-primary{ background:var(--primary-color-dark); color:#fff; }
+.btn-ghost{ background:#fff; }
+
+/* ==========================================================================
+   PROFIL PENJUAL
+   ========================================================================== */
+.card-profile{ display:flex; flex-direction:column; gap: var(--gap-md); }
+
+/* bar profil: kiri = identitas, kanan = aksi */
+.seller-hero{
+  display:flex; align-items:center; gap:1rem; flex-wrap:wrap;
+  justify-content: space-between; /* dorong tombol ke kanan */
+}
+.seller-identity{ display:flex; align-items:center; gap:1rem; }
+.profile-actions{ margin-left:auto; }
+
+.avatar{
+  width:56px; height:56px; border-radius:999px;
+  display:grid; place-items:center; font-weight:800;
+  background:#e6f6f1; color:#0a5f51; position:relative;
+}
+.avatar .dot{
+  position:absolute; right:-2px; bottom:-2px; width:12px; height:12px;
+  border-radius:999px; border:2px solid #fff; background:#9ca3af;
+}
+.avatar .online{ background:#10b981; }
+.seller-meta .seller-name{ font-weight:700; font-size:1.05rem; }
+.seller-meta .seller-mail,
+.seller-meta .seller-since{ color:var(--text-muted); font-size:.94rem; }
+
+.info-list{ margin:.2rem 0 0; }
+.info-list dt{ font-weight:600; }
+.info-list dd{ margin:0; color:var(--text-muted); }
+.info-list > div{
+  display:flex; align-items:center; justify-content:space-between; gap:.75rem;
+  padding:.4rem 0; border-bottom:1px dashed #eceff1;
+}
+.info-list > div:last-child{ border-bottom:none; }
+
+@media (max-width:600px){
+  .seller-hero{ gap:.75rem; }
+  .info-list > div{ flex-direction:column; align-items:flex-start; gap:.25rem; }
+}
+
+/* ==========================================================================
+   RIWAYAT PESANAN
+   ========================================================================== */
+.orders-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:.6rem; }
+.orders-head-hint{ color:var(--text-muted); font-size:.92rem; }
+
+.orders-viewport{ max-height:710px; overflow:auto; padding-right:.25rem; }
+.order-card{
+  border:1px solid var(--border-color); border-radius: var(--radius-lg);
+  padding:1rem; background:#fff; margin-bottom:.9rem;
+}
+.order-head{ display:flex; align-items:center; justify-content:space-between; gap:.75rem; margin-bottom:.6rem; }
+.shop-name{ font-weight:700; }
+.order-meta{ display:flex; align-items:center; gap:.5rem; }
+
+.order-items{ display:flex; flex-direction:column; gap:.75rem; margin-bottom:.8rem; }
+.order-item{ display:grid; grid-template-columns:80px 1fr; gap:.7rem; }
+.item-img{ width:80px; height:80px; border-radius:12px; object-fit:cover; }
+.item-body{ display:flex; flex-direction:column; gap:.4rem; }
+.item-row{ display:flex; align-items:center; justify-content:space-between; }
+.item-name{ font-weight:600; }
+.item-qty{ color:var(--text-muted); }
+.item-desc.scrollable{
+  max-height:72px; overflow:auto; border:1px dashed #e5eaef;
+  padding:.45rem .55rem; border-radius:.5rem; background:#fafcfd;
+}
+.item-subtotal{ font-weight:700; }
+
+.order-actions{
+  display:flex; align-items:center; justify-content:space-between; gap:.75rem; flex-wrap:wrap;
+  padding-top:.6rem; border-top:1px solid #f0f2f4;
+}
+.total-price{ font-weight:800; }
+
+@media (max-width:640px){
+  .order-item{ grid-template-columns:64px 1fr; }
+  .item-img{ width:64px; height:64px; }
+}
+
+/* ==========================================================================
+   RIWAYAT ULASAN
+   ========================================================================== */
+.reviews-section{ margin-top: var(--gap-lg); }
+.reviews-viewport{
+  max-height: 300px; /* akan di-clamp ke tinggi 1 kartu via JS */
+  overflow-y: auto;
+  display: grid;
+  gap: .9rem;
+  padding-right: .25rem;
+}
+.review-card{ border:1px solid var(--border-color); border-radius: var(--radius-lg); background:#fff; }
+.rev-stars{ display:flex; gap:.2rem; }
+.rev-stars .star{ width:18px; height:18px; fill:#e3e7ef; }
+.rev-stars .star.filled{ fill:#F6C000; }
+
+/* ==========================================================================
+   SCROLLBAR (WebKit)
+   ========================================================================== */
+.orders-viewport::-webkit-scrollbar,
+.reviews-viewport::-webkit-scrollbar{ width:8px; }
+.orders-viewport::-webkit-scrollbar-thumb,
+.reviews-viewport::-webkit-scrollbar-thumb{
+  background:#d9e3df; border-radius:8px;
+}
+
+/* --- Modal Detail Transaksi --- */
+/* --- Modal Detail Transaksi (LIGHT) --- */
+.modal{
+  position:fixed; inset:0; z-index:1200;
+  display:flex; align-items:center; justify-content:center;
+  padding:16px;
+}
+.modal.hidden{ display:none; }
+.modal-backdrop{
+  position:absolute; inset:0;
+  background: rgba(0,0,0,.25);
+  backdrop-filter: blur(2px);
+}
+.modal-card{
+  position:relative; z-index:1;
+  width:min(720px,100%); max-height:90vh; overflow:auto;
+
+  /* ⬇️ versi terang */
+  background: var(--secondary-color);
+  color: var(--text-dark);
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 18px 48px rgba(0,0,0,.12);
+  padding: 20px 22px;
+}
+.modal-title{ margin:0 0 6px; font-size:18px; font-weight:700; }
+.modal-sub{ margin:0 0 14px; color: var(--text-muted); font-size:13px; }
+
+/* Badge status (opsional, gunakan class tambahan: .badge--done/--ship/--proc/--fail) */
+.badge{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:4px 8px; border-radius:999px; font-size:12px;
+  background:#f6f7f8; color:#374151; border:1px solid var(--border-color);
+}
+.badge--done { background:#ecfdf5; color:#065f46; border-color:#d1fae5; }
+.badge--ship { background:#eff6ff; color:#1e40af; border-color:#dbeafe; }
+.badge--proc { background:#fff7ed; color:#9a3412; border-color:#ffedd5; }
+.badge--fail { background:#fef2f2; color:#991b1b; border-color:#fee2e2; }
+
+/* Deskripsi ringkas */
+.dl{
+  display:grid; grid-template-columns:160px 1fr;
+  gap:8px 14px; font-size:14px;
+}
+.dl dt{ color: var(--text-muted); }
+
+/* Tabel item ringkas (light) */
+.table-mini{
+  width:100%; border-collapse:separate; border-spacing:0 6px;
+  margin:10px 0;
+}
+.table-mini td{
+  background:#fff;
+  border:1px solid var(--border-color);
+  padding:10px; border-radius:10px; color: var(--text-dark);
+}
+.table-mini .thumb{
+  width:48px; height:48px; border-radius:8px; object-fit:cover; margin-right:8px;
+}
+
+/* Actions & close */
+.modal-actions{ display:flex; justify-content:flex-end; gap:8px; margin-top:14px; }
+.modal-close{
+  position:absolute; right:10px; top:10px;
+  border:0; background:transparent; color: var(--text-muted);
+  font-size:22px; cursor:pointer;
+}
+
+/* Inline reply composer (ringan & serasi tema) */
+.reply-composer{
+  border:1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background:#fff;
+  padding: .75rem;
+  margin: .6rem 1rem 1rem;
+}
+.reply-composer__top{ display:flex; justify-content:space-between; align-items:center; gap:.5rem; margin-bottom:.5rem; }
+.reply-composer__chips{ display:flex; flex-wrap:wrap; gap:.4rem; }
+.reply-chip{
+  border:1px solid var(--border-color); background:#fff; border-radius:999px;
+  padding:.25rem .6rem; font-size:.86rem; cursor:pointer;
+}
+.reply-composer textarea{
+  width:100%; min-height:90px; border:1px solid var(--border-color);
+  border-radius: var(--radius-sm); padding:.6rem; font:inherit; resize:vertical;
+}
+.reply-composer__bar{
+  display:flex; align-items:center; justify-content:space-between; gap:.5rem; margin-top:.6rem;
+  flex-wrap:wrap;
+}
+.reply-composer__opts{ display:flex; align-items:center; gap:.75rem; color:var(--text-muted); font-size:.9rem; }
+.reply-counter{ color:var(--text-muted); font-size:.86rem; }
+.reply-actions{ display:flex; gap:.5rem; }
+.seller-reply{
+  border-left:3px solid var(--primary-color-dark);
+  background:#fff; margin: .6rem 1rem 0; padding:.6rem .8rem; border-radius: var(--radius-sm);
+}
+.seller-reply__meta{ color:var(--text-muted); font-size:.86rem; margin-bottom:.25rem; }

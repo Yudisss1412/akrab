@@ -8,27 +8,31 @@
         transform: translateY(0);
     }
 }
+
 @keyframes shake {
     0%, 100% { 
         transform: translateX(0); 
     }
-    10%, 30%, 50%, 70%, 90% {
-        transform: translateX(-50px); 
+    10%, 30%, 50%, 70%, 90% { 
+        transform: translateX(-8px); 
     }
-    20%, 40%, 60%, 80% {
-        transform: translateX(50px); 
+    20%, 40%, 60%, 80% { 
+        transform: translateX(8px); 
     }
 }
+
 @keyframes gradientBG {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
+
 :root {
     --primary-color: #006E5C;
-    --secondary-color: #F5F5F5;
+    --secondary-color: #FFFFFF;
     --dark-text-color: #333;
     --error-color: #D32F2F;
+    --light-gray-color: #F5F5F5;
 }
 
 * {
@@ -41,6 +45,7 @@ body, html {
     height: 100%;
     font-family: 'Poppins', sans-serif;
     background-color: #eef3f2;
+    overflow: hidden;
 }
 
 .login-container {
@@ -51,20 +56,9 @@ body, html {
     justify-content: center;
     padding: 2rem;
     position: relative;
-}
-
-.login-container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('src/bg_landing_page.png');
-    background-size: cover;
-    background-position: center;
-    opacity: 0.2;
-    z-index: 1;
+    background: linear-gradient(45deg, #d4e9e2, #a8d5c9, #eef3f2);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
 }
 
 .login-content {
@@ -78,36 +72,51 @@ body, html {
     padding: 0 5%;
 }
 
+.welcome-text, .login-form-box {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 .welcome-text {
     flex-basis: 50%;
     color: var(--primary-color);
+    padding-right: 2rem;
 }
 
 .welcome-text h1 {
-    font-weight: 500;
+    font-weight: 700;
     font-size: 48px;
     line-height: 1.2;
     margin-bottom: 20px;
 }
 
 .welcome-text p {
-    font-weight: 500;
+    font-weight: 400;
     font-size: 18px;
-    line-height: 1.5;
+    line-height: 1.6;
     max-width: 626px;
-}
-.welcome-text p:first-of-type {
-    margin-bottom: 10px;
 }
 
 .login-form-box {
     width: 387px;
-    min-height: 382px;
-    background-color: rgba(245, 245, 245, 0.5);
+    min-height: 382px; /* Disesuaikan untuk 2 input */
+    background-color: rgba(255, 255, 255, 0.6);
     border-radius: 30px;
     padding: 25px 30px;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+    transition: all 0.5s ease;
+}
+
+.login-form-box.shake {
+    animation: shake 0.5s ease-in-out;
 }
 
 .login-form-box h2 {
@@ -115,11 +124,11 @@ body, html {
     font-size: 40px;
     color: var(--dark-text-color);
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 30px; 
 }
 
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 25px; 
     position: relative;
 }
 
@@ -127,28 +136,45 @@ body, html {
     font-family: 'Poppins', sans-serif;
     font-weight: 400;
     font-size: 15px;
-    color: var(--dark-text-color);
-    display: block;
-    margin-bottom: 5px;
+    color: #666;
+    position: absolute;
+    pointer-events: none;
+    left: 20px;
+    top: 13px;
+    transition: all 0.2s ease;
 }
 
 .form-group input {
     width: 100%;
-    height: 44px;
+    height: 48px;
     border: 1px solid transparent;
     border-radius: 30px;
-    background-color: var(--secondary-color);
+    background-color: var(--light-gray-color);
     padding: 0 20px;
+    padding-top: 14px;
     font-size: 15px;
     transition: border-color 0.3s;
 }
+
 .form-group input:focus {
     outline: none;
     border-color: var(--primary-color);
 }
 
+.form-group input:focus + label,
+.form-group input:not(:placeholder-shown) + label {
+    top: 5px;
+    left: 20px;
+    font-size: 11px;
+    color: var(--primary-color);
+}
+
 .form-group input.invalid {
     border-color: var(--error-color);
+}
+
+.form-group input.invalid + label {
+    color: var(--error-color);
 }
 
 .error-message {
@@ -156,30 +182,42 @@ body, html {
     font-size: 12px;
     font-family: 'Inter', sans-serif;
     padding-left: 15px;
-    padding-top: 3px;
-    display: none;
+    padding-top: 5px;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
 }
 
 .error-message.visible {
-    display: block;
+    max-height: 20px;
+    opacity: 1;
 }
 
 .login-button {
     width: 100%;
-    height: 44px;
+    height: 48px;
     border: none;
     border-radius: 30px;
     background-color: var(--primary-color);
     font-family: 'Poppins', sans-serif;
-    font-weight: 400;
+    font-weight: 500;
     font-size: 20px;
     color: var(--secondary-color);
     cursor: pointer;
-    margin-top: 20px;
-    transition: background-color 0.3s;
+    margin-top: 25px; 
+    transition: all 0.3s ease;
 }
+
 .login-button:hover {
     background-color: #005a4c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 110, 92, 0.3);
+}
+
+.login-button:active {
+    transform: translateY(0);
+    box-shadow: none;
 }
 
 .form-links {
@@ -191,9 +229,15 @@ body, html {
 .form-links a {
     font-family: 'Inter', sans-serif;
     font-weight: 400;
-    font-size: 10px;
+    font-size: 12px;
     color: var(--primary-color);
+    text-decoration: none;
+    transition: opacity 0.3s;
+}
+
+.form-links a:hover {
     text-decoration: underline;
+    opacity: 0.8;
 }
 
 @media (max-width: 992px) {
@@ -204,25 +248,13 @@ body, html {
     }
     .welcome-text {
         flex-basis: auto;
-    }
-    .welcome-text p {
-        max-width: 100%;
+        padding-right: 0;
     }
 }
 
 @media (max-width: 480px) {
-    .welcome-text h1 {
-        font-size: 36px;
-    }
-    .welcome-text p {
-        font-size: 16px;
-    }
-    .login-form-box {
-        width: 100%;
-        max-width: 387px;
-        padding: 20px;
-    }
-    .login-form-box h2 {
-        font-size: 32px;
-    }
+    .welcome-text h1 { font-size: 36px; }
+    .welcome-text p { font-size: 16px; }
+    .login-form-box { width: 100%; padding: 20px; }
+    .login-form-box h2 { font-size: 32px; }
 }

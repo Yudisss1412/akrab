@@ -1,0 +1,188 @@
+/* ====== Variables & base ====== */
+:root{
+  --primary-color:#a8d5c9;
+  --primary-color-dark:#006E5C;
+  --secondary-color:#FFFFFF;
+  --background-color:#f8f9fa;
+  --text-color-light:#f5f5f5;
+  --dark-text-color:#333;
+  --grey-text-color:#555;
+  --border-color:#e9ecef;
+
+  /* cart-specific */
+  --stroke:#e5e7eb;
+  --muted:#6b7280;
+}
+*{box-sizing:border-box}
+body{
+  font-family:'Poppins',system-ui,Segoe UI,Roboto,Arial,sans-serif;
+  background:var(--background-color);
+  color:var(--dark-text-color);
+  min-height:100vh;
+  display:flex;flex-direction:column;
+}
+
+/* ====== OVERRIDE LAYOUT (.shell) AGAR FULL WIDTH KHUSUS HALAMAN INI ====== */
+.shell{
+  /* buka batas lebar layout global */
+  max-width: none !important;
+  width: 100% !important;
+  margin-inline:auto !important;
+  /* top / right-left / bottom (ruang untuk fixed bar) */
+  padding:24px clamp(16px,4vw,32px) 96px !important;
+}
+
+/* ====== Layout khusus halaman cart ====== */
+/* Fokus ke area cart saja */
+.cart-page .container,
+.cart-bar__inner.container{
+  width:100%;
+  max-width:none;           /* <— dari 1200px jadi none agar benar-benar melebar */
+  margin:0;                 /* <— jangan di-center dengan width tetap */
+  padding-inline:clamp(16px,4vw,32px);
+}
+
+/* Jika ada style lain yang mengunci <main>, longgarkan untuk halaman ini */
+.cart-page main{
+  max-width:none;
+  padding-bottom:72px;   /* supaya tidak ketutup bar fixed */
+}
+
+/* Pastikan elemen utama ikut melebar */
+.cart-page .table-head,
+.cart-page .shop-row,
+.cart-page .cart-item{ width:100%; }
+
+/* ====== HEADER (ringkas) ====== */
+.header{
+  background:var(--secondary-color);
+  border-bottom:1px solid var(--border-color);
+  height:78px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 2.5rem;position:sticky;top:0;z-index:1001;
+}
+.header-left .logo{height:54px;width:auto;display:block}
+.header-center{flex:1;display:flex;justify-content:center}
+.header-right{display:flex;gap:1.2rem;align-items:center}
+.header-right a.profile-ico,
+.header-right a.cart-ico{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;color:inherit}
+.search-bar{
+  background:#fff;border:1.5px solid var(--border-color);border-radius:50px;
+  padding:0.7rem 1.2rem 0.7rem 2.8rem;min-width:330px;max-width:460px;width:100%;
+  position:relative;display:flex;align-items:center
+}
+.search-bar input{border:none;background:transparent;outline:none;font-size:1.05rem;width:100%;color:var(--dark-text-color)}
+.search-icon{position:absolute;left:1.05rem;top:50%;transform:translateY(-50%);width:22px;height:22px;color:#aaa}
+
+/* ===== PAGE HEAD ===== */
+.page-head{display:flex;align-items:center;justify-content:space-between;margin:14px 0 10px}
+.page-title{font-size:20px;font-weight:800}
+.bulk-actions{display:flex;align-items:center;gap:14px}
+.check{display:flex;align-items:center;gap:8px;user-select:none}
+.check input{appearance:none;width:18px;height:18px;border:2px solid var(--stroke);border-radius:6px;display:grid;place-items:center}
+.check input:checked{background:var(--primary-color-dark);border-color:var(--primary-color-dark)}
+.link{color:#ef4444;text-decoration:none;font-weight:600;cursor:pointer}
+
+/* ===== Header kolom di atas daftar produk ===== */
+.table-head{
+  display:grid;grid-template-columns:24px 96px 1fr auto auto auto 40px;
+  gap:12px;align-items:center;color:#6b7280;
+  padding:10px 12px;margin-bottom:8px;border-bottom:1px solid var(--stroke)
+}
+.th{font-weight:700}
+.th-check,.th-thumb{width:0}
+
+/* ===== Toko row ===== */
+.shop-row{display:flex;align-items:center;gap:8px;margin:10px 0 8px}
+.shop-badge{background:#ff4d4f;color:#fff;padding:2px 8px;border-radius:6px;font-size:12px}
+.shop-name{font-weight:700}
+
+/* ===== Card item (ukuran konsisten) ===== */
+.cart-item{
+  display:grid;
+  grid-template-columns:24px 96px 1fr auto auto auto 40px;
+  gap:12px;
+  align-items:center;
+  padding:16px 14px;
+  border:1px solid var(--stroke);
+  border-radius:16px;
+  background:#fff;
+  min-height:120px;
+}
+.cart-item+.cart-item{margin-top:14px}
+
+.thumb{
+  width:96px;height:96px;object-fit:cover;border-radius:12px;border:1px solid var(--stroke);background:#fff;
+}
+.meta{display:flex;flex-direction:column;justify-content:center;gap:6px}
+.title{margin:0;font-size:15px;line-height:1.3}
+.variant{font-size:12px;color:var(--muted)}
+.price-each{font-weight:800;font-size:14px}
+
+.qty{display:flex;align-items:center;justify-content:center;gap:6px}
+.qty-btn{
+  width:30px;height:30px;border:1px solid var(--stroke);background:#fff;border-radius:8px;cursor:pointer;
+}
+.qty-input{
+  width:58px;height:32px;border:1px solid var(--stroke);border-radius:8px;text-align:center;font-weight:700;
+}
+.total{font-weight:800;font-size:14px;text-align:center}
+.trash{
+  background:#fff;border:1px solid var(--stroke);border-radius:10px;width:38px;height:38px;
+  display:grid;place-items:center;color:#ef4444;cursor:pointer;
+}
+
+/* ===== Fixed bottom bar (Checkout) ===== */
+.cart-bar{
+  position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--border-color);
+  box-shadow:0 -6px 22px rgba(0,0,0,.05);z-index:1000;
+}
+.cart-bar.at-end{position:static;left:auto;right:auto;bottom:auto;box-shadow:none;border-top:0;margin-top:12px}
+.cart-bar__inner{display:flex;align-items:center;gap:16px;padding:12px 16px}
+.cart-bar__total{margin-left:auto;display:flex;align-items:center;gap:10px;font-weight:700}
+.btn-checkout{padding:12px 16px;border:none;border-radius:12px;background:linear-gradient(90deg,var(--primary-color-dark),#10b981);color:#fff;font-weight:800;cursor:pointer}
+.cart-bottom-spacer{height:72px}
+.cart-bottom-spacer.is-end{height:0}
+
+/* ===== FOOTER ===== */
+.footer{
+  min-height:40px;background:var(--secondary-color);color:var(--primary-color-dark);
+  display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;
+  width:100%;border-top:1px solid var(--border-color);box-sizing:border-box;position:static;left:0;bottom:0;z-index:100;
+}
+.footer-copyright,.footer-privacy a{color:var(--primary-color-dark);font-size:12px}
+.social-icons-background{width:140px;height:32px;border-radius:16px;background:var(--primary-color-dark);display:flex;justify-content:space-around;align-items:center;padding:0 10px}
+.social-icon svg{width:20px;height:20px;fill:#fff}
+
+/* ===== Responsive ===== */
+@media (max-width:900px){
+  .search-bar{min-width:0;max-width:none;width:100%}
+  .table-head{display:none}
+  .cart-item{
+    grid-template-columns:20px 72px 1fr;
+    grid-template-areas:
+      "c t meta"
+      "c t price"
+      "c t qty"
+      "c t total"
+      "c t del";
+  }
+  .cart-item .item-check{grid-area:c}
+  .thumb{grid-area:t;width:72px;height:72px}
+  .meta{grid-area:meta}
+  .desktop-only{display:none}
+  .mobile-only{display:block}
+  .qty{grid-area:qty;margin-top:4px}
+  .total{grid-area:total;margin-top:4px}
+  .trash{grid-area:del;margin-top:4px}
+}
+
+/* ===== Modal warning ===== */
+.modal-overlay{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.45);z-index:1100}
+.modal-overlay.is-open{display:grid}
+.modal{
+  width:min(540px,92vw);background:#fff;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.25);
+  padding:18px;border:1px solid var(--border-color);
+}
+.modal-title{margin:8px 6px 16px;font-weight:600;font-size:16px;color:#333;text-align:center}
+.modal-actions{display:flex;justify-content:center}
+.modal-ok{min-width:180px;padding:12px 16px;border:none;border-radius:8px;background:#ef4422;color:#fff;font-weight:700;cursor:pointer}

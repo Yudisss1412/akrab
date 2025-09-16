@@ -1,0 +1,58 @@
+:root{
+  --primary-color:#a8d5c9;
+  --primary-color-dark:#006E5C;
+  --secondary-color:#fff;
+  --border-color:#e9ecef;
+  --bg:#f8f9fa;
+  --text:#333;
+}
+*{box-sizing:border-box}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);margin:0;}
+
+/* header (copas cust_welcome) */
+.header{background:#fff;border-bottom:1px solid var(--border-color);height:78px;
+  display:flex;align-items:center;justify-content:space-between;padding:0 2rem;position:sticky;top:0;z-index:100}
+.header-left .logo{height:54px}
+.header-center{flex:1;display:flex;justify-content:center}
+.search-bar{background:#fff;border:1.5px solid var(--border-color);border-radius:50px;
+  padding:0.7rem 1.2rem 0.7rem 2.8rem;min-width:330px;max-width:460px;width:100%;position:relative;display:flex;align-items:center}
+.search-bar input{border:none;outline:none;width:100%}
+.search-icon{position:absolute;left:1rem;width:20px;height:20px;color:#aaa}
+.header-right{display:flex;gap:1rem;align-items:center}
+
+/* container */
+.container{max-width:1100px;margin:auto;padding:20px}
+
+/* checkout sections */
+.checkout-section{background:#fff;border:1px solid var(--border-color);border-radius:12px;margin-bottom:20px;padding:18px}
+.checkout-section h2{font-size:1.1rem;margin:0 0 12px;font-weight:600;color:var(--primary-color-dark)}
+
+/* alamat */
+.address .address-box{display:flex;justify-content:space-between;align-items:flex-start}
+.address .ubah{color:#007bff;font-size:0.9rem;text-decoration:none}
+
+/* produk */
+.product-row{display:flex;align-items:center;gap:12px;border-top:1px solid var(--border-color);padding:12px 0}
+.product-row:first-child{border-top:none}
+.product-row img{width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--border-color)}
+.product-row .info{flex:1}
+.product-row .title{font-weight:600}
+.product-row .variant{font-size:0.9rem;color:#666;margin:4px 0}
+.product-row .price{font-size:0.95rem}
+.subtotal{font-weight:600}
+
+/* metode pembayaran */
+.methods{display:flex;flex-wrap:wrap;gap:10px}
+.methods button{padding:10px 16px;border:1px solid var(--border-color);background:#fafafa;border-radius:8px;cursor:pointer;font-weight:500}
+.methods button:hover{border-color:var(--primary-color-dark);color:var(--primary-color-dark)}
+
+/* ringkasan */
+.summary .row{display:flex;justify-content:space-between;margin:6px 0;font-size:0.95rem}
+.summary .row.total{font-size:1.05rem;font-weight:700;color:#c00}
+.btn-order{margin-top:14px;width:100%;padding:14px;border:none;border-radius:10px;
+  background:var(--primary-color-dark);color:#fff;font-weight:700;cursor:pointer;font-size:1rem}
+
+/* footer */
+.footer{min-height:40px;background:#fff;color:var(--primary-color-dark);display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;border-top:1px solid var(--border-color)}
+.footer-privacy a{color:var(--primary-color-dark);font-size:12px}
+.social-icons-background{display:flex;gap:10px}

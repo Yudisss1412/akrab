@@ -13,21 +13,21 @@
     <div class="login-container">
         <div class="login-content">
             <div class="welcome-text">
-                <h1>Selamat Datang Kembali!</h1>
+                <h1>Selamat Datang<br>Kembali!</h1>
                 <p>Akses akunmu untuk mulai menjelajahi produk UMKM terbaik dari seluruh Indonesia.</p>
                 <p>Belanja langsung dari para pelaku usaha lokal dengan mudah dan aman.</p>
             </div>
             <div class="login-form-box">
-                <h2>Selamat Datang</h2>
+                <h2>Silahkan Masuk</h2>
                 <form id="loginForm" novalidate>
                     <div class="form-group">
+                        <input type="email" id="email" name="email" required placeholder=" ">
                         <label for="email">Email</label>
-                        <input type="email" id="email" name="email" required>
                         <p class="error-message" id="email-error"></p>
                     </div>
                     <div class="form-group">
+                        <input type="password" id="password" name="password" required placeholder=" ">
                         <label for="password">Password</label>
-                        <input type="password" id="password" name="password" required>
                         <p class="error-message" id="password-error"></p>
                     </div>
                     <button type="submit" class="login-button">Masuk</button>
@@ -37,9 +37,8 @@
                     </div>
                 </form>
             </div>
-
         </div>
     </div>
-    <script src="js/login.js"></script>
+    <script src="js/login.js" defer></script>
 </body>
 </html>

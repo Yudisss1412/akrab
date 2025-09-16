@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Checkout</title>
-  <link rel="stylesheet" href="css/checkout.css"/>
+  <link rel="stylesheet" href="{{ asset('css/customer/transaksi/checkout.css') }}"/>
 </head>
 <body>
 
@@ -113,6 +113,6 @@
             </div>
         </footer> -->
 
-  <script src="js/checkout.js"></script>
+  <script src="{{ asset('js/checkout.js') }}"></script>
 </body>
 </html>

@@ -8,7 +8,7 @@
 @endsection
 
 @push('styles')
-  <link rel="stylesheet" href="{{ asset('css/keranjang.css') }}" />
+  <link rel="stylesheet" href="{{ asset('css/customer/keranjang.css') }}" />
   <style>
     .shell{
       max-width: none !important;   /* <— dari 1200px jadi tidak dibatasi */

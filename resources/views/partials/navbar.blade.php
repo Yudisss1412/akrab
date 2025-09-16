@@ -1,7 +1,7 @@
         <header class="header">
             <div class="header-left">
                 <a href="{{ route('cust.welcome') }}">
-                    <img src="src/Logo_UMKM.png" class="logo" alt="Logo UMKM">
+                    <img src="{{ asset('src/Logo_UMKM.png') }}" class="logo" alt="Logo UMKM">
                 </a>
             </div>
             <div class="header-center">

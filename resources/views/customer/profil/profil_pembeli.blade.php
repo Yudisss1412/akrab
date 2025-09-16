@@ -8,7 +8,7 @@
 @endsection
 
 @push('styles')
-  <link rel="stylesheet" href="{{ asset('css/profil_pembeli.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/customer/profil/profil_pembeli.css') }}">
 @endpush
 
 @section('content')

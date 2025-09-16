@@ -5,14 +5,14 @@
   <title>Profil Penjual — AKRAB</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/profil_penjual.css">
+  <link rel="stylesheet" href="{{ asset('css/penjual/profil_penjual.css') }}">
 </head>
 <body>
   <!-- NAVBAR minimal ala AKRAB -->
   <header class="header" role="banner">
     <div class="header-left">
       <a href="{{ route('welcome') }}" aria-label="Ke beranda">
-        <img class="logo" src="/src/Logo_UMKM.png" alt="AKRAB">
+        <img class="logo" src="{{ asset('src/Logo_UMKM.png') }}" alt="AKRAB">
       </a>
     </div>
 
@@ -167,6 +167,6 @@
     </div>
   </footer>
 
-  <script src="/js/profil_penjual.js"></script>
+  <script src="{{ asset('js/profil_penjual.js') }}"></script>
 </body>
 </html>

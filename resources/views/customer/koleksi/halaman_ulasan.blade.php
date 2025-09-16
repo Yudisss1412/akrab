@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Penilaian Saya — Riwayat Ulasan</title>
-  <link rel="stylesheet" href="css/halaman_ulasan.css" />
+  <link rel="stylesheet" href="{{ asset('css/customer/koleksi/halaman_ulasan.css') }}" />
   <link rel="icon" href="data:," />
 </head>
 <body>
@@ -128,6 +128,6 @@
     </template>
   </main>
 
-  <script src="js/halaman_ulasan.js"></script>
+  <script src="{{ asset('js/halaman_ulasan.js') }}"></script>
 </body>
 </html>

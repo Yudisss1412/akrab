@@ -5,7 +5,7 @@
   <title>Admin Dashboard — AKRAB</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ asset('css/dashboard_admin.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/admin/dashboard_admin.css') }}">
 </head>
 <body>
   <!-- NAVBAR -->
@@ -13,7 +13,7 @@
     <div class="ak-navbar__inner">
       <div class="cw-left">
         <a href="{{ route('welcome') }}" aria-label="Ke beranda">
-          <img class="ak-logo" src="/src/Logo_UMKM.png" alt="AKRAB">
+          <img class="ak-logo" src="{{ asset('src/Logo_UMKM.png') }}" alt="AKRAB">
         </a>
         <h1 class="cw-title">Admin Dashboard</h1>
       </div>

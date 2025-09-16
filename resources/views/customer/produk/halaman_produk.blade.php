@@ -13,7 +13,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
 
   {{-- CSS khusus halaman produk (berisi style navbar+footer yang match cust_welcome) --}}
-  <link href="{{ asset('css/halaman_produk.css') }}?v=3" rel="stylesheet"/>
+  <link href="{{ asset('css/customer/produk/halaman_produk.css') }}?v=3" rel="stylesheet"/>
 <style>
 /* Scoped header/footer normalizer (drop-in) */
 .header img.logo, header .logo, .brand img, .navbar img.logo { max-height: 40px; height:auto; width:auto; }
@@ -22,7 +22,7 @@ footer { margin-top: 40px; }
 <body><header class="header">
 <div class="header-left">
 <a href="{{ route('cust.welcome') }}">
-<img alt="Logo UMKM" class="logo" src="src/Logo_UMKM.png"/>
+<img alt="Logo UMKM" class="logo" src="{{ asset('src/Logo_UMKM.png') }}"/>
 </a>
 </div>
 <div class="header-center">

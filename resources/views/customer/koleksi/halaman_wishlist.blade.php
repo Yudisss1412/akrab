@@ -8,7 +8,7 @@
 @endsection
 
 @push('styles')
-  <link rel="stylesheet" href="{{ asset('css/halaman_wishlist.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/customer/koleksi/halaman_wishlist.css') }}">
 @endpush
 
 @section('content')

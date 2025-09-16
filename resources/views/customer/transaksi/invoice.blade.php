@@ -5,7 +5,7 @@
   <title>Invoice — AKRAB</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/invoice.css">
+  <link rel="stylesheet" href="{{ asset('css/customer/transaksi/invoice.css') }}">
 </head>
 <body>
   <header class="ak-header">
@@ -172,6 +172,6 @@
     </section>
   </main>
 
-  <script src="/js/invoice.js"></script>
+  <script src="{{ asset('js/invoice.js') }}"></script>
 </body>
 </html>

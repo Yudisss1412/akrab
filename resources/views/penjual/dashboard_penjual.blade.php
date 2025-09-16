@@ -5,14 +5,14 @@
   <title>Manajemen Produk — AKRAB</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/dashboard_penjual.css">
+  <link rel="stylesheet" href="{{ asset('css/penjual/dashboard_penjual.css') }}">
 </head>
 <body>
 
   <!-- HEADER ala cust_welcome -->
   <header class="ak-navbar">
     <div class="ak-navbar__inner">
-      <img class="ak-logo" src="/src/Logo_UMKM.png" alt="AKRAB" />
+      <img class="ak-logo" src="{{ asset('src/Logo_UMKM.png') }}" alt="AKRAB" />
       <div class="header-right">
         <a class="profile-ico" href="{{ route('profil.penjual') }}" aria-label="Profil Penjual">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -142,6 +142,6 @@
     </div>
   </footer>
 
-  <script src="/js/dashboard_penjual.js"></script>
+  <script src="{{ asset('js/dashboard_penjual.js') }}"></script>
 </body>
 </html>

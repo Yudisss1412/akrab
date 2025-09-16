@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Edit Profil</title>
-  <link rel="stylesheet" href="css/edit_profil.css">
+  <link rel="stylesheet" href="{{ asset('css/customer/profil/edit_profil.css') }}">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -84,6 +84,6 @@
     <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
   </main>
 
-  <script src="js/edit_profil.js"></script>
+  <script src="{{ asset('js/edit_profil.js') }}"></script>
 </body>
 </html>

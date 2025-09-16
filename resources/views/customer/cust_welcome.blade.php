@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Selamat Datang - UMKM AKRAB</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/cust_welcome.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/customer/cust_welcome.css') }}">
 </head>
 <body>
     <script>
@@ -16,7 +16,7 @@
         <header class="header">
             <div class="header-left">
                 <a href="{{ route('cust.welcome') }}">
-                    <img src="src/Logo_UMKM.png" class="logo" alt="Logo UMKM">
+                    <img src="{{ asset('src/Logo_UMKM.png') }}" class="logo" alt="Logo UMKM">
                 </a>
             </div>
             <div class="header-center">
@@ -109,6 +109,6 @@
     </div>
 
 
-    <script src="js/cust_welcome.js"></script>
+    <script src="{{ asset('js/cust_welcome.js') }}"></script>
 </body>
 </html>

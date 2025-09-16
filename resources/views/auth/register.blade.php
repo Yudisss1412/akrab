@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&family=Inter:wght@400&display=swap" rel="stylesheet">
     <!-- Pastikan path ke file CSS sudah benar -->
-    <link rel="stylesheet" href="css/register.css">
+    <link rel="stylesheet" href="{{ asset('css/auth/register.css') }}">
 </head>
 <body>
     <div class="register-container">
@@ -52,6 +52,6 @@
         </div>
     </div>
     <!-- Pastikan path ke file JS sudah benar -->
-    <script src="js/register.js" defer></script>
+    <script src="{{ asset('js/register.js') }}" defer></script>
 </body>
 </html>

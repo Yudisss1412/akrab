@@ -3,7 +3,7 @@
 @section('title', ($produk->nama ?? request('nama') ?? 'Detail Produk').' — AKRAB')
 
 @push('styles')
-  <link rel="stylesheet" href="{{ asset('css/produk_detail.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/customer/produk/produk_detail.css') }}">
 @endpush
 
 @section('content')

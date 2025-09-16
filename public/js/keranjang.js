@@ -101,6 +101,17 @@
     el.classList.remove('is-open');
     el.setAttribute('aria-hidden', 'true');
   }
+  
+  // ===== Alert =====
+  function showAlert(title, message, type = 'success', duration = 3000){
+    // Cek apakah fungsi showAlert sudah didefinisikan di halaman (dari blade)
+    if(typeof window.showAlert === 'function'){
+      window.showAlert(title, message, type, duration);
+    } else {
+      // Fallback ke alert browser jika tidak ada
+      alert(title + ': ' + message);
+    }
+  }
 
   // ===== Apply/Update State <-> DOM =====
   function applyStateToDOM(){
@@ -161,6 +172,7 @@
     if (row && e.target.closest('.trash')) {
       removeFromState(row); saveState(state);
       row.remove(); recalcSummary(); setSelectAllState();
+      showAlert('Berhasil', 'Produk berhasil dihapus dari keranjang!', 'success');
     }
 
     // select all (atas & bawah)
@@ -176,7 +188,7 @@
 
     // hapus massal
     if (e.target.id === 'bulkDelete') {
-      const selected = $$('.cart-item .item-check:checked');
+      const selected = $('.cart-item .item-check:checked');
       if (!selected.length){ openModal('emptyModal'); return; }
       selected.forEach(cb => {
         const r = cb.closest('.cart-item');
@@ -185,21 +197,29 @@
       });
       saveState(state);
       recalcSummary(); setSelectAllState();
+      showAlert('Berhasil', 'Produk terpilih berhasil dihapus dari keranjang!', 'success');
     }
 
     // === Checkout ===
     if (e.target.id === 'checkout') {
       const anySelected = !!document.querySelector('.cart-item .item-check:checked');
-      if (!anySelected) { openModal('emptyModal'); return; }
+      if (!anySelected) { 
+        // openModal('emptyModal'); 
+        showAlert('Peringatan', 'Anda belum memilih produk untuk checkout', 'warning');
+        return; 
+      }
       // gunakan data-href jika disediakan di blade; fallback ke /checkout
       const href = e.target.dataset?.href || "/checkout";
-      window.location.href = href;
+      showAlert('Proses Checkout', 'Mengarahkan ke halaman checkout...', 'success', 0); // 0 = tidak otomatis hilang
+      setTimeout(() => {
+        window.location.href = href;
+      }, 1000);
     }
 
     // tutup modal: klik OK atau overlay
-    if (e.target.id === 'emptyOk' || (e.target.classList.contains('modal-overlay') && e.target.id === 'emptyModal')) {
-      closeModal('emptyModal');
-    }
+    // if (e.target.id === 'emptyOk' || (e.target.classList.contains('modal-overlay') && e.target.id === 'emptyModal')) {
+    //   closeModal('emptyModal');
+    // }
   });
 
   document.addEventListener('keydown', e=>{

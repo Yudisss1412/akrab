@@ -38,11 +38,107 @@
           ganti max-width:none di atas jadi:
           max-width: 1600px; margin-inline:auto;
        tapi sesuai permintaan: full lebar layar. */
+       
+    /* Alert styling - centered */
+    .alert {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1100;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      padding: 24px;
+      min-width: 300px;
+      max-width: 90%;
+      text-align: center;
+      border: 1px solid var(--stroke);
+      display: none;
+    }
+    
+    .alert.show {
+      display: block;
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    .alert-success {
+      border-left: 4px solid #10b981;
+    }
+    
+    .alert-error {
+      border-left: 4px solid #ef4444;
+    }
+    
+    .alert-warning {
+      border-left: 4px solid #f59e0b;
+    }
+    
+    .alert h3 {
+      margin-top: 0;
+      margin-bottom: 12px;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--dark-text-color);
+    }
+    
+    .alert p {
+      margin: 0 0 20px;
+      color: var(--grey-text-color);
+      line-height: 1.5;
+    }
+    
+    .alert .alert-close {
+      background: var(--primary-color-dark);
+      color: white;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .alert .alert-close:hover {
+      background: #004d40;
+    }
+    
+    .alert-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.4);
+      z-index: 1099;
+      display: none;
+    }
+    
+    .alert-overlay.show {
+      display: block;
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
   </style>
 @endpush
 
 @section('content')
-  <!-- Modal: belum memilih produk -->
+  <!-- Alert Overlay -->
+  <div class="alert-overlay" id="alertOverlay"></div>
+  
+  <!-- Alert Box -->
+  <div class="alert" id="alertBox">
+    <h3 id="alertTitle">Notifikasi</h3>
+    <p id="alertMessage">Ini adalah pesan alert.</p>
+    <button class="alert-close" id="alertClose">OK</button>
+  </div>
+
+  <!-- Modal: belum memilih produk (TIDAK DIGUNAKAN LAGI - diganti dengan alert centered) -->
+  <!--
   <div id="emptyModal" class="modal-overlay" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="emptyTitle">
       <p id="emptyTitle" class="modal-title">Anda belum memilih produk untuk checkout</p>
@@ -51,6 +147,7 @@
       </div>
     </div>
   </div>
+  -->
 
   <!-- ===== MAIN (Cart) ===== -->
   <div class="cart-page">
@@ -215,4 +312,64 @@
 
 @push('scripts')
   <script defer src="{{ asset('js/keranjang.js') }}"></script>
+  <script>
+    // Alert functions
+    let alertTimeout;
+    
+    function showAlert(title, message, type = 'success', duration = 3000) {
+      // Clear any existing timeout
+      if (alertTimeout) clearTimeout(alertTimeout);
+      
+      const alertBox = document.getElementById('alertBox');
+      const alertTitle = document.getElementById('alertTitle');
+      const alertMessage = document.getElementById('alertMessage');
+      const alertOverlay = document.getElementById('alertOverlay');
+      
+      // Set content
+      alertTitle.textContent = title;
+      alertMessage.textContent = message;
+      
+      // Set type
+      alertBox.className = 'alert';
+      if (type === 'error') {
+        alertBox.classList.add('alert-error');
+      } else if (type === 'warning') {
+        alertBox.classList.add('alert-warning');
+      } else {
+        alertBox.classList.add('alert-success');
+      }
+      
+      // Show alert
+      alertBox.classList.add('show');
+      alertOverlay.classList.add('show');
+      
+      // Auto hide after duration
+      if (duration > 0) {
+        alertTimeout = setTimeout(hideAlert, duration);
+      }
+    }
+    
+    function hideAlert() {
+      const alertBox = document.getElementById('alertBox');
+      const alertOverlay = document.getElementById('alertOverlay');
+      
+      alertBox.classList.remove('show');
+      alertOverlay.classList.remove('show');
+      
+      // Clear timeout
+      if (alertTimeout) {
+        clearTimeout(alertTimeout);
+        alertTimeout = null;
+      }
+    }
+    
+    // Event listeners
+    document.getElementById('alertClose').addEventListener('click', hideAlert);
+    document.getElementById('alertOverlay').addEventListener('click', hideAlert);
+    
+    // Example: Show alert on page load (can be removed)
+    // document.addEventListener('DOMContentLoaded', function() {
+    //   showAlert('Selamat datang', 'Produk berhasil ditambahkan ke keranjang!', 'success');
+    // });
+  </script>
 @endpush

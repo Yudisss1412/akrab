@@ -2,6 +2,10 @@
 
 @section('title', 'Checkout')
 
+@section('header')
+  @include('components.header_compact')
+@endsection
+
 @push('styles')
   <link rel="stylesheet" href="{{ asset('css/customer/transaksi/checkout.css') }}"/>
 @endpush

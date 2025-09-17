@@ -2,6 +2,10 @@
 
 @section('title', 'Keranjang Belanja — AKRAB')
 
+@section('header')
+  @include('components.header_compact')
+@endsection
+
 @push('styles')
   <link rel="stylesheet" href="{{ asset('css/customer/keranjang.css') }}" />
   <style>

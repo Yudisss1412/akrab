@@ -183,8 +183,12 @@
 </head>
 <body>
     <div class="main-layout">
-        <!-- Header Component -->
-        @include('components.header')
+        <!-- Conditional Header - Use compact header for specific pages -->
+        @if(request()->is('keranjang') || request()->is('transaksi/checkout') || request()->is('profil/*'))
+            @include('components.header_compact')
+        @else
+            @include('components.header')
+        @endif
         
         <!-- Main Content -->
         <main class="content">

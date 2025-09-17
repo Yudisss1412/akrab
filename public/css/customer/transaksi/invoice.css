@@ -1,7 +1,7 @@
 :root{
   --primary:#a8d5c9;
   --primary-600:#006E5C;
-  --bg:#f5f7fb;
+  --bg:#f0fdfa; /* disamakan dengan style.css utama */
   --card:#fff;
   --muted:#6b7280;
   --text:#111827;

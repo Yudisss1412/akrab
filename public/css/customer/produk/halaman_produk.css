@@ -15,7 +15,7 @@ body {
   --primary-color:#a8d5c9;
   --primary-color-dark:#006E5C;
   --secondary-color:#FFFFFF;
-  --background-color:#f8f9fa;
+  --background-color:#f0fdfa; /* disamakan dengan style.css utama */
   --dark-text-color:#333;
   --border-color:#e9ecef;
   

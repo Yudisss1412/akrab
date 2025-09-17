@@ -5,11 +5,11 @@
   --primary-color:         #a8d5c9;
   --primary-color-dark:    #006E5C;
   --secondary-color:       #FFFFFF;
-  --background-color:      #f0fdfa;
+  --background-color:      #f0fdfa; /* disamakan dengan style.css utama */
   --border-color:          #e9ecef;
 
-  --text-dark:             #233138;
-  --text-muted:            #6c757d;
+  --text-dark:             #333; /* disamakan dengan style.css utama */
+  --text-muted:            #555; /* disamakan dengan style.css utama */
 
   --radius-lg:             16px;
   --radius-md:             12px;

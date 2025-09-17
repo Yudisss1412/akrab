@@ -3,7 +3,7 @@
   --primary-color-dark:#006E5C;
   --secondary-color:#fff;
   --border-color:#e9ecef;
-  --bg:#f8f9fa;
+  --bg:#f0fdfa; /* disamakan dengan style.css utama */
   --text:#333;
 }
 *{box-sizing:border-box}

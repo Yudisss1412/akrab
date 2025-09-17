@@ -45,29 +45,15 @@ const daftarProduk = [
 let currentPage = 1;
 const pageSize  = 8;
 
-/* === WISHLIST: sinkron lintas halaman === */
-const WISHLIST_KEY = 'akrab_wishlist';
-function loadWishlistFromLS(){
-  try { return new Set(JSON.parse(localStorage.getItem(WISHLIST_KEY) || '[]')); }
-  catch { return new Set(); }
-}
-function saveWishlistToLS(set){
-  localStorage.setItem(WISHLIST_KEY, JSON.stringify([...set]));
-}
-const wishlist = loadWishlistFromLS();
-
 /* Rekomendasi: pagination 4/halaman */
 let rekomPage = 1;
 const rekomPageSize = 4;
 let rekomPool = [];
 
-/* ---------- SVG rating & wishlist kecil ---------- */
+/* ---------- SVG rating ---------- */
 const STAR_FULL  = `<svg width="27" height="27" viewBox="0 0 47 47" xmlns="http://www.w3.org/2000/svg"><path d="M11.4076 41.1253L14.5899 27.368L3.91699 18.1149L18.017 16.891L23.5003 3.91699L28.9837 16.891L43.0837 18.1149L32.4107 27.368L35.593 41.1253L23.5003 33.8305L11.4076 41.1253Z" fill="#FFF600"/></svg>`;
 const STAR_HALF  = `<svg width="27" height="27" viewBox="0 0 47 47" xmlns="http://www.w3.org/2000/svg"><path d="M29.6691 32.9982L28.0534 25.9482L33.4878 21.2482L26.3399 20.6118L23.5003 13.9535V29.2285L29.6691 32.9982ZM11.4076 41.1253L14.5899 27.368L3.91699 18.1149L18.017 16.891L23.5003 3.91699L28.9837 16.891L43.0837 18.1149L32.4107 27.368L35.593 41.1253L23.5003 33.8305L11.4076 41.1253Z" fill="#FFF700"/></svg>`;
 const STAR_EMPTY = `<svg width="27" height="27" viewBox="0 0 47 47" xmlns="http://www.w3.org/2000/svg"><path d="M17.3316 32.9493L23.5003 29.2285L29.6691 32.9982L28.0535 25.9482L33.4878 21.2482L26.3399 20.6118L23.5003 13.9535L20.6607 20.5628L13.5128 21.1993L18.9472 25.9482L17.3316 32.9493ZM11.4076 41.1253L14.5899 27.368L3.91699 18.1149L18.017 16.891L23.5003 3.91699L28.9837 16.891L43.0837 18.1149L32.4107 27.368L35.593 41.1253L23.5003 33.8305L11.4076 41.1253Z" fill="#FFF600"/></svg>`;
-const HEART_EMPTY= `<svg width="27" height="27" viewBox="0 0 47 47" xmlns="http://www.w3.org/2000/svg"><path d="M23.6962 36.3271L23.5003 36.5229L23.2849 36.3271C13.9828 27.8867 7.83366 22.3054 7.83366 16.6458C7.83366 12.7292 10.7712 9.79167 14.6878 9.79167C17.7037 9.79167 20.6412 11.75 21.6791 14.4133H25.3216C26.3595 11.75 29.297 9.79167 32.3128 9.79167C36.2295 9.79167 39.167 12.7292 39.167 16.6458C39.167 22.3054 33.0178 27.8867 23.6962 36.3271ZM32.3128 5.875C28.9053 5.875 25.6349 7.46125 23.5003 9.94833C21.3657 7.46125 18.0953 5.875 14.6878 5.875C8.65616 5.875 3.91699 10.5946 3.91699 16.6458C3.91699 24.0287 10.5753 30.08 20.6607 39.2254L23.5003 41.8104L26.3399 39.2254C36.4253 30.08 43.0837 24.0287 43.0837 16.6458C43.0837 10.5946 38.3445 5.875 32.3128 5.875Z" fill="#FF0000"/></svg>`;
-const HEART_FILL = `<svg width="27" height="27" viewBox="0 0 47 47" xmlns="http://www.w3.org/2000/svg"><path d="M23.5003 41.8104L20.6607 39.2254C10.5753 30.08 3.91699 24.0287 3.91699 16.6458C3.91699 10.5946 8.65616 5.875 14.6878 5.875C18.0953 5.875 21.3657 7.46125 23.5003 9.94833C25.6349 7.46125 28.9053 5.875 32.3128 5.875C38.3445 5.875 43.0837 10.5946 43.0837 16.6458C43.0837 24.0287 36.4253 30.08 26.3399 39.2254L23.5003 41.8104Z" fill="#F24822"/></svg>`;
-const heart = on => (on ? HEART_FILL : HEART_EMPTY);
 
 /* ---------- DOM ---------- */
 const grid           = document.getElementById('produk-grid');
@@ -117,21 +103,6 @@ function currentFilterKey(){
   return `${selectKategori ? selectKategori.value : 'all'}|${(inputSearch?.value||'').trim().toLowerCase()}`;
 }
 
-/* === WISHLIST toggle & penyegaran UI === */
-function toggleWishlist(name){
-  if (wishlist.has(name)) wishlist.delete(name); else wishlist.add(name);
-  saveWishlistToLS(wishlist);
-  refreshHeartsOnPage();
-}
-function refreshHeartsOnPage(){
-  document.querySelectorAll('.wish-small').forEach(btn=>{
-    const name = btn.dataset.name;
-    const on = wishlist.has(name);
-    btn.classList.toggle('active', on);
-    btn.innerHTML = heart(on);
-  });
-}
-
 /* ---------- RENDER LIST (utama) ---------- */
 function renderList(){
   if (!grid || !pagin) return;
@@ -144,11 +115,9 @@ function renderList(){
   const view  = filtered.slice(start, start + pageSize);
 
   grid.innerHTML = view.map(p=>{
-    const fav = wishlist.has(p.nama);
     const href = `${DETAIL_BASE}${encodeURIComponent(p.nama)}`;
     return `
       <div class="produk-card">
-        <button class="wish-small ${fav?'active':''}" data-name="${p.nama}" aria-label="Wishlist">${heart(fav)}</button>
         <img src="${p.gambar}" alt="${p.nama}"
              onerror="this.onerror=null;this.src='${IMG_PLACEHOLDER}'">
         <div class="produk-card-info">
@@ -213,11 +182,9 @@ function renderRekomendasi(){
   const view  = rekomPool.slice(start, start + rekomPageSize);
 
   rekomGrid.innerHTML = view.map(p=>{
-    const fav = wishlist.has(p.nama);
     const href = `${DETAIL_BASE}${encodeURIComponent(p.nama)}`;
     return `
       <div class="rek-card">
-        <button class="wish-small ${fav?'active':''}" data-name="${p.nama}" aria-label="Wishlist">${heart(fav)}</button>
         <img class="rek-img" src="${p.gambar}" alt="${p.nama}"
              onerror="this.onerror=null;this.src='${IMG_PLACEHOLDER}'">
         <div class="rek-body">
@@ -287,31 +254,18 @@ rekomPagin?.addEventListener('click', e=>{
 /* tombol di grid utama */
 grid?.addEventListener('click', e=>{
   const add  = e.target.closest('.btn-add');
-  const wish = e.target.closest('.wish-small');
   if (add){ alert(`${add.dataset.name} ditambahkan ke keranjang!`); return; }
-  if (wish){ toggleWishlist(wish.dataset.name); }
 });
 
 /* tombol di grid rekomendasi */
 rekomGrid?.addEventListener('click', e=>{
   const add  = e.target.closest('.rek-btn.ghost');
   const detail = e.target.closest('.rek-btn.primary');
-  const wish = e.target.closest('.wish-small');
   if (add){ alert(`${add.dataset.name} ditambahkan ke keranjang!`); return; }
   if (detail){ /* biarkan <a> navigate */ return; }
-  if (wish){ toggleWishlist(wish.dataset.name); }
-});
-
-/* sinkron jika wishlist berubah dari tab/halaman lain */
-window.addEventListener('storage', (ev)=>{
-  if (ev.key !== WISHLIST_KEY) return;
-  const latest = loadWishlistFromLS();
-  wishlist.clear(); latest.forEach(v=>wishlist.add(v));
-  refreshHeartsOnPage();
 });
 
 /* ---------- INIT ---------- */
 lastFilterKey = currentFilterKey();
 rekomPool = shuffle(filterData().length ? filterData() : daftarProduk);
 renderList();
-refreshHeartsOnPage();

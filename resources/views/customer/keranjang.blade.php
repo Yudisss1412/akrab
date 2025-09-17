@@ -1,11 +1,6 @@
-@extends('layouts.customer')
+@extends('layouts.app')
 
 @section('title', 'Keranjang Belanja — AKRAB')
-
-{{-- NAVBAR: pakai versi compact tanpa searchbar --}}
-@section('navbar')
-  @include('partials.navbar_compact', ['cartCount' => $cartCount ?? 0])
-@endsection
 
 @push('styles')
   <link rel="stylesheet" href="{{ asset('css/customer/keranjang.css') }}" />

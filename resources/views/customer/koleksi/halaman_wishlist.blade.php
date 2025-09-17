@@ -1,11 +1,6 @@
-@extends('layouts.customer')
+@extends('layouts.app')
 
 @section('title', 'Wishlist — AKRAB')
-
-{{-- Pakai navbar compact (tanpa search) --}}
-@section('navbar')
-  @includeIf('partials.navbar_compact')
-@endsection
 
 @push('styles')
   <link rel="stylesheet" href="{{ asset('css/customer/koleksi/halaman_wishlist.css') }}">

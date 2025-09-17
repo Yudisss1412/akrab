@@ -1,130 +1,213 @@
-@extends('layouts.customer')
+@extends('layouts.app')
 
-@section('title', ($produk->nama ?? request('nama') ?? 'Detail Produk').' — AKRAB')
+@section('title', ($produk->nama ?? request('nama') ?? 'Detail Produk') . ' — AKRAB')
 
 @push('styles')
-  <link rel="stylesheet" href="{{ asset('css/customer/produk/produk_detail.css') }}">
+  {{-- CSS khusus halaman produk detail --}}
+  <link href="{{ asset('css/customer/produk/produk_detail.css') }}" rel="stylesheet"/>
+  <link href="{{ asset('css/customer/produk/halaman_produk.css') }}" rel="stylesheet"/>
 @endpush
 
 @section('content')
-  {{-- Konten hanya halaman ini. Header & footer disediakan oleh layout --}}
-  <div class="main-layout pd-page" itemscope itemtype="http://schema.org/Product">
-    <meta itemprop="name" content="{{ $produk->nama ?? request('nama') ?? 'Produk' }}">
+  <div class="main-layout">
+    <main class="detail-page" role="main">
+      <div class="container">
+        <!-- Back button -->
+        <a href="{{ url()->previous() }}" class="back-btn" aria-label="Kembali">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+          Kembali
+        </a>
 
-    <div class="pd-wrap">
-      <div class="pd-top">
-        {{-- KIRI: GALERI --}}
-        <article class="card gallery-card">
-          <div class="main-img-wrap">
-            <img id="mainImg" class="main-img"
-                 src="{{ asset($produk->gambar ?? 'src/product_1.png') }}"
-                 alt="{{ $produk->nama ?? 'Foto Produk' }}"
-                 itemprop="image">
+        <!-- Product Gallery -->
+        <section class="gallery-section" aria-label="Galeri produk">
+          <div class="gallery-main">
+            <img id="mainImage" src="{{ $produk->gambar_utama ?? 'https://via.placeholder.com/600x600' }}" alt="{{ $produk->nama ?? 'Produk' }}" class="gallery-img">
           </div>
-
-          <div id="thumbs" class="thumbs">
-            @php
-              $thumbs = $produk->thumbs ?? [
-                asset('src/product_1.png'),
-                asset('src/product_1.png'),
-                asset('src/product_1.png'),
-              ];
-            @endphp
-            @foreach($thumbs as $i => $src)
-              <img class="thumb {{ $i===0 ? 'is-active' : '' }}" src="{{ $src }}" alt="Thumbnail {{ $i+1 }}">
+          <div class="gallery-thumbs" id="thumbnails">
+            @foreach(($produk->gambar ?? []) as $index => $img)
+              <img src="{{ $img }}" alt="{{ $produk->nama ?? 'Produk' }} {{ $index + 1 }}" 
+                   class="thumb {{ $index === 0 ? 'active' : '' }}" data-index="{{ $index }}">
             @endforeach
           </div>
-        </article>
+        </section>
 
-        {{-- KANAN: INFO PRODUK --}}
-        <aside class="card info-card">
-          <h1 id="pdTitle" class="pd-title"
-              data-name="{{ $produk->nama ?? request('nama') ?? 'Nama Produk' }}">
-            {{ $produk->nama ?? request('nama') ?? 'Nama Produk' }}
-          </h1>
-
-          <div class="price-wish-row">
-            <div class="price" id="pdPrice" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
-              <span itemprop="priceCurrency" content="IDR">Rp</span>
-              <span itemprop="price" content="{{ isset($produk->harga) ? $produk->harga : 62000 }}">
-                {{ isset($produk->harga) ? number_format($produk->harga,0,',','.') : '62.000' }}
-              </span>
+        <!-- Product Info -->
+        <section class="info-section" aria-label="Informasi produk">
+          <div class="info-header">
+            <h1 class="product-title">{{ $produk->nama ?? 'Nama Produk' }}</h1>
+            <div class="product-meta">
+              <span class="product-category">{{ $produk->kategori ?? 'Kategori' }}</span>
+              <div class="product-rating" aria-label="Rating {{ $produk->rating ?? '4.5' }} dari 5">
+                @for($i = 1; $i <= 5; $i++)
+                  @if($i <= floor($produk->rating ?? 4.5))
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                  @else
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="#E0E0E0"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                  @endif
+                @endfor
+                <span class="rating-text">({{ $produk->jumlah_ulasan ?? '128' }} ulasan)</span>
+              </div>
             </div>
+          </div>
 
-            {{-- fallback icon; akan ditimpa oleh JS sesuai state wishlist --}}
-            <button id="wishBtn" class="wish-btn wish-small" aria-label="Wishlist" aria-pressed="false">
-              <svg width="27" height="27" viewBox="0 0 47 47" xmlns="http://www.w3.org/2000/svg">
-                <path d="M23.6962 36.3271L23.5003 36.5229L23.2849 36.3271C13.9828 27.8867 7.83366 22.3054 7.83366 16.6458C7.83366 12.7292 10.7712 9.79167 14.6878 9.79167C17.7037 9.79167 20.6412 11.75 21.6791 14.4133H25.3216C26.3595 11.75 29.297 9.79167 32.3128 9.79167C36.2295 9.79167 39.167 12.7292 39.167 16.6458C39.167 22.3054 33.0178 27.8867 23.6962 36.3271ZM32.3128 5.875C28.9053 5.875 25.6349 7.46125 23.5003 9.94833C21.3657 7.46125 18.0953 5.875 14.6878 5.875C8.65616 5.875 3.91699 10.5946 3.91699 16.6458C3.91699 24.0287 10.5753 30.08 20.6607 39.2254L23.5003 41.8104L26.3399 39.2254C36.4253 30.08 43.0837 24.0287 43.0837 16.6458C43.0837 10.5946 38.3445 5.875 32.3128 5.875Z" fill="#FF0000"/>
+          <div class="price-section">
+            <div class="price-current">Rp<span class="price-number">{{ number_format($produk->harga ?? 100000, 0, ',', '.') }}</span></div>
+            @if($produk->harga_diskon ?? false)
+              <div class="price-original">Rp{{ number_format($produk->harga_asli ?? 120000, 0, ',', '.') }}</div>
+              <div class="discount-tag">-{{ round((($produk->harga_asli ?? 120000) - ($produk->harga ?? 100000)) / ($produk->harga_asli ?? 120000) * 100) }}%</div>
+            @endif
+          </div>
+
+          <div class="action-section">
+            <div class="quantity-selector">
+              <button class="qty-btn minus" type="button" aria-label="Kurangi jumlah">-</button>
+              <input class="qty-input" type="number" min="1" value="1" aria-label="Jumlah produk">
+              <button class="qty-btn plus" type="button" aria-label="Tambah jumlah">+</button>
+            </div>
+            <button class="btn btn-primary btn-add-cart" type="button">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="21" r="1"/>
+                <circle cx="20" cy="21" r="1"/>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+              </svg>
+              + Keranjang
+            </button>
+            <button class="btn btn-wishlist {{ $produk->di_wishlist ?? false ? 'active' : '' }}" type="button" aria-label="Wishlist">
+              <svg class="heart-outline" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+              <svg class="heart-fill" viewBox="0 0 24 24" width="20" height="20" fill="#FF4757">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
               </svg>
             </button>
           </div>
+        </section>
 
-          <div class="stars-row" id="pdStars">
-            <span class="rating-text">
-              {{ number_format($produk->rating ?? 4.8,1) }}
-              ({{ $produk->jml_ulasan ?? 128 }})
-            </span>
+        <!-- Product Description -->
+        <section class="desc-section" aria-label="Deskripsi produk">
+          <h2 class="section-title">Deskripsi Produk</h2>
+          <div class="product-description">
+            {{ $produk->deskripsi ?? 'Deskripsi lengkap produk akan muncul di sini. Ini adalah contoh deskripsi produk yang menjelaskan fitur-fitur, spesifikasi, dan manfaat dari produk ini.' }}
           </div>
+        </section>
 
-          <div class="desc-box">
-            <p id="pdDesc">
-              {{ $produk->deskripsi ?? 'Madu hutan asli, rasa bold, tanpa pemanasan. Kristalisasi alami bisa terjadi — ini tanda madu raw.' }}
-            </p>
-            <ul class="spec-list">
-              <li><strong>Kategori:</strong> <span id="sp-kat">{{ $produk->kategori ?? 'Minuman' }}</span></li>
-              <li><strong>Ukuran:</strong> <span id="sp-ukr">{{ $produk->ukuran ?? '250 ml' }}</span></li>
-              <li><strong>Bahan Utama:</strong> <span id="sp-bhn">{{ $produk->bahan ?? 'Madu hutan murni' }}</span></li>
-            </ul>
+        <!-- Product Specifications -->
+        <section class="specs-section" aria-label="Spesifikasi produk">
+          <h2 class="section-title">Spesifikasi</h2>
+          <ul class="specs-list">
+            @foreach(($produk->spesifikasi ?? []) as $spec)
+              <li class="spec-item">
+                <span class="spec-key">{{ $spec['nama'] ?? 'Spesifikasi' }}</span>
+                <span class="spec-value">{{ $spec['nilai'] ?? '-' }}</span>
+              </li>
+            @endforeach
+          </ul>
+        </section>
+
+        <!-- Reviews Section -->
+        <section class="reviews-section" aria-label="Ulasan pelanggan">
+          <div class="reviews-header">
+            <h2 class="section-title">Ulasan Pelanggan</h2>
+            <a href="#" class="see-all">Lihat Semua</a>
           </div>
-
-          <div class="cta-row">
-            <button type="button" id="btnAdd" class="btn btn-primary">Tambah ke Keranjang</button>
-            <button type="button" id="btnBuy" class="btn btn-outline">Beli Sekarang</button>
-          </div>
-        </aside>
-      </div>
-
-      {{-- ULASAN --}}
-      <section class="card review-box" aria-labelledby="ulasan-title">
-        <div class="reviews-head">
-          <h3 id="ulasan-title">Ulasan Pembeli</h3>
-          <div id="reviewsCount" class="reviews-count">
-            {{ isset($ulasan) ? count($ulasan) : 0 }} ulasan
-          </div>
-        </div>
-
-        <div class="review-scroller">
-          <button class="rev-nav rev-prev" type="button" aria-label="Geser kiri">‹</button>
-
-          <div id="reviewGrid"
-               class="review-row"
-               tabindex="0"
-               role="region"
-               aria-label="Ulasan pembeli (geser horizontal)">
-            @forelse(($ulasan ?? []) as $r)
-              <div class="review-card">
-                <div class="rev-avatar">{{ strtoupper(mb_substr($r->nama,0,1)) }}</div>
-                <div class="rev-content">
-                  <div class="rev-head">
-                    <span class="rev-name">{{ $r->nama }}</span>
-                    <span class="rev-date">{{ \Carbon\Carbon::parse($r->tanggal)->translatedFormat('d M Y') }}</span>
-                  </div>
-                  <div class="rev-stars" data-score="{{ $r->rating ?? 5 }}"></div>
-                  <p class="rev-text">{{ $r->teks }}</p>
-                </div>
+          <div class="reviews-summary">
+            <div class="avg-rating">
+              <span class="rating-score">{{ $produk->rating ?? '4.5' }}</span>
+              <div class="rating-stars">
+                @for($i = 1; $i <= 5; $i++)
+                  @if($i <= floor($produk->rating ?? 4.5))
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#FFD700"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                  @else
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#E0E0E0"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                  @endif
+                @endfor>
               </div>
-            @empty
-              {{-- akan diisi dummy oleh JS --}}
-            @endforelse
+              <span class="review-count">({{ $produk->jumlah_ulasan ?? '128' }} ulasan)</span>
+            </div>
           </div>
-
-          <button class="rev-nav rev-next" type="button" aria-label="Geser kanan">›</button>
-        </div>
-      </section>
-    </div>
+          <div class="reviews-list">
+            @foreach(($produk->ulasan ?? []) as $review)
+              <article class="review-card">
+                <div class="review-header">
+                  <div class="reviewer-info">
+                    <span class="reviewer-name">{{ $review['nama'] ?? 'Nama Pembeli' }}</span>
+                    <time class="review-date">{{ $review['tanggal'] ?? '1 Jan 2023' }}</time>
+                  </div>
+                  <div class="review-rating">
+                    @for($i = 1; $i <= 5; $i++)
+                      @if($i <= ($review['rating'] ?? 5))
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFD700"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                      @else
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="#E0E0E0"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                      @endif
+                    @endfor>
+                  </div>
+                </div>
+                <p class="review-content">{{ $review['komentar'] ?? 'Ulasan pelanggan tentang produk ini.' }}</p>
+              </article>
+            @endforeach
+          </div>
+        </section>
+      </div>
+    </main>
   </div>
 @endsection
 
 @push('scripts')
-  <script defer src="{{ asset('js/customer/produk/produk_detail.js') }}"></script>
+  <script>
+    // Basic functionality for quantity selector and wishlist
+    document.addEventListener('DOMContentLoaded', function() {
+      // Quantity selector
+      const qtyInput = document.querySelector('.qty-input');
+      const minusBtn = document.querySelector('.qty-btn.minus');
+      const plusBtn = document.querySelector('.qty-btn.plus');
+      
+      if (qtyInput && minusBtn && plusBtn) {
+        minusBtn.addEventListener('click', function() {
+          let value = parseInt(qtyInput.value) || 1;
+          if (value > 1) {
+            qtyInput.value = value - 1;
+          }
+        });
+        
+        plusBtn.addEventListener('click', function() {
+          let value = parseInt(qtyInput.value) || 1;
+          qtyInput.value = value + 1;
+        });
+        
+        qtyInput.addEventListener('change', function() {
+          let value = parseInt(qtyInput.value) || 1;
+          if (value < 1) value = 1;
+          qtyInput.value = value;
+        });
+      }
+      
+      // Wishlist button
+      const wishlistBtn = document.querySelector('.btn-wishlist');
+      if (wishlistBtn) {
+        wishlistBtn.addEventListener('click', function() {
+          this.classList.toggle('active');
+        });
+      }
+      
+      // Image gallery
+      const thumbnails = document.querySelectorAll('.thumb');
+      const mainImage = document.getElementById('mainImage');
+      
+      if (thumbnails.length > 0 && mainImage) {
+        thumbnails.forEach(thumb => {
+          thumb.addEventListener('click', function() {
+            // Remove active class from all thumbs
+            thumbnails.forEach(t => t.classList.remove('active'));
+            // Add active class to clicked thumb
+            this.classList.add('active');
+            // Update main image
+            mainImage.src = this.src;
+          });
+        });
+      }
+    });
+  </script>
 @endpush

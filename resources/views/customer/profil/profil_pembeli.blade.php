@@ -1,11 +1,6 @@
-@extends('layouts.customer')
+@extends('layouts.app')
 
 @section('title', 'Profil Pembeli — Wishlist & Riwayat Pesanan')
-
-{{-- Navbar tanpa searchbar --}}
-@section('navbar')
-  @include('partials.navbar_compact')
-@endsection
 
 @push('styles')
   <link rel="stylesheet" href="{{ asset('css/customer/profil/profil_pembeli.css') }}">

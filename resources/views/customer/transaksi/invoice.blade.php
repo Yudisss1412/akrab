@@ -1,177 +1,141 @@
-<!doctype html>
-<html lang="id">
-<head>
-  <meta charset="utf-8" />
-  <title>Invoice — AKRAB</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+@extends('layouts.app')
+
+@section('title', 'Invoice — AKRAB')
+
+@push('styles')
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ asset('css/customer/transaksi/invoice.css') }}">
-</head>
-<body>
-  <header class="ak-header">
-    <div class="brand">
-      <img src="{{ $store['logo'] ?? '/src/Logo_UMKM.png' }}" alt="AKRAB" class="logo">
-      <span>Invoice</span>
-    </div>
-    <div class="actions">
-      <button id="btnPrint" class="btn btn-primary" type="button" aria-label="Cetak invoice">
-        Cetak
-      </button>
-      <a href="{{ route('profil.penjual') }}" class="btn" aria-label="Kembali ke Profil Penjual">Kembali</a>
-    </div>
-  </header>
+@endpush
 
-  <main class="container-only-preview">
-    <section class="preview">
-      <div id="printCard" class="print-card">
-        @php
-          // Normalisasi data agar aman ketika key/variabel kosong
-          $store     = $store     ?? [];
-          $invoice   = $invoice   ?? [];
-          $buyer     = $buyer     ?? [];
-          $shipping  = $shipping  ?? [];
-          $payment   = $payment   ?? [];
-          $summary   = $summary   ?? [];
-          $itemsList = $items     ?? [[
-            'img'    => 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=300&auto=format&fit=crop',
-            'name'   => 'Mini Projector',
-            'variant'=> 'Default',
-            'qty'    => 1,
-            'price'  => 1250000,
-          ]];
+@section('content')
+  <main class="invoice-page">
+    <div class="container">
+      <header class="invoice-header">
+        <div class="brand">
+          <img src="{{ $store['logo'] ?? '/src/Logo_UMKM.png' }}" alt="AKRAB" class="logo">
+          <div>
+            <h1>Invoice</h1>
+            <p class="invoice-id">#INV-2023-001</p>
+          </div>
+        </div>
+        <div class="actions">
+          <button id="btnPrint" class="btn btn-primary" type="button" aria-label="Cetak invoice">
+            Cetak
+          </button>
+          <a href="{{ route('profil.pembeli') }}" class="btn" aria-label="Kembali ke Profil">Kembali</a>
+        </div>
+      </header>
 
-          $fmt = function($n){ return 'Rp '.number_format((float)$n, 0, ',', '.'); };
+      <div class="invoice-content">
+        <section class="invoice-details">
+          <div class="detail-row">
+            <span>Tanggal Pemesanan:</span>
+            <span>15 Juni 2023, 14:30</span>
+          </div>
+          <div class="detail-row">
+            <span>Status Pembayaran:</span>
+            <span class="status paid">Sudah Dibayar</span>
+          </div>
+          <div class="detail-row">
+            <span>Metode Pembayaran:</span>
+            <span>Transfer Bank - BCA</span>
+          </div>
+        </section>
 
-          $payStatus   = strtoupper($invoice['pay_status'] ?? 'PAID');
-          $orderStatus = $invoice['order_status'] ?? 'Selesai';
-          $issuedAt    = $invoice['issued_at']   ?? now();
-        @endphp
-
-        {{-- ================= HEADER ================= --}}
-        <div class="inv-head">
-          <div class="inv-store">
-            <img src="{{ $store['logo'] ?? '/src/Logo_UMKM.png' }}" alt="logo toko">
-            <div>
-              <div class="store-name">{{ $store['name'] ?? 'Shoppy.gg' }}</div>
-              <div class="muted">{{ $store['addr'] ?? 'Jl. Melati No. 12, Banyuwangi' }}</div>
-              <div class="muted">{{ $store['contact'] ?? '+62 812-3456-7890 • support@shoppy.gg' }}</div>
-            </div>
+        <div class="parties">
+          <div class="party">
+            <h3>Dikirim ke:</h3>
+            <p><strong>Andi Prasetyo</strong><br>
+            Jl. Merdeka No. 123<br>
+            Surabaya, Jawa Timur 60123<br>
+            0812-3456-7890</p>
           </div>
 
-          <div class="inv-meta">
-            <div class="muted small">Invoice</div>
-            <div class="strong">{{ $invoice['number'] ?? 'INV-2025-0001' }}</div>
-            <div class="badge {{ $payStatus === 'PAID' ? 'paid' : 'unpaid' }}">Bayar: {{ $payStatus }}</div>
-            <div class="badge">{{ $orderStatus }}</div>
-            <div class="muted small">
-              {{ \Carbon\Carbon::parse($issuedAt)->format('d M Y H:i') }}
-            </div>
+          <div class="party">
+            <h3>Dikirim dari:</h3>
+            <p><strong>Toko Grosir Elektronik</strong><br>
+            Jl. Teknologi No. 45<br>
+            Jakarta Selatan 12345<br>
+            grosir.elektronik@email.com</p>
           </div>
         </div>
 
-        {{-- ================= BLOK INFO ================= --}}
-        <div class="inv-cols">
-          <div class="box">
-            <h4>Pembeli</h4>
-            <div class="strong">{{ $buyer['name'] ?? 'Budi Santoso' }}</div>
-            <div class="muted">{{ $buyer['contact'] ?? 'budi@mail.com • 0812-0000-0000' }}</div>
-          </div>
-          <div class="box">
-            <h4>Pengiriman</h4>
-            <div>{{ $shipping['addr'] ?? 'Perum Mawar Blok A-12, Banyuwangi' }}</div>
-            <div class="muted">Kurir: {{ $shipping['courier'] ?? 'JNE • Reguler' }}</div>
-            <div class="muted">
-              Resi: {{ $shipping['awb'] ?? 'JNE1234567890' }}
-              @if(!empty($shipping['track']))
-                • <a href="{{ $shipping['track'] }}" target="_blank" rel="noopener">Tracking</a>
-              @endif
+        <section class="order-items">
+          <h3>Detail Pesanan</h3>
+          <div class="items-table">
+            <div class="table-header">
+              <div>Produk</div>
+              <div class="text-right">Harga</div>
+              <div class="text-center">Jumlah</div>
+              <div class="text-right">Total</div>
             </div>
-          </div>
-        </div>
-
-        <div class="inv-cols">
-          <div class="box">
-            <h4>Pembayaran</h4>
-            <div>Metode: <strong>{{ $payment['method'] ?? 'Virtual Account' }}</strong></div>
-            <div class="muted">ID Transaksi: {{ $payment['txid'] ?? '-' }}</div>
-            <div class="muted">
-              Waktu Bayar:
-              {{ !empty($payment['time']) ? \Carbon\Carbon::parse($payment['time'])->format('d M Y H:i') : '-' }}
-            </div>
-            <div class="badge" style="margin-top:6px">{{ $payment['status'] ?? 'Berhasil' }}</div>
-          </div>
-          <div class="box">
-            <h4>Catatan</h4>
-            <div class="note">{{ $note ?? 'Terima kasih telah berbelanja.' }}</div>
-          </div>
-        </div>
-
-        {{-- ================= ITEM TABLE ================= --}}
-        @php $subtotal = 0; @endphp
-        <table class="items-table" aria-label="Item">
-          <thead>
-            <tr>
-              <th>Item</th>
-              <th>Varian</th>
-              <th>Qty</th>
-              <th>Harga</th>
-              <th>Subtotal</th>
-            </tr>
-          </thead>
-          <tbody>
-            @foreach($itemsList as $it)
-              @php
-                $qty    = (int)($it['qty']   ?? 0);
-                $price  = (float)($it['price'] ?? 0);
-                $rowSub = $qty * $price;
-                $subtotal += $rowSub;
-              @endphp
-              <tr>
-                <td>
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <img class="thumb" src="{{ $it['img'] ?? '' }}" alt="">
-                    <div>{{ $it['name'] ?? '-' }}</div>
+            <div class="table-body">
+              <div class="table-row">
+                <div class="item-info">
+                  <img src="https://picsum.photos/seed/charger/64/64" alt="Charger" class="item-image">
+                  <div>
+                    <h4>Fast Charging Adapter 20W USB-C</h4>
+                    <p class="item-meta">Putih · Garansi Resmi</p>
                   </div>
-                </td>
-                <td>{{ $it['variant'] ?? '—' }}</td>
-                <td>{{ $qty }}</td>
-                <td>{{ $fmt($price) }}</td>
-                <td>{{ $fmt($rowSub) }}</td>
-              </tr>
-            @endforeach
-          </tbody>
-        </table>
-
-        {{-- ================= TOTALS ================= --}}
-        @php
-          $disc   = (float)($summary['disc']        ?? 0);
-          $shipC  = (float)($summary['ship']        ?? 0);
-          $tax    = (float)($summary['tax']         ?? 0);
-          $taxPct = isset($summary['tax_percent']) ? (float)$summary['tax_percent'] : null;
-
-          if ($taxPct !== null) {
-            $tax = max(0, ($subtotal - $disc) * ($taxPct / 100));
-          }
-
-          $grand = max(0, $subtotal - $disc + $shipC + $tax);
-        @endphp
-        <div class="summary">
-          <div></div>
-          <div class="totals">
-            <div class="row"><span>Subtotal</span><strong>{{ $fmt($subtotal) }}</strong></div>
-            <div class="row"><span>Diskon/Voucher</span><strong>- {{ $fmt($disc) }}</strong></div>
-            <div class="row"><span>Ongkir</span><strong>{{ $fmt($shipC) }}</strong></div>
-            <div class="row">
-              <span>Pajak{!! $taxPct !== null ? ' ('.$taxPct.'%)' : '' !!}</span>
-              <strong>{{ $fmt($tax) }}</strong>
+                </div>
+                <div class="text-right">Rp45.000</div>
+                <div class="text-center">1</div>
+                <div class="text-right">Rp45.000</div>
+              </div>
+              <div class="table-row">
+                <div class="item-info">
+                  <img src="https://picsum.photos/seed/cable/64/64" alt="Cable" class="item-image">
+                  <div>
+                    <h4>USB-C to Lightning Cable 1m</h4>
+                    <p class="item-meta">Hitam · Kompatibel iOS</p>
+                  </div>
+                </div>
+                <div class="text-right">Rp29.000</div>
+                <div class="text-center">2</div>
+                <div class="text-right">Rp58.000</div>
+              </div>
             </div>
-            <div class="row grand"><span>Grand Total</span><strong>{{ $fmt($grand) }}</strong></div>
           </div>
-        </div>
-      </div>
-    </section>
-  </main>
+        </section>
 
-  <script src="{{ asset('js/customer/transaksi/invoice.js') }}"></script>
-</body>
-</html>
+        <section class="payment-summary">
+          <div class="summary-row">
+            <span>Subtotal (2 produk)</span>
+            <span>Rp103.000</span>
+          </div>
+          <div class="summary-row">
+            <span>Ongkos Kirim</span>
+            <span>Rp9.000</span>
+          </div>
+          <div class="summary-row">
+            <span>Asuransi Pengiriman</span>
+            <span>Rp1.500</span>
+          </div>
+          <div class="summary-row discount">
+            <span>Diskon Voucher</span>
+            <span>-Rp5.000</span>
+          </div>
+          <div class="summary-divider"></div>
+          <div class="summary-row total">
+            <span>Total Pembayaran</span>
+            <span class="total-amount">Rp108.500</span>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+@endsection
+
+@push('scripts')
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Print button
+      const printBtn = document.getElementById('btnPrint');
+      if (printBtn) {
+        printBtn.addEventListener('click', function() {
+          window.print();
+        });
+      }
+    });
+  </script>
+@endpush

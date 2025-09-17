@@ -13,19 +13,26 @@ body{margin:0;font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Helvet
 .form-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:18px;border-bottom:1px solid var(--border)}
 .form-head h1{margin:0;font-size:28px;font-weight:700;letter-spacing:.2px;color: #006E5C;}
 .avatar-box{display:flex;align-items:center;gap:12px}
-.avatar-box img{
-  width:72px; height:72px;
-  border-radius:50%;
-  object-fit:cover;
-  border:2px solid var(--border);
-  cursor:pointer;
-}
-.avatar-label img {
+.avatar-preview {
   width: 72px;
   height: 72px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid var(--border);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+}
+.avatar-preview svg {
+  width: 48px;
+  height: 48px;
+  display: block;
+  stroke: #006E5C;
+  fill: none;
+}
+.avatar-label {
   cursor: pointer;
 }
 form{margin-top:18px}

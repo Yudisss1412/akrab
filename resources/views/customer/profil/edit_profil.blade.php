@@ -19,7 +19,12 @@
         <div class="avatar-box">
           <!-- Foto bisa diklik -->
           <label for="avatarInput" class="avatar-label">
-            <img id="avatarPreview" src="{{ $user->avatar_url ?? asset('src/Logo_UMKM.png') }}" alt="Avatar">
+            <div class="avatar-preview" id="avatarPreview">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                <path d="M12 10C14.2091 10 16 8.20914 16 6C16 3.79086 14.2091 2 12 2C9.79086 2 8 3.79086 8 6C8 8.20914 9.79086 10 12 10Z" stroke="#006E5C" stroke-width="1.5"/>
+                <path d="M20 17.5C20 19.985 20 22 12 22C4 22 4 19.985 4 17.5C4 15.015 7.582 13 12 13C16.418 13 20 15.015 20 17.5Z" stroke="#006E5C" stroke-width="1.5"/>
+              </svg>
+            </div>
           </label>
           <input type="file" id="avatarInput" name="avatar" accept="image/*" hidden>
         </div>
@@ -68,7 +73,8 @@
       if (file) {
         const reader = new FileReader();
         reader.onload = function(e) {
-          document.getElementById('avatarPreview').src = e.target.result;
+          const previewContainer = document.getElementById('avatarPreview');
+          previewContainer.innerHTML = '<img src="' + e.target.result + '" alt="Avatar" style="width:72px; height:72px; border-radius:50%; object-fit:cover;">';
         }
         reader.readAsDataURL(file);
       }

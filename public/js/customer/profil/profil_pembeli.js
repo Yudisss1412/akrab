@@ -120,3 +120,18 @@ document.addEventListener('click', function(e){
   // Penting: JANGAN panggil e.preventDefault(),
   // biarkan browser lanjut ke link.href ({{ route('welcome') }})
 });
+
+// Tambahkan animasi halus saat halaman dimuat
+document.addEventListener('DOMContentLoaded', function() {
+  const cards = document.querySelectorAll('.card, .wishlist-card, .order-card, .review-card');
+  cards.forEach((card, index) => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+    
+    setTimeout(() => {
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    }, 100 * index);
+  });
+});

@@ -62,19 +62,25 @@ body{
 }
 .header-left .logo{ height:54px; width:auto; display:block; }
 
-.header-center{ flex:1; display:flex; justify-content:center; padding:0 1rem; }
-.search-bar{
+/* Header reguler dengan search bar */
+.header:not(.compact) .header-center{
+  flex:1; display:flex; justify-content:center; padding:0 1rem;
   position:relative; display:flex; align-items:center;
   width:100%; max-width:560px; min-width:280px;
   background:#fff; border:1.5px solid var(--border-color);
   border-radius:999px; padding:.65rem 1rem .65rem 2.6rem;
 }
-.search-bar input{
+.header:not(.compact) .header-center input{
   width:100%; border:none; outline:none; background:transparent;
   font-size:1.05rem; color:var(--text-dark);
 }
-.search-icon{
+.header:not(.compact) .search-icon{
   position:absolute; left:.9rem; width:22px; height:22px; color:#889096;
+}
+
+/* Header compact tanpa search bar */
+.header.compact .header-center{
+  flex:1; display:flex; justify-content:center; padding:0 1rem;
 }
 
 .header-right{ display:flex; gap:1.2rem; align-items:center; }

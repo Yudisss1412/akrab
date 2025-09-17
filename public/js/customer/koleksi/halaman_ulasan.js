@@ -45,7 +45,7 @@ const data = {
 
 /* ======= Utilities ======= */
 const $ = (sel, el = document) => el.querySelector(sel);
-const $$ = (sel, el = document) => Array.from(el.querySelectorAll(sel));
+const $ = (sel, el = document) => Array.from(el.querySelectorAll(sel));
 
 function formatDate(iso){
   // Contoh: 29-08-2025 19:50
@@ -83,147 +83,397 @@ function addKV(ul, kvPairs){
 
 /* ======= Renderers ======= */
 function renderStats(){
-  $('#statUlasan').textContent = data.stats.ulasan;
-  $('#statTerbantu').textContent = data.stats.terbantu;
-  $('#statDilihat').textContent  = data.stats.dilihat;
+  // Tidak ada elemen statUlasan, statTerbantu, statDilihat dalam HTML
+  // Jadi kita lewati bagian ini
+}
+
+function createReviewCard(item, withRating = false) {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.dataset.id = item.id;
+
+  // Header
+  const header = document.createElement('div');
+  header.className = 'card__head';
+  
+  const userInfo = document.createElement('div');
+  userInfo.className = 'user';
+  
+  const userName = document.createElement('span');
+  userName.className = 'user__name';
+  userName.textContent = data.user.name;
+  userInfo.appendChild(userName);
+  
+  header.appendChild(userInfo);
+  
+  if (withRating) {
+    const starsWrap = makeStars(item.rating || 0);
+    header.appendChild(starsWrap);
+  }
+  
+  const timeEl = document.createElement('time');
+  timeEl.className = 'card__time';
+  timeEl.dateTime = item.timeISO;
+  timeEl.textContent = formatDate(item.timeISO);
+  header.appendChild(timeEl);
+  
+  card.appendChild(header);
+
+  // Body
+  const body = document.createElement('div');
+  body.className = 'card__body';
+  
+  if (withRating && item.kv && item.kv.length) {
+    const kvUL = document.createElement('ul');
+    kvUL.className = 'kv';
+    addKV(kvUL, item.kv);
+    body.appendChild(kvUL);
+  }
+  
+  const productLink = document.createElement('a');
+  productLink.className = 'product';
+  productLink.href = item.product?.url || '#';
+  
+  const productTitle = document.createElement('div');
+  productTitle.className = 'product__title';
+  productTitle.textContent = item.product?.title || 'Produk';
+  productLink.appendChild(productTitle);
+  
+  if (item.product?.variant) {
+    const productVariant = document.createElement('div');
+    productVariant.className = 'product__variant';
+    productVariant.textContent = item.product.variant;
+    productLink.appendChild(productVariant);
+  }
+  
+  body.appendChild(productLink);
+  card.appendChild(body);
+
+  // Footer
+  const footer = document.createElement('div');
+  footer.className = 'card__foot';
+  
+  const helpBtn = document.createElement('button');
+  helpBtn.className = 'btn';
+  helpBtn.textContent = 'Bantu';
+  helpBtn.addEventListener('click', (e)=>{
+    e.currentTarget.classList.toggle('is-on');
+    if(e.currentTarget.classList.contains('is-on')){
+      e.currentTarget.style.borderColor = 'var(--ok)';
+      e.currentTarget.style.color = 'var(--ok)';
+    }else{
+      e.currentTarget.style.borderColor = 'var(--border)';
+      e.currentTarget.style.color = 'var(--text)';
+    }
+  });
+  footer.appendChild(helpBtn);
+  
+  const updateBtn = document.createElement('button');
+  updateBtn.className = 'btn primary';
+  updateBtn.textContent = withRating ? 'Perbarui' : 'Tulis Ulasan';
+  updateBtn.addEventListener('click', ()=> {
+    if (withRating) {
+      alert('Aksi: Perbarui ulasan ' + (item.product?.title || ''));
+    } else {
+      alert('Aksi: Tulis Ulasan untuk item ' + (item.product?.title || ''));
+    }
+  });
+  footer.appendChild(updateBtn);
+  
+  card.appendChild(footer);
+
+  return card;
 }
 
 function renderList(container, items, {withRating}={}){
   container.innerHTML = '';
   if(!items || items.length===0){
-    const empty = document.importNode($('#tplEmpty').content, true);
-    container.appendChild(empty);
+    // Tampilkan empty state
+    const parentSection = container.closest('.tab-content');
+    if (parentSection) {
+      const emptyState = parentSection.querySelector('.empty-state');
+      if (emptyState) {
+        emptyState.hidden = false;
+      }
+    }
     return;
   }
 
+  // Sembunyikan empty state
+  const parentSection = container.closest('.tab-content');
+  if (parentSection) {
+    const emptyState = parentSection.querySelector('.empty-state');
+    if (emptyState) {
+      emptyState.hidden = true;
+    }
+  }
+
   items.forEach(item=>{
-    const card = document.importNode($('#tplCard').content, true);
-    const art = card.querySelector('.card');
-    art.dataset.id = item.id;
-
-    // Header
-    card.querySelector('.user__name').textContent = data.user.name;
-    const starsWrap = card.querySelector('.stars');
-    if(withRating){
-      starsWrap.replaceWith(makeStars(item.rating || 0));
-    }else{
-      starsWrap.remove(); // belum dinilai => tidak ada bintang
-    }
-    const timeEl = card.querySelector('.card__time');
-    timeEl.dateTime = item.timeISO;
-    timeEl.textContent = formatDate(item.timeISO);
-
-    // Body
-    const kvUL = card.querySelector('.kv');
-    if(withRating && item.kv && item.kv.length){
-      addKV(kvUL, item.kv);
-    }else{
-      kvUL.remove();
-    }
-
-    const p = item.product || {};
-    card.querySelector('.product').href = p.url || '#';
-    card.querySelector('.product__title').textContent = p.title || 'Produk';
-    card.querySelector('.product__variant').textContent = p.variant || '';
-
-    // Footer buttons
-    if(!withRating){
-      // Belum Dinilai: tombol "Tulis Ulasan" alih-alih Perbarui
-      const upd = card.querySelector('.btn-update');
-      upd.textContent = 'Tulis Ulasan';
-      upd.addEventListener('click', ()=> alert('Aksi: Tulis Ulasan untuk item '+(p.title||'')));
-    }else{
-      card.querySelector('.btn-update').addEventListener('click', ()=> alert('Aksi: Perbarui ulasan '+(p.title||'')));
-    }
-    card.querySelector('.btn-help').addEventListener('click', (e)=>{
-      e.currentTarget.classList.toggle('is-on');
-      if(e.currentTarget.classList.contains('is-on')){
-        e.currentTarget.style.borderColor = 'var(--ok)';
-        e.currentTarget.style.color = 'var(--ok)';
-      }else{
-        e.currentTarget.style.borderColor = 'var(--line)';
-        e.currentTarget.style.color = 'var(--text)';
-      }
-    });
-
+    const card = createReviewCard(item, withRating);
     container.appendChild(card);
   });
 }
 
 /* ======= Tabs & Toolbar ======= */
 function setupTabs(){
-  const tabs = $$('.tab');
-  const indicator = $('.tab__indicator');
-  const listBelum = $('#listBelum');
-  const listDinilai = $('#listDinilai');
+  const tabs = $('.tab');
+
+  function activate(tabElement){
+    // Remove active class from all tabs
+    $('.tab').forEach(t => t.classList.remove('active'));
+    
+    // Add active class to clicked tab
+    tabElement.classList.add('active');
+    
+    // Hide all tab contents
+    const tabContents = $('.tab-content');
+    tabContents.forEach(content => {
+      content.classList.remove('active');
+      content.hidden = true;
+    });
+    
+    // Show appropriate content based on tab
+    const tabName = tabElement.dataset.tab;
+    const targetContent = $(`#${tabName}-content`);
+    if(targetContent) {
+      targetContent.classList.add('active');
+      targetContent.hidden = false;
+    }
+  }
+
+  tabs.forEach(t => t.addEventListener('click', () => activate(t)));
+
+  // init - activate first tab
+  if(tabs.length > 0) {
+    activate(tabs[0]);
+  }
+}
+
+/* ======= Init ======= */
+document.addEventListener('DOMContentLoaded', ()=>{
+  // Setup tabs
+  setupTabs();
+  
+  // Render review list
+  const reviewListContainer = $('#reviewList');
+  if(reviewListContainer) {
+    renderList(reviewListContainer, data.dinilai, {withRating:true});
+  }
+
+  // back button
+  const backBtn = $('#btnBack');
+  if(backBtn) {
+    backBtn.addEventListener('click', ()=> {
+      if(history.length > 1) {
+        history.back();
+      } else {
+        window.location.href = '/';
+      }
+    });
+  }
+});
+  // Contoh: 29-08-2025 19:50
+  const d = new Date(iso);
+  const pad = n => n.toString().padStart(2,'0');
+  const dd = pad(d.getDate());
+  const mm = pad(d.getMonth()+1);
+  const yyyy = d.getFullYear();
+  const hh = pad(d.getHours());
+  const mi = pad(d.getMinutes());
+  return `${dd}-${mm}-${yyyy} ${hh}:${mi}`;
+}
+
+function makeStars(n=0){
+  const wrap = document.createElement('div');
+  wrap.className = 'stars';
+  for(let i=1;i<=5;i++){
+    const span = document.createElement('span');
+    span.className = 'star';
+    span.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path d="M12 .587l3.668 7.431 8.2 1.192-5.934 5.788 1.402 8.168L12 18.896l-7.336 3.87 1.402-8.168L.132 9.21l8.2-1.192L12 .587z"
+        fill="${i<=n ? '#f6c34f' : '#3a4157'}"/></svg>`;
+    wrap.appendChild(span);
+  }
+  return wrap;
+}
+
+function addKV(ul, kvPairs){
+  kvPairs.forEach(([k,v])=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<span class="k">${k}:</span><span class="v">${v}</span>`;
+    ul.appendChild(li);
+  });
+}
+
+/* ======= Renderers ======= */
+function renderStats(){
+  // Tidak ada elemen statUlasan, statTerbantu, statDilihat dalam HTML
+  // Jadi kita lewati bagian ini
+}
+
+function createReviewCard(item, withRating = false) {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.dataset.id = item.id;
+
+  // Header
+  const header = document.createElement('div');
+  header.className = 'card__head';
+  
+  const userInfo = document.createElement('div');
+  userInfo.className = 'user';
+  
+  const userName = document.createElement('span');
+  userName.className = 'user__name';
+  userName.textContent = data.user.name;
+  userInfo.appendChild(userName);
+  
+  header.appendChild(userInfo);
+  
+  if (withRating) {
+    const starsWrap = makeStars(item.rating || 0);
+    header.appendChild(starsWrap);
+  }
+  
+  const timeEl = document.createElement('time');
+  timeEl.className = 'card__time';
+  timeEl.dateTime = item.timeISO;
+  timeEl.textContent = formatDate(item.timeISO);
+  header.appendChild(timeEl);
+  
+  card.appendChild(header);
+
+  // Body
+  const body = document.createElement('div');
+  body.className = 'card__body';
+  
+  if (withRating && item.kv && item.kv.length) {
+    const kvUL = document.createElement('ul');
+    kvUL.className = 'kv';
+    addKV(kvUL, item.kv);
+    body.appendChild(kvUL);
+  }
+  
+  const productLink = document.createElement('a');
+  productLink.className = 'product';
+  productLink.href = item.product?.url || '#';
+  
+  const productTitle = document.createElement('div');
+  productTitle.className = 'product__title';
+  productTitle.textContent = item.product?.title || 'Produk';
+  productLink.appendChild(productTitle);
+  
+  if (item.product?.variant) {
+    const productVariant = document.createElement('div');
+    productVariant.className = 'product__variant';
+    productVariant.textContent = item.product.variant;
+    productLink.appendChild(productVariant);
+  }
+  
+  body.appendChild(productLink);
+  card.appendChild(body);
+
+  // Footer
+  const footer = document.createElement('div');
+  footer.className = 'card__foot';
+  
+  const helpBtn = document.createElement('button');
+  helpBtn.className = 'btn btn-help';
+  helpBtn.textContent = 'Bantu';
+  helpBtn.addEventListener('click', (e)=>{
+    e.currentTarget.classList.toggle('is-on');
+    if(e.currentTarget.classList.contains('is-on')){
+      e.currentTarget.style.borderColor = 'var(--ok)';
+      e.currentTarget.style.color = 'var(--ok)';
+    }else{
+      e.currentTarget.style.borderColor = 'var(--border)';
+      e.currentTarget.style.color = 'var(--text)';
+    }
+  });
+  footer.appendChild(helpBtn);
+  
+  const updateBtn = document.createElement('button');
+  updateBtn.className = 'btn btn-update';
+  updateBtn.textContent = withRating ? 'Perbarui' : 'Tulis Ulasan';
+  updateBtn.addEventListener('click', ()=> {
+    if (withRating) {
+      alert('Aksi: Perbarui ulasan ' + (item.product?.title || ''));
+    } else {
+      alert('Aksi: Tulis Ulasan untuk item ' + (item.product?.title || ''));
+    }
+  });
+  footer.appendChild(updateBtn);
+  
+  card.appendChild(footer);
+
+  return card;
+}
+
+function renderList(container, items, {withRating}={}){
+  container.innerHTML = '';
+  if(!items || items.length===0){
+    // Tampilkan empty state
+    const emptyState = container.closest('section').querySelector('.empty-state');
+    if (emptyState) {
+      emptyState.hidden = false;
+    }
+    return;
+  }
+
+  // Sembunyikan empty state
+  const emptyState = container.closest('section').querySelector('.empty-state');
+  if (emptyState) {
+    emptyState.hidden = true;
+  }
+
+  items.forEach(item=>{
+    const card = createReviewCard(item, withRating);
+    container.appendChild(card);
+  });
+}
+
+/* ======= Tabs & Toolbar ======= */
+function setupTabs(){
+  const tabs = $('.tab');
+  const ulasanContent = $('#ulasan-content');
+  const wishlistContent = $('#wishlist-content');
 
   function activate(key){
     tabs.forEach(t=>{
       const active = t.dataset.tab === key;
-      t.classList.toggle('is-active', active);
+      t.classList.toggle('active', active);
       t.setAttribute('aria-selected', String(active));
     });
-    if(key==='belum'){
-      listBelum.hidden = false; listDinilai.hidden = true;
+    
+    if(key === 'ulasan'){
+      ulasanContent.classList.add('active');
+      wishlistContent.classList.remove('active');
+      wishlistContent.hidden = true;
+      ulasanContent.hidden = false;
     }else{
-      listBelum.hidden = true; listDinilai.hidden = false;
+      ulasanContent.classList.remove('active');
+      wishlistContent.classList.add('active');
+      wishlistContent.hidden = false;
+      ulasanContent.hidden = true;
     }
-
-    // Pindah indikator
-    const activeTab = $('.tab.is-active');
-    const rect = activeTab.getBoundingClientRect();
-    const host = $('.tabs').getBoundingClientRect();
-    indicator.style.width = rect.width + 'px';
-    indicator.style.left = (activeTab.offsetLeft + 14) + 'px';
   }
 
   tabs.forEach(t=>t.addEventListener('click', ()=>activate(t.dataset.tab)));
-  window.addEventListener('resize', ()=>activate($('.tab.is-active').dataset.tab));
+  window.addEventListener('resize', ()=>activate($('.tab.active').dataset.tab));
 
   // init
-  activate('dinilai');
+  activate('ulasan');
 }
 
 function setupSearchAndSort(){
-  const input = $('#searchInput');
-  const select = $('#sortSelect');
-
-  function apply(){
-    const q = input.value.trim().toLowerCase();
-    let list = [...data.dinilai];
-
-    if(q){
-      list = list.filter(it=>{
-        const hay = [it.product?.title, it.product?.variant, ...(it.kv||[]).flat()].join(' ').toLowerCase();
-        return hay.includes(q);
-      });
-    }
-
-    switch(select.value){
-      case 'oldest':
-        list.sort((a,b)=> new Date(a.timeISO) - new Date(b.timeISO)); break;
-      case 'ratingHigh':
-        list.sort((a,b)=> (b.rating||0) - (a.rating||0)); break;
-      case 'ratingLow':
-        list.sort((a,b)=> (a.rating||0) - (b.rating||0)); break;
-      default: // latest
-        list.sort((a,b)=> new Date(b.timeISO) - new Date(a.timeISO));
-    }
-
-    renderList($('#listDinilai'), list, {withRating:true});
-  }
-
-  input.addEventListener('input', apply);
-  select.addEventListener('change', apply);
-
-  // initial for dinilai
-  apply();
+  // Untuk saat ini kita tidak mengimplementasikan search dan sort
+  // karena tidak ada elemen input yang sesuai dalam HTML
 }
 
 /* ======= Init ======= */
 document.addEventListener('DOMContentLoaded', ()=>{
   renderStats();
-  renderList($('#listBelum'), data.belumDinilai, {withRating:false});
+  renderList($('#reviewList'), data.dinilai, {withRating:true});
   setupTabs();
   setupSearchAndSort();
 

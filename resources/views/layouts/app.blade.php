@@ -42,7 +42,7 @@
     .header-right{ display: flex; gap: 1.2rem; align-items: center; }
 
     /* Icons di navbar */
-    .search-bar{
+    header:not(.compact) .search-bar{
       background: #fff;
       border: 1.5px solid var(--border-color);
       border-radius: 50px;
@@ -50,11 +50,11 @@
       min-width: 330px; max-width: 460px; width: 100%;
       position: relative; display: flex; align-items: center;
     }
-    .search-bar input{
+    header:not(.compact) .search-bar input{
       border: none; background: transparent; outline: none;
       font-size: 1.1rem; width: 100%; color: var(--dark-text-color);
     }
-    .search-icon{
+    header:not(.compact) .search-icon{
       position: absolute; left: 1.05rem; top: 50%; transform: translateY(-50%);
       width: 22px; height: 22px; color: #aaa; display: block; line-height: 0;
     }
@@ -112,9 +112,9 @@
     .footer svg{ max-width: none !important; transform: none !important; }
 
     /* ========== Responsive ========== */
-    @media (max-width: 992px){
+    @media (max-width: 768px){
       .header{ padding: 0 1.5rem; }
-      .search-bar{ min-width: 200px; }
+      header:not(.compact) .search-bar{ min-width: 200px; }
     }
 
     @media (max-width: 480px){
@@ -184,7 +184,7 @@
 <body>
     <div class="main-layout">
         <!-- Conditional Header - Use compact header for specific pages -->
-        @if(request()->is('keranjang') || request()->is('transaksi/checkout') || request()->is('profil/*'))
+        @if(request()->is('keranjang') || request()->is('transaksi/checkout') || request()->is('profil') || request()->is('profil/*'))
             @include('components.header_compact')
         @else
             @include('components.header')

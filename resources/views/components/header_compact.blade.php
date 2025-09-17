@@ -1,11 +1,11 @@
-<header class="header">
+<header class="header compact">
     <div class="header-left">
         <a href="{{ route('cust.welcome') }}">
             <img src="{{ asset('src/Logo_UMKM.png') }}" class="logo" alt="Logo UMKM">
         </a>
     </div>
     <div class="header-center">
-        <!-- Empty space where search bar would be -->
+        <!-- Header compact tanpa search bar -->
     </div>
     <div class="header-right">
         <a class="profile-ico" href="{{ route('profil.pembeli') }}" aria-label="Profil">

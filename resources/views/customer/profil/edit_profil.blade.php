@@ -19,7 +19,7 @@
         <div class="avatar-box">
           <!-- Foto bisa diklik -->
           <label for="avatarInput" class="avatar-label">
-            <img id="avatarPreview" src="{{ $user->avatar_url ?? 'default.png' }}" alt="Avatar">
+            <img id="avatarPreview" src="{{ $user->avatar_url ?? asset('src/Logo_UMKM.png') }}" alt="Avatar">
           </label>
           <input type="file" id="avatarInput" name="avatar" accept="image/*" hidden>
         </div>
@@ -77,6 +77,15 @@
     // Form submission
     document.getElementById('editProfileForm').addEventListener('submit', function(e) {
       e.preventDefault();
+      // Validasi sederhana
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      
+      if (!name || !email) {
+        alert('Mohon lengkapi semua field yang wajib diisi.');
+        return;
+      }
+      
       // Simulasi simpan data
       alert('Profil berhasil diperbarui!');
       // Redirect ke halaman profil

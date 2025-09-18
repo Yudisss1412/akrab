@@ -19,6 +19,13 @@ body {
   background: var(--bg) !important; /* memastikan background menggunakan variabel yang benar */
   color: var(--text);
   font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+  /* Remove any default padding that might cause spacing issues */
+  padding: 0;
+}
+
+/* Override main content padding to reduce spacing */
+main.content {
+  padding: 0 !important;
 }
 
 /* Appbar */
@@ -32,10 +39,10 @@ body {
 .icon-btn { background: none; border: none; cursor: pointer; color: var(--text); padding: 0; }
 
 /* Container */
-.container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; } /* disamakan dengan halaman profil */
+.container { max-width: 1200px; margin: 0 auto; padding: 1rem; } /* Reduced padding to decrease distance from navbar */
 
 /* Tabs */
-.tabs { display: flex; gap: 20px; padding: 0 1.5rem; border-bottom: 1px solid var(--border); } /* disamakan dengan halaman profil */
+.tabs { display: flex; gap: 20px; padding: 0 1rem; border-bottom: 1px solid var(--border); } /* Reduced padding */
 .tab {
   background: none; border: none; padding: 14px 0; cursor: pointer;
   font-weight: 600; color: var(--muted);
@@ -43,15 +50,18 @@ body {
 .tab.active { color: var(--brand); border-bottom: 2px solid var(--brand); }
 
 /* Tab Content */
-.tab-content { padding: 1.5rem; } /* disamakan dengan halaman profil */
+.tab-content { padding: 1rem 0 0 0; } /* Reduced top padding to decrease distance from tabs */
 .tab-content[hidden] { display: none; }
 
 /* Review List */
 .review-list { 
   display: grid; 
-  gap: 1.5rem; 
-  /* Tambahkan min-height untuk memastikan konten terlihat */
+  gap: 1rem; 
+  /* Reduced gap between reviews */
   min-height: 200px;
+  /* Remove any default margin that might be causing extra spacing */
+  margin: 0;
+  padding: 0.5rem 0 0 0; /* Add small top padding and remove bottom padding */
 }
 
 /* Review Card */

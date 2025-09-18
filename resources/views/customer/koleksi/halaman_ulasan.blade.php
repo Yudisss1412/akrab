@@ -21,28 +21,18 @@
     <div class="container">
       <div class="tabs">
         <button class="tab active" data-tab="ulasan">Ulasan Saya</button>
-        <button class="tab" data-tab="wishlist">Wishlist</button>
       </div>
 
       <section class="tab-content active" id="ulasan-content">
         <div class="review-list" id="reviewList">
           <!-- Reviews will be loaded here -->
         </div>
-        <div class="empty-state" id="emptyState" hidden>
-          <img src="{{ asset('src/empty-reviews.svg') }}" alt="" class="empty-img">
+        <div class="empty-state" id="emptyState" style="display: none;">
+          <div class="empty-img" style="width: 100px; height: 100px; background-color: #eee; margin: 0 auto 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+            <span style="font-size: 40px;">⭐</span>
+          </div>
           <p class="empty-text">Belum ada ulasan produk.</p>
           <a href="{{ route('cust.welcome') }}" class="btn btn-primary">Belanja Sekarang</a>
-        </div>
-      </section>
-
-      <section class="tab-content" id="wishlist-content" hidden>
-        <div class="wishlist-grid" id="wishlistGrid">
-          <!-- Wishlist items will be loaded here -->
-        </div>
-        <div class="empty-state" id="wishlistEmpty" hidden>
-          <img src="{{ asset('src/empty-wishlist.svg') }}" alt="" class="empty-img">
-          <p class="empty-text">Wishlist kamu masih kosong.</p>
-          <a href="{{ route('cust.welcome') }}" class="btn btn-primary">Jelajahi Produk</a>
         </div>
       </section>
     </div>
@@ -59,7 +49,7 @@
       <form id="editReviewForm">
         <input type="hidden" id="reviewId">
         <div class="form-group">
-          <label for="product-name">Produk</label>
+          <label for="productName">Produk</label>
           <input type="text" id="productName" readonly>
         </div>
         <div class="form-group">
@@ -73,8 +63,8 @@
           </div>
         </div>
         <div class="form-group">
-          <label for="review-text">Ulasan</label>
-          <textarea id="reviewText" rows="4" placeholder="Bagikan pengalamanmu menggunakan produk ini..."></textarea>
+          <label for="reviewText">Ulasan</label>
+          <textarea id="reviewText" rows="6" placeholder="Bagikan pengalamanmu menggunakan produk ini..."></textarea>
         </div>
         <div class="form-actions">
           <button type="button" class="btn btn-secondary" id="deleteReview">Hapus</button>

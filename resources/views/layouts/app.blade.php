@@ -184,7 +184,7 @@
 <body>
     <div class="main-layout">
         <!-- Conditional Header - Use compact header for specific pages -->
-        @if(request()->is('keranjang') || request()->is('transaksi/checkout') || request()->is('profil') || request()->is('profil/*'))
+        @if(request()->is('keranjang') || request()->is('transaksi/checkout') || request()->is('profil') || request()->is('profil/*') || request()->is('edit_profil'))
             @include('components.header_compact')
         @else
             @include('components.header')

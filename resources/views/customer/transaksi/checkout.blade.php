@@ -98,24 +98,6 @@
               <textarea id="orderNotes" placeholder="Contoh: Warna biru dong, terima kasih"></textarea>
             </div>
           </section>
-
-          <!-- Metode Pembayaran -->
-          <section class="payment-methods">
-            <h2>Metode Pembayaran</h2>
-            <div class="form-group">
-              <label for="paymentMethod">Pilih Metode Pembayaran</label>
-              <select id="paymentMethod" class="form-control">
-                <option value="bank_transfer">Transfer Bank</option>
-                <option value="e_wallet">Dompet Digital</option>
-                <option value="cod">Cash on Delivery (COD)</option>
-              </select>
-            </div>
-            
-            <!-- Payment method details container -->
-            <div class="payment-details" id="paymentDetails">
-              <!-- Details will be shown based on selection -->
-            </div>
-          </section>
         </div>
 
         <div class="sidebar">
@@ -163,10 +145,8 @@
       const checkoutBtn = document.querySelector('.btn-checkout');
       if (checkoutBtn) {
         checkoutBtn.addEventListener('click', function() {
-          // Simulasi proses checkout
-          alert('Pesanan berhasil dibuat! Mengarahkan ke halaman pembayaran...');
-          // Redirect ke halaman pembayaran
-          window.location.href = '#';
+          // Redirect to shipping page
+          window.location.href = '{{ route("cust.pengiriman") }}';
         });
       }
 

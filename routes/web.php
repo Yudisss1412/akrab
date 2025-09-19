@@ -47,6 +47,14 @@ Route::get('/checkout', function () {
     return view('customer.transaksi.checkout');
 })->name('checkout');
 
+Route::get('/pengiriman', function () {
+    return view('customer.transaksi.pengiriman');
+})->name('cust.pengiriman');
+
+Route::get('/pembayaran', function () {
+    return view('customer.transaksi.pembayaran');
+})->name('cust.pembayaran');
+
 Route::get('/halaman_ulasan', function () {
     return view('customer.koleksi.halaman_ulasan');
 })->name('halaman_ulasan');

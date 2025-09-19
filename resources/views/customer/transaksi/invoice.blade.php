@@ -1,9 +1,12 @@
 @extends('layouts.app')
 
-@section('title', 'Invoice — AKRAB')
+@section('title', 'Invoice')
+
+@section('header')
+  @include('components.header_compact')
+@endsection
 
 @push('styles')
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ asset('css/customer/transaksi/invoice.css') }}">
 @endpush
 
@@ -12,7 +15,7 @@
     <div class="container">
       <header class="invoice-header">
         <div class="brand">
-          <img src="{{ $store['logo'] ?? '/src/Logo_UMKM.png' }}" alt="AKRAB" class="logo">
+          <img src="{{ asset('src/Logo_UMKM.png') }}" alt="AKRAB" class="logo">
           <div>
             <h1>Invoice</h1>
             <p class="invoice-id">#INV-2023-001</p>

@@ -412,49 +412,6 @@ section h2 {
   border-color: var(--primary-color);
 }
 
-/* Payment Methods */
-.payment-methods .form-group {
-  margin-bottom: 20px;
-}
-
-.payment-details {
-  margin-top: 20px;
-  padding: 20px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-  background: var(--gray-100);
-}
-
-.payment-details h3 {
-  margin-top: 0;
-  font-size: 16px;
-  color: var(--text);
-}
-
-.payment-details p {
-  margin: 8px 0;
-  font-size: 14px;
-  color: #666;
-  line-height: 1.5;
-}
-
-.payment-details .cod-info {
-  background: #fff8e6;
-  border: 1px solid #ffe082;
-  border-radius: 8px;
-  padding: 12px;
-  margin-top: 12px;
-}
-
-.payment-details .cod-info strong {
-  color: #e65100;
-}
-
-.payment-details .cod-info p {
-  margin: 6px 0;
-  font-size: 13px;
-}
-
 /* Modal */
 .modal {
   position: fixed;

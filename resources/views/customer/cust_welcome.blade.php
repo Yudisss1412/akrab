@@ -56,13 +56,27 @@
             <section class="content-section">
                 <h3>Jelajahi Kategori</h3>
                 <div class="category-grid">
-                    <div class="category-card"><span>🍽️</span><h4>Kuliner</h4></div>
-                    <div class="category-card"><span>👕</span><h4>Fashion</h4></div>
-                    <div class="category-card"><span>👜</span><h4>Kerajinan Tangan</h4></div>
-                    <div class="category-card"><span>🌿</span><h4>Produk Berkebun</h4></div>
-                    <div class="category-card"><span>🧼</span><h4>Produk Kesehatan</h4></div>
-                    <div class="category-card"><span>🧒</span><h4>Mainan</h4></div>
-                    <div class="category-card"><span>🎁</span><h4>Hampers</h4></div>
+                    <a href="{{ route('kategori.kuliner') }}" class="category-card-link">
+                        <div class="category-card"><span>🍽️</span><h4>Kuliner</h4></div>
+                    </a>
+                    <a href="{{ route('kategori.fashion') }}" class="category-card-link">
+                        <div class="category-card"><span>👕</span><h4>Fashion</h4></div>
+                    </a>
+                    <a href="{{ route('kategori.kerajinan') }}" class="category-card-link">
+                        <div class="category-card"><span>👜</span><h4>Kerajinan Tangan</h4></div>
+                    </a>
+                    <a href="{{ route('kategori.berkebun') }}" class="category-card-link">
+                        <div class="category-card"><span>🌿</span><h4>Produk Berkebun</h4></div>
+                    </a>
+                    <a href="{{ route('kategori.kesehatan') }}" class="category-card-link">
+                        <div class="category-card"><span>🧼</span><h4>Produk Kesehatan</h4></div>
+                    </a>
+                    <a href="{{ route('kategori.mainan') }}" class="category-card-link">
+                        <div class="category-card"><span>🧒</span><h4>Mainan</h4></div>
+                    </a>
+                    <a href="{{ route('kategori.hampers') }}" class="category-card-link">
+                        <div class="category-card"><span>🎁</span><h4>Hampers</h4></div>
+                    </a>
                 </div>
             </section>
         </main>

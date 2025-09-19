@@ -77,6 +77,38 @@ Route::get('/invoice', function () {
     return view('customer.transaksi.invoice');
 })->name('invoice');
 
+Route::get('/kategori', function () {
+    return view('customer.kategori.kategori');
+})->name('kategori');
+
+Route::get('/kategori/kuliner', function () {
+    return view('customer.kategori.kuliner');
+})->name('kategori.kuliner');
+
+Route::get('/kategori/fashion', function () {
+    return view('customer.kategori.fashion');
+})->name('kategori.fashion');
+
+Route::get('/kategori/kerajinan', function () {
+    return view('customer.kategori.kerajinan');
+})->name('kategori.kerajinan');
+
+Route::get('/kategori/berkebun', function () {
+    return view('customer.kategori.berkebun');
+})->name('kategori.berkebun');
+
+Route::get('/kategori/kesehatan', function () {
+    return view('customer.kategori.kesehatan');
+})->name('kategori.kesehatan');
+
+Route::get('/kategori/mainan', function () {
+    return view('customer.kategori.mainan');
+})->name('kategori.mainan');
+
+Route::get('/kategori/hampers', function () {
+    return view('customer.kategori.hampers');
+})->name('kategori.hampers');
+
 Route::get('/dashboard_admin', function () {
     return view('admin.dashboard_admin');
 })->name('dashboard.admin');

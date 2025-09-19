@@ -140,19 +140,49 @@ main{
 
 /* ========== Kategori ========== */
 .category-grid{
-  display: grid; grid-template-columns: repeat(7, 1fr);
+  display: grid; 
+  grid-template-columns: repeat(7, 1fr);
   gap: 1.2rem;
+  align-items: stretch; /* Ensure all grid items stretch to same height */
+}
+.category-card-link {
+  text-decoration: none;
+  color: inherit;
+  height: 100%;
+  display: block;
 }
 .category-card{
-  background: var(--secondary-color); border-radius: 13px; padding: 1.5rem .5rem;
-  text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,.05);
-  font-size: 1.09rem; font-weight: 600; color: var(--dark-text-color);
-  display: flex; flex-direction: column; align-items: center; gap: .3rem;
-  transition: box-shadow .16s, transform .16s; cursor: pointer;
+  background: var(--secondary-color); 
+  border-radius: 13px; 
+  padding: 1.5rem .5rem;
+  text-align: center; 
+  box-shadow: 0 4px 15px rgba(0,0,0,.05);
+  font-size: 1.09rem; 
+  font-weight: 600; 
+  color: var(--dark-text-color);
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  gap: .3rem;
+  transition: box-shadow .16s, transform .16s; 
+  cursor: pointer;
+  height: 100%; /* Ensure all cards take full height of grid cell */
+  justify-content: center; /* Center content vertically */
+  min-height: 120px; /* Set minimum height for consistency */
 }
 .category-card:hover{ transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,.08); }
-.category-card span{ font-size: 2.35rem; margin-bottom: .33rem; }
-.category-card h4{ font-weight: 600; font-size: 1.09rem; }
+.category-card span{ 
+  font-size: 2.35rem; 
+  margin-bottom: .33rem; 
+  line-height: 1; /* Ensure consistent line height for emojis */
+}
+.category-card h4{ 
+  font-weight: 600; 
+  font-size: 1.09rem; 
+  margin: 0; /* Remove default margins */
+  line-height: 1.3; /* Consistent line height */
+  text-align: center; /* Center text */
+}
 
 /* ========== Footer (struktur dasar) ========== */
 .footer{

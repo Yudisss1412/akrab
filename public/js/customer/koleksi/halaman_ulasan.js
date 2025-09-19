@@ -31,7 +31,11 @@ const data = {
         title: "【MG】 Stick Stik DS4 LightBar + DUS ASLI",
         variant: "Variasi: Hitam, SAMA BOX + KABEL",
         url: "#"
-      }
+      },
+      images: [
+        { name: "produk1.jpg", size: 123456, type: "image/jpeg" },
+        { name: "produk2.jpg", size: 234567, type: "image/jpeg" }
+      ]
     },
     {
       id: "r2",
@@ -42,7 +46,8 @@ const data = {
         title: "Gedi Luxury 13011 Jam Tangan Wanita Rantai",
         variant: "Variasi: Full Black",
         url: "#"
-      }
+      },
+      images: []
     }
   ]
 };
@@ -168,11 +173,14 @@ function createReviewCard(item, withRating = false) {
       if (starsWrap) {
         // Tambahkan event listener untuk mengubah rating
         starsWrap.style.cursor = 'pointer';
-        starsWrap.addEventListener('click', (e) => {
+        starsWrap.addEventListener('click', handleCardStarsClick);
+        
+        // Fungsi terpisah untuk menangani klik bintang di card
+        function handleCardStarsClick(e) {
           // Pastikan hanya merespon klik pada bintang itu sendiri
           console.log('Card stars clicked');
           openReviewModal(item, card);
-        });
+        }
         
         header.appendChild(starsWrap);
         console.log('Stars wrap appended to header');
@@ -231,32 +239,66 @@ function createReviewCard(item, withRating = false) {
     card.appendChild(body);
     console.log('Body appended to card');
 
+    // Images section (if any images exist)
+    if (item.images && item.images.length > 0) {
+      const imagesContainer = document.createElement('div');
+      imagesContainer.className = 'review-images';
+      
+      const imagesTitle = document.createElement('div');
+      imagesTitle.className = 'images-title';
+      imagesTitle.textContent = 'Foto Ulasan:';
+      imagesContainer.appendChild(imagesTitle);
+      
+      const imagesGrid = document.createElement('div');
+      imagesGrid.className = 'images-grid';
+      
+      item.images.forEach((image, index) => {
+        const imageWrapper = document.createElement('div');
+        imageWrapper.className = 'image-wrapper';
+        imageWrapper.addEventListener('click', () => {
+          openLightbox(image, index, item.images);
+        });
+        
+        // Untuk demo, kita akan buat placeholder gambar
+        // Dalam implementasi nyata, ini akan berisi URL gambar yang sebenarnya
+        const placeholder = document.createElement('div');
+        placeholder.className = 'image-placeholder';
+        placeholder.textContent = '📷';
+        
+        const imageInfo = document.createElement('div');
+        imageInfo.className = 'image-info';
+        imageInfo.textContent = image.name || `Foto ${index + 1}`;
+        
+        imageWrapper.appendChild(placeholder);
+        imageWrapper.appendChild(imageInfo);
+        imagesGrid.appendChild(imageWrapper);
+      });
+      
+      imagesContainer.appendChild(imagesGrid);
+      card.appendChild(imagesContainer);
+      console.log('Images section appended to card');
+    }
+
     // Footer
     const footer = document.createElement('div');
     footer.className = 'rev-foot';
     console.log('Footer element created:', footer);
     
-    const helpBtn = document.createElement('button');
-    helpBtn.className = 'btn';
-    helpBtn.textContent = 'Bantu';
-    helpBtn.addEventListener('click', (e)=>{
-      e.currentTarget.classList.toggle('is-on');
-      if(e.currentTarget.classList.contains('is-on')){
-        e.currentTarget.style.borderColor = 'var(--ok)';
-        e.currentTarget.style.color = 'var(--ok)';
-      }else{
-        e.currentTarget.style.borderColor = 'var(--border)';
-        e.currentTarget.style.color = 'var(--text)';
-      }
-    });
-    footer.appendChild(helpBtn);
-    console.log('Help button created and appended');
-    
     const updateBtn = document.createElement('button');
-    updateBtn.className = 'btn primary';
+    updateBtn.className = 'btn btn-primary';
     updateBtn.textContent = item.rating !== undefined ? 'Perbarui' : 'Tulis Ulasan';
+    
+    // Store item and card references in the button's dataset for debugging
+    updateBtn.dataset.itemId = item.id;
+    updateBtn.dataset.itemTitle = item.product?.title || '';
+    
     updateBtn.addEventListener('click', ()=> {
+      console.log('Perbarui button clicked');
+      console.log('Button dataset:', updateBtn.dataset);
+      console.log('Item data:', item);
+      console.log('Card element:', card);
       if (item.rating !== undefined) {
+        console.log('Opening review modal');
         openReviewModal(item, card);
       } else {
         alert('Aksi: Tulis Ulasan untuk item ' + (item.product?.title || ''));
@@ -278,7 +320,7 @@ function createReviewCard(item, withRating = false) {
   }
 }
 
-function renderList(container, items, {withRating}={}){
+function renderList(container, items, {withRating}={}) {
   try {
     console.log('=== RENDERLIST CALLED ===');
     console.log('Parameters:', {container, items, withRating});
@@ -418,10 +460,13 @@ function setupTabs(){
 
     tabs.forEach((t, index) => {
       console.log('Adding click listener to tab', index, ':', t);
-      t.addEventListener('click', () => {
+      t.addEventListener('click', handleTabClick);
+      
+      // Fungsi terpisah untuk menangani klik tab
+      function handleTabClick() {
         console.log('Tab', index, 'clicked');
         activate(t);
-      });
+      }
     });
 
     // init - activate first tab
@@ -445,18 +490,48 @@ function setupSearchAndSort(){
 let currentEditCard = null;
 
 function openReviewModal(item, cardElement) {
+  console.log('=== OPENING REVIEW MODAL ===');
   console.log('Opening review modal for item:', item);
   console.log('Item rating:', item.rating);
+  console.log('Card element:', cardElement);
   
   // Simpan referensi card yang sedang diedit
   currentEditCard = cardElement;
+  console.log('Set currentEditCard:', currentEditCard);
+  
+  // Tambahkan class ke body untuk mencegah scrolling
+  document.body.classList.add('modal-open');
+  console.log('Added modal-open class to body');
+  
+  // Reset image files for new review
+  window.currentReviewImages = [];
+  console.log('Reset window.currentReviewImages to empty array');
   
   // Isi data ke dalam modal
   const modal = document.getElementById('editReviewModal');
+  console.log('Modal element:', modal);
+  console.log('Modal element type:', typeof modal);
+  console.log('Modal element found:', !!modal);
+  
   if (!modal) {
     console.log('Modal element not found');
+    // Try to find it another way
+    const modals = document.querySelectorAll('#editReviewModal');
+    console.log('Number of modal elements found with querySelectorAll:', modals.length);
+    if (modals.length > 0) {
+      console.log('Found modal with querySelectorAll:', modals[0]);
+    }
     return;
   }
+  console.log('Modal element found, continuing...');
+  
+  // Check if modal is in the DOM
+  console.log('Modal parent node:', modal.parentNode);
+  console.log('Modal is connected to DOM:', modal.isConnected);
+  
+  // Check modal styles
+  console.log('Modal computed display:', window.getComputedStyle(modal).display);
+  console.log('Modal hasAttribute hidden:', modal.hasAttribute('hidden'));
   
   // Isi data produk
   const productNameInput = document.getElementById('productName');
@@ -502,111 +577,245 @@ function openReviewModal(item, cardElement) {
     reviewTextInput.value = reviewText;
   }
   
+  // Jika item memiliki gambar, siapkan untuk ditampilkan di modal
+  if (item.images && item.images.length > 0) {
+    // Konversi gambar yang ada ke format yang bisa ditampilkan di modal
+    window.currentReviewImages = item.images.map(img => ({
+      name: img.name,
+      size: img.size,
+      type: img.type,
+      dataURL: img.dataURL || img.url || null
+    }));
+  }
+  
+  // Update image previews
+  const previewContainer = document.getElementById('previewContainer');
+  const dropArea = document.getElementById('dropArea');
+  if (previewContainer && dropArea) {
+    if (window.currentReviewImages.length > 0) {
+      previewContainer.style.display = 'block';
+      dropArea.style.display = 'none';
+      updateImagePreviews();
+    } else {
+      previewContainer.style.display = 'none';
+      dropArea.style.display = 'block';
+    }
+  }
+  
   // Simpan ID review untuk penggunaan saat submit
   const reviewIdInput = document.getElementById('reviewId');
   if (reviewIdInput) {
     reviewIdInput.value = item.id || '';
+    console.log('Set review ID input to:', item.id);
   }
   
+  // Setup modal event listeners setiap kali modal dibuka
+  setupModalEventListeners();
+  
   // Tampilkan modal
-  modal.hidden = false;
+  console.log('About to show modal, current hidden state:', modal.hidden);
+  console.log('Modal hasAttribute hidden:', modal.hasAttribute('hidden'));
+  // Use removeAttribute instead of setting hidden property to false
+  modal.removeAttribute('hidden');
+  console.log('Modal hidden attribute removed');
+  console.log('Modal hasAttribute hidden after removal:', modal.hasAttribute('hidden'));
+  
+  // Force reflow to ensure changes take effect
+  modal.offsetHeight;
+  
+  // Check if modal is now visible
+  console.log('Modal computed display after removal:', window.getComputedStyle(modal).display);
   
   console.log('Modal opened with rating:', item.rating);
+  console.log('=== FINISHED OPENING REVIEW MODAL ===');
 }
 
 function closeReviewModal() {
+  console.log('=== CLOSING REVIEW MODAL ===');
   const modal = document.getElementById('editReviewModal');
+  console.log('Modal element:', modal);
   if (modal) {
-    modal.hidden = true;
+    // Use setAttribute instead of setting hidden property to true
+    modal.setAttribute('hidden', '');
+    console.log('Modal hidden attribute added');
   }
   // Reset referensi card
   currentEditCard = null;
   
-  // Update tampilan card setelah modal ditutup
+  // Hapus class dari body untuk mengizinkan scrolling kembali
+  document.body.classList.remove('modal-open');
+  console.log('Removed modal-open class from body');
+  
+  // Reset image files
+  window.currentReviewImages = [];
+  
+  // Reset form
+  const editReviewForm = $q('#editReviewForm');
+  if (editReviewForm) {
+    editReviewForm.reset();
+    console.log('Edit review form reset');
+  }
+  
+  // Reset rating stars
+  const ratingContainer = document.getElementById('rating');
+  if (ratingContainer) {
+    const stars = ratingContainer.querySelectorAll('.star');
+    stars.forEach(star => {
+      star.classList.remove('active');
+    });
+    console.log('Rating stars reset');
+  }
+  
+  // Reset image previews
+  const previewContainer = document.getElementById('previewContainer');
+  const dropArea = document.getElementById('dropArea');
+  if (previewContainer && dropArea) {
+    previewContainer.style.display = 'none';
+    dropArea.style.display = 'block';
+    const imagePreviews = document.getElementById('imagePreviews');
+    if (imagePreviews) {
+      imagePreviews.innerHTML = '';
+    }
+    console.log('Image previews reset');
+  }
+  
+  // Reset review ID
+  const reviewIdInput = document.getElementById('reviewId');
+  if (reviewIdInput) {
+    reviewIdInput.value = '';
+    console.log('Review ID input reset');
+  }
+  
+  // Tutup lightbox jika terbuka
+  closeLightbox();
+  
   console.log('Review modal closed');
+  console.log('=== FINISHED CLOSING REVIEW MODAL ===');
 }
 
 function setupModalEventListeners() {
+  console.log('=== SETTING UP MODAL EVENT LISTENERS ===');
+  
   // Setup close button
   const closeModalBtn = $q('#closeModal');
+  console.log('Close button:', closeModalBtn);
   if (closeModalBtn) {
     closeModalBtn.addEventListener('click', closeReviewModal);
+    console.log('Close button event listener added');
+  } else {
+    console.log('Close button not found');
   }
   
   // Setup overlay click to close
   const modalOverlay = $q('.modal-overlay');
+  console.log('Modal overlay:', modalOverlay);
   if (modalOverlay) {
     modalOverlay.addEventListener('click', closeReviewModal);
+    console.log('Modal overlay event listener added');
+  } else {
+    console.log('Modal overlay not found');
   }
   
   // Setup rating stars
   const ratingContainer = $q('#rating');
+  console.log('Rating container:', ratingContainer);
   if (ratingContainer) {
     console.log('Setting up rating container event listener');
-    ratingContainer.addEventListener('click', (e) => {
-      console.log('Rating container clicked, target:', e.target);
-      console.log('Target class list:', e.target.classList);
-      
-      if (e.target.classList.contains('star')) {
-        const value = parseInt(e.target.dataset.value);
-        console.log('Star clicked, value:', value);
-        
-        // Aktifkan bintang secara berurutan dari kiri ke kanan
-        const stars = ratingContainer.querySelectorAll('.star');
-        console.log('Total stars found:', stars.length);
-        
-        // Reset semua bintang terlebih dahulu
-        stars.forEach(star => {
-          star.classList.remove('active');
-        });
-        
-        // Aktifkan bintang dari 1 hingga nilai yang diklik
-        for (let i = 0; i < stars.length; i++) {
-          const starValue = parseInt(stars[i].dataset.value);
-          if (starValue <= value) {
-            stars[i].classList.add('active');
-          }
-        }
-        
-        // Log status akhir untuk debugging
-        stars.forEach((star, index) => {
-          const isActive = star.classList.contains('active');
-          console.log('Final Clicked Star', index + 1, 'active:', isActive);
-        });
-        
-        // Update nilai rating di UI real-time (opsional)
-        console.log('Rating updated to:', value);
-      } else {
-        console.log('Clicked element is not a star');
-      }
-    });
+    ratingContainer.addEventListener('click', handleRatingClick);
+    console.log('Rating container event listener added');
+  } else {
+    console.log('Rating container not found');
   }
   
   // Setup form submit
   const editReviewForm = $q('#editReviewForm');
+  console.log('Edit review form:', editReviewForm);
   if (editReviewForm) {
-    editReviewForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      console.log('Form submitted');
-      saveReviewChanges();
-    });
+    editReviewForm.addEventListener('submit', handleFormSubmit);
+    console.log('Edit review form event listener added');
+  } else {
+    console.log('Edit review form not found');
   }
   
   // Setup delete button
   const deleteReviewBtn = $q('#deleteReview');
+  console.log('Delete review button:', deleteReviewBtn);
   if (deleteReviewBtn) {
-    deleteReviewBtn.addEventListener('click', () => {
-      // Hapus ulasan (implementasi sesuai kebutuhan)
-      console.log('Deleting review');
-      closeReviewModal();
-    });
+    deleteReviewBtn.addEventListener('click', handleDeleteReview);
+    console.log('Delete review button event listener added');
+  } else {
+    console.log('Delete review button not found');
   }
+  
+  // Setup drag and drop functionality
+  setupDragAndDrop();
+  console.log('=== FINISHED SETTING UP MODAL EVENT LISTENERS ===');
+}
+
+// Fungsi terpisah untuk menangani klik rating
+function handleRatingClick(e) {
+  console.log('Rating container clicked, target:', e.target);
+  console.log('Target class list:', e.target.classList);
+  
+  if (e.target.classList.contains('star')) {
+    const value = parseInt(e.target.dataset.value);
+    console.log('Star clicked, value:', value);
+    
+    // Aktifkan bintang secara berurutan dari kiri ke kanan
+    const ratingContainer = document.getElementById('rating');
+    const stars = ratingContainer.querySelectorAll('.star');
+    console.log('Total stars found:', stars.length);
+    
+    // Reset semua bintang terlebih dahulu
+    stars.forEach(star => {
+      star.classList.remove('active');
+    });
+    
+    // Aktifkan bintang dari 1 hingga nilai yang diklik
+    for (let i = 0; i < stars.length; i++) {
+      const starValue = parseInt(stars[i].dataset.value);
+      if (starValue <= value) {
+        stars[i].classList.add('active');
+      }
+    }
+    
+    // Log status akhir untuk debugging
+    stars.forEach((star, index) => {
+      const isActive = star.classList.contains('active');
+      console.log('Final Clicked Star', index + 1, 'active:', isActive);
+    });
+    
+    // Update nilai rating di UI real-time (opsional)
+    console.log('Rating updated to:', value);
+  } else {
+    console.log('Clicked element is not a star');
+  }
+}
+
+// Fungsi terpisah untuk menangani submit form
+function handleFormSubmit(e) {
+  e.preventDefault();
+  console.log('Form submitted');
+  saveReviewChanges();
+}
+
+// Fungsi terpisah untuk menangani hapus ulasan
+function handleDeleteReview() {
+  // Hapus ulasan (implementasi sesuai kebutuhan)
+  console.log('Deleting review');
+  closeReviewModal();
 }
 
 function saveReviewChanges() {
   console.log('saveReviewChanges called');
   // Dapatkan data dari form
-  const reviewId = document.getElementById('reviewId').value;
+  const reviewId = document.getElementById('reviewId').value.trim();
+  console.log('Review ID from form:', reviewId);
+  
+  if (!reviewId) {
+    console.error('Review ID is empty or undefined');
+    return;
+  }
   
   // Hitung rating dengan cara yang lebih akurat
   let rating = 0;
@@ -655,49 +864,43 @@ function saveReviewChanges() {
     });
   }
   
-  // Gunakan referensi card yang disimpan atau temukan card yang sesuai
-  let reviewCard = currentEditCard;
-  if (!reviewCard) {
-    reviewCard = document.querySelector(".review-card[data-id='" + reviewId + "']");
+  // Dapatkan file gambar yang dipilih (jika ada)
+  const selectedFiles = window.currentReviewImages || [];
+  console.log('Selected images:', selectedFiles);
+  console.log('Number of selected images:', selectedFiles.length);
+  console.log('Window currentReviewImages:', window.currentReviewImages);
+  console.log('Window currentReviewImages type:', typeof window.currentReviewImages);
+  
+  // For debugging - let's log the actual files
+  if (selectedFiles && selectedFiles.length > 0) {
+    selectedFiles.forEach((file, index) => {
+      console.log('File', index, ':', file.name, file.size, file.type);
+    });
+  } else {
+    console.log('No files selected');
   }
   
-  if (reviewCard) {
-    console.log('Updating card rating to:', rating);
-    // Perbarui rating di header card
-    updateCardRating(reviewCard, rating);
-    
-    // Perbarui konten KV jika ada
-    const kvList = reviewCard.querySelector('.kv');
-    if (kvList) {
-      // Simpan referensi ke parent dan next sibling sebelum menghapus
-      const parent = kvList.parentNode;
-      const nextSibling = kvList.nextSibling;
-      
-      // Hapus KV list lama
-      kvList.remove();
-      
-      // Buat KV list baru
-      const newKvList = document.createElement('ul');
-      newKvList.className = 'kv';
-      addKV(newKvList, kv);
-      
-      // Sisipkan KV list baru di posisi yang sama
-      if (nextSibling) {
-        parent.insertBefore(newKvList, nextSibling);
-      } else {
-        parent.appendChild(newKvList);
-      }
+  // Gunakan referensi card yang disimpan atau temukan card yang sesuai
+  let reviewCard = currentEditCard;
+  console.log('Current edit card:', currentEditCard);
+  console.log('Current edit card type:', typeof currentEditCard);
+  if (!reviewCard) {
+    console.log('Searching for card with ID:', reviewId);
+    reviewCard = document.querySelector(".review-card[data-id='" + reviewId + "']");
+    console.log('Found card by querySelector:', reviewCard);
+    if (!reviewCard) {
+      console.error('Could not find review card with ID:', reviewId);
+      // Try to find any card as fallback
+      reviewCard = document.querySelector('.review-card');
+      console.log('Fallback - found any card:', reviewCard);
     }
-    
-    // Update data item dalam objek data untuk memastikan perubahan persisten
-    const reviewItem = data.dinilai.find(item => item.id === reviewId);
-    if (reviewItem) {
-      const oldRating = reviewItem.rating;
-      reviewItem.rating = rating;
-      reviewItem.kv = kv;
-      console.log('Data updated from rating', oldRating, 'to', rating, ':', reviewItem);
-    }
+  } else {
+    console.log('Using current edit card');
   }
+  
+  console.log('Review card found:', reviewCard);
+  console.log('Review ID:', reviewId);
+  console.log('Review card dataset ID:', reviewCard ? reviewCard.dataset.id : 'N/A');
   
   // Tutup modal
   closeReviewModal();
@@ -705,9 +908,24 @@ function saveReviewChanges() {
   // Reset referensi card
   currentEditCard = null;
   
+  // Reset image files
+  window.currentReviewImages = [];
+  
   // Tampilkan pesan sukses (opsional)
   console.log('Review changes saved successfully');
   console.log('Updated rating:', rating);
+  
+  // Reset form setelah perubahan disimpan
+  const editReviewForm = $q('#editReviewForm');
+  if (editReviewForm) {
+    editReviewForm.reset();
+  }
+  
+  // Reset review ID
+  const reviewIdInput = document.getElementById('reviewId');
+  if (reviewIdInput) {
+    reviewIdInput.value = '';
+  }
 }
 
 function updateCardRating(cardElement, newRating) {
@@ -728,7 +946,10 @@ function updateCardRating(cardElement, newRating) {
     
     // Tambahkan event listener untuk mengubah rating
     newStars.style.cursor = 'pointer';
-    newStars.addEventListener('click', (e) => {
+    newStars.addEventListener('click', handleStarsClick);
+    
+    // Fungsi terpisah untuk menangani klik bintang
+    function handleStarsClick(e) {
       // Temukan item data berdasarkan ID card
       const cardId = cardElement.dataset.id;
       const item = data.dinilai.find(i => i.id === cardId);
@@ -739,7 +960,7 @@ function updateCardRating(cardElement, newRating) {
         item.rating = newRating;
         openReviewModal(item, cardElement);
       }
-    });
+    }
     
     // Cari posisi yang benar untuk menyisipkan bintang
     // Urutan yang benar: userInfo → stars → timeEl
@@ -768,14 +989,359 @@ function updateCardRating(cardElement, newRating) {
   }
 }
 
+function updateCardImages(cardElement, images) {
+  console.log('=== updateCardImages called ===');
+  console.log('Card element:', cardElement);
+  console.log('Card element tag name:', cardElement ? cardElement.tagName : 'N/A');
+  console.log('Card element class list:', cardElement ? cardElement.classList : 'N/A');
+  console.log('Images to display:', images);
+  console.log('Number of images:', images ? images.length : 0);
+  console.log('Images type:', typeof images);
+  
+  // Validate inputs
+  if (!cardElement) {
+    console.error('Card element is null or undefined');
+    return;
+  }
+  
+  if (!images || images.length === 0) {
+    console.log('No images to display');
+    // Hide any existing images container
+    const existingContainer = cardElement.querySelector('.review-images');
+    if (existingContainer) {
+      console.log('Hiding existing images container');
+      existingContainer.style.display = 'none';
+    } else {
+      console.log('No existing images container to hide');
+    }
+    return;
+  }
+  
+  // Temukan atau buat container untuk gambar
+  let imagesContainer = cardElement.querySelector('.review-images');
+  if (!imagesContainer) {
+    console.log('Creating new images container');
+    imagesContainer = document.createElement('div');
+    imagesContainer.className = 'review-images';
+    // Sisipkan setelah rev-body tapi sebelum rev-foot
+    const body = cardElement.querySelector('.rev-body');
+    const footer = cardElement.querySelector('.rev-foot');
+    console.log('Body element:', body);
+    console.log('Footer element:', footer);
+    if (body && footer) {
+      console.log('Inserting images container before footer');
+      try {
+        cardElement.insertBefore(imagesContainer, footer);
+      } catch (e) {
+        console.error('Error inserting images container:', e);
+      }
+    } else if (body) {
+      console.log('Appending images container to body');
+      try {
+        body.appendChild(imagesContainer);
+      } catch (e) {
+        console.error('Error appending images container to body:', e);
+      }
+    } else {
+      console.log('Appending images container to card');
+      try {
+        cardElement.appendChild(imagesContainer);
+      } catch (e) {
+        console.error('Error appending images container to card:', e);
+      }
+    }
+    console.log('Created new images container');
+  } else {
+    console.log('Found existing images container');
+  }
+  
+  // Kosongkan container
+  imagesContainer.innerHTML = '';
+  console.log('Cleared images container');
+  
+  // Tampilkan gambar
+  console.log('Displaying', images.length, 'images');
+  imagesContainer.style.display = 'block';
+  
+  const imagesTitle = document.createElement('div');
+  imagesTitle.className = 'images-title';
+  imagesTitle.textContent = 'Foto Ulasan:';
+  imagesContainer.appendChild(imagesTitle);
+  
+  const imagesGrid = document.createElement('div');
+  imagesGrid.className = 'images-grid';
+  
+  images.forEach((image, index) => {
+    console.log('Creating image element for:', image);
+    const imageWrapper = document.createElement('div');
+    imageWrapper.className = 'image-wrapper';
+    // Tambahkan event listener baru
+    imageWrapper.addEventListener('click', () => {
+      openLightbox(image, index, images);
+    });
+    
+    // Untuk demo, kita akan buat placeholder gambar
+    // Dalam implementasi nyata, ini akan berisi URL gambar yang sebenarnya
+    // Gunakan gambar sebenarnya jika dataURL tersedia, jika tidak gunakan placeholder
+    let imageElement;
+    if (image.dataURL || image.url) {
+      const img = document.createElement('img');
+      img.src = image.dataURL || image.url;
+      img.alt = image.name || `Foto ${index + 1}`;
+      img.className = 'review-image';
+      imageElement = img;
+    } else {
+      const placeholder = document.createElement('div');
+      placeholder.className = 'image-placeholder';
+      placeholder.textContent = '📷';
+      imageElement = placeholder;
+    }
+    
+    imageWrapper.appendChild(imageElement);
+    
+    const imageInfo = document.createElement('div');
+    imageInfo.className = 'image-info';
+    imageInfo.textContent = image.name || `Foto ${index + 1}`;
+    
+    imageWrapper.appendChild(imageInfo);
+    imagesGrid.appendChild(imageWrapper);
+  });
+  
+  imagesContainer.appendChild(imagesGrid);
+  console.log('Added images to container');
+  
+  console.log('Card images updated successfully');
+}
+
+function openLightbox(image, index, images) {
+  console.log('Opening lightbox for image:', image);
+  
+  // Buat atau temukan lightbox
+  let lightbox = document.getElementById('imageLightbox');
+  if (!lightbox) {
+    lightbox = document.createElement('div');
+    lightbox.id = 'imageLightbox';
+    lightbox.className = 'lightbox';
+    
+    const lightboxContent = document.createElement('div');
+    lightboxContent.className = 'lightbox-content';
+    lightboxContent.textContent = '📷 ' + (image.name || 'Foto Produk');
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'lightbox-close';
+    closeBtn.innerHTML = '&times;';
+    closeBtn.addEventListener('click', handleCloseButtonClick);
+    
+    // Fungsi terpisah untuk menangani klik tombol close
+    function handleCloseButtonClick() {
+      closeLightbox();
+    }
+    
+    lightbox.appendChild(lightboxContent);
+    lightbox.appendChild(closeBtn);
+    document.body.appendChild(lightbox);
+    
+    // Tambahkan event listener untuk menutup lightbox saat klik di luar gambar
+    lightbox.addEventListener('click', handleLightboxClick);
+    
+    // Fungsi terpisah untuk menangani klik lightbox
+    function handleLightboxClick(e) {
+      if (e.target === lightbox) {
+        closeLightbox();
+      }
+    }
+  }
+  
+  // Tampilkan lightbox
+  lightbox.classList.add('open');
+  
+  // Mencegah scrolling background
+  document.body.classList.add('modal-open');
+}
+
+function closeLightbox() {
+  const lightbox = document.getElementById('imageLightbox');
+  if (lightbox) {
+    lightbox.classList.remove('open');
+  }
+  
+  // Kembalikan scrolling background
+  document.body.classList.remove('modal-open');
+}
+
+function setupDragAndDrop() {
+  const dropArea = document.getElementById('dropArea');
+  const fileInput = document.getElementById('fileInput');
+  const browseLink = dropArea.querySelector('.browse-link');
+  const previewContainer = document.getElementById('previewContainer');
+  const imagePreviews = document.getElementById('imagePreviews');
+  const clearAllBtn = document.getElementById('clearAllBtn');
+  
+  console.log('Setting up drag and drop functionality');
+  console.log('Drop area:', dropArea);
+  console.log('File input:', fileInput);
+  
+  // Initialize array to store selected files
+  window.currentReviewImages = [];
+  console.log('Initialized window.currentReviewImages as empty array');
+  
+  if (!dropArea || !fileInput) {
+    console.log('Drag and drop elements not found');
+    return;
+  }
+  
+  // Click on browse link opens file input
+  browseLink.addEventListener('click', handleBrowseLinkClick);
+  
+  // Click on drop area opens file input
+  dropArea.addEventListener('click', handleDropAreaClick);
+  
+  // Handle file selection via input
+  fileInput.addEventListener('change', handleFileInputChange);
+  
+  // Prevent default drag behaviors
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, preventDefaults, false);
+    document.body.addEventListener(eventName, preventDefaults, false);
+  });
+  
+  // Highlight drop area when item is dragged over it
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropArea.addEventListener(eventName, highlight, false);
+  });
+  
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, unhighlight, false);
+  });
+  
+  // Handle dropped files
+  dropArea.addEventListener('drop', handleDrop, false);
+  
+  // Handle clear all button
+  if (clearAllBtn) {
+    clearAllBtn.addEventListener('click', handleClearAllClick);
+  }
+  
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  
+  function highlight() {
+    dropArea.classList.add('drag-over');
+  }
+  
+  function unhighlight() {
+    dropArea.classList.remove('drag-over');
+  }
+  
+  function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    handleFiles(files);
+  }
+  
+  function handleFiles(files) {
+  console.log('Handling files:', files);
+  console.log('Number of files:', files.length);
+  // Kosongkan array sebelum menambahkan file baru untuk menghindari duplikasi
+  window.currentReviewImages = [];
+  
+  [...files].forEach(file => {
+    console.log('Processing file:', file.name, file.size, file.type);
+    if (file.type.startsWith('image/')) {
+      // Baca file sebagai data URL agar bisa ditampilkan
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        // Tambahkan dataURL ke file object
+        file.dataURL = e.target.result;
+        window.currentReviewImages.push(file);
+        console.log('Added file to currentReviewImages with dataURL:', file.name);
+        // Update preview setelah file selesai dibaca
+        updateImagePreviews();
+      };
+      reader.readAsDataURL(file);
+    } else {
+      console.log('File is not an image, skipping:', file.name);
+    }
+  });
+  console.log('Current review images after handling:', window.currentReviewImages);
+}
+  
+  function updateImagePreviews() {
+    imagePreviews.innerHTML = '';
+    
+    if (window.currentReviewImages.length > 0) {
+      previewContainer.style.display = 'block';
+      dropArea.style.display = 'none';
+      
+      window.currentReviewImages.forEach((file, index) => {
+        const previewDiv = document.createElement('div');
+        previewDiv.className = 'image-preview';
+        
+        const img = document.createElement('img');
+        // Gunakan dataURL yang sudah disimpan saat file diproses
+        img.src = file.dataURL || '';
+        img.alt = file.name;
+        
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'remove-image';
+        removeBtn.innerHTML = '&times;';
+        removeBtn.addEventListener('click', handleRemoveImageClick);
+        
+        function handleRemoveImageClick(e) {
+          e.stopPropagation();
+          window.currentReviewImages.splice(index, 1);
+          updateImagePreviews();
+          
+          // If no images left, show drop area again
+          if (window.currentReviewImages.length === 0) {
+            previewContainer.style.display = 'none';
+            dropArea.style.display = 'block';
+          }
+        }
+        
+        previewDiv.appendChild(img);
+        previewDiv.appendChild(removeBtn);
+        imagePreviews.appendChild(previewDiv);
+      });
+    } else {
+      previewContainer.style.display = 'none';
+      dropArea.style.display = 'block';
+    }
+  }
+  
+  // Fungsi terpisah untuk menangani klik browse link
+  function handleBrowseLinkClick(e) {
+    e.preventDefault();
+    fileInput.click();
+  }
+  
+  // Fungsi terpisah untuk menangani klik drop area
+  function handleDropAreaClick() {
+    fileInput.click();
+  }
+  
+  // Fungsi terpisah untuk menangani perubahan input file
+  function handleFileInputChange(e) {
+    handleFiles(e.target.files);
+  }
+  
+  // Fungsi terpisah untuk menangani klik tombol clear all
+  function handleClearAllClick() {
+    window.currentReviewImages = [];
+    updateImagePreviews();
+  }
+}
+
 /* ======= Init ======= */
 document.addEventListener('DOMContentLoaded', ()=>{
   try {
     console.log('=== INITIALIZING HALAMAN ULASAN ===');
     console.log('Document loaded, starting initialization');
     
-    // Setup modal event listeners
-    setupModalEventListeners();
+    // Setup escape key listener
+    document.addEventListener('keydown', handleEscapeKey);
     
     // Check if required elements exist
     const reviewList = $q('#reviewList');
@@ -811,20 +1377,42 @@ document.addEventListener('DOMContentLoaded', ()=>{
       }
     }
     
+    // Check modal elements exist
+    console.log('Checking modal elements...');
+    const modal = document.getElementById('editReviewModal');
+    const modalOverlay = $q('.modal-overlay');
+    const ratingContainer = $q('#rating');
+    const editReviewForm = $q('#editReviewForm');
+    const closeModalBtn = $q('#closeModal');
+    const deleteReviewBtn = $q('#deleteReview');
+    
+    console.log('Modal elements found:', {
+      modal: modal ? 'YES' : 'NO',
+      modalOverlay: modalOverlay ? 'YES' : 'NO',
+      ratingContainer: ratingContainer ? 'YES' : 'NO',
+      editReviewForm: editReviewForm ? 'YES' : 'NO',
+      closeModalBtn: closeModalBtn ? 'YES' : 'NO',
+      deleteReviewBtn: deleteReviewBtn ? 'YES' : 'NO'
+    });
+    
+    // Setup modal event listeners AFTER reviews are rendered
+    setupModalEventListeners();
+    
     console.log('Setting up tabs...');
     setupTabs();
     
     console.log('Setting up search and sort...');
     setupSearchAndSort();
 
-    // back button (optional: change URL according to your app)
-    const backBtn = $q('#btnBack');
-    if (backBtn) {
-      console.log('Setting up back button...');
-      backBtn.addEventListener('click', ()=> history.length>1 ? history.back() : location.href = './profil_pembeli.html');
-    } else {
-      console.warn('Back button (#btnBack) not found');
-    }
+    // Add test button for debugging (remove in production)
+    // const testBtn = document.createElement('button');
+    // testBtn.textContent = 'Test Images';
+    // testBtn.style.position = 'fixed';
+    // testBtn.style.bottom = '20px';
+    // testBtn.style.right = '20px';
+    // testBtn.style.zIndex = '10000';
+    // testBtn.addEventListener('click', testImageDisplay);
+    // document.body.appendChild(testBtn);
     
     console.log('=== INITIALIZATION COMPLETE ===');
   } catch (error) {
@@ -832,3 +1420,28 @@ document.addEventListener('DOMContentLoaded', ()=>{
     console.error('Stack trace:', error.stack);
   }
 });
+
+// Fungsi terpisah untuk menangani tombol escape
+function handleEscapeKey(e) {
+  if (e.key === 'Escape') {
+    closeLightbox();
+  }
+}
+
+// Test function to manually trigger image display (for debugging)
+function testImageDisplay() {
+  console.log('Testing image display...');
+  const testImages = [
+    { name: 'test1.jpg', size: 12345, type: 'image/jpeg' },
+    { name: 'test2.png', size: 23456, type: 'image/png' }
+  ];
+  
+  // Try to find a card
+  const card = document.querySelector('.review-card');
+  if (card) {
+    console.log('Found card, updating images...');
+    updateCardImages(card, testImages);
+  } else {
+    console.log('No card found');
+  }
+}

@@ -9,10 +9,12 @@
 @section('content')
   <!-- App Header -->
   <header class="appbar">
-    <button class="icon-btn" id="btnBack" aria-label="Kembali">
+    <a href="{{ url()->previous() }}" class="icon-btn" id="btnBack" aria-label="Kembali">
       <!-- back arrow -->
-      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/></svg>
-    </button>
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+    </a>
     <h1 class="app-title">Penilaian Saya</h1>
     <div class="spacer"></div>
   </header>
@@ -65,6 +67,28 @@
         <div class="form-group">
           <label for="reviewText">Ulasan</label>
           <textarea id="reviewText" rows="6" placeholder="Bagikan pengalamanmu menggunakan produk ini..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Foto Produk (Opsional)</label>
+          <div class="drop-area" id="dropArea">
+            <div class="drop-area-content">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              <p class="drop-text">Seret & lepas foto di sini</p>
+              <p class="drop-hint">atau <span class="browse-link">pilih dari komputer</span></p>
+              <input type="file" id="fileInput" accept="image/*" multiple style="display: none;">
+            </div>
+          </div>
+          <div class="preview-container" id="previewContainer" style="display: none;">
+            <div class="preview-header">
+              <span>Foto yang dipilih:</span>
+              <button type="button" class="clear-all-btn" id="clearAllBtn">Hapus Semua</button>
+            </div>
+            <div class="image-previews" id="imagePreviews"></div>
+          </div>
         </div>
         <div class="form-actions">
           <button type="button" class="btn btn-secondary" id="deleteReview">Hapus</button>

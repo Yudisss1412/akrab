@@ -19,30 +19,47 @@ body {
   background: var(--bg) !important; /* memastikan background menggunakan variabel yang benar */
   color: var(--text);
   font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-  /* Remove any default padding that might cause spacing issues */
-  padding: 0;
-}
-
-/* Override main content padding to reduce spacing */
-main.content {
-  padding: 0 !important;
 }
 
 /* Appbar */
 .appbar {
-  position: sticky; top: 0; z-index: 10;
-  display: flex; align-items: center; gap: 10px;
-  height: 78px; padding: 0 2.5rem; /* disamakan dengan halaman profil */
-  background: var(--secondary-color); border-bottom: 1px solid var(--border);
+  background: transparent;
+  border-bottom: none;
+  height: 78px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2.5rem;
+  z-index: 1001;
+  position: sticky; top: 0;
 }
-.appbar .app-title { font-size: 18px; font-weight: 600; margin: 0; }
-.icon-btn { background: none; border: none; cursor: pointer; color: var(--text); padding: 0; }
+.appbar .app-title { 
+  font-size: 20px; 
+  font-weight: 800; 
+  margin: 0; 
+  color: var(--dark-text-color);
+}
+.icon-btn { 
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 999px;
+  border: none;
+  background: transparent; 
+  color: var(--dark-text-color); 
+  text-decoration: none;
+  transition: background .15s ease;
+  cursor: pointer; 
+  padding: 0; 
+}
+.icon-btn:hover {
+  background: rgba(0, 0, 0, 0.05); 
+}
+.spacer {
+  flex: 1;
+}
 
 /* Container */
-.container { max-width: 1200px; margin: 0 auto; padding: 1rem; } /* Reduced padding to decrease distance from navbar */
+.container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; } /* disamakan dengan halaman profil */
 
 /* Tabs */
-.tabs { display: flex; gap: 20px; padding: 0 1rem; border-bottom: 1px solid var(--border); } /* Reduced padding */
+.tabs { display: flex; gap: 20px; padding: 0 1.5rem; border-bottom: 1px solid var(--border); } /* disamakan dengan halaman profil */
 .tab {
   background: none; border: none; padding: 14px 0; cursor: pointer;
   font-weight: 600; color: var(--muted);
@@ -50,18 +67,15 @@ main.content {
 .tab.active { color: var(--brand); border-bottom: 2px solid var(--brand); }
 
 /* Tab Content */
-.tab-content { padding: 1rem 0 0 0; } /* Reduced top padding to decrease distance from tabs */
+.tab-content { padding: 1.5rem; } /* disamakan dengan halaman profil */
 .tab-content[hidden] { display: none; }
 
 /* Review List */
 .review-list { 
   display: grid; 
-  gap: 1rem; 
-  /* Reduced gap between reviews */
+  gap: 1.5rem; 
+  /* Tambahkan min-height untuk memastikan konten terlihat */
   min-height: 200px;
-  /* Remove any default margin that might be causing extra spacing */
-  margin: 0;
-  padding: 0.5rem 0 0 0; /* Add small top padding and remove bottom padding */
 }
 
 /* Review Card */
@@ -122,12 +136,132 @@ main.content {
   transition: all 0.2s ease;
 }
 .btn:hover { background: #f5f5f5; }
-.btn.primary { background: var(--brand); color: #fff; border-color: var(--brand); }
-.btn.primary:hover { background: #005a4a; border-color: #005a4a; }
+.btn-primary { background: var(--brand); color: #fff; border-color: var(--brand); }
+.btn-primary:hover { background: #005a4a; border-color: #005a4a; }
 .btn.is-on { 
   background: #ecfdf5; 
   color: var(--ok); 
   border-color: var(--ok); 
+}
+
+/* Review Images Styles */
+.review-images {
+  padding: 0 16px 16px 16px;
+  border-top: 1px solid var(--border);
+  margin-top: 16px;
+  display: block; /* Make sure it's visible by default */
+}
+
+.images-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.images-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 12px;
+}
+
+.image-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.image-wrapper:hover {
+  transform: scale(1.05);
+}
+
+.image-placeholder {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #666;
+  border: 1px solid var(--border);
+  margin-bottom: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.review-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  margin-bottom: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.image-info {
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0 4px;
+}
+
+/* Lightbox Styles */
+.lightbox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.lightbox.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.lightbox-content {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 /* Empty state */
@@ -150,25 +284,26 @@ main.content {
 /* Modal */
 .modal {
   position: fixed; 
-  top: 78px; /* Menyesuaikan dengan tinggi header */
+  top: 0; /* Changed from 78px to 0 to cover full viewport */
   left: 0; 
   right: 0; 
   bottom: 0;
   display: flex; 
-  align-items: flex-start; /* Mengatur posisi ke atas */
+  align-items: center; /* Changed from flex-start to center for better positioning */
   justify-content: center;
-  z-index: 100;
-  overflow-y: auto; /* Memungkinkan scrolling jika modal terlalu tinggi */
-  padding: 20px; /* Memberikan ruang di sekitar modal */
+  z-index: 1003; /* Increased z-index to ensure it's above header (1001) and footer (100) */
+  overflow-y: auto;
+  padding: 20px;
 }
 .modal[hidden] { display: none; }
 .modal-overlay {
-  position: absolute; 
+  position: fixed; /* Changed from absolute to fixed */
   top: 0; 
   left: 0; 
   right: 0; 
   bottom: 0;
   background: rgba(0,0,0,0.5);
+  z-index: 1002; /* Ensure overlay is below modal content but above other content */
 }
 .modal-content {
   position: relative;
@@ -176,10 +311,11 @@ main.content {
   border-radius: var(--radius);
   max-width: 500px; 
   width: 100%;
-  margin: 20px auto; /* Memberikan margin atas dan bawah */
-  max-height: calc(100vh - 160px); /* Membatasi tinggi modal */
-  overflow-y: auto; /* Memungkinkan scrolling dalam modal jika konten terlalu panjang */
+  margin: 20px auto;
+  max-height: calc(100vh - 40px); /* Increased available height */
+  overflow-y: auto;
   box-shadow: var(--shadow);
+  z-index: 1003; /* Ensure content is above overlay */
 }
 .modal-header {
   display: flex; justify-content: space-between; align-items: center;
@@ -216,6 +352,131 @@ form { padding: 16px; }
   resize: vertical; 
   min-height: 100px;
 }
+
+/* Drag and drop area styles */
+.drop-area {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
+  background-color: #fafafa;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.drop-area:hover {
+  border-color: var(--brand);
+  background-color: #f0fdfa;
+}
+
+.drop-area.drag-over {
+  border-color: var(--brand);
+  background-color: #e6f4f1;
+}
+
+.drop-area-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.drop-area-content svg {
+  color: #999;
+  margin-bottom: 12px;
+}
+
+.drop-area:hover .drop-area-content svg {
+  color: var(--brand);
+}
+
+.drop-text {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  color: #666;
+}
+
+.drop-hint {
+  margin: 0;
+  font-size: 14px;
+  color: #999;
+}
+
+.browse-link {
+  color: var(--brand);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.preview-container {
+  margin-top: 16px;
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.clear-all-btn {
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: underline;
+}
+
+.clear-all-btn:hover {
+  color: #dc2626;
+}
+
+.image-previews {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 12px;
+}
+
+.image-preview {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 100px;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+}
+
+.image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.remove-image {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.remove-image:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
 .rating { 
   display: flex; gap: 4px; 
   /* Menghapus direction: rtl agar urutan bintang dari kiri ke kanan */
@@ -384,5 +645,3 @@ form { padding: 16px; }
   .btn { width: 100%; text-align: center; }
   .modal-content { width: 95%; }
 }
-
-

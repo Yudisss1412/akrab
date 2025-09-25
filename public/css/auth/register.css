@@ -9,18 +9,6 @@
     }
 }
 
-@keyframes shake {
-    0%, 100% { 
-        transform: translateX(0); 
-    }
-    10%, 30%, 50%, 70%, 90% { 
-        transform: translateX(-8px); 
-    }
-    20%, 40%, 60%, 80% { 
-        transform: translateX(8px); 
-    }
-}
-
 @keyframes gradientBG {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
@@ -115,9 +103,7 @@ body, html {
     transition: all 0.5s ease;
 }
 
-.register-form-box.shake {
-    animation: shake 0.5s ease-in-out;
-}
+
 
 .register-form-box h2 {
     font-weight: 500;

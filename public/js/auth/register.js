@@ -73,10 +73,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (!isFormValid) {
-            registerFormBox.classList.add('shake');
-            setTimeout(() => {
-                registerFormBox.classList.remove('shake');
-            }, 500);
             return;
         }
         console.log('Formulir pendaftaran valid, mengalihkan...');

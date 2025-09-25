@@ -84,10 +84,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (!isFormValid) {
-            if (loginFormBox) {
-                loginFormBox.classList.add('shake');
-                setTimeout(() => loginFormBox.classList.remove('shake'), 500);
-            }
             return;
         }
 

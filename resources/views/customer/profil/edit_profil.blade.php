@@ -30,30 +30,34 @@
         </div>
       </header>
 
-      <form class="edit-form" id="editProfileForm">
-        <div class="form-group">
+      <form class="edit-form" id="editProfileForm" novalidate>
+        <div class="form-group field">
+          <input type="text" id="name" name="name" value="{{ $user->name ?? '' }}" required placeholder=" ">
           <label for="name">Nama Lengkap</label>
-          <input type="text" id="name" name="name" value="{{ $user->name ?? '' }}" required>
+          <p class="error-message" id="name-error"></p>
         </div>
 
-        <div class="form-group">
+        <div class="form-group field">
+          <input type="email" id="email" name="email" value="{{ $user->email ?? '' }}" required placeholder=" ">
           <label for="email">Email</label>
-          <input type="email" id="email" name="email" value="{{ $user->email ?? '' }}" required>
+          <p class="error-message" id="email-error"></p>
         </div>
 
-        <div class="form-group">
+        <div class="form-group field">
+          <input type="tel" id="phone" name="phone" value="{{ $user->phone ?? '' }}" required placeholder=" ">
           <label for="phone">Nomor Telepon</label>
-          <input type="tel" id="phone" name="phone" value="{{ $user->phone ?? '' }}" required>
+          <p class="error-message" id="phone-error"></p>
         </div>
 
-        <div class="form-group">
+        <div class="form-group field">
+          <textarea id="address" name="address" rows="3" required placeholder=" ">{{ $user->address ?? '' }}</textarea>
           <label for="address">Alamat</label>
-          <textarea id="address" name="address" rows="3" required>{{ $user->address ?? '' }}</textarea>
+          <p class="error-message" id="address-error"></p>
         </div>
 
         <div class="form-group">
-          <label for="bio">Bio</label>
           <textarea id="bio" name="bio" rows="3" placeholder="Ceritakan sedikit tentang dirimu...">{{ $user->bio ?? '' }}</textarea>
+          <label for="bio">Bio</label>
         </div>
 
         <div class="form-actions">
@@ -61,11 +65,17 @@
           <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
         </div>
       </form>
+      <div id="formAlertContainer" class="form-alert-container"></div>
     </section>
   </main>
 @endsection
 
 @push('scripts')
+  <script>
+    // Define profile route for use in edit_profil.js
+    window.PROFIL_ROUTE = '{{ route("profil.pembeli") }}';
+  </script>
+  <script src="{{ asset('js/customer/profil/edit_profil.js') }}"></script>
   <script>
     // Preview avatar saat dipilih
     document.getElementById('avatarInput').addEventListener('change', function(e) {
@@ -78,24 +88,6 @@
         }
         reader.readAsDataURL(file);
       }
-    });
-
-    // Form submission
-    document.getElementById('editProfileForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      // Validasi sederhana
-      const name = document.getElementById('name').value;
-      const email = document.getElementById('email').value;
-      
-      if (!name || !email) {
-        alert('Mohon lengkapi semua field yang wajib diisi.');
-        return;
-      }
-      
-      // Simulasi simpan data
-      alert('Profil berhasil diperbarui!');
-      // Redirect ke halaman profil
-      window.location.href = '{{ route("profil.pembeli") }}';
     });
   </script>
 @endpush

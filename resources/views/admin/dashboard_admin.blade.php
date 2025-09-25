@@ -6,22 +6,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ asset('css/admin/dashboard_admin.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/admin_penjual/style.css') }}">
 </head>
 <body>
-  <!-- NAVBAR -->
-  <header class="ak-navbar" role="banner">
-    <div class="ak-navbar__inner">
-      <div class="cw-left">
-        <a href="{{ route('welcome') }}" aria-label="Ke beranda">
-          <img class="ak-logo" src="{{ asset('src/Logo_UMKM.png') }}" alt="AKRAB">
-        </a>
-        <h1 class="cw-title">Admin Dashboard</h1>
-      </div>
-      <!-- (profil icon dihapus) -->
-    </div>
-  </header>
-
-  <main class="shell">
+  @include('components.admin_penjual.header')
+  
+  <div class="main-layout">
+    <div class="content-wrapper">
+      <main class="admin-page-content">
     <!-- Toolbar -->
     <div class="page-toolbar">
       <div class="page-toolbar__left">
@@ -51,16 +43,11 @@
         </div>
       </div>
     </section>
-  </main>
+  </main> <!-- end of admin-page-content -->
+    </div> <!-- end of content-wrapper -->
+  </div> <!-- end of main-layout -->
 
-  <footer class="ak-footer" role="contentinfo">
-    <div class="ak-footer__inner">
-      <span class="ak-footer__icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><path d="M12 2 2 7l10 5 10-5-10-5Zm0 7L2 4v13l10 5 10-5V4l-10 5Z"/></svg>
-      </span>
-      <span class="ak-footer__brand">Akrab Banyuwangi</span>
-    </div>
-  </footer>
+  @include('components.admin_penjual.footer')
 
   <script src="{{ asset('js/admin/dashboard_admin.js') }}"></script>
 </body>

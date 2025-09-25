@@ -1,0 +1,167 @@
+/* 
+================================
+AKRAB — Header & Footer Admin/Penjual Styles
+================================ 
+*/
+
+:root {
+  --ak-primary: #006E5C;
+  --ak-primary-light: #a8d5c9;
+  --ak-white: #FFFFFF;
+  --ak-background: #f0fdfa;
+  --ak-text: #1D232A;
+  --ak-border: #E5E7EB;
+  --ak-radius: 12px;
+  --ak-space: 16px;
+}
+
+/* ========== Layout ========== */
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-layout {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Khusus untuk halaman admin/penjual - bukan mengubah shell global */
+.admin-page-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem; /* Tambahkan padding agar konten tidak mepet */
+}
+
+/* Untuk halaman admin khusus */
+.admin-page-content .page-toolbar {
+  margin-bottom: 1rem;
+}
+
+.admin-page-content .list-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ========== Header ========== */
+.ak-navbar {
+  background: var(--ak-white);
+  border-bottom: 1px solid var(--ak-border);
+  height: 78px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 1001;
+}
+
+.ak-navbar__inner {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ak-logo {
+  height: 54px;
+  width: auto;
+  display: block;
+}
+
+.header-right {
+  display: flex;
+  gap: 1.2rem;
+  align-items: center;
+}
+
+.profile-ico {
+  width: 27px;
+  height: 27px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.profile-ico svg {
+  width: 27px;
+  height: 27px;
+  display: block;
+  stroke: var(--ak-primary);
+  fill: none;
+}
+
+/* ========== Footer ========== */
+.ak-footer {
+  background-color: var(--ak-white);
+  border-top: 1px solid var(--ak-border);
+  width: 100%;
+  position: static;
+  z-index: 100;
+  font-size: 12px;
+  color: var(--ak-primary);
+  display: flex;
+  justify-content: center;
+  margin-top: auto;
+}
+
+.ak-footer__inner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 2rem; /* Mengurangi padding agar tidak terlalu tebal */
+  height: 40px; /* Menyesuaikan dengan ukuran yang lebih proporsional */
+}
+
+.ak-footer__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ak-footer__brand {
+  font-weight: 600;
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 768px) {
+  .ak-navbar {
+    padding: 0 1.5rem;
+  }
+  
+  .ak-navbar__inner {
+    padding: 0 0.5rem;
+  }
+  
+  .main-layout {
+    min-height: calc(100vh - 78px - 56px);
+    padding-bottom: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .ak-navbar {
+    padding: 0 1rem;
+  }
+  
+  .ak-footer {
+    padding: 1rem;
+    justify-content: center;
+  }
+}

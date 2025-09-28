@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <title>Edit Profil Penjual — AKRAB</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ asset('css/penjual/edit_profil_penjual.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/admin_penjual/style.css') }}">
+</head>
+<body>
+  @include('components.admin_penjual.header')
+
+  <div class="main-layout">
+    <div class="content-wrapper">
+      <main class="content admin-page-content" role="main">
+        <div class="page">
+          <section class="card form-card" aria-labelledby="title-edit-profile">
+          <header class="form-head">
+            <h1 id="title-edit-profile">Edit Profil Toko</h1>
+            <div class="avatar-box">
+              <!-- Foto bisa diklik -->
+              <label for="avatarInput" class="avatar-label">
+                <div class="avatar-preview" id="avatarPreview">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 10C14.2091 10 16 8.20914 16 6C16 3.79086 14.2091 2 12 2C9.79086 2 8 3.79086 8 6C8 8.20914 9.79086 10 12 10Z" stroke="#006E5C" stroke-width="1.5"/>
+                    <path d="M20 17.5C20 19.985 20 22 12 22C4 22 4 19.985 4 17.5C4 15.015 7.582 13 12 13C16.418 13 20 15.015 20 17.5Z" stroke="#006E5C" stroke-width="1.5"/>
+                  </svg>
+                </div>
+              </label>
+              <input type="file" id="avatarInput" name="avatar" accept="image/*" hidden>
+            </div>
+          </header>
+
+          <form class="edit-form" id="editSellerProfileForm" action="{{ route('profil.penjual') }}" method="POST" novalidate>
+            <div class="form-group field">
+              <input type="text" id="shopName" name="shopName" value="{{ old('shopName', 'Shoppy.gg') }}" required placeholder=" ">
+              <label for="shopName">Nama Toko</label>
+              <p class="error-message" id="shopName-error"></p>
+            </div>
+
+            <div class="form-group field">
+              <input type="text" id="ownerName" name="ownerName" value="{{ old('ownerName', 'Kristin Watson') }}" required placeholder=" ">
+              <label for="ownerName">Nama Pemilik</label>
+              <p class="error-message" id="ownerName-error"></p>
+            </div>
+
+            <div class="form-group field">
+              <input type="email" id="email" name="email" value="{{ old('email', 'kristin@akrab.gg') }}" required placeholder=" ">
+              <label for="email">Email</label>
+              <p class="error-message" id="email-error"></p>
+            </div>
+
+            <div class="form-group field">
+              <input type="tel" id="phone" name="phone" value="{{ old('phone', '+62 812-3456-7890') }}" required placeholder=" ">
+              <label for="phone">Nomor Telepon</label>
+              <p class="error-message" id="phone-error"></p>
+            </div>
+
+            <div class="form-group field">
+              <textarea id="address" name="address" rows="3" required placeholder=" ">{{ old('address', 'Jl. Melati No. 12, Banyuwangi') }}</textarea>
+              <label for="address">Alamat</label>
+              <p class="error-message" id="address-error"></p>
+            </div>
+
+            <div class="form-group field">
+              <textarea id="shopDescription" name="shopDescription" rows="3" required placeholder=" ">{{ old('shopDescription', 'Toko perlengkapan rumah & aksesoris. Buka setiap hari 09.00–21.00.') }}</textarea>
+              <label for="shopDescription">Deskripsi Toko</label>
+              <p class="error-message" id="shopDescription-error"></p>
+            </div>
+
+            <div class="bank-info-section">
+              <h3>Informasi Bank Penerima</h3>
+              <div class="grid-two">
+                <div class="form-group field">
+                  <select id="bankName" name="bankName">
+                    <option value="">Pilih Bank</option>
+                    <option value="BCA" {{ old('bankName') == 'BCA' ? 'selected' : '' }}>BCA</option>
+                    <option value="BNI" {{ old('bankName') == 'BNI' ? 'selected' : '' }}>BNI</option>
+                    <option value="BRI" {{ old('bankName') == 'BRI' ? 'selected' : '' }}>BRI</option>
+                    <option value="Mandiri" {{ old('bankName') == 'Mandiri' ? 'selected' : '' }}>Mandiri</option>
+                    <option value="BTN" {{ old('bankName') == 'BTN' ? 'selected' : '' }}>BTN</option>
+                    <option value="CIMB Niaga" {{ old('bankName') == 'CIMB Niaga' ? 'selected' : '' }}>CIMB Niaga</option>
+                    <option value="Danamon" {{ old('bankName') == 'Danamon' ? 'selected' : '' }}>Danamon</option>
+                    <option value="Permata" {{ old('bankName') == 'Permata' ? 'selected' : '' }}>Permata</option>
+                    <option value="OCBC NISP" {{ old('bankName') == 'OCBC NISP' ? 'selected' : '' }}>OCBC NISP</option>
+                    <option value="Bank Central Asia" {{ old('bankName') == 'Bank Central Asia' ? 'selected' : '' }}>Bank Central Asia</option>
+                    <option value="Bank Mandiri" {{ old('bankName') == 'Bank Mandiri' ? 'selected' : '' }}>Bank Mandiri</option>
+                    <option value="Bank Rakyat Indonesia" {{ old('bankName') == 'Bank Rakyat Indonesia' ? 'selected' : '' }}>Bank Rakyat Indonesia</option>
+                  </select>
+                  <p class="error-message" id="bankName-error"></p>
+                </div>
+                
+                <div class="form-group field">
+                  <input type="text" id="accountNumber" name="accountNumber" value="{{ old('accountNumber', '1234567890') }}" required placeholder=" ">
+                  <label for="accountNumber">Nomor Rekening</label>
+                  <p class="error-message" id="accountNumber-error"></p>
+                </div>
+              </div>
+              
+              <div class="form-group field">
+                <input type="text" id="accountHolder" name="accountHolder" value="{{ old('accountHolder', 'Kristin Watson') }}"" required placeholder=" ">
+                <label for="accountHolder">Atas Nama</label>
+                <p class="error-message" id="accountHolder-error"></p>
+              </div>
+            </div>
+
+            @csrf
+            <div class="form-actions">
+              <a href="{{ route('profil.penjual') }}" class="btn btn-secondary">Batal</a>
+              <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+            </div>
+          </form>
+          <div id="formAlertContainer" class="form-alert-container"></div>
+        </section>
+        </div> <!-- end of page -->
+      </main>
+    </div> <!-- end of content-wrapper -->
+  </div> <!-- end of main-layout -->
+
+  @include('components.admin_penjual.footer')
+
+  <script src="{{ asset('js/penjual/edit_profil_penjual.js') }}"></script>
+</body>
+</html>

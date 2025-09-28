@@ -31,7 +31,7 @@
         </div>
         <!-- kanan: aksi -->
         <div class="profile-actions">
-          <a href="{{ route('edit.profil') }}" id="btnEditProfile" class="btn btn-primary btn-sm">
+          <a href="{{ route('edit.profil.penjual') }}" id="btnEditProfile" class="btn btn-primary btn-sm">
             Edit Profil
           </a>
         </div>

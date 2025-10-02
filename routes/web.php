@@ -1,9 +1,36 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SellerManagementController;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "web" middleware group. Make something great!
+|
+*/
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+// Seller Management Routes
+Route::prefix('admin')->name('sellers.')->group(function () {
+    Route::get('/sellers', [SellerManagementController::class, 'index'])->name('index');
+    Route::get('/sellers/create', [SellerManagementController::class, 'create'])->name('create');
+    Route::post('/sellers', [SellerManagementController::class, 'store'])->name('store');
+    Route::get('/sellers/{seller}', [SellerManagementController::class, 'show'])->name('show');
+    Route::get('/sellers/{seller}/edit', [SellerManagementController::class, 'edit'])->name('edit');
+    Route::put('/sellers/{seller}', [SellerManagementController::class, 'update'])->name('update');
+    Route::delete('/sellers/{seller}', [SellerManagementController::class, 'destroy'])->name('destroy');
+    Route::post('/sellers/{seller}/suspend', [SellerManagementController::class, 'suspend'])->name('suspend');
+    Route::post('/sellers/{seller}/activate', [SellerManagementController::class, 'activate'])->name('activate');
+    Route::post('/sellers/bulk-action', [SellerManagementController::class, 'bulkAction'])->name('bulk_action');
+    Route::get('/sellers/dashboard-stats', [SellerManagementController::class, 'getDashboardStats'])->name('dashboard_stats');
 });
 
 Route::get('/welcome', function () {
@@ -73,6 +100,10 @@ Route::get('/profil_penjual', function () {
     return view('penjual.profil_penjual');
 })->name('profil.penjual');
 
+Route::get('/edit_profil_penjual', function () {
+    return view('penjual.edit_profil_penjual');
+})->name('edit.profil.penjual');
+
 Route::get('/invoice', function () {
     return view('customer.transaksi.invoice');
 })->name('invoice');
@@ -112,3 +143,55 @@ Route::get('/kategori/hampers', function () {
 Route::get('/dashboard_admin', function () {
     return view('admin.dashboard_admin');
 })->name('dashboard.admin');
+
+Route::get('/profil_admin', function () {
+    return view('admin.profil_admin');
+})->name('profil.admin');
+
+// Admin dashboard related routes
+Route::get('/reports/violations', function () {
+    return '<h1>Daftar Laporan Pelanggaran Penjual</h1><p>Halaman ini menampilkan daftar laporan pelanggaran dari penjual.</p>';
+})->name('reports.violations');
+
+Route::get('/support/tickets', function () {
+    return '<h1>Daftar Tiket Bantuan</h1><p>Halaman ini menampilkan daftar tiket bantuan dari pengguna.</p>';
+})->name('support.tickets');
+
+Route::get('/withdrawal/requests', function () {
+    return '<h1>Daftar Permintaan Penarikan Dana</h1><p>Halaman ini menampilkan daftar permintaan penarikan dana dari penjual.</p>';
+})->name('withdrawal.requests');
+
+
+
+Route::get('/commission/settings', function () {
+    return '<h1>Pengaturan Komisi</h1><p>Halaman untuk mengatur pengaturan komisi platform.</p>';
+})->name('commission.settings');
+
+Route::get('/send/announcement', function () {
+    return '<h1>Kirim Pengumuman</h1><p>Halaman untuk mengirim pengumuman ke pengguna.</p>';
+})->name('send.announcement');
+
+Route::get('/reports/violations', function () {
+    return view('admin.reports_violations');
+})->name('reports.violations');
+
+Route::get('/reports/violations/{id}', function ($id) {
+    return view('admin.report_detail', ['reportId' => $id]);
+})->name('reports.violations.detail');
+
+Route::get('/support/tickets', function () {
+    return view('admin.support_tickets');
+})->name('support.tickets');
+
+Route::get('/support/tickets/{id}', function ($id) {
+    return view('admin.ticket_detail', ['ticketId' => $id]);
+})->name('support.tickets.detail');
+
+Route::get('/withdrawal/requests', function () {
+    return view('admin.withdrawal_requests');
+})->name('withdrawal.requests');
+
+// Product Management Routes
+Route::get('/admin/produk', function () {
+    return view('admin.produk.index');
+})->name('produk.index');

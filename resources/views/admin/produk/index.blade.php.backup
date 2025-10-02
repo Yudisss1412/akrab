@@ -1,0 +1,973 @@
+﻿@extends('layouts.admin')
+
+@section('title', 'Manajemen Produk - AKRAB')
+
+@include('components.admin_penjual.header')
+
+@push('styles')
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ asset('css/admin/dashboard_admin.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/admin_penjual/style.css') }}">
+  <style>
+    /* Enhanced styles for product management page */
+    :root {
+      --primary: #006E5C;
+      --primary-light: #a8d5c9;
+      --secondary: #6c757d;
+      --success: #28a745;
+      --danger: #dc3545;
+      --warning: #ffc107;
+      --info: #17a2b8;
+      --light: #f8f9fa;
+      --dark: #343a40;
+      --white: #ffffff;
+      --gray: #6c757d;
+      --border: #dee2e6;
+      --box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+      --border-radius: 0.375rem;
+      --transition: all 0.3s ease;
+    }
+    
+    body {
+      background-color: #f5f7fa;
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #333;
+    }
+    
+    .main-content {
+      padding-top: 2rem;
+      padding-bottom: 2rem;
+    }
+    
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding: 1.5rem 0;
+    }
+    
+    .page-title {
+      margin: 0;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .page-title i {
+      color: var(--primary-light);
+    }
+    
+    .filter-panel {
+      background: var(--white);
+      border-radius: var(--border-radius);
+      border: none;
+      box-shadow: var(--box-shadow);
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+    
+    .filter-panel:hover {
+      box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.1);
+    }
+    
+    .filter-header {
+      padding: 1.25rem 1.5rem;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .filter-title {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .filter-content {
+      padding: 1.5rem;
+    }
+    
+    .form-label {
+      font-weight: 600;
+      color: #495057;
+    }
+    
+    .form-control, .form-select {
+      border: 1px solid var(--border);
+      border-radius: var(--border-radius);
+      padding: 0.65rem 0.75rem;
+      transition: var(--transition);
+    }
+    
+    .form-control:focus, .form-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 0.2rem rgba(0, 110, 92, 0.25);
+      outline: 0;
+    }
+    
+    .btn {
+      border-radius: var(--border-radius);
+      padding: 0.5rem 1rem;
+      font-weight: 600;
+      transition: var(--transition);
+      border: none;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      border: 1px solid var(--primary);
+    }
+    
+    .btn-primary:hover {
+      background: #005a4a;
+      border-color: #005a4a;
+      transform: translateY(-2px);
+    }
+    
+    .btn-secondary {
+      background: var(--secondary);
+      border: 1px solid var(--secondary);
+    }
+    
+    .btn-secondary:hover {
+      background: #5a6268;
+      border-color: #545b62;
+      transform: translateY(-2px);
+    }
+    
+    .table-container {
+      background: var(--white);
+      border-radius: var(--border-radius);
+      border: none;
+      box-shadow: var(--box-shadow);
+      overflow: hidden;
+      transition: var(--transition);
+    }
+    
+    .table-container:hover {
+      box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.1);
+    }
+    
+    .table-header {
+      padding: 1.25rem 1.5rem;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .table-title {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .table-content {
+      padding: 1.5rem;
+    }
+    
+    .table {
+      margin-bottom: 0;
+    }
+    
+    .table th {
+      background-color: #f8f9fa;
+      color: #495057;
+      font-weight: 600;
+      padding: 0.9rem 0.75rem;
+      border-top: none;
+    }
+    
+    .table td {
+      padding: 0.9rem 0.75rem;
+      vertical-align: middle;
+    }
+    
+    .table-hover tbody tr:hover {
+      background-color: rgba(0, 110, 92, 0.05);
+    }
+    
+    .table-striped tbody tr:nth-of-type(odd) {
+      background-color: rgba(0, 0, 0, 0.02);
+    }
+    
+    .badge {
+      padding: 0.4em 0.7em;
+      font-size: 0.8em;
+      font-weight: 500;
+      border-radius: 50rem;
+    }
+    
+    .btn-group .btn {
+      margin-right: 0.25rem;
+    }
+    
+    .btn-group .btn:last-child {
+      margin-right: 0;
+    }
+    
+    .pagination {
+      margin-bottom: 0;
+    }
+    
+    .pagination .page-link {
+      color: var(--primary);
+      border-radius: var(--border-radius);
+      margin: 0 0.1rem;
+    }
+    
+    .pagination .page-item.active .page-link {
+      background-color: var(--primary);
+      border-color: var(--primary);
+    }
+    
+    .card {
+      box-shadow: var(--box-shadow);
+      border: none;
+      border-radius: var(--border-radius);
+      transition: var(--transition);
+    }
+    
+    .table-responsive {
+      border-radius: var(--border-radius);
+    }
+    
+    /* Product thumbnail styling */
+    .product-thumbnail {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 4px;
+      border: 1px solid #dee2e6;
+    }
+    
+    /* Badge styling for different statuses */
+    .badge-pending {
+      background-color: #ffc107;
+      color: #212529;
+    }
+    
+    .badge-active {
+      background-color: #28a745;
+      color: white;
+    }
+    
+    .badge-suspended {
+      background-color: #dc3545;
+      color: white;
+    }
+    
+    .badge-rejected {
+      background-color: #6c757d;
+      color: white;
+    }
+    
+    /* Tab styling */
+    .nav-tabs .nav-link {
+      border: 1px solid transparent;
+      border-bottom: 3px solid transparent;
+    }
+    
+    .nav-tabs .nav-link.active {
+      border-color: var(--primary) var(--primary) transparent;
+      background-color: white;
+      color: var(--primary);
+      border-bottom: 3px solid var(--primary);
+    }
+    
+    .tab-content {
+      margin-top: 1rem;
+    }
+    
+    /* Category management layout */
+    .category-layout {
+      display: flex;
+      gap: 1.5rem;
+    }
+    
+    .category-panel {
+      flex: 1;
+      background: var(--white);
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--box-shadow);
+      padding: 1.5rem;
+      min-height: 400px;
+    }
+    
+    .category-panel h3 {
+      color: var(--primary);
+      border-bottom: 2px solid var(--primary-light);
+      padding-bottom: 0.5rem;
+      margin-top: 0;
+    }
+    
+    .category-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .category-list li {
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .category-list li:hover {
+      background-color: #f8f9fa;
+    }
+    
+    .category-list li.active {
+      background-color: var(--primary-light);
+      color: white;
+    }
+    
+    .subcategory-list {
+      margin-left: 1rem;
+    }
+    
+    /* Action button styling */
+    .btn-square {
+      width: 32px;
+      height: 32px;
+      padding: 0.25rem 0.5rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .btn-view {
+      background-color: #17a2b8;
+      color: white;
+    }
+    
+    .btn-view:hover {
+      background-color: #138496;
+      color: white;
+    }
+    
+    .btn-edit {
+      background-color: #007bff;
+      color: white;
+    }
+    
+    .btn-edit:hover {
+      background-color: #0069d9;
+      color: white;
+    }
+    
+    .btn-approve {
+      background-color: #28a745;
+      color: white;
+    }
+    
+    .btn-approve:hover {
+      background-color: #218838;
+      color: white;
+    }
+    
+    .btn-reject {
+      background-color: #dc3545;
+      color: white;
+    }
+    
+    .btn-reject:hover {
+      background-color: #c82333;
+      color: white;
+    }
+    
+    .btn-suspend {
+      background-color: #ffc107;
+      color: #212529;
+    }
+    
+    .btn-suspend:hover {
+      background-color: #e0a800;
+      color: #212529;
+    }
+    
+    /* Responsive improvements */
+    @media (max-width: 768px) {
+      .category-layout {
+        flex-direction: column;
+      }
+      
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+    }
+  </style>
+@endpush
+
+@section('content')
+  <div class="container-fluid">
+    <div class="main-layout">
+      <div class="content-wrapper">
+        <main class="admin-page-content main-content">
+        <div class="page-header">
+          <h2 class="page-title">Manajemen Produk</h2>
+        </div>
+
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs" id="productManagementTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="products-tab" data-bs-toggle="tab" data-bs-target="#products-tab-pane" type="button" role="tab">Produk</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="categories-tab" data-bs-toggle="tab" data-bs-target="#categories-tab-pane" type="button" role="tab">Kategori & Atribut</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews-tab-pane" type="button" role="tab">Ulasan Produk</button>
+          </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="productManagementTabsContent">
+          <!-- Products Tab -->
+          <div class="tab-pane fade show active" id="products-tab-pane" role="tabpanel">
+            <div class="mt-3">
+              <!-- Filter Panel - Horizontal Layout -->
+              <div class="filter-panel">
+                <div class="filter-header">
+                  <h3 class="filter-title"><i class="fas fa-filter"></i> Filter dan Pencarian</h3>
+                </div>
+                <div class="filter-content">
+                  <form id="productFilterForm" method="GET" action="#">
+                    <div class="row g-2">
+                      <div class="col-md-3 mb-2">
+                        <label for="search" class="form-label">Cari Produk</label>
+                        <input type="text" class="form-control" id="search" name="search" placeholder="Nama Produk atau SKU">
+                      </div>
+                      <div class="col-md-3 mb-2">
+                        <label for="seller_filter" class="form-label">Filter berdasarkan Penjual</label>
+                        <select class="form-select" id="seller_filter" name="seller_id">
+                          <option value="">Semua Penjual</option>
+                          <option value="1">Toko Fajar Jaya</option>
+                          <option value="2">Warung Online</option>
+                          <option value="3">Grosir Murah</option>
+                          <option value="4">Toko Elektronik</option>
+                          <option value="5">Fashion Kita</option>
+                        </select>
+                      </div>
+                      <div class="col-md-2 mb-2">
+                        <label for="status_filter" class="form-label">Status Produk</label>
+                        <select class="form-select" id="status_filter" name="status">
+                          <option value="">Semua Status</option>
+                          <option value="pending">Menunggu Persetujuan</option>
+                          <option value="active">Aktif</option>
+                          <option value="suspended">Ditangguhkan</option>
+                          <option value="rejected">Ditolak</option>
+                        </select>
+                      </div>
+                      <div class="col-md-2 mb-2">
+                        <label for="category_filter" class="form-label">Kategori</label>
+                        <select class="form-select" id="category_filter" name="category">
+                          <option value="">Semua Kategori</option>
+                          <option value="electronics">Elektronik</option>
+                          <option value="fashion">Fashion</option>
+                          <option value="books">Buku</option>
+                          <option value="sports">Olahraga</option>
+                          <option value="food">Makanan</option>
+                        </select>
+                      </div>
+                    </div>              </div>            </div>          </div>        </div>      </div>    </div>  </div>
+              </div>
+              
+              <!-- Products Table -->
+              <div class="table-container">
+                <div class="table-header">
+                  <h3 class="table-title">Daftar Produk</h3>
+                </div>
+                <div class="table-content">
+                  <div class="table-responsive">
+                  <table class="table table-striped table-hover">
+                    <thead>
+                      <tr>
+                        <th scope="col">Info Produk</th>
+                        <th scope="col">Nama Toko</th>
+                        <th scope="col">Kategori</th>
+                        <th scope="col">Harga dan Stok</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <div style="display: flex; align-items: center; gap: 1rem;">
+                            <img src="{{ asset('src/produk_sample.jpg') }}" alt="Sample Product" class="product-thumbnail">
+                            <div>
+                              <div><strong>Smartphone ABC 128GB</strong></div>
+                              <small class="text-muted">SKU: SM-ABC-128</small>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <a href="{{ route('sellers.show', 1) }}" class="text-primary">Toko Fajar Jaya</a>
+                        </td>
+                        <td>
+                          <div>Elektronik</div>
+                          <small class="text-muted">Smartphone</small>
+                        </td>
+                        <td>
+                          <div><strong>Rp 3,500,000</strong></div>
+                          <small class="text-muted">Stok: 25</small>
+                        </td>
+                        <td>
+                          <span class="badge badge-pending d-block">Menunggu Persetujuan</span>
+                        </td>
+                        <td>
+                          <div class="btn-group" role="group">
+                            <a href="#" class="btn btn-sm btn-view" title="Lihat di Situs">
+                              <i class="fas fa-external-link-alt"></i>
+                            </a>
+                            <a href="#" class="btn btn-sm btn-edit" title="Edit">
+                              <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-approve" title="Setujui">
+                              <i class="fas fa-check"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-reject" title="Tolak">
+                              <i class="fas fa-times"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <div style="display: flex; align-items: center; gap: 1rem;">
+                            <img src="{{ asset('src/produk_sample.jpg') }}" alt="Sample Product" class="product-thumbnail">
+                            <div>
+                              <div><strong>Kemeja Formal Pria</strong></div>
+                              <small class="text-muted">SKU: FM-KM-001</small>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <a href="{{ route('sellers.show', 2) }}" class="text-primary">Warung Online</a>
+                        </td>
+                        <td>
+                          <div>Fashion</div>
+                          <small class="text-muted">Pakaian Pria</small>
+                        </td>
+                        <td>
+                          <div><strong>Rp 185,000</strong></div>
+                          <small class="text-muted">Stok: 50</small>
+                        </td>
+                        <td>
+                          <span class="badge badge-active d-block">Aktif</span>
+                        </td>
+                        <td>
+                          <div class="btn-group" role="group">
+                            <a href="#" class="btn btn-sm btn-view" title="Lihat di Situs">
+                              <i class="fas fa-external-link-alt"></i>
+                            </a>
+                            <a href="#" class="btn btn-sm btn-edit" title="Edit">
+                              <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-suspend" title="Tangguhkan">
+                              <i class="fas fa-pause"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <div style="display: flex; align-items: center; gap: 1rem;">
+                            <img src="{{ asset('src/produk_sample.jpg') }}" alt="Sample Product" class="product-thumbnail">
+                            <div>
+                              <div><strong>Buku Pemrograman Laravel</strong></div>
+                              <small class="text-muted">SKU: BK-LRV-001</small>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <a href="{{ route('sellers.show', 3) }}" class="text-primary">Grosir Murah</a>
+                        </td>
+                        <td>
+                          <div>Buku</div>
+                          <small class="text-muted">Teknologi</small>
+                        </td>
+                        <td>
+                          <div><strong>Rp 125,000</strong></div>
+                          <small class="text-muted">Stok: 15</small>
+                        </td>
+                        <td>
+                          <span class="badge badge-suspended d-block">Ditangguhkan</span>
+                        </td>
+                        <td>
+                          <div class="btn-group" role="group">
+                            <a href="#" class="btn btn-sm btn-view" title="Lihat di Situs">
+                              <i class="fas fa-external-link-alt"></i>
+                            </a>
+                            <a href="#" class="btn btn-sm btn-edit" title="Edit">
+                              <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-approve" title="Setujui">
+                              <i class="fas fa-check"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <div style="display: flex; align-items: center; gap: 1rem;">
+                            <img src="{{ asset('src/produk_sample.jpg') }}" alt="Sample Product" class="product-thumbnail">
+                            <div>
+                              <div><strong>Jersey Sepak Bola</strong></div>
+                              <small class="text-muted">SKU: JR-SB-001</small>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <a href="{{ route('sellers.show', 4) }}" class="text-primary">Toko Elektronik</a>
+                        </td>
+                        <td>
+                          <div>Olahraga</div>
+                          <small class="text-muted">Pakaian Olahraga</small>
+                        </td>
+                        <td>
+                          <div><strong>Rp 95,000</strong></div>
+                          <small class="text-muted">Stok: 30</small>
+                        </td>
+                        <td>
+                          <span class="badge badge-rejected d-block">Ditolak</span>
+                        </td>
+                        <td>
+                          <div class="btn-group" role="group">
+                            <a href="#" class="btn btn-sm btn-view" title="Lihat di Situs">
+                              <i class="fas fa-external-link-alt"></i>
+                            </a>
+                            <a href="#" class="btn btn-sm btn-edit" title="Edit">
+                              <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-approve" title="Setujui">
+                              <i class="fas fa-check"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan="6" class="text-center py-4">Tidak ada data produk ditemukan.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="mt-3 d-flex justify-content-between align-items-center">
+                  Menampilkan 1 sampai 4 dari 25 produk
+                </div>
+                <div>
+                  <nav aria-label="Navigasi produk">
+                    <ul class="pagination">
+                      <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Previous">
+                          <span aria-hidden="true">&laquo;&laquo; Sebelumnya</span>
+                        </a>
+                      </li>
+                      <li class="page-item active"><span class="page-link" style="color: white;">1</span></li>
+                      <li class="page-item"><a class="page-link" href="#">2</a></li>
+                      <li class="page-item"><a class="page-link" href="#">3</a></li>
+                      <li class="page-item"><a class="page-link" href="#">4</a></li>
+                      <li class="page-item"><a class="page-link" href="#">5</a></li>
+                      <li class="page-item">
+                        <a class="page-link" href="#" aria-label="Next">
+                          <span aria-hidden="true">Berikutnya &raquo;&raquo;</span>
+                        </a>
+                      </li>
+                    </ul>
+                  </nav>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Categories & Attributes Tab -->
+          <div class="tab-pane fade" id="categories-tab-pane" role="tabpanel">
+            <div class="mt-3">
+              <div class="category-layout">
+                <div class="category-panel">
+                  <h3>Kategori Utama</h3>
+                  <div class="d-flex justify-content-between mb-3">
+                    <button class="btn btn-primary">Tambah Kategori</button>
+                  </div>
+                  <ul class="category-list">
+                    <li class="active">Elektronik</li>
+                    <li>Fashion</li>
+                    <li>Buku</li>
+                    <li>Olahraga</li>
+                    <li>Makanan</li>
+                    <li>Kerajinan</li>
+                    <li>Kesehatan</li>
+                    <li>Rumah Tangga</li>
+                  </ul>
+                </div>
+                
+                <div class="category-panel">
+                  <h3>Subkategori: Elektronik</h3>
+                  <div class="d-flex justify-content-between mb-3">
+                    <button class="btn btn-primary">Tambah Subkategori</button>
+                  </div>
+                  <ul class="category-list subcategory-list">
+                    <li>Smartphone</li>
+                    <li>Laptop</li>
+                    <li>Tablet</li>
+                    <li>Aksesoris</li>
+                    <li>Kamera</li>
+                  </ul>
+                  
+                  <h3 class="mt-4">Atribut Produk</h3>
+                  <div class="d-flex justify-content-between mb-3">
+                    <button class="btn btn-primary">Tambah Atribut</button>
+                  </div>
+                  <ul class="category-list">
+                    <li>Ukuran</li>
+                    <li>Warna</li>
+                    <li>Merek</li>
+                    <li>Bahan</li>
+                    <li>Model</li>
+                    <li>Tahun Produksi</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reviews Tab -->
+          <div class="tab-pane fade" id="reviews-tab-pane" role="tabpanel">
+            <div class="mt-3">
+              <!-- Filter Panel for Reviews -->
+              <div class="filter-panel">
+                <div class="filter-header">
+                  <h3 class="filter-title"><i class="fas fa-filter"></i> Filter Ulasan</h3>
+                </div>
+                <div class="filter-content">
+                  <form id="reviewFilterForm" method="GET" action="#">
+                    <div class="row g-2">
+                      <div class="col-md-3 mb-2">
+                        <label for="review_status_filter" class="form-label">Status Ulasan</label>
+                        <select class="form-select" id="review_status_filter" name="review_status">
+                          <option value="">Semua Status</option>
+                          <option value="pending">Menunggu Persetujuan</option>
+                          <option value="approved">Disetujui</option>
+                          <option value="rejected">Ditolak</option>
+                        </select>
+                      </div>
+                      <div class="col-md-3 mb-2">
+                        <label for="rating_filter" class="form-label">Filter berdasarkan Rating</label>
+                        <select class="form-select" id="rating_filter" name="rating">
+                          <option value="">Semua Rating</option>
+                          <option value="1">1 Bintang</option>
+                          <option value="2">2 Bintang</option>
+                          <option value="3">3 Bintang</option>
+                          <option value="4">4 Bintang</option>
+                          <option value="5">5 Bintang</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4 mb-2">
+                        <label for="review_search" class="form-label">Cari berdasarkan</label>
+                        <input type="text" class="form-control" id="review_search" name="review_search" placeholder="Isi ulasan, nama produk, atau nama pengguna">
+                      </div>
+                    </div>              </div>            </div>          </div>        </div>      </div>    </div>  </div>
+              </div>
+              
+              <!-- Reviews Table -->
+              <div class="table-container">
+                <div class="table-header">
+                  <h3 class="table-title">Daftar Ulasan Produk</h3>
+                </div>
+                <div class="table-content">
+                  <div class="table-responsive">
+                  <table class="table table-striped table-hover">
+                    <thead>
+                      <tr>
+                        <th scope="col">Ulasan</th>
+                        <th scope="col">Info Produk</th>
+                        <th scope="col">Info Pengguna</th>
+                        <th scope="col">Tanggal</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <div>Produk sangat bagus, kualitas sesuai harga. Pengiriman cepat dan aman.</div>
+                          <div>
+                            <span class="badge bg-warning text-dark">
+                              <i class="fas fa-star"></i> 4
+                            </span>
+                          </div>
+                        </td>
+                        <td>
+                          <a href="#" class="text-primary">Smartphone ABC 128GB</a>
+                        </td>
+                        <td>
+                          <div><strong>Andi Prasetyo</strong></div>
+                          <small class="text-muted">andi@example.com</small>
+                        </td>
+                        <td>15 Agu 2024</td>
+                        <td>
+                          <span class="badge badge-active d-block">Disetujui</span>
+                        </td>
+                        <td>
+                          <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-sm btn-approve" title="Setujui">
+                              <i class="fas fa-check"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-danger" title="Hapus">
+                              <i class="fas fa-trash"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-warning" title="Tandai sebagai Spam">
+                              <i class="fas fa-ban"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <div>Barang tidak sesuai deskripsi. Warna berbeda dari yang ditampilkan di foto.</div>
+                          <div>
+                            <span class="badge bg-warning text-dark">
+                              <i class="fas fa-star"></i> 1
+                            </span>
+                          </div>
+                        </td>
+                        <td>
+                          <a href="#" class="text-primary">Kemeja Formal Pria</a>
+                        </td>
+                        <td>
+                          <div><strong>Siti Nurhaliza</strong></div>
+                          <small class="text-muted">siti@example.com</small>
+                        </td>
+                        <td>18 Agu 2024</td>
+                        <td>
+                          <span class="badge badge-pending d-block">Menunggu Persetujuan</span>
+                        </td>
+                        <td>
+                          <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-sm btn-approve" title="Setujui">
+                              <i class="fas fa-check"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-danger" title="Hapus">
+                              <i class="fas fa-trash"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-warning" title="Tandai sebagai Spam">
+                              <i class="fas fa-ban"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <div>Produk sangat bagus dan tahan lama. Cocok untuk penggunaan sehari-hari.</div>
+                          <div>
+                            <span class="badge bg-warning text-dark">
+                              <i class="fas fa-star"></i> 5
+                            </span>
+                          </div>
+                        </td>
+                        <td>
+                          <a href="#" class="text-primary">Buku Pemrograman Laravel</a>
+                        </td>
+                        <td>
+                          <div><strong>Ahmad Fauzi</strong></div>
+                          <small class="text-muted">ahmad@example.com</small>
+                        </td>
+                        <td>20 Agu 2024</td>
+                        <td>
+                          <span class="badge badge-active d-block">Disetujui</span>
+                        </td>
+                        <td>
+                          <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-sm btn-approve" title="Setujui">
+                              <i class="fas fa-check"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-danger" title="Hapus">
+                              <i class="fas fa-trash"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-warning" title="Tandai sebagai Spam">
+                              <i class="fas fa-ban"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan="6" class="text-center py-4">Tidak ada data ulasan produk ditemukan.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="mt-3 d-flex justify-content-between align-items-center">
+                  Menampilkan 1 sampai 3 dari 15 ulasan
+                </div>
+                <div>
+                  <nav aria-label="Navigasi ulasan">
+                    <ul class="pagination">
+                      <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Previous">
+                          <span aria-hidden="true">&laquo;&laquo; Sebelumnya</span>
+                        </a>
+                      </li>
+                      <li class="page-item active"><span class="page-link" style="color: white;">1</span></li>
+                      <li class="page-item"><a class="page-link" href="#">2</a></li>
+                      <li class="page-item"><a class="page-link" href="#">3</a></li>
+                      <li class="page-item">
+                        <a class="page-link" href="#" aria-label="Next">
+                          <span aria-hidden="true">Berikutnya &raquo;&raquo;</span>
+                        </a>
+                      </li>
+                    </ul>
+                  </nav>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>  <!-- Close the col-md-12 div -->
+</div>  <!-- Close the row div -->
+</main>
+</div>
+</div>
+
+  @include('components.admin_penjual.footer')
+
+  <!-- JavaScript for Tabs and Interactions -->
+  <script>
+    // Handle tab changes
+    document.addEventListener('DOMContentLoaded', function() {
+      const tabTriggerList = [].slice.call(document.querySelectorAll('#productManagementTabs button[data-bs-toggle="tab"]'));
+      tabTriggerList.forEach(function(tabTrigger) {
+        tabTrigger.addEventListener('shown.bs.tab', function(event) {
+          // You can add custom logic here when tab changes
+          console.log('Tab changed to: ' + event.target.textContent);
+        });
+      });
+    });
+  </script>
+  
+@endsection
+
+
+

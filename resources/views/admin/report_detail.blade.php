@@ -1,0 +1,486 @@
+@extends('layouts.admin')
+
+@section('title', 'Detail Laporan Pelanggaran - AKRAB')
+
+@push('styles')
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ asset('css/admin/dashboard_admin.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/admin_penjual/style.css') }}">
+  <style>
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 500;
+    }
+    
+    .back-btn:hover {
+      background-color: var(--bg);
+    }
+    
+    .detail-container {
+      background: white;
+      border-radius: var(--ak-radius);
+      border: 1px solid var(--ak-border);
+      box-shadow: 0 8px 20px rgba(0,0,0,.05);
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+    
+    .detail-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--ak-border);
+      background: linear-gradient(135deg, #006E5C 0%, #a8d5c9 100%);
+      color: white;
+    }
+    
+    .detail-content {
+      padding: 1.5rem;
+    }
+    
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--ak-border);
+    }
+    
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .info-card {
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 1rem;
+      border: 1px solid var(--border);
+    }
+    
+    .info-label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 0.25rem;
+    }
+    
+    .info-value {
+      font-weight: 600;
+      color: var(--text);
+    }
+    
+    .evidence-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .evidence-item {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      text-align: center;
+    }
+    
+    .evidence-img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      display: block;
+    }
+    
+    .evidence-desc {
+      padding: 0.75rem;
+      font-size: 0.9rem;
+    }
+    
+    .chat-container {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      height: 300px;
+      overflow-y: auto;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      background: var(--bg);
+    }
+    
+    .chat-message {
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      border-radius: 8px;
+      max-width: 80%;
+    }
+    
+    .chat-message.admin {
+      background: #e0f7fa;
+      margin-left: auto;
+    }
+    
+    .chat-message.user {
+      background: white;
+      border: 1px solid var(--border);
+      margin-right: auto;
+    }
+    
+    .violation-history {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    .history-item {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .history-item:last-child {
+      border-bottom: none;
+    }
+    
+    .action-steps {
+      background: white;
+      border-radius: var(--ak-radius);
+      border: 1px solid var(--ak-border);
+      box-shadow: 0 8px 20px rgba(0,0,0,.05);
+      padding: 1.5rem;
+    }
+    
+    .step {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--ak-border);
+    }
+    
+    .step:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    
+    .step-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .step-number {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0;
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      background: white;
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 110, 92, 0.1);
+    }
+    
+    textarea.form-control {
+      min-height: 120px;
+      resize: vertical;
+    }
+    
+    .btn-submit {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      font-size: 1rem;
+    }
+    
+    .btn-submit:hover {
+      background: #005a4a;
+    }
+    
+    .status-badge {
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    
+    .status-pending {
+      background-color: #fffbeb;
+      color: #f59e0b;
+    }
+    
+    .status-verified {
+      background-color: #ecfdf5;
+      color: #10b981;
+    }
+    
+    .status-resolved {
+      background-color: #eff6ff;
+      color: #3b82f6;
+    }
+    
+    .status-rejected {
+      background-color: #fef2f2;
+      color: #ef4444;
+    }
+  </style>
+@endpush
+
+@section('content')
+  <div class="container-fluid">
+    <div class="main-layout">
+      <div class="content-wrapper">
+        <main class="admin-page-content">
+        <div class="page-header">
+          <h1>Detail Laporan Pelanggaran</h1>
+          <a href="{{ route('reports.violations') }}" class="back-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 12H5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Kembali ke Daftar Laporan
+          </a>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 70% 30%; gap: 1.5rem; height: 100%;">
+          <!-- Kolom Kiri: Detail Mendalam -->
+          <div class="detail-container">
+            <div class="detail-header">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <h2 style="margin: 0; font-size: 1.5rem;">Laporan Pelanggaran #{{ $reportId ?? 'VR-XXXX-XX-XX-XXX' }}</h2>
+                  <p style="margin: 0.25rem 0 0; opacity: 0.9;">Dilaporkan pada 15 Juni 2023</p>
+                </div>
+                <span class="status-badge status-pending">Pending</span>
+              </div>
+            </div>
+            
+            <div class="detail-content">
+              <!-- Detail Utama Laporan -->
+              <h3 class="section-title">Detail Utama Laporan</h3>
+              <div class="info-grid">
+                <div class="info-card">
+                  <div class="info-label">ID Laporan</div>
+                  <div class="info-value">{{ $reportId ?? 'VR-XXXX-XX-XX-XXX' }}</div>
+                </div>
+                
+                <div class="info-card">
+                  <div class="info-label">Status</div>
+                  <div class="info-value">Baru</div>
+                </div>
+                
+                <div class="info-card">
+                  <div class="info-label">Tanggal Laporan</div>
+                  <div class="info-value">15 Juni 2023</div>
+                </div>
+              </div>
+              
+              <!-- Informasi Pelapor dan Penjual yang Dilaporkan -->
+              <h3 class="section-title">Informasi Pelapor & Penjual Terlapor</h3>
+              <div class="info-grid">
+                <div class="info-card">
+                  <div class="info-label">Pelapor</div>
+                  <div class="info-value">Budi Santoso</div>
+                  <div class="info-label" style="margin-top: 0.5rem;">Email</div>
+                  <div class="info-value">budi.santoso@email.com</div>
+                  <div class="info-label" style="margin-top: 0.5rem;">ID Pengguna</div>
+                  <div class="info-value">USR-001234</div>
+                </div>
+                
+                <div class="info-card">
+                  <div class="info-label">Penjual Terlapor</div>
+                  <div class="info-value">Toko Sejahtera</div>
+                  <div class="info-label" style="margin-top: 0.5rem;">Email</div>
+                  <div class="info-value">tokosejahtera@umkm.com</div>
+                  <div class="info-label" style="margin-top: 0.5rem;">ID Penjual</div>
+                  <div class="info-value">SLR-005678</div>
+                </div>
+                
+                <div class="info-card">
+                  <div class="info-label">Produk Terkait</div>
+                  <div class="info-value">Kaos Original Branded</div>
+                  <div class="info-label" style="margin-top: 0.5rem;">ID Produk</div>
+                  <div class="info-value">PRD-009876</div>
+                  <div class="info-label" style="margin-top: 0.5rem;">Kategori</div>
+                  <div class="info-value">Fashion</div>
+                </div>
+              </div>
+              
+              <!-- Riwayat Pelanggaran Penjual -->
+              <h3 class="section-title">Riwayat Pelanggaran Penjual</h3>
+              <div class="violation-history">
+                <div class="history-item">
+                  <div style="display: flex; justify-content: space-between;">
+                    <div>
+                      <strong>Produk Palsu - Sepatu Branded</strong>
+                      <div style="font-size: 0.9rem; color: var(--muted);">Dilaporkan: 12 Juni 2023</div>
+                    </div>
+                    <span class="status-badge status-resolved">Diselesaikan</span>
+                  </div>
+                  <div style="margin-top: 0.5rem; font-size: 0.9rem;">Penjual diberi peringatan dan produk dinonaktifkan.</div>
+                </div>
+                <div class="history-item">
+                  <div style="display: flex; justify-content: space-between;">
+                    <div>
+                      <strong>Deskripsi Menyesatkan - Jam Tangan</strong>
+                      <div style="font-size: 0.9rem; color: var(--muted);">Dilaporkan: 5 Juni 2023</div>
+                    </div>
+                    <span class="status-badge status-resolved">Diselesaikan</span>
+                  </div>
+                  <div style="margin-top: 0.5rem; font-size: 0.9rem;">Penjual diberi peringatan dan deskripsi produk diperbaiki.</div>
+                </div>
+              </div>
+              
+              <!-- Bukti Laporan -->
+              <h3 class="section-title">Bukti Laporan</h3>
+              <div class="evidence-grid">
+                <div class="evidence-item">
+                  <img src="https://via.placeholder.com/200x150/cccccc/666666.png?text=Gambar+1" alt="Bukti Gambar" class="evidence-img">
+                  <div class="evidence-desc">Gambar produk palsu</div>
+                </div>
+                <div class="evidence-item">
+                  <img src="https://via.placeholder.com/200x150/cccccc/666666.png?text=Gambar+2" alt="Bukti Gambar" class="evidence-img">
+                  <div class="evidence-desc">Perbandingan produk asli vs palsu</div>
+                </div>
+                <div class="evidence-item">
+                  <img src="https://via.placeholder.com/200x150/cccccc/666666.png?text=Gambar+3" alt="Bukti Gambar" class="evidence-img">
+                  <div class="evidence-desc">Screenshot deskripsi produk</div>
+                </div>
+                <div class="evidence-item">
+                  <img src="https://via.placeholder.com/200x150/cccccc/666666.png?text=Gambar+4" alt="Bukti Gambar" class="evidence-img">
+                  <div class="evidence-desc">Screenshot pembayaran</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Kolom Kanan: Aksi Multi-langkah (Sticky) -->
+          <div style="position: sticky; top: 1.5rem; height: fit-content;">
+            <div class="action-steps">
+              <h3 class="section-title">Ambil Tindakan</h3>
+              
+              <div class="step">
+                <div class="step-title">
+                  <span class="step-number">1</span>
+                  Pilih Tindakan
+                </div>
+                <div class="form-group">
+                  <label for="actionType">Tindakan</label>
+                  <select id="actionType" class="form-control">
+                    <option value="">Pilih tindakan yang akan diambil</option>
+                    <option value="reject">Tolak Laporan</option>
+                    <option value="warning">Beri Peringatan ke Penjual</option>
+                    <option value="deactivate">Nonaktifkan Produk Terkait</option>
+                    <option value="suspend_temp">Blokir Penjual Sementara</option>
+                    <option value="suspend_perm">Blokir Penjual Permanen</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div class="step" id="messageStep" style="display: none;">
+                <div class="step-title">
+                  <span class="step-number">2</span>
+                  Tulis Pesan untuk Penjual
+                </div>
+                <div class="form-group">
+                  <label for="actionMessage">Pesan Peringatan</label>
+                  <textarea id="actionMessage" class="form-control" placeholder="Tulis pesan peringatan untuk penjual..."></textarea>
+                </div>
+              </div>
+              
+              <div class="step">
+                <div class="step-title">
+                  <span class="step-number">3</span>
+                  Konfirmasi
+                </div>
+                <button class="btn-submit" id="confirmAction">Kirim Tindakan</button>
+              </div>
+            </div>
+          </div>
+        
+      </main>
+    </div>
+  </div>
+
+  @include('components.admin_penjual.footer')
+
+  <script>
+    // Handle action selection and conditional message field display
+    document.getElementById('actionType').addEventListener('change', function() {
+      const messageStep = document.getElementById('messageStep');
+      const actionMessage = document.getElementById('actionMessage');
+      
+      // Show message field only for specific actions
+      if (this.value === 'warning') {
+        messageStep.style.display = 'block';
+        actionMessage.placeholder = 'Silakan tulis pesan peringatan untuk penjual...';
+      } else {
+        messageStep.style.display = 'none';
+      }
+    });
+    
+    // Handle form submission
+    document.getElementById('confirmAction').addEventListener('click', function() {
+      const actionType = document.getElementById('actionType').value;
+      const actionMessage = document.getElementById('actionMessage');
+      
+      if (!actionType) {
+        alert('Silakan pilih tindakan terlebih dahulu.');
+        return;
+      }
+      
+      // Only require message if warning is selected
+      if (actionType === 'warning' && !actionMessage.value.trim()) {
+        alert('Silakan tulis pesan peringatan untuk penjual.');
+        return;
+      }
+      
+      // In a real application, this would submit the action to the server
+      alert(`Tindakan "${actionType}" berhasil dikirimkan. Laporan akan diperbarui sesuai dengan tindakan yang dipilih.`);
+    });
+  </script>
+@endsection

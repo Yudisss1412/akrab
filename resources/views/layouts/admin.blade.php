@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@yield('title', 'Admin - UMKM AKRAB')</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        body.dashboard-page .navbar {
+            display: none;
+        }
+    </style>
+    @stack('styles')
+</head>
+<body class="{{ request()->routeIs('dashboard.admin') ? 'dashboard-page' : '' }}">
+    <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+            <div class="container-fluid">
+                @if(!request()->routeIs('dashboard.admin'))
+                <a class="navbar-brand" href="javascript:history.back()" title="Kembali ke halaman sebelumnya">
+                    <i class="fas fa-arrow-left me-2"></i>UMKM AKRAB Admin
+                </a>
+                @else
+                <span class="navbar-brand">
+                    UMKM AKRAB Admin
+                </span>
+                @endif
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Success and Error Messages -->
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+        
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+        
+        <!-- Main Content -->
+        <main>
+            @yield('content')
+        </main>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    @stack('scripts')
+</body>
+</html>

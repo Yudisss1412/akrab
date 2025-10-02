@@ -41,6 +41,7 @@ body{
 .btn-primary{ background:var(--primary); color:#fff; border-color:var(--primary); }
 .btn-link{ background:none; border:0; color:#3f3f46; cursor:pointer; }
 .btn-link:disabled{ opacity:.4; cursor:not-allowed; }
+.link-btn{ border:0; background:transparent; color:var(--text); cursor:pointer; }
 
 .search{
   display:flex; align-items:center; gap:6px; background:#fff;
@@ -68,10 +69,14 @@ body{
 .icon-btn:hover{ transform:translateY(-1px); box-shadow:0 6px 12px rgba(0,0,0,.06); }
 .icon-trash path{ stroke:var(--danger); }
 
-/* Footer/Pagination */
+/* Footer/Pagination - styled to match seller dashboard */
 .table-footer{
   display:flex; justify-content:space-between; align-items:center;
-  border-top:1px solid var(--border); padding:10px 14px; font-size:14px; color:#4b5563;
+  font-size:14px; color:var(--muted);
+  width:100%; padding:10px 16px; margin:10px 0 24px;
+}
+.table-footer .nav{
+  display:flex; gap:12px;
 }
 
 /* Modal kecil (Nama Kategori) */

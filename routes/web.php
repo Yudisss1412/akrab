@@ -148,6 +148,15 @@ Route::get('/profil_admin', function () {
     return view('admin.profil_admin');
 })->name('profil.admin');
 
+Route::get('/edit_profil_admin', function () {
+    return view('admin.edit_profil_admin');
+})->name('edit.profil.admin');
+
+Route::put('/admin/profil/update', function () {
+    // Logika untuk menyimpan perubahan profil admin
+    return redirect()->route('profil.admin')->with('success', 'Profil admin berhasil diperbarui!');
+})->name('profil.admin.update');
+
 // Admin dashboard related routes
 Route::get('/reports/violations', function () {
     return '<h1>Daftar Laporan Pelanggaran Penjual</h1><p>Halaman ini menampilkan daftar laporan pelanggaran dari penjual.</p>';

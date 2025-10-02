@@ -4,211 +4,277 @@
 
 @push('styles')
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ asset('css/admin/dashboard_admin.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/penjual/profil_penjual.css') }}">
   <link rel="stylesheet" href="{{ asset('css/admin_penjual/style.css') }}">
   <style>
-    /* Admin Profile Specific Styles */
-    .profile-container {
-      max-width: 800px;
-      margin: 0 auto;
-      background: var(--white);
-      border-radius: var(--ak-radius);
-      border: 1px solid var(--ak-border);
-      box-shadow: 0 8px 20px rgba(0,0,0,.05);
-      overflow: hidden;
-    }
-    
-    .profile-header {
-      background: var(--ak-primary);
-      color: white;
-      padding: 1.5rem;
-      text-align: center;
-    }
-    
-    .profile-content {
-      padding: 1.5rem;
-    }
-    
-    .profile-section {
-      margin-bottom: 1.5rem;
-    }
-    
-    .profile-title {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--ak-text);
-      margin-bottom: 1rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid var(--ak-border);
-    }
-    
-    .profile-info-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-    }
-    
-    .info-item {
-      margin-bottom: 0.75rem;
-    }
-    
-    .info-label {
-      font-weight: 500;
-      color: var(--muted);
-      font-size: 0.875rem;
-      margin-bottom: 0.25rem;
-    }
-    
-    .info-value {
-      font-weight: 600;
-      color: var(--text);
-      font-size: 1rem;
-    }
-    
-    .profile-actions {
+    /* Sesuaikan beberapa elemen admin dengan desain profil penjual */
+    .admin-profile .info-list > div {
       display: flex;
-      gap: 0.75rem;
-      margin-top: 1.5rem;
+      align-items: center;
+      justify-content: space-between;
+      gap: .75rem;
+      padding: .4rem 0;
+      border-bottom: 1px dashed #eceff1;
+    }
+    
+    .admin-profile .info-list > div:last-child {
+      border-bottom: none;
+    }
+    
+    .admin-profile .info-list dt {
+      font-weight: 600;
+      flex: 1;
+    }
+    
+    .admin-profile .info-list dd {
+      margin: 0;
+      color: var(--text-muted);
+      text-align: right;
+      flex: 1;
+    }
+    
+    .admin-orders-viewport {
+      max-height: 500px;
+      overflow: auto;
+      margin-top: 1rem;
+    }
+    
+    .admin-order-card {
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1rem;
+      background: #fff;
+      margin-bottom: .9rem;
+    }
+    
+    .admin-order-card .item-desc {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      white-space: normal;
+      flex: 1;
+      min-width: 0; /* Memastikan elemen bisa mengecil saat teks terlalu panjang */
+    }
+    
+    .admin-order-card .item-body {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: .4rem;
+      width: 100%; /* Memastikan lebar penuh digunakan */
+    }
+    
+    .admin-order-card .item-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       flex-wrap: wrap;
+      width: 100%; /* Memastikan lebar penuh digunakan */
     }
     
-    .btn {
-      padding: 8px 16px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--white);
-      cursor: pointer;
-      font-weight: 500;
+    /* Perbaikan untuk tampilan log personal */
+    .admin-order-card .order-items {
+      width: 100%;
+    }
+    
+    .admin-order-card .order-item {
+      display: flex;
+      flex-direction: column; /* Ubah ke kolom agar teks panjang tidak menyebabkan overflow */
+      gap: .4rem;
+      width: 100%;
+    }
+    
+    /* Pengaturan untuk membuat header custom muncul di atas dan navbar Bootstrap muncul di bawah */
+    
+    /* Header custom tetap menggunakan sticky tapi kita akan menyembunyikan navbar Bootstrap */
+    .ak-navbar {
+      position: sticky;
+      top: 0;
+      z-index: 1001;
+    }
+    
+    /* Sembunyikan navbar Bootstrap asli dan buat elemen pengganti */
+    body .navbar {
+      display: none !important;
+    }
+    
+    /* Buat elemen untuk menempatkan tombol back di bawah header custom */
+    .custom-back-nav {
+      position: static; /* Mengubah dari sticky ke static agar tidak mengikuti scroll */
+      background-color: #f8f9fa; /* Warna latar navbar Bootstrap */
+      padding: 0.75rem 1.5rem;
+      border-bottom: 1px solid #dee2e6;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+    }
+    
+    .custom-back-nav a {
+      display: flex;
+      align-items: center;
       text-decoration: none;
-      display: inline-block;
-      text-align: center;
+      color: inherit;
     }
     
-    .btn-primary {
-      background: var(--primary);
-      color: #fff;
-      border-color: var(--primary);
+    .main-layout {
+      margin-top: 0; /* Hilangkan margin-top agar tidak terlalu jauh dari tombol back */
     }
     
-    .btn-outline {
-      background: transparent;
-      border: 1px solid var(--primary);
-      color: var(--primary);
-    }
-    
-    .profile-avatar {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid var(--ak-primary-light);
-      margin: 0 auto 1rem;
-      display: block;
+    /* Menjaga agar konten tidak tertutup oleh header sticky */
+    .content.admin-page-content {
+      margin-top: 0;
+      padding-top: 30px; /* Kurangi ruang antara tombol back dan isi konten */
     }
   </style>
 @endpush
 
 @section('content')
-  <div class="container-fluid">
+  @include('components.admin_penjual.header')
+  <!-- Custom back navigation -->
+  <div class="custom-back-nav">
+    <a href="javascript:history.back()" class="navbar-brand" title="Kembali ke halaman sebelumnya">
+      <i class="fas fa-arrow-left me-2"></i>UMKM AKRAB Admin
+    </a>
+  </div>
     <div class="main-layout">
       <div class="content-wrapper">
-        <main class="admin-page-content">
-        <div class="profile-container">
-          <div class="profile-header">
-            <h1>Profil Admin</h1>
-            <p>Kelola informasi akun Anda</p>
-          </div>
-          
-          <div class="profile-content">
-            <div class="profile-section text-center">
-              <img src="{{ asset('src/admin-avatar.png') }}" alt="Admin Avatar" class="profile-avatar" onerror="this.src='https://ui-avatars.com/api/?name=Admin+User&background=006E5C&color=fff&size=100'">
-              <h2 style="margin-top: 0.5rem; margin-bottom: 0.25rem;">Admin Utama</h2>
-              <p style="margin: 0; color: var(--muted);">Administrator Sistem</p>
-            </div>
-            
-            <div class="profile-section">
-              <h3 class="profile-title">Informasi Pribadi</h3>
-              <div class="profile-info-grid">
-                <div class="info-item">
-                  <div class="info-label">Nama Lengkap</div>
-                  <div class="info-value">Admin Utama</div>
+        <main class="content admin-page-content" role="main">
+          <!-- Profil Admin -->
+          <section class="card card-profile admin-profile" aria-labelledby="adminTitle">
+            <div class="seller-hero">
+              <!-- kiri: identitas -->
+              <div class="seller-identity">
+                <div class="avatar" aria-hidden="true">
+                  <span>A</span>
+                  <i class="dot online"></i>
                 </div>
-                <div class="info-item">
-                  <div class="info-label">Email</div>
-                  <div class="info-value">admin@akrab.com</div>
-                </div>
-                <div class="info-item">
-                  <div class="info-label">Nomor Telepon</div>
-                  <div class="info-value">+62 812-3456-7890</div>
-                </div>
-                <div class="info-item">
-                  <div class="info-label">Jabatan</div>
-                  <div class="info-value">Administrator</div>
-                </div>
-                <div class="info-item">
-                  <div class="info-label">Tanggal Bergabung</div>
-                  <div class="info-value">1 Januari 2024</div>
-                </div>
-                <div class="info-item">
-                  <div class="info-label">Status Akun</div>
-                  <div class="info-value" style="color: #10b981; font-weight: 600;">Aktif</div>
+                <div class="seller-meta">
+                  <h1 id="adminTitle" class="seller-name">Admin Utama</h1>
+                  <div class="seller-mail">admin@akrab.com</div>
+                  <div class="seller-since">Bergabung sejak <strong>2024</strong></div>
                 </div>
               </div>
-            </div>
-            
-            <div class="profile-section">
-              <h3 class="profile-title">Statistik Admin</h3>
-              <div class="profile-info-grid">
-                <div class="info-item">
-                  <div class="info-label">Jumlah Penjual Terdaftar</div>
-                  <div class="info-value" style="font-size: 1.25rem;">127</div>
-                </div>
-                <div class="info-item">
-                  <div class="info-label">Jumlah Produk Aktif</div>
-                  <div class="info-value" style="font-size: 1.25rem;">843</div>
-                </div>
-                <div class="info-item">
-                  <div class="info-label">Transaksi Bulan Ini</div>
-                  <div class="info-value" style="font-size: 1.25rem;">2,156</div>
-                </div>
-                <div class="info-item">
-                  <div class="info-label">Total Pendapatan</div>
-                  <div class="info-value" style="font-size: 1.25rem;">Rp 1.245.678.000</div>
-                </div>
+              <!-- kanan: aksi -->
+              <div class="profile-actions">
+                <a href="{{ route('edit.profil.admin') }}" id="btnEditProfile" class="btn btn-primary btn-sm">
+                  Edit Profil
+                </a>
               </div>
             </div>
-            
-            <div class="profile-section">
-              <h3 class="profile-title">Akses Sistem</h3>
-              <div class="profile-info-grid">
-                <div class="info-item">
-                  <div class="info-label">Terakhir Login</div>
-                  <div class="info-value">Hari ini, 14:30 WIB</div>
-                </div>
-                <div class="info-item">
-                  <div class="info-label">IP Terakhir</div>
-                  <div class="info-value">192.168.1.100</div>
-                </div>
-                <div class="info-item">
-                  <div class="info-label">Perangkat Login</div>
-                  <div class="info-value">Desktop - Windows 10</div>
-                </div>
-                <div class="info-item">
-                  <div class="info-label">Level Akses</div>
-                  <div class="info-value">Super Admin</div>
-                </div>
+
+            <dl class="info-list" aria-label="Info Admin">
+              <div>
+                <dt>Nama Lengkap</dt>
+                <dd>Admin Utama</dd>
               </div>
+              <div>
+                <dt>Email</dt>
+                <dd>admin@akrab.com</dd>
+              </div>
+              <div>
+                <dt>No. HP</dt>
+                <dd>+62 812-3456-7890</dd>
+              </div>
+              <div>
+                <dt>Jabatan</dt>
+                <dd>Administrator</dd>
+              </div>
+              <div>
+                <dt>Level Akses</dt>
+                <dd>Super Admin</dd>
+              </div>
+              <div>
+                <dt>Status Akun</dt>
+                <dd style="color: #10b981; font-weight: 600;">Aktif</dd>
+              </div>
+            </dl>
+          </section>
+
+
+
+          <!-- Log Personal -->
+          <section class="card reviews-section" aria-labelledby="logTitle">
+            <div class="card-head">
+              <h2 id="logTitle" class="card-title">Log Personal</h2>
             </div>
-            
-            <div class="profile-actions">
-              <a href="#" class="btn btn-primary">Edit Profil</a>
-              <a href="#" class="btn btn-outline">Ganti Password</a>
-              <a href="#" class="btn btn-outline">Riwayat Aktivitas</a>
-              <a href="{{ route('dashboard.admin') }}" class="btn btn-outline">Kembali ke Dashboard</a>
+            <div class="admin-orders-viewport">
+              <article class="admin-order-card" data-order-id="LOG-001">
+                <div class="order-head">
+                  <div class="shop-name">Anda</div>
+                  <div class="order-meta">
+                    <span>Tanggal:
+                      <time datetime="2025-09-05">05 Sep 2025</time>
+                    </span>
+                    • <span>Status: <strong>Berhasil</strong></span>
+                  </div>
+                </div>
+
+                <div class="order-items">
+                  <div class="order-item">
+                    <div class="item-body">
+                      <div class="item-row">
+                        <div class="item-name">Menyetujui penarikan dana</div>
+                      </div>
+                      <div class="item-desc scrollable">
+                        Anda menyetujui penarikan dana untuk Toko Aneka Roti.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </article>
+              
+              <article class="admin-order-card" data-order-id="LOG-002">
+                <div class="order-head">
+                  <div class="shop-name">Anda</div>
+                  <div class="order-meta">
+                    <span>Tanggal:
+                      <time datetime="2025-09-04">04 Sep 2025</time>
+                    </span>
+                    • <span>Status: <strong>Selesai</strong></span>
+                  </div>
+                </div>
+
+                <div class="order-items">
+                  <div class="order-item">
+                    <div class="item-body">
+                      <div class="item-row">
+                        <div class="item-name">Menangguhkan akun pembeli</div>
+                      </div>
+                      <div class="item-desc scrollable">
+                        Anda menangguhkan akun pembeli Jerome Bell.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </article>
+              
+              <article class="admin-order-card" data-order-id="LOG-003">
+                <div class="order-head">
+                  <div class="shop-name">Anda</div>
+                  <div class="order-meta">
+                    <span>Tanggal:
+                      <time datetime="2025-09-03">03 Sep 2025</time>
+                    </span>
+                    • <span>Status: <strong>Selesai</strong></span>
+                  </div>
+                </div>
+
+                <div class="order-items">
+                  <div class="order-item">
+                    <div class="item-body">
+                      <div class="item-row">
+                        <div class="item-name">Mengubah pengaturan komisi</div>
+                      </div>
+                      <div class="item-desc scrollable">
+                        Anda mengubah pengaturan komisi platform.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </article>
             </div>
-          </div>
-        </div>
-      </main>
+          </section>
+        </main>
+      </div>
     </div>
-  </div>
+  @include('components.admin_penjual.footer')
 @endsection

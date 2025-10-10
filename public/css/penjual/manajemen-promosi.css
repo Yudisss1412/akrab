@@ -1,0 +1,615 @@
+/* Gaya khusus untuk halaman manajemen promosi - mengikuti style yang konsisten dengan manajemen pesanan dan produk */
+:root {
+  --ak-primary: #006E5C;
+  --ak-primary-light: #a8d5c9;
+  --ak-white: #FFFFFF;
+  --ak-background: #f0fdfa;
+  --ak-text: #1D232A;
+  --ak-muted: #6b7280;
+  --ak-border: #E5E7EB;
+  --ak-radius: 12px;
+  --ak-space: 16px;
+  --ak-danger: #dc3545;
+  --ak-warning: #ffc107;
+  --ak-success: #28a745;
+  --ak-info: #17a2b8;
+}
+
+/* Page Header - mengikuti style dari manajemen pesanan/produk */
+.page-header {
+  background: var(--ak-white);
+  border-radius: var(--ak-radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--ak-border);
+}
+
+.page-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--ak-primary);
+}
+
+/* Button styling mengikuti style manajemen pesanan/produk */
+.btn {
+  border: 1px solid transparent;
+  border-radius: var(--ak-radius);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-primary {
+  background: var(--ak-primary);
+  color: white;
+  border-color: var(--ak-primary);
+}
+
+.btn-primary:hover {
+  background: #005a4a;
+  border-color: #005a4a;
+}
+
+.btn-outline-secondary {
+  color: var(--ak-text);
+  border-color: var(--ak-border);
+}
+
+.btn-outline-secondary:hover {
+  background: var(--ak-background);
+  border-color: #a0aec0;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+/* Card styling mengikuti style manajemen pesanan/produk */
+.card {
+  background: var(--ak-white);
+  border-radius: var(--ak-radius);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--ak-border);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.card-header {
+  background: var(--ak-white);
+  border-bottom: 1px solid var(--ak-border);
+  padding: 1rem 1.25rem;
+  font-weight: 600;
+  color: var(--ak-primary);
+  border-radius: var(--ak-radius) var(--ak-radius) 0 0 !important;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+/* Status Badge styling */
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-pending {
+  background: rgba(59, 130, 246, 0.1);
+  color: #2563eb;
+}
+
+.status-completed {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+}
+
+.status-cancelled,
+.status-expired {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+.status-upcoming {
+  background: rgba(245, 158, 11, 0.1);
+  color: #ea580c;
+}
+
+/* Table styling */
+.table {
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.table th {
+  border-top: none;
+  font-weight: 600;
+  color: var(--ak-text);
+  background-color: transparent;
+  border-top: none;
+  white-space: nowrap;
+}
+
+.table td {
+  vertical-align: middle;
+  padding: 0.75rem 1rem;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+/* Action buttons styling */
+.action-buttons {
+  display: flex;
+  gap: 0.25rem;
+  justify-content: flex-end;
+}
+
+/* Tombol aksi berbentuk lingkaran penuh - dengan aturan yang sangat kuat */
+.action-btn,
+.btn-edit,
+.btn-deactivate,
+.btn-delete {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  background-color: #f3f4f6 !important;
+  border: 1px solid #e5e7eb !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  min-width: 36px !important;
+  min-height: 36px !important;
+  max-width: 36px !important;
+  max-height: 36px !important;
+  
+  /* Border radius untuk semua browser */
+  -webkit-border-radius: 50% !important;
+  -moz-border-radius: 50% !important;
+  -ms-border-radius: 50% !important;
+  -o-border-radius: 50% !important;
+  
+  /* Menonaktifkan semua style default */
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  
+  /* Memastikan ukuran tetap */
+  line-height: 1 !important;
+  text-align: center !important;
+}
+
+/* Hover effect untuk tombol Edit */
+.action-btn:hover,
+.btn-edit:hover {
+  background-color: #e5e7eb !important;
+  border-color: #d1d5db !important;
+}
+
+/* Hover effect untuk tombol Nonaktifkan */
+.btn-deactivate:hover {
+  background-color: #e5e7eb !important;
+  border-color: #d1d5db !important;
+}
+
+/* Hover effect untuk tombol Hapus */
+.btn-delete:hover {
+  background-color: #fee2e2 !important;
+  border-color: #fecaca !important;
+}
+
+.btn-delete:hover svg {
+  stroke: #ef4444 !important;
+}
+
+/* Disabled state untuk tombol Nonaktifkan pada promosi yang sudah berakhir */
+.btn-deactivate:disabled {
+  background-color: #f3f4f6 !important;
+  border-color: #e5e7eb !important;
+  cursor: not-allowed !important;
+  opacity: 0.5 !important;
+}
+
+/* SVG icon styling */
+.action-btn svg {
+  width: 20px !important;
+  height: 20px !important;
+  stroke: #4b5563 !important;
+  transition: all 0.2s ease !important;
+  display: block !important;
+  margin: auto !important;
+}
+
+/* Hover effect untuk SVG dalam tombol */
+.action-btn:hover svg {
+  stroke: #006E5C !important;
+}
+
+/* Tab styling - Modern Interactive Tabs */
+.tabs-navigation {
+  background: var(--ak-white);
+  border-radius: var(--ak-radius);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--ak-border);
+  padding: 0.5rem;
+  margin-bottom: 1.5rem;
+  overflow: hidden; /* To ensure rounded corners are maintained */
+  position: relative;
+}
+
+/* Container for the tabs - Using flexbox for equal spacing */
+.tabs-container {
+  display: flex;
+  background: var(--ak-white);
+  border-radius: calc(var(--ak-radius) - 0.25rem); /* Slightly smaller radius to accommodate padding */
+  position: relative;
+  z-index: 1;
+}
+
+/* Tab button styling */
+.tab-button {
+  color: var(--ak-muted);
+  border: none;
+  border-radius: calc(var(--ak-radius) - 0.25rem);
+  padding: 0.875rem 1rem;
+  font-weight: 600;
+  font-size: 0.9375rem; /* Slightly larger font */
+  background-color: transparent;
+  transition: all 0.3s ease;
+  position: relative;
+  flex: 1;
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 56px;
+  z-index: 2;
+}
+
+/* Active tab styling with primary accent color and subtle background */
+.tab-button.tab-active {
+  color: var(--ak-primary);
+  background-color: rgba(0, 110, 92, 0.05); /* Subtle primary color background */
+  position: relative;
+  overflow: hidden;
+}
+
+/* Active tab bottom indicator */
+.tab-button.tab-active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--ak-primary);
+  border-radius: 3px 3px 0 0;
+}
+
+/* Inactive tab styling */
+.tab-button.tab-inactive {
+  color: var(--ak-muted);
+  background-color: transparent;
+}
+
+/* Hover effect for tabs */
+.tab-button:hover:not(.tab-active) {
+  color: var(--ak-primary);
+  background-color: rgba(0, 110, 92, 0.03);
+}
+
+/* Additional styling to create a more modern look */
+.tab-button i {
+  font-size: 1.125rem;
+  transition: transform 0.3s ease;
+}
+
+.tab-button.tab-active i {
+  color: var(--ak-primary);
+}
+
+.tab-button:hover:not(.tab-active) i {
+  transform: translateY(-1px);
+  color: var(--ak-primary);
+}
+
+/* Tab Content styling */
+#promotionTabContent {
+  background: var(--ak-white);
+  border-radius: var(--ak-radius);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--ak-border);
+  overflow: hidden;
+}
+
+.tab-panel {
+  padding: 1.5rem;
+  display: none; /* Default sembunyikan semua tab panel */
+}
+
+.tab-panel.active {
+  display: block; /* Tampilkan hanya tab yang aktif */
+}
+
+.tab-panel.hidden,
+.tab-panel.d-none {
+  display: none !important; /* Pastikan tetap disembunyikan */
+}
+
+/* Card styling within tabs */
+.tab-panel .card {
+  border: none;
+  box-shadow: none;
+  margin-bottom: 0;
+}
+
+.tab-panel .card-header {
+  background: transparent;
+  border-bottom: none;
+  padding: 0 0 1rem 0;
+}
+
+.tab-panel .card-body {
+  padding: 0;
+}
+
+/* Modal styling */
+.modal-content {
+  border-radius: var(--ak-radius);
+  border: 1px solid var(--ak-border);
+}
+
+.modal-header {
+  background: var(--ak-white);
+  border-bottom: 1px solid var(--ak-border);
+  padding: 1rem 1.5rem;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+/* Promotion type cards in modal */
+.promotion-types {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.promotion-type-card {
+  padding: 1.5rem;
+  border: 1px solid var(--ak-border);
+  border-radius: var(--ak-radius);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  text-align: center;
+  background: var(--ak-white);
+}
+
+.promotion-type-card:hover {
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
+  border-color: var(--ak-primary);
+}
+
+.promotion-type-card i {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.promotion-type-card h5 {
+  margin-bottom: 0.5rem;
+  color: var(--ak-text);
+}
+
+.promotion-type-card p {
+  margin-bottom: 1rem;
+  color: var(--ak-muted);
+  font-size: 0.875rem;
+}
+
+/* Pagination styling - Rounded full buttons like Manajemen Produk and Pesanan */
+.pagination-promosi {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+}
+
+.pagination-info {
+  color: var(--ak-muted);
+  font-size: 0.875rem;
+}
+
+.pagination-nav {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pagination-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--ak-border);
+  background: var(--ak-white);
+  border-radius: 50%; /* Rounded-full equivalent */
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--ak-text);
+}
+
+.pagination-btn:hover {
+  background: var(--ak-primary);
+  color: white;
+  border-color: var(--ak-primary);
+}
+
+.pagination-btn.active {
+  background: var(--ak-primary);
+  color: white;
+  border-color: var(--ak-primary);
+}
+
+.pagination-separator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  font-size: 0.875rem;
+  color: var(--ak-muted);
+}
+
+/* Enhanced pagination container */
+nav[aria-label*="Navigasi halaman"] {
+  background: var(--ak-white);
+  border-radius: var(--ak-radius);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--ak-border);
+  padding: 1rem;
+  margin-top: 1.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .page-header {
+    padding: 1rem;
+  }
+  
+  .page-header .d-flex {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .card-body {
+    padding: 1rem;
+  }
+  
+  .table-responsive {
+    font-size: 0.875rem;
+  }
+  
+  .table th,
+  .table td {
+    padding: 0.5rem;
+  }
+  
+  .action-buttons {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .tabs-navigation {
+    padding: 0.25rem;
+  }
+  
+  .nav-tabs {
+    flex-wrap: wrap;
+  }
+  
+  .nav-tabs .nav-link {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    margin-right: 0.125rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .promotion-types {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .modal-body {
+    padding: 1rem;
+  }
+  
+  /* Tab content adjustments for mobile */
+  .tab-pane {
+    padding: 1rem;
+  }
+  
+  /* Pagination adjustments for mobile */
+  .pagination {
+    flex-wrap: wrap;
+  }
+  
+  .pagination .page-link {
+    padding: 0.4rem 0.6rem;
+    min-width: 2rem;
+    font-size: 0.8125rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .page-header {
+    padding: 0.75rem;
+  }
+  
+  .page-title {
+    font-size: 1.25rem;
+  }
+  
+  .card-body {
+    padding: 0.75rem;
+  }
+  
+  .table th,
+  .table td {
+    padding: 0.4rem;
+    font-size: 0.8125rem;
+  }
+  
+  .status-badge {
+    padding: 0.15rem 0.5rem;
+    font-size: 0.6875rem;
+  }
+  
+  .action-buttons {
+    gap: 0.125rem;
+  }
+  
+  .action-button {
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
+  }
+  
+  /* Tab navigation adjustments for small screens */
+  .nav-tabs .nav-link {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8125rem;
+  }
+  
+  /* Pagination adjustments for small screens */
+  .pagination .page-link {
+    padding: 0.3rem 0.5rem;
+    min-width: 1.75rem;
+    font-size: 0.75rem;
+  }
+  
+  nav[aria-label*="Navigasi halaman"] {
+    padding: 0.75rem;
+  }
+}

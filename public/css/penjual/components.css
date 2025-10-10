@@ -1,0 +1,124 @@
+/* Gaya khusus untuk komponen header penjual */
+.header.compact {
+  background: var(--ak-white);
+  border-bottom: 1px solid var(--ak-border);
+  height: 78px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2.5rem;
+  z-index: 1001;
+  position: sticky;
+  top: 0;
+}
+
+.header.compact .header-left .logo {
+  height: 54px;
+  width: auto;
+  display: block;
+}
+
+.header.compact .header-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.header.compact .header-right {
+  display: flex;
+  gap: 1.2rem;
+  align-items: center;
+}
+
+.profile-ico {
+  width: 27px;
+  height: 27px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-ico svg {
+  width: 27px;
+  height: 27px;
+  display: block;
+  stroke: var(--ak-primary-dark);
+  fill: none;
+}
+
+/* Gaya khusus untuk komponen footer penjual */
+.footer {
+  background-color: var(--ak-white);
+  color: var(--ak-primary-dark);
+  border-top: 1px solid var(--ak-border);
+  width: 100%;
+  position: static;
+  z-index: 100;
+  font-size: 12px;
+  padding: 1rem 2rem;
+}
+
+.footer__inner {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+}
+
+.footer-left {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.footer-right {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+}
+
+.footer-links a {
+  color: var(--ak-primary-dark);
+  text-decoration: none;
+  font-size: 12px;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive untuk mobile */
+@media (max-width: 768px) {
+  .header.compact {
+    padding: 0 1.5rem;
+  }
+  
+  .footer__inner {
+    grid-template-columns: 1fr;
+    row-gap: 0.75rem;
+    text-align: center;
+  }
+  
+  .footer-left,
+  .footer-right {
+    justify-self: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .footer__inner.footer-3col {
+    grid-template-columns: 1fr;
+    row-gap: 0.75rem;
+    text-align: center;
+  }
+  
+  .footer-left,
+  .footer-center,
+  .footer-right {
+    justify-self: center;
+  }
+}

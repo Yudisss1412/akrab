@@ -178,25 +178,22 @@
     </style>
     
     <link rel="stylesheet" href="{{ asset('css/customer/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/order-detail.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     
     @stack('styles')
+    
+    <!-- CSS khusus untuk komponen penjual -->
+    @if(request()->routeIs('penjual.*'))
+        <link rel="stylesheet" href="{{ asset('css/penjual/components.css') }}">
+    @endif
 </head>
 <body>
     <div class="main-layout">
-        <!-- Conditional Header - Use compact header for specific pages -->
-        @if(request()->is('keranjang') || request()->is('transaksi/checkout') || request()->is('profil') || request()->is('profil/*') || request()->is('edit_profil'))
-            @include('components.header_compact')
-        @else
-            @include('components.header')
-        @endif
-        
         <!-- Main Content -->
         <main class="content">
             @yield('content')
         </main>
-        
-        <!-- Footer Component -->
-        @include('components.footer')
     </div>
 
     <script src="{{ asset('js/customer/script.js') }}"></script>

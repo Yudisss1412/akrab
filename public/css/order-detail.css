@@ -1,0 +1,339 @@
+/* Gaya khusus untuk halaman detail pesanan - mengikuti style yang konsisten dengan halaman manajemen pesanan */
+:root {
+  --ak-primary: #006E5C;
+  --ak-primary-light: #a8d5c9;
+  --ak-white: #FFFFFF;
+  --ak-background: #f0fdfa;
+  --ak-text: #1D232A;
+  --ak-muted: #6b7280;
+  --ak-border: #E5E7EB;
+  --ak-radius: 12px;
+  --ak-space: 16px;
+}
+
+/* Page Header - mengikuti style dari manajemen pesanan */
+.page-header {
+  background: var(--ak-white);
+  border-radius: var(--ak-radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--ak-border);
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--ak-primary);
+}
+
+/* Button styling mengikuti style manajemen pesanan */
+.btn {
+  border: 1px solid transparent;
+  border-radius: var(--ak-radius);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-outline {
+  border: 1px solid var(--ak-primary);
+  color: var(--ak-primary);
+  background: transparent;
+}
+
+.btn-outline:hover {
+  background: var(--ak-primary);
+  color: white;
+}
+
+.btn-primary {
+  background: var(--ak-primary);
+  color: white;
+  border-color: var(--ak-primary);
+}
+
+.btn-primary:hover {
+  background: #005a4a;
+  border-color: #005a4a;
+}
+
+/* Card styling mengikuti style manajemen pesanan */
+.card {
+  background: var(--ak-white);
+  border-radius: var(--ak-radius);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--ak-border);
+  overflow: hidden;
+}
+
+.card-header {
+  background: var(--ak-white);
+  border-bottom: 1px solid var(--ak-border);
+  padding: 1rem 1.25rem;
+  font-weight: 600;
+  color: var(--ak-primary);
+  border-radius: var(--ak-radius) var(--ak-radius) 0 0 !important;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+/* Status Badge styling */
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-pending-payment {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+}
+
+.status-processing {
+  background: rgba(59, 130, 246, 0.1);
+  color: #2563eb;
+}
+
+.status-shipping {
+  background: rgba(139, 69, 193, 0.1);
+  color: #8b45c1;
+}
+
+.status-completed {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+}
+
+.status-cancelled {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+/* Table styling */
+.table {
+  margin-bottom: 0;
+}
+
+.table th {
+  border-top: none;
+  font-weight: 600;
+  color: var(--ak-text);
+  background-color: transparent;
+}
+
+.table td {
+  vertical-align: middle;
+  padding: 0.75rem 1rem;
+}
+
+/* Product image styling */
+.product-image {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+  background: #f3f4f6;
+}
+
+/* Summary card styling */
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--ak-border);
+}
+
+.summary-item:last-child {
+  border-bottom: none;
+  font-weight: 600;
+}
+
+.summary-label {
+  color: var(--ak-muted);
+}
+
+.summary-value {
+  font-weight: 500;
+}
+
+/* Info section styling */
+.info-section {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--ak-border);
+}
+
+.info-section:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.info-title {
+  font-weight: 600;
+  color: var(--ak-primary);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--ak-border);
+}
+
+.info-row {
+  display: flex;
+  margin-bottom: 0.75rem;
+}
+
+.info-label {
+  min-width: 150px;
+  color: var(--ak-muted);
+  font-weight: 500;
+}
+
+.info-value {
+  flex: 1;
+}
+
+/* Seller actions styling */
+.seller-actions .btn {
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.seller-actions .btn:last-child {
+  margin-bottom: 0;
+}
+
+/* Timeline styling */
+.timeline {
+  position: relative;
+  padding: 1rem 0;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 16px;
+  width: 2px;
+  background: var(--ak-border);
+  z-index: 1;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 1.5rem;
+  align-items: flex-start;
+}
+
+.timeline-item:last-child {
+  margin-bottom: 0;
+}
+
+.timeline-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--ak-primary-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-left: 0;
+  margin-right: 1rem;
+  color: var(--ak-primary);
+  position: relative;
+  z-index: 2;
+}
+
+.timeline-content {
+  flex: 1;
+  margin-left: 1rem;
+}
+
+.timeline-content p {
+  margin-bottom: 0.25rem;
+}
+
+.timeline-date {
+  color: var(--ak-muted);
+  font-size: 0.875rem;
+}
+
+/* Print buttons styling */
+.print-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.print-buttons .btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Modal z-index fix */
+.modal {
+  z-index: 1050 !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .print-buttons {
+    flex-direction: column;
+  }
+  
+  .info-row {
+    flex-direction: column;
+  }
+  
+  .info-label {
+    min-width: auto;
+    margin-bottom: 0.25rem;
+  }
+  
+  .page-header {
+    padding: 1rem;
+  }
+  
+  .card-body {
+    padding: 1rem;
+  }
+  
+  .page-header .d-flex {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+}
+
+/* Additional spacing */
+.py-4 {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.mb-4 {
+  margin-bottom: 1.5rem;
+}
+
+.mt-4 {
+  margin-top: 1.5rem;
+}
+
+/* Container */
+.container-fluid {
+  padding: 0 1.5rem;
+}

@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <title>Manajemen Ulasan — AKRAB</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ asset('css/admin_penjual/style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <style>
+    :root {
+      --ak-primary: #006E5C;
+      --ak-primary-light: #a8d5c9;
+      --ak-white: #FFFFFF;
+      --ak-background: #f0fdfa;
+      --ak-text: #1D232A;
+      --ak-muted: #6b7280;
+      --ak-border: #E5E7EB;
+      --ak-success: #10B981;
+      --ak-danger: #EF4444;
+      --ak-warning: #F59E0B;
+      --ak-radius: 12px;
+      --ak-space: 16px;
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      color: var(--ak-text);
+      background: var(--ak-background);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .main-layout {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .content-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 0 1.5rem;
+    }
+    
+    /* Page header */
+    .page-header {
+      background: var(--ak-white);
+      border-radius: var(--ak-radius);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--ak-border);
+    }
+    
+    .page-header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--ak-primary);
+    }
+    
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    @media (min-width: 768px) {
+      .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    
+    .stat-card {
+      background: var(--ak-white);
+      border-radius: var(--ak-radius);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--ak-border);
+    }
+    
+    .stat-title {
+      font-size: 0.875rem;
+      color: var(--ak-muted);
+      margin: 0 0 0.25rem 0;
+    }
+    
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--ak-text);
+      margin: 0;
+    }
+    
+    .star-breakdown {
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+    
+    .star-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.25rem;
+    }
+    
+    .star-label {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.875rem;
+    }
+    
+    .star-progress {
+      flex: 1;
+      height: 8px;
+      background: #e5e7eb;
+      border-radius: 4px;
+      margin: 0 0.5rem;
+      overflow: hidden;
+    }
+    
+    .star-progress-bar {
+      height: 100%;
+      background: var(--ak-warning);
+    }
+    
+    /* Filter row */
+    .filter-row {
+      background: var(--ak-white);
+      border-radius: var(--ak-radius);
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--ak-border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+    }
+    
+    .filter-group {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .filter-group label {
+      display: block;
+      font-size: 0.875rem;
+      color: var(--ak-muted);
+      margin-bottom: 0.5rem;
+    }
+    
+    .filter-control {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid var(--ak-border);
+      border-radius: var(--ak-radius);
+      background: var(--ak-white);
+    }
+    
+    /* Review card */
+    .review-card {
+      background: var(--ak-white);
+      border-radius: var(--ak-radius);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--ak-border);
+    }
+    
+    .review-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+    
+    .reviewer-info {
+      flex: 1;
+    }
+    
+    .reviewer-name {
+      font-weight: 600;
+      margin: 0;
+    }
+    
+    .review-date {
+      font-size: 0.875rem;
+      color: var(--ak-muted);
+      margin: 0.25rem 0 0;
+    }
+    
+    .review-rating {
+      display: flex;
+      gap: 0.25rem;
+    }
+    
+    .star {
+      color: var(--ak-warning);
+    }
+    
+    .star.empty {
+      color: #d1d5db;
+    }
+    
+    .review-content {
+      margin: 1rem 0;
+      line-height: 1.5;
+    }
+    
+    .review-product {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 1rem 0;
+      padding: 0.75rem;
+      background: #f9fafb;
+      border-radius: var(--ak-radius);
+    }
+    
+    .product-image {
+      width: 60px;
+      height: 60px;
+      border-radius: var(--ak-radius);
+      object-fit: cover;
+      border: 1px solid var(--ak-border);
+    }
+    
+    .product-info {
+      flex: 1;
+    }
+    
+    .product-name {
+      margin: 0;
+      font-weight: 500;
+      color: var(--ak-primary);
+    }
+    
+    .product-name a {
+      text-decoration: none;
+      color: var(--ak-primary);
+    }
+    
+    .product-name a:hover {
+      text-decoration: underline;
+    }
+    
+    .reply-btn {
+      background: var(--ak-primary);
+      color: white;
+      border: none;
+      border-radius: var(--ak-radius);
+      padding: 0.5rem 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .reply-btn:hover {
+      background: #005a4a;
+    }
+    
+    .reply-form {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--ak-border);
+    }
+    
+    .reply-textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--ak-border);
+      border-radius: var(--ak-radius);
+      min-height: 100px;
+      resize: vertical;
+      margin-bottom: 0.5rem;
+    }
+    
+    .reply-textarea:focus {
+      outline: none;
+      border-color: var(--ak-primary);
+    }
+    
+    .reply-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+    }
+    
+    .btn-secondary {
+      background: #e5e7eb;
+      color: var(--ak-text);
+      border: none;
+      border-radius: var(--ak-radius);
+      padding: 0.5rem 1rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    
+    .btn-secondary:hover {
+      background: #d1d5db;
+    }
+    
+    .char-count {
+      text-align: right;
+      font-size: 0.75rem;
+      color: var(--ak-muted);
+      margin-top: 0.25rem;
+    }
+    
+    /* Pagination */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+    }
+    
+    .pagination a, .pagination span {
+      display: inline-block;
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--ak-radius);
+      text-decoration: none;
+      font-size: 0.875rem;
+    }
+    
+    .pagination .active {
+      background: var(--ak-primary);
+      color: white;
+    }
+    
+    .card {
+      background: var(--ak-white);
+      border-radius: var(--ak-radius);
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--ak-border);
+    }
+  </style>
+</head>
+<body>
+  @include('components.admin_penjual.header')
+
+  <div class="main-layout">
+    <div class="content-wrapper">
+      <main class="content admin-page-content" role="main">
+        <!-- Page Header -->
+        <section class="page-header">
+          <h1>Manajemen Ulasan</h1>
+        </section>
+
+        <!-- Stats Card -->
+        <section class="stats-grid">
+          <div class="stat-card">
+            <p class="stat-title">Rating Rata-rata</p>
+            <p class="stat-value">4.8 ⭐</p>
+          </div>
+          
+          <div class="stat-card">
+            <p class="stat-title">Total Ulasan</p>
+            <p class="stat-value">142</p>
+          </div>
+          
+          <div class="stat-card">
+            <p class="stat-title">Rincian Ulasan</p>
+            <div class="star-breakdown">
+              <div class="star-row">
+                <span class="star-label">
+                  <span class="star">⭐</span> 5
+                </span>
+                <div class="star-progress">
+                  <div class="star-progress-bar" style="width: 70%"></div>
+                </div>
+                <span>85</span>
+              </div>
+              <div class="star-row">
+                <span class="star-label">
+                  <span class="star">⭐</span> 4
+                </span>
+                <div class="star-progress">
+                  <div class="star-progress-bar" style="width: 15%"></div>
+                </div>
+                <span>25</span>
+              </div>
+              <div class="star-row">
+                <span class="star-label">
+                  <span class="star">⭐</span> 3
+                </span>
+                <div class="star-progress">
+                  <div class="star-progress-bar" style="width: 5%"></div>
+                </div>
+                <span>12</span>
+              </div>
+              <div class="star-row">
+                <span class="star-label">
+                  <span class="star">⭐</span> 2
+                </span>
+                <div class="star-progress">
+                  <div class="star-progress-bar" style="width: 3%"></div>
+                </div>
+                <span>5</span>
+              </div>
+              <div class="star-row">
+                <span class="star-label">
+                  <span class="star">⭐</span> 1
+                </span>
+                <div class="star-progress">
+                  <div class="star-progress-bar" style="width: 2%"></div>
+                </div>
+                <span>3</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Filter Row -->
+        <div class="filter-row">
+          <div class="filter-group">
+            <label for="filter-star">Filter berdasarkan Bintang</label>
+            <select id="filter-star" class="filter-control">
+              <option value="">Semua Bintang</option>
+              <option value="5">5 Bintang</option>
+              <option value="4">4 Bintang</option>
+              <option value="3">3 Bintang</option>
+              <option value="2">2 Bintang</option>
+              <option value="1">1 Bintang</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label for="filter-reply">Filter berdasarkan Status Balasan</label>
+            <select id="filter-reply" class="filter-control">
+              <option value="">Semua Status</option>
+              <option value="replied">Telah Dibalas</option>
+              <option value="pending">Belum Dibalas</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label for="sort-by">Urutkan berdasarkan</label>
+            <select id="sort-by" class="filter-control">
+              <option value="newest">Terbaru</option>
+              <option value="oldest">Terlama</option>
+              <option value="highest">Rating Tertinggi</option>
+              <option value="lowest">Rating Terendah</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Reviews List with Alpine.js -->
+        <div x-data="{ reviews: [
+          {
+            id: 1,
+            name: 'Budi Santoso',
+            rating: 5,
+            comment: 'Produk sangat bagus, kualitas oke banget. Pengiriman cepat dan kemasan rapi. Recommended seller ini!',
+            date: '10 Okt 2025',
+            product: {
+              name: 'Kaos Polos Premium',
+              image: 'https://placehold.co/60x60'
+            },
+            replied: true,
+            reply: 'Terima kasih atas ulasannya, Bapak Budi!'
+          },
+          {
+            id: 2,
+            name: 'Siti Aminah',
+            rating: 4,
+            comment: 'Kualitas bagus, tapi sedikit kebesaran dari ukuran yang saya pesan.',
+            date: '8 Okt 2025',
+            product: {
+              name: 'Celana Panjang Casual',
+              image: 'https://placehold.co/60x60'
+            },
+            replied: false,
+            reply: null
+          },
+          {
+            id: 3,
+            name: 'Ahmad Fauzi',
+            rating: 5,
+            comment: 'Barang sesuai deskripsi, pengiriman cepat, dan harga terjangkau. Akan pesan lagi lain waktu.',
+            date: '5 Okt 2025',
+            product: {
+              name: 'Jaket Hoodie Hangat',
+              image: 'https://placehold.co/60x60'
+            },
+            replied: true,
+            reply: 'Terima kasih, Pak Ahmad! Kami tunggu kedatangan berikutnya.'
+          },
+          {
+            id: 4,
+            name: 'Dewi Anggraini',
+            rating: 3,
+            comment: 'Produknya bagus, tapi kemasannya agak rusak saat diterima.',
+            date: '3 Okt 2025',
+            product: {
+              name: 'Topi Snapback Trendy',
+              image: 'https://placehold.co/60x60'
+            },
+            replied: false,
+            reply: null
+          },
+          {
+            id: 5,
+            name: 'Rizki Pratama',
+            rating: 5,
+            comment: 'Sangat puas dengan produk dan pelayanannya. Seller responsif dan ramah.',
+            date: '1 Okt 2025',
+            product: {
+              name: 'Sendal Sandal Jepit',
+              image: 'https://placehold.co/60x60'
+            },
+            replied: false,
+            reply: null
+          }
+        ] }">
+          <template x-for="review in reviews" :key="review.id">
+            <div class="review-card" x-data="{ isReplying: false, replyText: '' }">
+              <div class="review-header">
+                <div class="reviewer-info">
+                  <h3 class="reviewer-name" x-text="review.name"></h3>
+                  <p class="review-date" x-text="review.date"></p>
+                </div>
+                
+                <div class="review-rating">
+                  <template x-for="n in 5" :key="n">
+                    <span class="star" x-bind:class="n <= review.rating ? '' : 'empty'">⭐</span>
+                  </template>
+                </div>
+              </div>
+              
+              <div class="review-content" x-text="review.comment"></div>
+              
+              <div class="review-product">
+                <img :src="review.product.image" alt="Gambar Produk" class="product-image">
+                <div class="product-info">
+                  <h4 class="product-name">
+                    <a href="#" x-text="review.product.name"></a>
+                  </h4>
+                </div>
+              </div>
+              
+              <button class="reply-btn" @click="isReplying = !isReplying">
+                <span x-text="isReplying ? 'Batal' : (review.replied ? 'Lihat Balasan' : 'Balas')"></span>
+              </button>
+              
+              <div class="reply-form" x-show="isReplying" x-cloak>
+                <textarea 
+                  class="reply-textarea" 
+                  placeholder="Tulis balasan untuk ulasan ini..." 
+                  x-model="replyText"
+                  x-ref="replyTextarea"
+                  x-effect="if (isReplying) $refs.replyTextarea.focus()"
+                ></textarea>
+                
+                <div class="char-count" x-text="`${replyText.length}/250 karakter`"></div>
+                
+                <div class="reply-actions">
+                  <button class="btn-secondary" @click="isReplying = false; replyText = ''">Batal</button>
+                  <button class="reply-btn" @click="isReplying = false; replyText = ''">
+                    Kirim Balasan
+                  </button>
+                </div>
+              </div>
+              
+              <div x-show="review.replied && !isReplying" class="reply-display" style="margin-top: 1rem; padding: 1rem; background: #f0fdfa; border-left: 3px solid var(--ak-primary); border-radius: 0 var(--ak-radius) var(--ak-radius) 0;">
+                <strong>Balasan:</strong>
+                <p style="margin: 0.5rem 0 0;" x-text="review.reply"></p>
+              </div>
+            </div>
+          </template>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+          <a href="#" class="prev">‹ Sebelumnya</a>
+          <a href="#">1</a>
+          <a href="#">2</a>
+          <a href="#">3</a>
+          <span class="active">4</span>
+          <a href="#">5</a>
+          <a href="#" class="next">Berikutnya ›</a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  @include('components.admin_penjual.footer')
+  
+  <script>
+    // No script conversion needed since we removed double square brackets from template
+  </script>
+</body>
+</html>

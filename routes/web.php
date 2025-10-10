@@ -3,6 +3,33 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SellerManagementController;
 
+// Route debugging untuk verifikasi sistem
+Route::get('/debug-info', function() {
+    return [
+        'laravel_version' => app()->version(),
+        'php_version' => phpversion(),
+        'environment' => app()->environment(),
+        'view_exists' => view()->exists('penjual.manajemen_promosi'),
+        'file_exists' => file_exists(resource_path('views/penjual/manajemen_promosi.blade.php')),
+        'route_works' => true
+    ];
+});
+
+// Route untuk Manajemen Promosi - ditempatkan di awal untuk menghindari konflik
+Route::get('/penjual/promosi', function() {
+    if(file_exists(resource_path('views/penjual/manajemen_promosi.blade.php'))) {
+        return view('penjual.manajemen_promosi');
+    } else {
+        return response()->json(['error' => 'View file tidak ditemukan', 'path' => resource_path('views/penjal.manajemen_promosi.blade.php')], 404);
+    }
+})->name('penjual.promosi');
+
+Route::get('/penjual/promosi/diskon', [\App\Http\Controllers\PromotionController::class, 'createDiscount'])->name('penjual.promosi.diskon');
+Route::get('/penjual/promosi/voucher', [\App\Http\Controllers\PromotionController::class, 'createVoucher'])->name('penjual.promosi.voucher');
+Route::get('/penjual/promosi/{id}/edit', [\App\Http\Controllers\PromotionController::class, 'edit'])->name('penjual.promosi.edit');
+Route::post('/penjual/promosi/{id}/nonaktifkan', [\App\Http\Controllers\PromotionController::class, 'nonaktifkan'])->name('penjual.promosi.nonaktifkan');
+Route::delete('/penjual/promosi/{id}', [\App\Http\Controllers\PromotionController::class, 'destroy'])->name('penjual.promosi.destroy');
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -163,7 +190,7 @@ Route::get('/reports/violations', function () {
 })->name('reports.violations');
 
 Route::get('/support/tickets', function () {
-    return '<h1>Daftar Tiket Bantuan</h1><p>Halaman ini menampilkan daftar tiket bantuan dari pengguna.</p>';
+    return '<h1>Daftar Tiket Bantahan</h1><p>Halaman ini menampilkan daftar tiket bantuan dari pengguna.</p>';
 })->name('support.tickets');
 
 Route::get('/withdrawal/requests', function () {
@@ -204,3 +231,34 @@ Route::get('/withdrawal/requests', function () {
 Route::get('/admin/produk', function () {
     return view('admin.produk.index');
 })->name('produk.index');
+
+Route::get('/penjual/produk', function () {
+    return view('penjual.manajemen_produk');
+})->name('penjual.produk');
+
+Route::get('/penjual/pesanan', function () {
+    return view('penjual.manajemen_pesanan');
+})->name('penjual.pesanan');
+
+Route::get('/penjual/saldo', function () {
+    return view('penjual.saldo_penarikan');
+})->name('penjual.saldo');
+
+Route::get('/penjual/ulasan', function () {
+    return view('penjual.manajemen_ulasan');
+})->name('penjual.ulasan');
+
+
+
+// Order Detail Route - parameter sebagai string karena menggunakan order number
+Route::get('/penjual/pesanan/{order}', [\App\Http\Controllers\OrderDetailController::class, 'show'])->name('orders.show');
+
+// Order Invoice Route
+Route::get('/invoice/{order}', [\App\Http\Controllers\OrderDetailController::class, 'invoice'])->name('order.invoice');
+
+// Shipping Label Route - Simple approach
+Route::get('/shipping-label/{order}', function ($order) {
+    $orderData = \App\Models\Order::where('order_number', $order)->firstOrFail();
+    $orderData->load(['items.product', 'items.variant', 'user', 'shipping_address']);
+    return view('shipping_label', ['order' => $orderData]);
+})->name('shipping.label');

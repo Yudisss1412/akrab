@@ -10,7 +10,7 @@
       <h3 class="product-name">Hampers Lebaran</h3>
       <p class="product-description">Hampers lebaran dengan aneka kue kering dan camilan</p>
       <div class="product-price">Rp250.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -20,7 +20,7 @@
       <h3 class="product-name">Hampers Natal</h3>
       <p class="product-description">Hampers natal dengan coklat premium dan minuman hangat</p>
       <div class="product-price">Rp320.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -30,7 +30,7 @@
       <h3 class="product-name">Hampers Valentine</h3>
       <p class="product-description">Hampers valentine dengan bunga kering dan coklat</p>
       <div class="product-price">Rp180.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -40,7 +40,7 @@
       <h3 class="product-name">Hampers Ulang Tahun</h3>
       <p class="product-description">Hampers ulang tahun dengan kue homemade dan lilin</p>
       <div class="product-price">Rp150.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -50,7 +50,7 @@
       <h3 class="product-name">Hampers Baby Shower</h3>
       <p class="product-description">Hampers baby shower dengan perlengkapan bayi dan camilan</p>
       <div class="product-price">Rp280.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -60,7 +60,7 @@
       <h3 class="product-name">Hampers Corporate</h3>
       <p class="product-description">Hampers corporate dengan produk premium dan kemasan elegan</p>
       <div class="product-price">Rp450.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -70,7 +70,7 @@
       <h3 class="product-name">Hampers Wedding</h3>
       <p class="product-description">Hampers wedding dengan souvenir unik dan kemasan indah</p>
       <div class="product-price">Rp380.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -80,7 +80,7 @@
       <h3 class="product-name">Hampers Syukuran</h3>
       <p class="product-description">Hampers syukuran dengan aneka kue dan buah-buahan</p>
       <div class="product-price">Rp220.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
 @endsection

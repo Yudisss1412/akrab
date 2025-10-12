@@ -10,7 +10,7 @@
       <h3 class="product-name">Minyak Telon Bayi</h3>
       <p class="product-description">Minyak telon bayi dengan bahan alami dan aman untuk kulit</p>
       <div class="product-price">Rp45.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -20,7 +20,7 @@
       <h3 class="product-name">Balsam Gurah</h3>
       <p class="product-description">Balsam gurah dengan khasiat menghangatkan dan menyegarkan</p>
       <div class="product-price">Rp25.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -30,7 +30,7 @@
       <h3 class="product-name">Sirup Herbal</h3>
       <p class="product-description">Sirup herbal dengan campuran rempah alami</p>
       <div class="product-price">Rp35.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -40,7 +40,7 @@
       <h3 class="product-name">Salep Kulit</h3>
       <p class="product-description">Salep kulit dengan bahan alami untuk mengatasi iritasi</p>
       <div class="product-price">Rp30.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -50,7 +50,7 @@
       <h3 class="product-name">Minyak Kayu Putih</h3>
       <p class="product-description">Minyak kayu putih dengan khasiat menyembuhkan luka</p>
       <div class="product-price">Rp28.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -60,7 +60,7 @@
       <h3 class="product-name">Jahe Merah Bubuk</h3>
       <p class="product-description">Jahe merah bubuk dengan khasiat meningkatkan stamina</p>
       <div class="product-price">Rp40.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -70,7 +70,7 @@
       <h3 class="product-name">Kapsul Temu Lawak</h3>
       <p class="product-description">Kapsul temu lawak dengan khasiat menjaga kesehatan pencernaan</p>
       <div class="product-price">Rp55.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -80,7 +80,7 @@
       <h3 class="product-name">Teh Daun Senna</h3>
       <p class="product-description">Teh daun senna dengan khasiat alami untuk kesehatan</p>
       <div class="product-price">Rp22.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
 @endsection

@@ -10,7 +10,7 @@
       <h3 class="product-name">Baju Batik Wanita</h3>
       <p class="product-description">Baju batik wanita dengan motif tradisional dan bahan nyaman</p>
       <div class="product-price">Rp180.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -20,7 +20,7 @@
       <h3 class="product-name">Sarung Tangan Kulit</h3>
       <p class="product-description">Sarung tangan kulit dengan kualitas premium dan desain elegan</p>
       <div class="product-price">Rp95.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -30,7 +30,7 @@
       <h3 class="product-name">Tas Tenun</h3>
       <p class="product-description">Tas tenun dengan motif khas daerah dan bahan tahan lama</p>
       <div class="product-price">Rp150.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -40,7 +40,7 @@
       <h3 class="product-name">Sepatu Sandal</h3>
       <p class="product-description">Sepatu sandal nyaman dengan desain modern</p>
       <div class="product-price">Rp120.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -50,7 +50,7 @@
       <h3 class="product-name">Kerudung Instan</h3>
       <p class="product-description">Kerudung instan dengan bahan adem dan mudah dipakai</p>
       <div class="product-price">Rp65.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -60,7 +60,7 @@
       <h3 class="product-name">Dompet Kulit</h3>
       <p class="product-description">Dompet kulit asli dengan desain minimalis</p>
       <div class="product-price">Rp85.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -70,7 +70,7 @@
       <h3 class="product-name">Baju Kemeja Pria</h3>
       <p class="product-description">Kemeja pria dengan bahan katun premium dan jahitan rapi</p>
       <div class="product-price">Rp160.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -80,7 +80,7 @@
       <h3 class="product-name">Jilbab Segi Empat</h3>
       <p class="product-description">Jilbab segi empat dengan bahan lembut dan warna menarik</p>
       <div class="product-price">Rp55.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
 @endsection

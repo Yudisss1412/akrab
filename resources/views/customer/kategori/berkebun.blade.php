@@ -10,7 +10,7 @@
       <h3 class="product-name">Pupuk Organik Cair</h3>
       <p class="product-description">Pupuk organik cair dengan bahan alami untuk tanaman sayur</p>
       <div class="product-price">Rp45.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -20,7 +20,7 @@
       <h3 class="product-name">Bibit Tanaman Hias</h3>
       <p class="product-description">Bibit tanaman hias dengan akar sehat dan daun subur</p>
       <div class="product-price">Rp25.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -30,7 +30,7 @@
       <h3 class="product-name">Media Tanam Coco Peat</h3>
       <p class="product-description">Media tanam coco peat dengan kualitas tinggi</p>
       <div class="product-price">Rp35.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -40,7 +40,7 @@
       <h3 class="product-name">Benih Cabai</h3>
       <p class="product-description">Benih cabai berkualitas dengan tingkat kecambah tinggi</p>
       <div class="product-price">Rp15.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -50,7 +50,7 @@
       <h3 class="product-name">Kompos Organik</h3>
       <p class="product-description">Kompos organik dengan proses fermentasi alami</p>
       <div class="product-price">Rp40.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -60,7 +60,7 @@
       <h3 class="product-name">Alat Penyiram Otomatis</h3>
       <p class="product-description">Alat penyiram otomatis untuk kebun rumah</p>
       <div class="product-price">Rp120.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -70,7 +70,7 @@
       <h3 class="product-name">Bibit Tomat</h3>
       <p class="product-description">Bibit tomat dengan varietas unggul</p>
       <div class="product-price">Rp20.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -80,7 +80,7 @@
       <h3 class="product-name">Pestisida Nabati</h3>
       <p class="product-description">Pestisida nabati ramah lingkungan</p>
       <div class="product-price">Rp30.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
 @endsection

@@ -106,7 +106,7 @@
               <h3 class="product-name">${product.name}</h3>
               <p class="product-description">${product.description}</p>
               <div class="product-price">${product.price}</div>
-              <button class="btn btn-primary view-product">Lihat Produk</button>
+              <button class="btn btn-primary view-product">Pratinjau</button>
             </div>
           `;
           productsContainer.appendChild(productCard);

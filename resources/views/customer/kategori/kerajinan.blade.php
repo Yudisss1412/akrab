@@ -10,7 +10,7 @@
       <h3 class="product-name">Topeng Wayang</h3>
       <p class="product-description">Topeng wayang dengan ukiran tangan dan cat alami</p>
       <div class="product-price">Rp250.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -20,7 +20,7 @@
       <h3 class="product-name">Tas Anyaman Pandan</h3>
       <p class="product-description">Tas anyaman pandan dengan desain tradisional</p>
       <div class="product-price">Rp120.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -30,7 +30,7 @@
       <h3 class="product-name">Gantungan Kunci Kayu</h3>
       <p class="product-description">Gantungan kunci kayu dengan ukiran motif khas</p>
       <div class="product-price">Rp25.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -40,7 +40,7 @@
       <h3 class="product-name">Lukisan Batik</h3>
       <p class="product-description">Lukisan batik dengan teknik tradisional</p>
       <div class="product-price">Rp450.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -50,7 +50,7 @@
       <h3 class="product-name">Patung Kayu</h3>
       <p class="product-description">Patung kayu dengan bentuk hewan khas Indonesia</p>
       <div class="product-price">Rp180.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -60,7 +60,7 @@
       <h3 class="product-name">Keranjang Anyaman</h3>
       <p class="product-description">Keranjang anyaman dengan bahan alami</p>
       <div class="product-price">Rp85.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -70,7 +70,7 @@
       <h3 class="product-name">Hiasan Dinding</h3>
       <p class="product-description">Hiasan dinding dengan motif etnik</p>
       <div class="product-price">Rp150.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -80,7 +80,7 @@
       <h3 class="product-name">Perhiasan Kayu</h3>
       <p class="product-description">Perhiasan kayu dengan finishing natural</p>
       <div class="product-price">Rp75.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
 @endsection

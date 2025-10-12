@@ -10,7 +10,7 @@
       <h3 class="product-name">Kue Tradisional Bali</h3>
       <p class="product-description">Kue tradisional khas Bali dengan rasa otentik dan bahan alami pilihan</p>
       <div class="product-price">Rp45.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -20,7 +20,7 @@
       <h3 class="product-name">Kopi Arabica Gayo</h3>
       <p class="product-description">Kopi arabica premium dari pegunungan Gayo dengan aroma khas</p>
       <div class="product-price">Rp85.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -30,7 +30,7 @@
       <h3 class="product-name">Madu Hutan Asli</h3>
       <p class="product-description">Madu murni dari hutan tropis dengan khasiat alami tinggi</p>
       <div class="product-price">Rp120.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -40,7 +40,7 @@
       <h3 class="product-name">Keripik Tempe</h3>
       <p class="product-description">Keripik tempe renyah dengan bumbu tradisional khas Indonesia</p>
       <div class="product-price">Rp25.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -50,7 +50,7 @@
       <h3 class="product-name">Minyak Kelapa Murni</h3>
       <p class="product-description">Minyak kelapa murni dengan proses pemanasan dingin</p>
       <div class="product-price">Rp65.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -60,7 +60,7 @@
       <h3 class="product-name">Sambal Lombok</h3>
       <p class="product-description">Sambal pedas khas Lombok dengan cabai pilihan</p>
       <div class="product-price">Rp30.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -70,7 +70,7 @@
       <h3 class="product-name">Teh Herbal</h3>
       <p class="product-description">Teh herbal dengan campuran rempah alami</p>
       <div class="product-price">Rp40.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -80,7 +80,7 @@
       <h3 class="product-name">Kerupuk Udang</h3>
       <p class="product-description">Kerupuk udang renyah dengan rasa autentik</p>
       <div class="product-price">Rp20.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
 @endsection

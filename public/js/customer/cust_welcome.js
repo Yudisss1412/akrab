@@ -43,7 +43,7 @@ function renderProdukPopuler() {
       <div class="pop-modern-body">
         <div class="pop-modern-title">${produk.nama}</div>
         <div class="pop-modern-price">${produk.harga}</div>
-        <button class="pop-modern-btn lihat-detail-btn" data-idx="${idx}">Lihat Produk</button>
+        <button class="pop-modern-btn lihat-detail-btn" data-idx="${idx}">Pratinjau</button>
       </div>
     `;
     grid.appendChild(card);

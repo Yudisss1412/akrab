@@ -47,7 +47,7 @@
             <h3 class="product-name">Produk Kuliner 1</h3>
             <p class="product-description">Deskripsi singkat produk kuliner yang lezat dan berkualitas tinggi</p>
             <div class="product-price">Rp50.000</div>
-            <button class="btn btn-primary view-product">Lihat Produk</button>
+            <button class="btn btn-primary view-product">Pratinjau</button>
           </div>
         </div>
         
@@ -57,7 +57,7 @@
             <h3 class="product-name">Produk Fashion 1</h3>
             <p class="product-description">Deskripsi singkat produk fashion yang stylish dan nyaman</p>
             <div class="product-price">Rp120.000</div>
-            <button class="btn btn-primary view-product">Lihat Produk</button>
+            <button class="btn btn-primary view-product">Pratinjau</button>
           </div>
         </div>
         
@@ -67,7 +67,7 @@
             <h3 class="product-name">Produk Kerajinan 1</h3>
             <p class="product-description">Deskripsi singkat produk kerajinan tangan yang unik dan artistik</p>
             <div class="product-price">Rp85.000</div>
-            <button class="btn btn-primary view-product">Lihat Produk</button>
+            <button class="btn btn-primary view-product">Pratinjau</button>
           </div>
         </div>
         
@@ -77,7 +77,7 @@
             <h3 class="product-name">Produk Berkebun 1</h3>
             <p class="product-description">Deskripsi singkat produk berkebun yang alami dan berkualitas</p>
             <div class="product-price">Rp45.000</div>
-            <button class="btn btn-primary view-product">Lihat Produk</button>
+            <button class="btn btn-primary view-product">Pratinjau</button>
           </div>
         </div>
         
@@ -87,7 +87,7 @@
             <h3 class="product-name">Produk Kesehatan 1</h3>
             <p class="product-description">Deskripsi singkat produk kesehatan yang alami dan aman</p>
             <div class="product-price">Rp75.000</div>
-            <button class="btn btn-primary view-product">Lihat Produk</button>
+            <button class="btn btn-primary view-product">Pratinjau</button>
           </div>
         </div>
         
@@ -97,7 +97,7 @@
             <h3 class="product-name">Produk Mainan 1</h3>
             <p class="product-description">Deskripsi singkat produk mainan yang menyenangkan dan edukatif</p>
             <div class="product-price">Rp35.000</div>
-            <button class="btn btn-primary view-product">Lihat Produk</button>
+            <button class="btn btn-primary view-product">Pratinjau</button>
           </div>
         </div>
         
@@ -107,7 +107,7 @@
             <h3 class="product-name">Produk Hampers 1</h3>
             <p class="product-description">Deskripsi singkat produk hampers yang elegan dan lengkap</p>
             <div class="product-price">Rp250.000</div>
-            <button class="btn btn-primary view-product">Lihat Produk</button>
+            <button class="btn btn-primary view-product">Pratinjau</button>
           </div>
         </div>
         
@@ -117,7 +117,7 @@
             <h3 class="product-name">Produk Kuliner 2</h3>
             <p class="product-description">Deskripsi singkat produk kuliner yang lezat dan berkualitas tinggi</p>
             <div class="product-price">Rp65.000</div>
-            <button class="btn btn-primary view-product">Lihat Produk</button>
+            <button class="btn btn-primary view-product">Pratinjau</button>
           </div>
         </div>
       </div>
@@ -258,7 +258,7 @@
               <h3 class="product-name">${product.name}</h3>
               <p class="product-description">${product.description}</p>
               <div class="product-price">${product.price}</div>
-              <button class="btn btn-primary view-product">Lihat Produk</button>
+              <button class="btn btn-primary view-product">Pratinjau</button>
             </div>
           `;
           productsContainer.appendChild(productCard);

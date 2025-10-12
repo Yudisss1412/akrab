@@ -10,7 +10,7 @@
       <h3 class="product-name">Puzzle Kayu Anak</h3>
       <p class="product-description">Puzzle kayu dengan bentuk hewan untuk melatih motorik anak</p>
       <div class="product-price">Rp65.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -20,7 +20,7 @@
       <h3 class="product-name">Boneka Wayang</h3>
       <p class="product-description">Boneka wayang dengan bahan kain halus dan motif tradisional</p>
       <div class="product-price">Rp45.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -30,7 +30,7 @@
       <h3 class="product-name">Mobil Kayu</h3>
       <p class="product-description">Mobil kayu dengan roda kayu dan cat non-toxic</p>
       <div class="product-price">Rp55.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -40,7 +40,7 @@
       <h3 class="product-name">Batu Cincin Anak</h3>
       <p class="product-description">Batu cincin anak dengan warna-warna cerah</p>
       <div class="product-price">Rp35.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -50,7 +50,7 @@
       <h3 class="product-name">Kartu Edukasi</h3>
       <p class="product-description">Kartu edukasi dengan gambar dan huruf untuk belajar</p>
       <div class="product-price">Rp25.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -60,7 +60,7 @@
       <h3 class="product-name">Bambu Melody</h3>
       <p class="product-description">Mainan bambu melody dengan suara merdu</p>
       <div class="product-price">Rp75.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -70,7 +70,7 @@
       <h3 class="product-name">Balok Bangun</h3>
       <p class="product-description">Balok bangun dengan berbagai bentuk geometris</p>
       <div class="product-price">Rp85.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
   
@@ -80,7 +80,7 @@
       <h3 class="product-name">Wayang Kulit Mini</h3>
       <p class="product-description">Wayang kulit mini dengan karakter wayang klasik</p>
       <div class="product-price">Rp120.000</div>
-      <button class="btn btn-primary view-product">Lihat Produk</button>
+      <button class="btn btn-primary view-product">Pratinjau</button>
     </div>
   </div>
 @endsection

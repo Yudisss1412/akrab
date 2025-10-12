@@ -190,10 +190,16 @@
 </head>
 <body>
     <div class="main-layout">
+        <!-- Header -->
+        @yield('header')
+        
         <!-- Main Content -->
         <main class="content">
             @yield('content')
         </main>
+        
+        <!-- Footer -->
+        @yield('footer')
     </div>
 
     <script src="{{ asset('js/customer/script.js') }}"></script>

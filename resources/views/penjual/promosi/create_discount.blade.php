@@ -194,7 +194,7 @@
           <div class="form-group">
             <label for="productSearch" class="form-label">Pilih Produk yang akan Didiskon</label>
             <div class="product-search-container">
-              <input type="text" id="productSearch" class="form-control" placeholder="Cari produk...">
+              <input type="text" id="productSearch" class="form-control" placeholder="Cari di Akrab...">
               <div class="product-suggestions" id="productSuggestions"></div>
             </div>
             

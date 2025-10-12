@@ -374,7 +374,7 @@
             
             <div class="filter-group">
               <label for="searchFilter">Cari</label>
-              <input type="text" id="searchFilter" placeholder="Cari tiket...">
+              <input type="text" id="searchFilter" placeholder="Cari di Akrab...">
             </div>
           </div>
           

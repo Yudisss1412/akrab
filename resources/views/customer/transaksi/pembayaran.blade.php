@@ -3,7 +3,7 @@
 @section('title', 'Pembayaran')
 
 @section('header')
-  @include('components.header_compact')
+  @include('components.customer.header.header')
 @endsection
 
 @push('styles')

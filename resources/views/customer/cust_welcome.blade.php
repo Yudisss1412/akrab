@@ -1,6 +1,10 @@
-@extends('layouts.customer')
+@extends('layouts.app')
 
 @section('title', 'Selamat Datang - UMKM AKRAB')
+
+@section('header')
+  @include('components.customer.header.header')
+@endsection
 
 @section('content')
 <script>
@@ -19,6 +23,29 @@
       max-width: 1450px;
       margin: 0 auto;
       flex: 1;
+    }
+
+    /* Custom styles for rounded icons with shadow effect */
+    .profile-ico, .cart-ico {
+      border-radius: 50%;
+      background-color: #ffffff;
+      padding: 2px;
+      border: 1px solid #e9ecef;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-ico:hover, .cart-ico:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .profile-ico svg, .cart-ico svg {
+      width: 24px;
+      height: 24px;
     }
 
     /* Welcome Banner */
@@ -556,4 +583,8 @@
 </div>
 
 <script src="{{ asset('js/customer/cust_welcome.js') }}"></script>
+@endsection
+
+@section('footer')
+  @include('components.customer.footer.footer')
 @endsection

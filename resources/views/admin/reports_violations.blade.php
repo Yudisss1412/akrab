@@ -248,7 +248,7 @@
         <div class="filters">
           <div class="filter-group">
             <label for="searchFilter">Cari</label>
-            <input type="text" id="searchFilter" placeholder="Cari semua kolom...">
+            <input type="text" id="searchFilter" placeholder="Cari di Akrab...">
           </div>
           
           <div class="filter-group">

@@ -3,7 +3,7 @@
 @section('title', 'Kategori - UMKM AKRAB')
 
 @section('header')
-  @include('components.header_compact')
+  @include('components.customer.header.header')
 @endsection
 
 @push('styles')
@@ -186,3 +186,7 @@
     });
   </script>
 @endpush
+
+@section('footer')
+  @include('components.customer.footer.footer')
+@endsection

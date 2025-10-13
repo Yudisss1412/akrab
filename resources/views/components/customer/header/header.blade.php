@@ -1,3 +1,13 @@
+<style>
+  .header .profile-ico, .header .cart-ico {
+    border-radius: 0 !important;
+    border: none !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+</style>
+
 <!-- Header khusus pelanggan untuk halaman utama -->
 <header class="header">
   <div class="header-left">

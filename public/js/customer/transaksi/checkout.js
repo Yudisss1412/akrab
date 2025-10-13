@@ -1,15 +1,7 @@
 // Address selection
 document.addEventListener('DOMContentLoaded', function() {
-  // Checkout button
-  const checkoutBtn = document.querySelector('.btn-checkout');
-  if (checkoutBtn) {
-    checkoutBtn.addEventListener('click', function() {
-      // Simulasi proses checkout
-      alert('Pesanan berhasil dibuat! Mengarahkan ke halaman pembayaran...');
-      // Redirect ke halaman pembayaran
-      // window.location.href = '#';
-    });
-  }
+  // Tombol checkout sudah ditangani di blade template (checkout.blade.php)
+  // Hanya tangani interaksi alamat dan metode pembayaran di sini
 
   // Address selection - clicking on card selects it
   const addressCards = document.querySelectorAll('.address-card');

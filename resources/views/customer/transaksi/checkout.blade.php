@@ -158,7 +158,7 @@
                 <span>Rp 210.000</span>
               </div>
               
-              <button class="btn btn-primary btn-checkout">
+              <button class="btn btn-primary btn-checkout" onclick="window.location.href='{{ route("cust.pengiriman") }}'; return false;">
                 Bayar Sekarang
               </button>
             </div>
@@ -172,15 +172,6 @@
 @push('scripts')
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Checkout button
-      const checkoutBtn = document.querySelector('.btn-checkout');
-      if (checkoutBtn) {
-        checkoutBtn.addEventListener('click', function() {
-          // Redirect to shipping page
-          window.location.href = '{{ route("cust.pengiriman") }}';
-        });
-      }
-      
       // Metode pengiriman selection
       const metodeOptions = document.querySelectorAll('.option-card');
       metodeOptions.forEach(option => {

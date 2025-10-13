@@ -67,7 +67,7 @@ body{
   flex:1; display:flex; justify-content:center; padding:0 1rem;
   position:relative; display:flex; align-items:center;
   width:100%; max-width:560px; min-width:280px;
-  background:#fff; border:1.5px solid var(--border-color);
+  background:#fff;
   border-radius:999px; padding:.65rem 1rem .65rem 2.6rem;
 }
 .header:not(.compact) .header-center input{

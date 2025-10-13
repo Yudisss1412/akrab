@@ -97,6 +97,15 @@ class AuthController extends Controller
         // Get the buyer role
         $buyerRole = \App\Models\Role::where('name', 'buyer')->first();
         if (!$buyerRole) {
+            if ($request->expectsJson() || $request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sistem role belum diatur. Silakan hubungi administrator.',
+                    'errors' => [
+                        'system' => ['Sistem role belum diatur. Silakan hubungi administrator.']
+                    ]
+                ], 500);
+            }
             return back()->withErrors(['system' => 'Sistem role belum diatur. Silakan hubungi administrator.']);
         }
 
@@ -108,6 +117,15 @@ class AuthController extends Controller
         ]);
 
         Auth::login($user);
+
+        // Check if it's an AJAX request
+        if ($request->expectsJson() || $request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Registrasi berhasil! Selamat datang di platform kami.',
+                'redirect' => route('customer.dashboard')
+            ]);
+        }
 
         return redirect()->route('customer.dashboard');
     }

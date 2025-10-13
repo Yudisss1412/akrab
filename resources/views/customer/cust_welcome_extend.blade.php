@@ -13,8 +13,8 @@
 </script>
 
 <section class="welcome-banner">
-    <h2>Selamat datang kembali, Anggara!</h2>
-    <p>Semoga harimu menyenangkan dan penuh inspirasi dari produk lokal terbaik.</p>
+    <h2>Selamat datang, {{ auth()->user() ? auth()->user()->name : 'Pengunjung' }}!</h2>
+    <p>Temukan produk UMKM terbaik dari seluruh Indonesia.</p>
 </section>
 
 <section class="content-section">

@@ -11,17 +11,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!registerForm) return;
 
     const inputs = {
+        name: document.getElementById('name'),
         email: document.getElementById('email'),
-        phone: document.getElementById('phone'),
-        address: document.getElementById('address'),
-        password: document.getElementById('password')
+        password: document.getElementById('password'),
+        password_confirmation: document.getElementById('password_confirmation')
     };
 
     const errors = {
+        name: document.getElementById('name-error'),
         email: document.getElementById('email-error'),
-        phone: document.getElementById('phone-error'),
-        address: document.getElementById('address-error'),
-        password: document.getElementById('password-error')
+        password: document.getElementById('password-error'),
+        password_confirmation: document.getElementById('password-confirmation-error')
     };
 
     function showError(field, message) {
@@ -41,26 +41,21 @@ document.addEventListener('DOMContentLoaded', () => {
         return emailRegex.test(email);
     }
 
-    registerForm.addEventListener('submit', (event) => {
+    registerForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         let isFormValid = true;
         Object.keys(inputs).forEach(field => clearError(field));
+
+        if (inputs.name.value.trim() === '') {
+            showError('name', 'Harap isi bidang ini.');
+            isFormValid = false;
+        }
 
         if (inputs.email.value.trim() === '') {
             showError('email', 'Harap isi bidang ini.');
             isFormValid = false;
         } else if (!isValidEmail(inputs.email.value.trim())) {
             showError('email', 'Format email tidak valid.');
-            isFormValid = false;
-        }
-
-        if (inputs.phone.value.trim() === '') {
-            showError('phone', 'Harap isi bidang ini.');
-            isFormValid = false;
-        }
-
-        if (inputs.address.value.trim() === '') {
-            showError('address', 'Harap isi bidang ini.');
             isFormValid = false;
         }
 
@@ -72,16 +67,73 @@ document.addEventListener('DOMContentLoaded', () => {
             isFormValid = false;
         }
 
+        if (inputs.password_confirmation.value.trim() !== inputs.password.value.trim()) {
+            showError('password_confirmation', 'Konfirmasi password tidak cocok.');
+            isFormValid = false;
+        }
+
         if (!isFormValid) {
             return;
         }
-        console.log('Formulir pendaftaran valid, mengalihkan...');
-        registerFormBox.style.transition = 'all 0.5s ease';
-        registerFormBox.style.opacity = '0';
-        registerFormBox.style.transform = 'scale(0.9)';
 
-        setTimeout(() => {
-            window.location.href = '/cust_welcome'; 
-        }, 500);
+        // Show loading state
+        const submitButton = registerForm.querySelector('.register-button');
+        const originalButtonText = submitButton.textContent;
+        submitButton.textContent = 'Memproses...';
+        submitButton.disabled = true;
+
+        try {
+            // Prepare form data
+            const formData = new FormData();
+            formData.append('name', inputs.name.value.trim());
+            formData.append('email', inputs.email.value.trim());
+            formData.append('password', inputs.password.value.trim());
+            formData.append('password_confirmation', inputs.password_confirmation.value.trim());
+            formData.append('_token', document.querySelector('input[name="_token"]').value);
+
+            // Make AJAX request to Laravel backend
+            const response = await fetch(registerForm.getAttribute('action'), {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            if (response.ok) {
+                // Registration successful
+                console.log('Registration successful, redirecting...');
+                
+                registerFormBox.style.transition = 'all 0.5s ease';
+                registerFormBox.style.opacity = '0';
+                registerFormBox.style.transform = 'scale(0.9)';
+
+                // Redirect to customer dashboard (not the old welcome page)
+                setTimeout(() => {
+                    window.location.href = '/customer/dashboard'; 
+                }, 500);
+            } else {
+                // Handle validation errors
+                const responseData = await response.json();
+                
+                if (responseData.errors) {
+                    Object.keys(responseData.errors).forEach(field => {
+                        if (errors[field]) {
+                            showError(field, responseData.errors[field][0]);
+                        }
+                    });
+                } else {
+                    // General error message
+                    showError('email', 'Terjadi kesalahan saat pendaftaran. Silakan coba lagi.');
+                }
+            }
+        } catch (error) {
+            console.error('Registration error:', error);
+            showError('email', 'Terjadi kesalahan jaringan. Silakan coba lagi.');
+        } finally {
+            // Reset button state
+            submitButton.textContent = originalButtonText;
+            submitButton.disabled = false;
+        }
     });
 });

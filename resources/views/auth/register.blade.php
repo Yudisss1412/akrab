@@ -20,28 +20,38 @@
             </div>
             <div class="register-form-box">
                 <h2>Silahkan Daftar</h2>
-                <form id="registerForm" novalidate>
+                <form id="registerForm" method="POST" action="{{ route('register') }}" novalidate>
+                    @csrf
                     <!-- [DIUBAH] Struktur di dalam setiap form-group diperbaiki. -->
                     <!-- Elemen <input> sekarang berada SEBELUM <label>. -->
                     <div class="form-group">
-                        <input type="email" id="email" name="email" required placeholder=" ">
+                        <input type="text" id="name" name="name" required placeholder=" " value="{{ old('name') }}">
+                        <label for="name">Nama Lengkap</label>
+                        @error('name')
+                            <p class="error-message" id="name-error">{{ $message }}</p>
+                        @enderror
+                        <p class="error-message" id="name-error"></p>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="email" name="email" required placeholder=" " value="{{ old('email') }}">
                         <label for="email">Email</label>
+                        @error('email')
+                            <p class="error-message" id="email-error">{{ $message }}</p>
+                        @enderror
                         <p class="error-message" id="email-error"></p>
-                    </div>
-                    <div class="form-group">
-                        <input type="tel" id="phone" name="phone" required placeholder=" ">
-                        <label for="phone">No HP</label>
-                        <p class="error-message" id="phone-error"></p>
-                    </div>
-                    <div class="form-group">
-                        <input type="text" id="address" name="address" required placeholder=" ">
-                        <label for="address">Alamat</label>
-                        <p class="error-message" id="address-error"></p>
                     </div>
                     <div class="form-group">
                         <input type="password" id="password" name="password" required placeholder=" ">
                         <label for="password">Password</label>
+                        @error('password')
+                            <p class="error-message" id="password-error">{{ $message }}</p>
+                        @enderror
                         <p class="error-message" id="password-error"></p>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="password_confirmation" name="password_confirmation" required placeholder=" ">
+                        <label for="password_confirmation">Konfirmasi Password</label>
+                        <p class="error-message" id="password-confirmation-error"></p>
                     </div>
                     <button type="submit" class="register-button">Daftar</button>
                     <div class="form-links">

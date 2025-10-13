@@ -91,3 +91,7 @@
     });
   </script>
 @endpush
+
+@section('footer')
+  @include('components.customer.footer.footer')
+@endsection

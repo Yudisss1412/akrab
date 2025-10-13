@@ -73,7 +73,7 @@
           <i class="bi bi-gear"></i>
           <span>Pengaturan Akun</span>
         </a>
-        <a href="#" class="nav-item js-logout" data-target="logout">
+        <a href="#" class="nav-item js-logout" id="logoutBtn" data-target="logout">
           <i class="bi bi-box-arrow-right"></i>
           <span>Keluar</span>
         </a>
@@ -295,9 +295,9 @@
               <button class="btn btn-outline">Minta Unduhan</button>
             </div>
             
-            <div class="settings-item danger-zone">
-              <div class="settings-label">Hapus Akun Anda</div>
-              <button class="btn btn-danger">Hapus Akun</button>
+            <div class="settings-item">
+              <div class="settings-label">Nonaktifkan Akun Anda</div>
+              <button class="btn btn-outline" id="deactivateAccountBtn">Nonaktifkan Akun</button>
             </div>
           </div>
         </div>
@@ -333,24 +333,38 @@
         </div>
       </div>
       
-      <!-- Modal Konfirmasi Hapus Akun -->
-      <div id="deleteAccountModal" class="modal">
+      <!-- Modal Konfirmasi Nonaktifkan Akun -->
+      <div id="deactivateAccountModal" class="modal">
         <div class="modal-content">
           <div class="modal-header">
-            <h4>Hapus Akun</h4>
-            <span class="close" id="closeDeleteAccountModal">&times;</span>
+            <h4>Nonaktifkan Akun?</h4>
+            <span class="close" id="closeDeactivateAccountModal">&times;</span>
           </div>
           <div class="modal-body">
-            <p class="warning-text">
-              <strong>Peringatan Penting:</strong> Tindakan ini akan menghapus akun Anda secara permanen.
-              Semua data Anda, termasuk riwayat pesanan, ulasan, dan informasi akun akan dihapus secara permanen.
-              Tindakan ini tidak dapat dibatalkan.
-            </p>
-            <p>Apakah Anda yakin ingin menghapus akun Anda?</p>
+            <p> Akun Anda akan disembunyikan dari publik dan Anda akan otomatis logout. 
+            Anda bisa mengaktifkan kembali akun Anda kapan saja dengan cara login ulang. 
+            Lanjutkan?</p>
           </div>
           <div class="modal-footer">
-            <button class="btn btn-outline" id="cancelDeleteAccount">Batal</button>
-            <button class="btn btn-danger" id="confirmDeleteAccount">Hapus Akun</button>
+            <button class="btn btn-outline" id="cancelDeactivateAccount">Batal</button>
+            <button class="btn btn-primary" id="confirmDeactivateAccount">Ya, Nonaktifkan</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Modal Konfirmasi Keluar -->
+      <div id="logoutModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4>Keluar?</h4>
+            <span class="close" id="closeLogoutModal">&times;</span>
+          </div>
+          <div class="modal-body">
+            <p>Apakah Anda yakin ingin keluar dari akun Anda?</p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-outline" id="cancelLogout">Batal</button>
+            <button class="btn btn-primary" id="confirmLogout">Ya, Keluar</button>
           </div>
         </div>
       </div>

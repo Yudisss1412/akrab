@@ -185,33 +185,72 @@ document.addEventListener('DOMContentLoaded', function() {
         cancelPasswordChange.addEventListener('click', closeChangePasswordHandler);
       }
       
-      // Account deletion modal functionality
-      const deleteAccountBtns = document.querySelectorAll('.settings-item.danger-zone .btn-danger');
-      const deleteAccountBtnActual = deleteAccountBtns.length > 0 ? deleteAccountBtns[0] : null;
+      // Account deactivation modal functionality
+      const deactivateAccountBtn = document.getElementById('deactivateAccountBtn');
       
-      const deleteAccountModal = document.getElementById('deleteAccountModal');
-      const closeDeleteAccountModal = document.getElementById('closeDeleteAccountModal');
-      const cancelDeleteAccount = document.getElementById('cancelDeleteAccount');
-      const confirmDeleteAccount = document.getElementById('confirmDeleteAccount');
+      const deactivateAccountModal = document.getElementById('deactivateAccountModal');
+      const closeDeactivateAccountModal = document.getElementById('closeDeactivateAccountModal');
+      const cancelDeactivateAccount = document.getElementById('cancelDeactivateAccount');
+      const confirmDeactivateAccount = document.getElementById('confirmDeactivateAccount');
       
-      if (deleteAccountBtnActual && deleteAccountModal) {
-        deleteAccountBtnActual.removeEventListener('click', deleteAccountHandler);
-        deleteAccountBtnActual.addEventListener('click', deleteAccountHandler);
+      if (deactivateAccountBtn && deactivateAccountModal) {
+        deactivateAccountBtn.removeEventListener('click', deactivateAccountHandler);
+        deactivateAccountBtn.addEventListener('click', deactivateAccountHandler);
       }
       
-      if (closeDeleteAccountModal && deleteAccountModal) {
-        closeDeleteAccountModal.removeEventListener('click', closeDeleteAccountHandler);
-        closeDeleteAccountModal.addEventListener('click', closeDeleteAccountHandler);
+      if (closeDeactivateAccountModal && deactivateAccountModal) {
+        closeDeactivateAccountModal.removeEventListener('click', closeDeactivateAccountHandler);
+        closeDeactivateAccountModal.addEventListener('click', closeDeactivateAccountHandler);
       }
       
-      if (cancelDeleteAccount && deleteAccountModal) {
-        cancelDeleteAccount.removeEventListener('click', closeDeleteAccountHandler);
-        cancelDeleteAccount.addEventListener('click', closeDeleteAccountHandler);
+      if (cancelDeactivateAccount && deactivateAccountModal) {
+        cancelDeactivateAccount.removeEventListener('click', closeDeactivateAccountHandler);
+        cancelDeactivateAccount.addEventListener('click', closeDeactivateAccountHandler);
       }
       
-      if (confirmDeleteAccount && deleteAccountModal) {
-        confirmDeleteAccount.removeEventListener('click', confirmDeleteHandler);
-        confirmDeleteAccount.addEventListener('click', confirmDeleteHandler);
+      if (confirmDeactivateAccount && deactivateAccountModal) {
+        confirmDeactivateAccount.removeEventListener('click', confirmDeactivateHandler);
+        confirmDeactivateAccount.addEventListener('click', confirmDeactivateHandler);
+      }
+      
+      // Logout modal functionality
+      const logoutBtn = document.getElementById('logoutBtn');
+      const logoutModal = document.getElementById('logoutModal');
+      const closeLogoutModal = document.getElementById('closeLogoutModal');
+      const cancelLogout = document.getElementById('cancelLogout');
+      const confirmLogout = document.getElementById('confirmLogout');
+      
+      if (logoutBtn && logoutModal) {
+        logoutBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          logoutModal.classList.add('show');
+        });
+      }
+      
+      if (closeLogoutModal && logoutModal) {
+        closeLogoutModal.addEventListener('click', function() {
+          logoutModal.classList.remove('show');
+        });
+      }
+      
+      if (cancelLogout && logoutModal) {
+        cancelLogout.addEventListener('click', function() {
+          logoutModal.classList.remove('show');
+        });
+      }
+      
+      if (confirmLogout && logoutModal) {
+        confirmLogout.addEventListener('click', function() {
+          // In a real application, redirect to the logout route
+          // Using the href from the original logout link
+          let logoutLink = document.querySelector('.js-logout');
+          if (logoutLink && logoutLink.href) {
+            window.location.href = logoutLink.href;
+          } else {
+            // Fallback to default logout route if not found
+            window.location.href = '/logout';  // Adjust this URL to match your actual logout route
+          }
+        });
       }
       
       // Password change form submission
@@ -236,28 +275,32 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
     
-    function deleteAccountHandler() {
-      const deleteAccountModal = document.getElementById('deleteAccountModal');
-      if (deleteAccountModal) {
-        deleteAccountModal.classList.add('show');
+    function deactivateAccountHandler() {
+      const deactivateAccountModal = document.getElementById('deactivateAccountModal');
+      if (deactivateAccountModal) {
+        deactivateAccountModal.classList.add('show');
       }
     }
     
-    function closeDeleteAccountHandler() {
-      const deleteAccountModal = document.getElementById('deleteAccountModal');
-      if (deleteAccountModal) {
-        deleteAccountModal.classList.remove('show');
+    function closeDeactivateAccountHandler() {
+      const deactivateAccountModal = document.getElementById('deactivateAccountModal');
+      if (deactivateAccountModal) {
+        deactivateAccountModal.classList.remove('show');
       }
     }
     
-    function confirmDeleteHandler() {
-      // In a real application, this would trigger the account deletion process
-      alert('Akun Anda akan dihapus. Fungsi ini akan diimplementasikan di backend.');
-      const deleteAccountModal = document.getElementById('deleteAccountModal');
-      if (deleteAccountModal) {
-        deleteAccountModal.classList.remove('show');
+    function confirmDeactivateHandler() {
+      // In a real application, this would trigger the account deactivation process
+      alert('Akun Anda akan dinonaktifkan. Fungsi ini akan diimplementasikan di backend.');
+      const deactivateAccountModal = document.getElementById('deactivateAccountModal');
+      if (deactivateAccountModal) {
+        deactivateAccountModal.classList.remove('show');
       }
+      // In a real app, you would redirect to logout after deactivation
+      // window.location.href = '{{ route("logout") }}';
     }
+    
+    // Logout functionality will be handled by direct redirect in the confirm handler
     
     function savePasswordHandler() {
       // Get form values
@@ -346,14 +389,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // Close modal when clicking outside of it using event delegation
     document.addEventListener('click', function(event) {
       const changePasswordModal = document.getElementById('changePasswordModal');
-      const deleteAccountModal = document.getElementById('deleteAccountModal');
+      const deactivateAccountModal = document.getElementById('deactivateAccountModal');
+      const logoutModal = document.getElementById('logoutModal');
       
       // Only close if clicking on the backdrop (not on modal content)
       if (changePasswordModal && event.target === changePasswordModal) {
         changePasswordModal.classList.remove('show');
       }
-      if (deleteAccountModal && event.target === deleteAccountModal) {
-        deleteAccountModal.classList.remove('show');
+      if (deactivateAccountModal && event.target === deactivateAccountModal) {
+        deactivateAccountModal.classList.remove('show');
+      }
+      if (logoutModal && event.target === logoutModal) {
+        logoutModal.classList.remove('show');
       }
     });
   }

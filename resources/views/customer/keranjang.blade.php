@@ -143,7 +143,7 @@
           
           <div class="actions">
             <a href="{{ route('kategori.kuliner') }}" class="btn-outline">Lanjut Belanja</a>
-            <a href="{{ route('transaksi.checkout') }}" class="btn-primary">Checkout</a>
+            <a href="{{ route('checkout') }}" class="btn-primary">Checkout</a>
           </div>
         </div>
       </div>

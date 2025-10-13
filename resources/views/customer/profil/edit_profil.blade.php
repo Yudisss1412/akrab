@@ -3,7 +3,7 @@
 @section('title', 'Edit Profil')
 
 @section('header')
-  @include('components.customer.header.header')
+  @include('components.customer.header.header_compact')
 @endsection
 
 @push('styles')

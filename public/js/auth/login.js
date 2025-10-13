@@ -17,21 +17,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const emailError = document.getElementById('email-error');
     const passwordError = document.getElementById('password-error');
 
-    // ===== NEW: daftar akun dummy (seller & buyer) + redirect masing-masing
-    const dummyAccounts = [
-        { email: 'seller@demo.test', password: 'password123', role: 'seller', redirect: '/dashboard_penjual' },
-        { email: 'buyer@demo.test',  password: 'password123', role: 'buyer',  redirect: '/cust_welcome'  },
-        { email: 'admin@demo.test',  password: 'password123', role: 'admin',  redirect: '/dashboard_admin' } // ← tambah ini
-        // boleh tambah lagi:
-        // { email: 'admin@demo.test', password: 'password123', role: 'admin', redirect: '/admin.html' },
-    ];
-
     function isValidEmail(email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
     }
 
-    loginForm.addEventListener('submit', (event) => {
+    loginForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         let isFormValid = true;
 
@@ -67,42 +58,74 @@ document.addEventListener('DOMContentLoaded', () => {
             isFormValid = false;
         }
 
-        // ===== CHANGED: cek ke daftar akun dummy, bukan ke 1 email/password statis
-        let matchedAccount = null;
-        if (isFormValid) {
-            matchedAccount = dummyAccounts.find(acc =>
-                acc.email === emailValue && acc.password === passwordValue
-            );
-
-            if (!matchedAccount) {
-                emailError.textContent = 'Email atau sandi salah.';
-                emailError.classList.add('visible');
-                emailInput.classList.add('invalid');
-                passwordInput.classList.add('invalid');
-                isFormValid = false;
-            }
-        }
-
         if (!isFormValid) {
             return;
         }
 
-        // ===== NEW: simpan "session" ringan (biar halaman tujuan bisa guard per role)
-        localStorage.setItem('auth', JSON.stringify({
-            email: matchedAccount.email,
-            role: matchedAccount.role
-        }));
+        // Show loading state
+        const submitButton = loginForm.querySelector('.login-button');
+        const originalButtonText = submitButton.textContent;
+        submitButton.textContent = 'Memproses...';
+        submitButton.disabled = true;
 
-        console.log('Formulir login valid, mengalihkan...');
-        if (loginFormBox) {
-            loginFormBox.style.transition = 'all 0.5s ease';
-            loginFormBox.style.opacity = '0';
-            loginFormBox.style.transform = 'scale(0.9)';
+        try {
+            // Prepare form data
+            const formData = new FormData();
+            formData.append('email', emailValue);
+            formData.append('password', passwordValue);
+            formData.append('_token', document.querySelector('input[name="_token"]').value);
+
+            // Make AJAX request to Laravel backend
+            const response = await fetch('/login', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            const responseData = await response.json();
+
+            if (response.ok) {
+                // Login successful - redirect to intended page or dashboard
+                console.log('Login successful, redirecting...');
+                
+                if (loginFormBox) {
+                    loginFormBox.style.transition = 'all 0.5s ease';
+                    loginFormBox.style.opacity = '0';
+                    loginFormBox.style.transform = 'scale(0.9)';
+                }
+
+                // Redirect to dashboard or intended page
+                setTimeout(() => {
+                    window.location.href = responseData.redirect || '/dashboard';
+                }, 500);
+            } else {
+                // Login failed - show error message
+                if (responseData.message) {
+                    emailError.textContent = responseData.message;
+                } else if (responseData.errors && responseData.errors.email) {
+                    emailError.textContent = responseData.errors.email[0];
+                } else if (responseData.errors && responseData.errors.password) {
+                    passwordError.textContent = responseData.errors.password[0];
+                } else {
+                    emailError.textContent = 'Email atau sandi salah.';
+                }
+                
+                emailError.classList.add('visible');
+                emailInput.classList.add('invalid');
+                passwordInput.classList.add('invalid');
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            emailError.textContent = 'Terjadi kesalahan saat login. Silakan coba lagi.';
+            emailError.classList.add('visible');
+            emailInput.classList.add('invalid');
+            passwordInput.classList.add('invalid');
+        } finally {
+            // Reset button state
+            submitButton.textContent = originalButtonText;
+            submitButton.disabled = false;
         }
-
-        // ===== CHANGED: redirect sesuai akun (seller → /seller.html, buyer → /buyer.html)
-        setTimeout(() => {
-            window.location.href = matchedAccount.redirect;
-        }, 500);
     });
 });

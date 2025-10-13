@@ -1,0 +1,132 @@
+@extends('layouts.customer-layout')
+
+@section('title', 'Dashboard Pembeli - UMKM AKRAB')
+
+@section('content')
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="h3 mb-4">Dashboard Pembeli</h1>
+            
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Rekomendasi Produk</h5>
+                            <div class="row">
+                                @for($i = 1; $i <= 4; $i++)
+                                <div class="col-md-3 mb-3">
+                                    <div class="card h-100">
+                                        <img src="{{ asset('src/placeholder-image.jpg') }}" class="card-img-top" alt="Product" style="height: 150px; object-fit: cover;">
+                                        <div class="card-body d-flex flex-column">
+                                            <h6 class="card-title">Produk Rekomendasi {{ $i }}</h6>
+                                            <p class="card-text text-success fw-bold">Rp 50.000</p>
+                                            <p class="card-text"><small class="text-muted">Toko Serba Ada</small></p>
+                                            <a href="#" class="btn btn-primary mt-auto">Lihat Produk</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                @endfor
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Aktivitas Terakhir</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="fw-bold">Pesanan Baru</div>
+                                        <small class="text-muted">2 hari yang lalu</small>
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill">#ORD-001</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="fw-bold">Ulasan Produk</div>
+                                        <small class="text-muted">1 minggu yang lalu</small>
+                                    </div>
+                                    <span class="badge bg-success rounded-pill">4/5</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="fw-bold">Wishlist Ditambahkan</div>
+                                        <small class="text-muted">1 minggu yang lalu</small>
+                                    </div>
+                                    <span class="badge bg-info rounded-pill">3</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="fw-bold">Alamat Ditambahkan</div>
+                                        <small class="text-muted">2 minggu yang lalu</small>
+                                    </div>
+                                    <span class="badge bg-warning rounded-pill">Baru</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Promo Hari Ini</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-success">
+                                <h6 class="alert-heading">Diskon 20% untuk semua produk!</h6>
+                                <p class="mb-0">Berlaku hingga akhir bulan ini. Gunakan kode: HEMAT20</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Pesanan Terbaru</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Nomor Pesanan</th>
+                                            <th>Produk</th>
+                                            <th>Status</th>
+                                            <th>Tanggal</th>
+                                            <th>Total</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for($i = 1; $i <= 5; $i++)
+                                        <tr>
+                                            <td>#ORD-00{{$i}}</td>
+                                            <td>Produk {{$i}}</td>
+                                            <td>
+                                                <span class="badge bg-warning">Diproses</span>
+                                            </td>
+                                            <td>10 Okt 2025</td>
+                                            <td>Rp {{number_format(150000 + ($i * 10000), 0, ',', '.')}}</td>
+                                            <td>
+                                                <a href="#" class="btn btn-sm btn-outline-primary">Lihat</a>
+                                            </td>
+                                        </tr>
+                                        @endfor
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection

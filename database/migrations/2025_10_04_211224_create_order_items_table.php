@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
             $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
-            $table->foreignId('variant_id')->nullable()->constrained('product_variants')->onDelete('set null');
+            $table->foreignId('variant_id')->nullable(); // Foreign key constraint added later after product_variants exists
             $table->integer('quantity');
             $table->decimal('unit_price', 15, 2);
             $table->decimal('subtotal', 15, 2);

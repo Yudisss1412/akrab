@@ -20,15 +20,15 @@ Route::get('/penjual/promosi', function() {
     if(file_exists(resource_path('views/penjual/manajemen_promosi.blade.php'))) {
         return view('penjual.manajemen_promosi');
     } else {
-        return response()->json(['error' => 'View file tidak ditemukan', 'path' => resource_path('views/penjal.manajemen_promosi.blade.php')], 404);
+        return response()->json(['error' => 'View file tidak ditemukan', 'path' => resource_path('views/penjual/manajemen_promosi.blade.php')], 404);
     }
 })->name('penjual.promosi');
 
-Route::get('/penjual/promosi/diskon', [\App\Http\Controllers\PromotionController::class, 'createDiscount'])->name('penjual.promosi.diskon');
-Route::get('/penjual/promosi/voucher', [\App\Http\Controllers\PromotionController::class, 'createVoucher'])->name('penjual.promosi.voucher');
-Route::get('/penjual/promosi/{id}/edit', [\App\Http\Controllers\PromotionController::class, 'edit'])->name('penjual.promosi.edit');
-Route::post('/penjual/promosi/{id}/nonaktifkan', [\App\Http\Controllers\PromotionController::class, 'nonaktifkan'])->name('penjual.promosi.nonaktifkan');
-Route::delete('/penjual/promosi/{id}', [\App\Http\Controllers\PromotionController::class, 'destroy'])->name('penjual.promosi.destroy');
+Route::get('/penjual/promosi/diskon', [App\Http\Controllers\PromotionController::class, 'createDiscount'])->name('penjual.promosi.diskon');
+Route::get('/penjual/promosi/voucher', [App\Http\Controllers\PromotionController::class, 'createVoucher'])->name('penjual.promosi.voucher');
+Route::get('/penjual/promosi/{id}/edit', [App\Http\Controllers\PromotionController::class, 'edit'])->name('penjual.promosi.edit');
+Route::post('/penjual/promosi/{id}/nonaktifkan', [App\Http\Controllers\PromotionController::class, 'nonaktifkan'])->name('penjual.promosi.nonaktifkan');
+Route::delete('/penjual/promosi/{id}', [App\Http\Controllers\PromotionController::class, 'destroy'])->name('penjual.promosi.destroy');
 
 /*
 |--------------------------------------------------------------------------
@@ -263,14 +263,37 @@ Route::get('/penjual/ulasan', function () {
 
 
 // Order Detail Route - parameter sebagai string karena menggunakan order number
-Route::get('/penjual/pesanan/{order}', [\App\Http\Controllers\OrderDetailController::class, 'show'])->name('orders.show');
+Route::get('/penjual/pesanan/{order}', [App\Http\Controllers\OrderDetailController::class, 'show'])->name('orders.show');
 
 // Order Invoice Route
-Route::get('/invoice/{order}', [\App\Http\Controllers\OrderDetailController::class, 'invoice'])->name('order.invoice');
+Route::get('/invoice/{order}', [App\Http\Controllers\OrderDetailController::class, 'invoice'])->name('order.invoice');
 
 // Shipping Label Route - Simple approach
 Route::get('/shipping-label/{order}', function ($order) {
-    $orderData = \App\Models\Order::where('order_number', $order)->firstOrFail();
+    $orderData = App\Models\Order::where('order_number', $order)->firstOrFail();
     $orderData->load(['items.product', 'items.variant', 'user', 'shipping_address']);
     return view('shipping_label', ['order' => $orderData]);
 })->name('shipping.label');
+
+// Role-based Dashboards
+Route::middleware(['auth', 'admin.role'])->group(function () {
+    Route::get('/admin/dashboard', [App\Http\Controllers\RoleDashboardController::class, 'showAdminDashboard'])->name('admin.dashboard');
+});
+
+Route::middleware(['auth', 'seller.role'])->group(function () {
+    Route::get('/penjual/dashboard', [App\Http\Controllers\RoleDashboardController::class, 'showSellerDashboard'])->name('seller.dashboard');
+});
+
+Route::middleware(['auth', 'customer.role'])->group(function () {
+    Route::get('/customer/dashboard', [App\Http\Controllers\RoleDashboardController::class, 'showCustomerDashboard'])->name('customer.dashboard');
+});
+
+// Authentication Routes
+Route::get('/login', [App\Http\Controllers\AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
+Route::get('/register', [App\Http\Controllers\AuthController::class, 'showRegisterForm'])->name('register');
+Route::post('/register', [App\Http\Controllers\AuthController::class, 'register']);
+Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout'])->name('logout');
+
+// General dashboard route that shows different content based on role
+Route::middleware(['auth'])->get('/dashboard', [App\Http\Controllers\RoleDashboardController::class, 'showRoleBasedDashboard'])->name('dashboard');

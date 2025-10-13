@@ -1,0 +1,204 @@
+{{-- resources/views/components/sidebar.blade.php --}}
+<aside class="sidebar {{ $role ?? 'customer' }}-sidebar bg-light border-end min-vh-100 position-fixed" style="width: 280px; z-index: 1000;">
+    <div class="sidebar-header text-center py-4">
+        <div class="d-flex align-items-center justify-content-center">
+            <img src="{{ asset('src/Logo_UMKM.png') }}" alt="UMKM AKRAB Logo" class="me-2" style="width: 40px; height: auto;">
+            <h4 class="mb-0 fw-bold">UMKM AKRAB</h4>
+        </div>
+    </div>
+    
+    <ul class="nav flex-column px-3 py-2">
+        {{-- Menu untuk Admin --}}
+        @if($role === 'admin')
+            <li class="nav-item mb-2">
+                <h6 class="nav-header text-uppercase text-muted small px-2">Dashboard</h6>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('dashboard.admin') ? 'active' : '' }}" href="{{ route('dashboard.admin') }}">
+                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                </a>
+            </li>
+            
+            <li class="nav-item mb-2 mt-3">
+                <h6 class="nav-header text-uppercase text-muted small px-2">Manajemen</h6>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('sellers.*') ? 'active' : '' }}" href="{{ route('sellers.index') }}">
+                    <i class="fas fa-users me-2"></i>Kelola Penjual
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('produk.index') ? 'active' : '' }}" href="{{ route('produk.index') }}">
+                    <i class="fas fa-box me-2"></i>Kelola Produk
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('reports.violations') ? 'active' : '' }}" href="{{ route('reports.violations') }}">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Laporan Pelanggaran
+                </a>
+            </li>
+            
+            <li class="nav-item mb-2 mt-3">
+                <h6 class="nav-header text-uppercase text-muted small px-2">Operasional</h6>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('support.tickets') ? 'active' : '' }}" href="{{ route('support.tickets') }}">
+                    <i class="fas fa-headset me-2"></i>Tiket Bantuan
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('withdrawal.requests') ? 'active' : '' }}" href="{{ route('withdrawal.requests') }}">
+                    <i class="fas fa-money-bill-wave me-2"></i>Permintaan Penarikan
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('commission.settings') ? 'active' : '' }}" href="{{ route('commission.settings') }}">
+                    <i class="fas fa-percent me-2"></i>Pengaturan Komisi
+                </a>
+            </li>
+            
+            <li class="nav-item mb-2 mt-3">
+                <h6 class="nav-header text-uppercase text-muted small px-2">Akun</h6>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('profil.admin') ? 'active' : '' }}" href="{{ route('profil.admin') }}">
+                    <i class="fas fa-user-cog me-2"></i>Profil Admin
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('logout') }}">
+                    <i class="fas fa-sign-out-alt me-2"></i>Keluar
+                </a>
+            </li>
+        
+        {{-- Menu untuk Penjual --}}
+        @elseif($role === 'seller')
+            <li class="nav-item mb-2">
+                <h6 class="nav-header text-uppercase text-muted small px-2">Dashboard</h6>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('dashboard.penjual') ? 'active' : '' }}" href="{{ route('dashboard.penjual') }}">
+                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                </a>
+            </li>
+            
+            <li class="nav-item mb-2 mt-3">
+                <h6 class="nav-header text-uppercase text-muted small px-2">Produk</h6>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('penjual.produk') ? 'active' : '' }}" href="{{ route('penjual.produk') }}">
+                    <i class="fas fa-boxes me-2"></i>Manajemen Produk
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('penjual.promosi') ? 'active' : '' }}" href="{{ route('penjual.promosi') }}">
+                    <i class="fas fa-bullhorn me-2"></i>Manajemen Promosi
+                </a>
+            </li>
+            
+            <li class="nav-item mb-2 mt-3">
+                <h6 class="nav-header text-uppercase text-muted small px-2">Penjualan</h6>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('penjual.pesanan') ? 'active' : '' }}" href="{{ route('penjual.pesanan') }}">
+                    <i class="fas fa-shopping-cart me-2"></i>Manajemen Pesanan
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('penjual.ulasan') ? 'active' : '' }}" href="{{ route('penjual.ulasan') }}">
+                    <i class="fas fa-comments me-2"></i>Ulasan Produk
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('penjual.saldo') ? 'active' : '' }}" href="{{ route('penjual.saldo') }}">
+                    <i class="fas fa-wallet me-2"></i>Saldo & Penarikan
+                </a>
+            </li>
+            
+            <li class="nav-item mb-2 mt-3">
+                <h6 class="nav-header text-uppercase text-muted small px-2">Akun</h6>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('profil.penjual') ? 'active' : '' }}" href="{{ route('profil.penjual') }}">
+                    <i class="fas fa-store me-2"></i>Profil Toko
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('logout') }}">
+                    <i class="fas fa-sign-out-alt me-2"></i>Keluar
+                </a>
+            </li>
+        
+        {{-- Menu untuk Pembeli --}}
+        @else
+            <li class="nav-item mb-2">
+                <h6 class="nav-header text-uppercase text-muted small px-2">Navigasi</h6>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('welcome') ? 'active' : '' }}" href="{{ route('welcome') }}">
+                    <i class="fas fa-home me-2"></i>Beranda
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('kategori') || request()->routeIs('kategori.*') ? 'active' : '' }}" href="{{ route('kategori') }}">
+                    <i class="fas fa-th-large me-2"></i>Kategori Produk
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('keranjang') ? 'active' : '' }}" href="{{ route('keranjang') }}">
+                    <i class="fas fa-shopping-cart me-2"></i>Keranjang
+                    @if(session('cart_count', 0) > 0)
+                        <span class="badge bg-danger ms-2">{{ session('cart_count', 0) }}</span>
+                    @endif
+                </a>
+            </li>
+            
+            <li class="nav-item mb-2 mt-3">
+                <h6 class="nav-header text-uppercase text-muted small px-2">Akun Saya</h6>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('profil.pembeli') ? 'active' : '' }}" href="{{ route('profil.pembeli') }}">
+                    <i class="fas fa-user me-2"></i>Profil Saya
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('halaman_wishlist') ? 'active' : '' }}" href="{{ route('halaman_wishlist') }}">
+                    <i class="fas fa-heart me-2"></i>Wishlist
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('halaman_ulasan') ? 'active' : '' }}" href="{{ route('halaman_ulasan') }}">
+                    <i class="fas fa-star me-2"></i>Ulasan Saya
+                </a>
+            </li>
+            
+            <li class="nav-item mb-2 mt-3">
+                <h6 class="nav-header text-uppercase text-muted small px-2">Transaksi</h6>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('checkout') }}">
+                    <i class="fas fa-credit-card me-2"></i>Checkout
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('cust.pengiriman') }}">
+                    <i class="fas fa-truck me-2"></i>Status Pengiriman
+                </a>
+            </li>
+            
+            <li class="nav-item mb-2 mt-3">
+                <h6 class="nav-header text-uppercase text-muted small px-2">Lainnya</h6>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('support.tickets') }}">
+                    <i class="fas fa-headset me-2"></i>Bantuan
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('logout') }}">
+                    <i class="fas fa-sign-out-alt me-2"></i>Keluar
+                </a>
+            </li>
+        @endif
+    </ul>
+</aside>

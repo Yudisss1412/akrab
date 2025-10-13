@@ -19,15 +19,22 @@
             </div>
             <div class="login-form-box">
                 <h2>Silahkan Masuk</h2>
-                <form id="loginForm" novalidate>
+                <form id="loginForm" method="POST" action="{{ route('login') }}" novalidate>
+                    @csrf
                     <div class="form-group">
-                        <input type="email" id="email" name="email" required placeholder=" ">
+                        <input type="email" id="email" name="email" required placeholder=" " value="{{ old('email') }}">
                         <label for="email">Email</label>
+                        @error('email')
+                            <p class="error-message" id="email-error">{{ $message }}</p>
+                        @enderror
                         <p class="error-message" id="email-error"></p>
                     </div>
                     <div class="form-group">
                         <input type="password" id="password" name="password" required placeholder=" ">
                         <label for="password">Password</label>
+                        @error('password')
+                            <p class="error-message" id="password-error">{{ $message }}</p>
+                        @enderror
                         <p class="error-message" id="password-error"></p>
                     </div>
                     <button type="submit" class="login-button">Masuk</button>

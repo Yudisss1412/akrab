@@ -201,7 +201,7 @@
     // Alert functions
     let alertTimeout;
     
-    function showAlert(title, message, type = 'success') {
+    function showAlert(title, message, type = 'success', showCartButton = true) {
       const alertOverlay = document.getElementById('alertOverlay');
       const alertTitle = document.getElementById('alertTitle');
       const alertMessage = document.getElementById('alertMessage');
@@ -214,6 +214,13 @@
       // Add appropriate class based on type
       alertOverlay.classList.remove('alert-success', 'alert-error', 'alert-warning');
       alertOverlay.classList.add(`alert-${type}`);
+      
+      // Show or hide the "Lihat Keranjang" button based on the parameter
+      if (showCartButton) {
+        alertAction.style.display = 'block';
+      } else {
+        alertAction.style.display = 'none';
+      }
       
       // Show alert
       alertOverlay.style.display = 'flex';
@@ -246,6 +253,12 @@
       if (e.target === this) {
         hideAlert();
       }
+    });
+    
+    // Event listener untuk tombol "Lihat Keranjang"
+    document.getElementById('alertAction').addEventListener('click', function() {
+      // Arahkan ke halaman keranjang
+      window.location.href = "{{ route('keranjang') }}";
     });
     
     // Example: Show alert on page load (can be removed)

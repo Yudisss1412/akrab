@@ -103,10 +103,10 @@
   }
   
   // ===== Alert =====
-  function showAlert(title, message, type = 'success', duration = 3000){
+  function showAlert(title, message, type = 'success', showCartButton = true){
     // Cek apakah fungsi showAlert sudah didefinisikan di halaman (dari blade)
     if(typeof window.showAlert === 'function'){
-      window.showAlert(title, message, type, duration);
+      window.showAlert(title, message, type, showCartButton);
     } else {
       // Fallback ke alert browser jika tidak ada
       alert(title + ': ' + message);

@@ -1,6 +1,10 @@
-@extends('layouts.customer')
+@extends('layouts.app')
 
 @section('title', 'Selamat Datang - UMKM AKRAB')
+
+@section('header')
+  @include('components.customer.header.header')
+@endsection
 
 @section('content')
 <script>
@@ -73,4 +77,8 @@
 </div>
 
 <script src="{{ asset('js/customer/cust_welcome.js') }}"></script>
+@endsection
+
+@section('footer')
+  @include('components.customer.footer.footer')
 @endsection

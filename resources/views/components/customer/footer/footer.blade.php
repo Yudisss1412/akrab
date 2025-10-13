@@ -1,3 +1,4 @@
+<!-- Footer khusus pelanggan untuk halaman utama -->
 <footer class="footer">
     <div class="footer__inner footer-3col">
         <!-- Kiri: Copyright -->

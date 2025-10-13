@@ -57,23 +57,23 @@
       
       <!-- NAVIGATION MENU -->
       <nav class="profile-navigation card">
-        <a href="#" class="nav-item active">
+        <a href="#" class="nav-item active" data-target="order-history">
           <i class="bi bi-bag-check"></i>
           <span>Riwayat Pesanan</span>
         </a>
-        <a href="{{ route('halaman_wishlist') }}" class="nav-item">
+        <a href="#" class="nav-item" data-target="wishlist-section">
           <i class="bi bi-heart"></i>
           <span>Wishlist</span>
         </a>
-        <a href="{{ route('halaman_ulasan') }}" class="nav-item">
+        <a href="#" class="nav-item" data-target="review-history">
           <i class="bi bi-chat-left-text"></i>
           <span>Ulasan Saya</span>
         </a>
-        <a href="#" class="nav-item">
+        <a href="#" class="nav-item" data-target="account-settings">
           <i class="bi bi-gear"></i>
           <span>Pengaturan Akun</span>
         </a>
-        <a href="#" class="nav-item">
+        <a href="#" class="nav-item js-logout" data-target="logout">
           <i class="bi bi-box-arrow-right"></i>
           <span>Keluar</span>
         </a>
@@ -83,14 +83,14 @@
     <!-- RIGHT COLUMN (Main Content) -->
     <div class="main-content">
       <!-- MY WISHLIST -->
-      <section class="wishlist-section card">
+      <section id="wishlist-section" class="wishlist-section card hidden-content">
         <div class="section-header">
           <h3>Wishlist Saya</h3>
           <a href="{{ route('halaman_wishlist') }}" class="view-all">Lihat Semua</a>
         </div>
         
-        <div id="wishlistGrid" class="wl-grid" role="list" aria-live="polite">
-          <!-- Wishlist items akan diisi oleh JavaScript -->
+        <div id="wishlistGrid" role="list" aria-live="polite">
+          <!-- Wishlist items will be filled by JavaScript -->
         </div>
 
         <div id="wlEmpty" class="wl-empty" hidden>
@@ -100,7 +100,7 @@
       </section>
 
       <!-- ORDER HISTORY -->
-      <section class="order-history card">
+      <section id="order-history" class="order-history card active-content">
         <div class="section-header">
           <h3>Riwayat Pesanan</h3>
           <a href="#" class="view-all">Lihat Semua</a>
@@ -124,7 +124,10 @@
                 <img src="{{ asset('src/CangkirKeramik1.png') }}" alt="Cangkir Keramik">
                 <span class="item-count">+2 item lainnya</span>
               </div>
-              <a href="{{ $u1 }}" class="btn btn-outline">Beli Lagi</a>
+              <div class="order-actions">
+                <a href="{{ $u1 }}" class="btn btn-outline">Lihat Detail</a>
+                <!-- Tombol Lacak Pesanan hanya muncul jika status "Dikirim" -->
+              </div>
             </div>
           </article>
           
@@ -145,14 +148,17 @@
                 <img src="{{ asset('src/PiringKayu.png') }}" alt="Piring Kayu">
                 <span class="item-count">+1 item lainnya</span>
               </div>
-              <a href="{{ $u2 }}" class="btn btn-outline">Beli Lagi</a>
+              <div class="order-actions">
+                <a href="{{ $u2 }}" class="btn btn-outline">Lihat Detail</a>
+                <a href="#" class="btn btn-primary">Lacak Pesanan</a>
+              </div>
             </div>
           </article>
         </div>
       </section>
 
       <!-- MY REVIEWS -->
-      <section class="review-history card">
+      <section id="review-history" class="review-history card hidden-content">
         <div class="section-header">
           <h3>Ulasan Saya</h3>
           <a href="{{ route('halaman_ulasan') }}" class="view-all">Lihat Semua</a>
@@ -165,6 +171,7 @@
               <img src="{{ asset('src/CangkirKeramik1.png') }}" alt="Cangkir Keramik">
               <div class="product-info">
                 <h4>Cangkir Keramik 250ml</h4>
+                <p class="shop-name">Toko Keramik Bagus</p>
                 <div class="rating">
                   <i class="bi bi-star-fill"></i>
                   <i class="bi bi-star-fill"></i>
@@ -179,6 +186,12 @@
             <div class="review-content">
               <p>Kualitas bagus, sesuai pesanan. Pengiriman cepat dan aman.</p>
             </div>
+            
+            <div class="review-actions">
+              <button class="btn btn-icon" title="Edit Ulasan">
+                <i class="bi bi-pencil"></i>
+              </button>
+            </div>
           </article>
           
           <!-- Review 2 -->
@@ -187,6 +200,7 @@
               <img src="{{ asset('src/PiringKayu.png') }}" alt="Piring Kayu">
               <div class="product-info">
                 <h4>Piring Kayu Jati</h4>
+                <p class="shop-name">Toko Mebel Jati</p>
                 <div class="rating">
                   <i class="bi bi-star-fill"></i>
                   <i class="bi bi-star-fill"></i>
@@ -201,9 +215,145 @@
             <div class="review-content">
               <p>Desainnya unik dan elegan. Cocok untuk penggunaan sehari-hari.</p>
             </div>
+            
+            <div class="review-actions">
+              <button class="btn btn-icon" title="Edit Ulasan">
+                <i class="bi bi-pencil"></i>
+              </button>
+            </div>
           </article>
         </div>
       </section>
+      
+      <!-- ACCOUNT SETTINGS (New Content) -->
+      <section id="account-settings" class="account-settings card hidden-content">
+        <div class="section-header">
+          <h3>Pengaturan Akun</h3>
+        </div>
+        
+        <div class="settings-content">
+          <!-- Keamanan Akun -->
+          <div class="settings-card card">
+            <h4>Keamanan Akun</h4>
+            
+            <div class="settings-item">
+              <div class="settings-label">Kata Sandi</div>
+              <button class="btn btn-outline" id="changePasswordBtn">Ubah</button>
+            </div>
+            
+            <div class="settings-item">
+              <div class="settings-label">Autentikasi Dua Faktor</div>
+              <div class="settings-controls">
+                <span class="badge status-inactive">Tidak Aktif</span>
+                <button class="btn btn-outline">Kelola</button>
+              </div>
+            </div>
+            
+            <div class="settings-item">
+              <div class="settings-label">Sesi Login Aktif</div>
+              <button class="btn btn-outline">Lihat & Kelola</button>
+            </div>
+          </div>
+          
+          <!-- Preferensi Notifikasi -->
+          <div class="settings-card card">
+            <h4>Preferensi Notifikasi</h4>
+            
+            <div class="notification-setting">
+              <label class="switch">
+                <input type="checkbox" checked>
+                <span class="slider"></span>
+              </label>
+              <span class="setting-label">Notifikasi Status Pesanan</span>
+            </div>
+            
+            <div class="notification-setting">
+              <label class="switch">
+                <input type="checkbox" checked>
+                <span class="slider"></span>
+              </label>
+              <span class="setting-label">Promo & Penawaran Spesial</span>
+            </div>
+            
+            <div class="notification-setting">
+              <label class="switch">
+                <input type="checkbox">
+                <span class="slider"></span>
+              </label>
+              <span class="setting-label">Newsletter Mingguan</span>
+            </div>
+            
+            <button class="btn btn-primary" style="margin-top: 1rem;">Simpan Preferensi</button>
+          </div>
+          
+          <!-- Privasi & Data -->
+          <div class="settings-card card">
+            <h4>Privasi & Data</h4>
+            
+            <div class="settings-item">
+              <div class="settings-label">Unduh salinan data Anda</div>
+              <button class="btn btn-outline">Minta Unduhan</button>
+            </div>
+            
+            <div class="settings-item danger-zone">
+              <div class="settings-label">Hapus Akun Anda</div>
+              <button class="btn btn-danger">Hapus Akun</button>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Modal Ubah Kata Sandi -->
+      <div id="changePasswordModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4>Ubah Kata Sandi</h4>
+            <span class="close" id="closeChangePasswordModal">&times;</span>
+          </div>
+          <div class="modal-body">
+            <form id="passwordChangeForm">
+              <div class="form-group">
+                <label for="currentPassword">Kata Sandi Saat Ini</label>
+                <input type="password" id="currentPassword" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label for="newPassword">Kata Sandi Baru</label>
+                <input type="password" id="newPassword" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label for="confirmNewPassword">Konfirmasi Kata Sandi Baru</label>
+                <input type="password" id="confirmNewPassword" class="form-control" required>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-outline" id="cancelPasswordChange">Batal</button>
+            <button class="btn btn-primary" id="savePasswordChange">Simpan</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Modal Konfirmasi Hapus Akun -->
+      <div id="deleteAccountModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4>Hapus Akun</h4>
+            <span class="close" id="closeDeleteAccountModal">&times;</span>
+          </div>
+          <div class="modal-body">
+            <p class="warning-text">
+              <strong>Peringatan Penting:</strong> Tindakan ini akan menghapus akun Anda secara permanen.
+              Semua data Anda, termasuk riwayat pesanan, ulasan, dan informasi akun akan dihapus secara permanen.
+              Tindakan ini tidak dapat dibatalkan.
+            </p>
+            <p>Apakah Anda yakin ingin menghapus akun Anda?</p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-outline" id="cancelDeleteAccount">Batal</button>
+            <button class="btn btn-danger" id="confirmDeleteAccount">Hapus Akun</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 @endsection
@@ -254,31 +404,23 @@
     function wishlistCardTemplate(item){
       const onStyle  = item.liked ? '' : 'display:none';
       const offStyle = item.liked ? 'display:none' : '';
-      return `<article class="wl-card" role="listitem" data-id="${item.id}">
-        <header class="card__head">
-          <div class="user__name">${item.shop}</div>
-          <time class="card__time">${item.date}</time>
-        </header>
-
-        <div class="card__body">
-          <a class="product" href="${item.url}" aria-label="Lihat produk ${item.title}">
-            <div class="product__thumb">
-              <img src="${item.img}" alt="${item.title}">
-            </div>
-            <div class="product__meta">
-              <div class="product__title">${item.title}</div>
-              <div class="product__shop">${item.shop}</div>
-            </div>
-          </a>
+      return `<article class="wl-card card" role="listitem" data-id="${item.id}">
+        <div class="product">
+          <div class="product__thumb">
+            <img src="${item.img}" alt="${item.title}">
+          </div>
+          <div class="product__meta">
+            <div class="product__title">${item.title}</div>
+            <div class="product__shop">${item.shop}</div>
+            <div class="wl-price">Rp ${fmtIDR(item.price)}</div>
+          </div>
+          <div class="product__actions">
+            <button class="wl-like" aria-pressed="true" title="Hapus dari wishlist">
+              <svg class="svg-off" style="${offStyle}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47 47"><path d="M23.6962 36.3271L23.5003 36.5229L23.2849 36.3271C13.9828 27.8867 7.83366 22.3054 7.83366 16.6458C7.83366 12.7292 10.7712 9.79167 14.6878 9.79167C17.7037 9.79167 20.6412 11.75 21.6791 14.4133H25.3216C26.3595 11.75 29.297 9.79167 32.3128 9.79167C36.2295 9.79167 39.167 12.7292 39.167 16.6458C39.167 22.3054 33.0178 27.8867 23.6962 36.3271ZM32.3128 5.875C28.9053 5.875 25.6349 7.46125 23.5003 9.94833C21.3657 7.46125 18.0953 5.875 14.6878 5.875C8.65616 5.875 3.91699 10.5946 3.91699 16.6458C3.91699 24.0287 10.5753 30.08 20.6607 39.2254L23.5003 41.8104L26.3399 39.2254C36.4253 30.08 43.0837 24.0287 43.0837 16.6458C43.0837 10.5946 38.3445 5.875 32.3128 5.875Z" fill="#F24822"/></svg>
+              <svg class="svg-on"  style="${onStyle}"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47 47"><path d="M23.5003 41.8104L20.6607 39.2254C10.5753 30.08 3.91699 24.0287 3.91699 16.6458C3.91699 10.5946 8.65616 5.875 14.6878 5.875C18.0953 5.875 21.3657 7.46125 23.5003 9.94833C25.6349 7.46125 28.9053 5.875 32.3128 5.875C38.3445 5.875 43.0837 10.5946 43.0837 16.6458C43.0837 24.0287 36.4253 30.08 26.3399 39.2254L23.5003 41.8104Z" fill="#F24822"/></svg>
+            </button>
+          </div>
         </div>
-
-        <footer class="card__foot">
-          <div class="wl-price">Rp ${fmtIDR(item.price)}</div>
-          <button class="wl-like" aria-pressed="true" title="Hapus dari wishlist">
-            <svg class="svg-off" style="${offStyle}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47 47"><path d="M23.6962 36.3271L23.5003 36.5229L23.2849 36.3271C13.9828 27.8867 7.83366 22.3054 7.83366 16.6458C7.83366 12.7292 10.7712 9.79167 14.6878 9.79167C17.7037 9.79167 20.6412 11.75 21.6791 14.4133H25.3216C26.3595 11.75 29.297 9.79167 32.3128 9.79167C36.2295 9.79167 39.167 12.7292 39.167 16.6458C39.167 22.3054 33.0178 27.8867 23.6962 36.3271ZM32.3128 5.875C28.9053 5.875 25.6349 7.46125 23.5003 9.94833C21.3657 7.46125 18.0953 5.875 14.6878 5.875C8.65616 5.875 3.91699 10.5946 3.91699 16.6458C3.91699 24.0287 10.5753 30.08 20.6607 39.2254L23.5003 41.8104L26.3399 39.2254C36.4253 30.08 43.0837 24.0287 43.0837 16.6458C43.0837 10.5946 38.3445 5.875 32.3128 5.875Z" fill="#F24822"/></svg>
-            <svg class="svg-on"  style="${onStyle}"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47 47"><path d="M23.5003 41.8104L20.6607 39.2254C10.5753 30.08 3.91699 24.0287 3.91699 16.6458C3.91699 10.5946 8.65616 5.875 14.6878 5.875C18.0953 5.875 21.3657 7.46125 23.5003 9.94833C25.6349 7.46125 28.9053 5.875 32.3128 5.875C38.3445 5.875 43.0837 10.5946 43.0837 16.6458C43.0837 24.0287 36.4253 30.08 26.3399 39.2254L23.5003 41.8104Z" fill="#F24822"/></svg>
-          </button>
-        </footer>
       </article>`;
     }
 
@@ -310,6 +452,163 @@
 
     // ====== Init ======
     document.addEventListener('DOMContentLoaded', fetchWishlist);
+  </script>
+  
+  <!-- JavaScript for Dynamic Content Switching -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      try {
+        // Get all navigation links and content sections
+        const navItems = document.querySelectorAll('.profile-navigation .nav-item');
+        const contentSections = document.querySelectorAll('.main-content section');
+        
+        // Add click event listeners to navigation items
+        navItems.forEach(item => {
+          item.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Get the target content ID from data attribute
+            const targetId = this.getAttribute('data-target');
+            
+            // Remove active class from all navigation items
+            navItems.forEach(navItem => {
+              navItem.classList.remove('active');
+            });
+            
+            // Add active class to clicked navigation item
+            this.classList.add('active');
+            
+            // Hide all content sections
+            contentSections.forEach(section => {
+              section.classList.remove('active-content');
+              section.classList.add('hidden-content');
+            });
+            
+            // Show the target content section
+            const targetSection = document.getElementById(targetId);
+            if (targetSection) {
+              targetSection.classList.remove('hidden-content');
+              targetSection.classList.add('active-content');
+            }
+          });
+        });
+        
+        // Set default active content (Riwayat Pesanan) on page load
+        contentSections.forEach(section => {
+          section.classList.remove('active-content');
+          section.classList.add('hidden-content');
+        });
+        
+        const defaultSection = document.getElementById('order-history');
+        if (defaultSection) {
+          defaultSection.classList.remove('hidden-content');
+          defaultSection.classList.add('active-content');
+        }
+        
+        // Password change modal functionality
+        const changePasswordBtn = document.getElementById('changePasswordBtn');
+        const changePasswordModal = document.getElementById('changePasswordModal');
+        const closeChangePasswordModal = document.getElementById('closeChangePasswordModal');
+        const cancelPasswordChange = document.getElementById('cancelPasswordChange');
+        const savePasswordChange = document.getElementById('savePasswordChange');
+        const passwordChangeForm = document.getElementById('passwordChangeForm');
+        
+        if (changePasswordBtn && changePasswordModal) {
+          changePasswordBtn.addEventListener('click', function() {
+            changePasswordModal.style.display = 'flex';
+          });
+        }
+        
+        if (closeChangePasswordModal && changePasswordModal) {
+          closeChangePasswordModal.addEventListener('click', function() {
+            changePasswordModal.style.display = 'none';
+          });
+        }
+        
+        if (cancelPasswordChange && changePasswordModal) {
+          cancelPasswordChange.addEventListener('click', function() {
+            changePasswordModal.style.display = 'none';
+          });
+        }
+        
+        // Close modal when clicking outside of it
+        window.addEventListener('click', function(event) {
+          if (changePasswordModal && event.target === changePasswordModal) {
+            changePasswordModal.style.display = 'none';
+          }
+        });
+        
+        // Account deletion modal functionality
+        const deleteAccountBtn = document.querySelector('.btn-danger');
+        const deleteAccountModal = document.getElementById('deleteAccountModal');
+        const closeDeleteAccountModal = document.getElementById('closeDeleteAccountModal');
+        const cancelDeleteAccount = document.getElementById('cancelDeleteAccount');
+        const confirmDeleteAccount = document.getElementById('confirmDeleteAccount');
+        
+        if (deleteAccountBtn && deleteAccountModal) {
+          deleteAccountBtn.addEventListener('click', function() {
+            deleteAccountModal.style.display = 'flex';
+          });
+        }
+        
+        if (closeDeleteAccountModal && deleteAccountModal) {
+          closeDeleteAccountModal.addEventListener('click', function() {
+            deleteAccountModal.style.display = 'none';
+          });
+        }
+        
+        if (cancelDeleteAccount && deleteAccountModal) {
+          cancelDeleteAccount.addEventListener('click', function() {
+            deleteAccountModal.style.display = 'none';
+          });
+        }
+        
+        if (confirmDeleteAccount && deleteAccountModal) {
+          confirmDeleteAccount.addEventListener('click', function() {
+            // In a real application, this would trigger the account deletion process
+            alert('Akun Anda akan dihapus. Fungsi ini akan diimplementasikan di backend.');
+            deleteAccountModal.style.display = 'none';
+          });
+        }
+        
+        // Close delete modal when clicking outside of it
+        window.addEventListener('click', function(event) {
+          if (deleteAccountModal && event.target === deleteAccountModal) {
+            deleteAccountModal.style.display = 'none';
+          }
+        });
+        
+        // Password change form submission
+        if (savePasswordChange && passwordChangeForm && changePasswordModal) {
+          savePasswordChange.addEventListener('click', function() {
+            // Get form values
+            const currentPassword = document.getElementById('currentPassword')?.value;
+            const newPassword = document.getElementById('newPassword')?.value;
+            const confirmNewPassword = document.getElementById('confirmNewPassword')?.value;
+            
+            // Basic validation
+            if (!currentPassword || !newPassword || !confirmNewPassword) {
+              alert('Harap isi semua kolom kata sandi.');
+              return;
+            }
+            
+            if (newPassword !== confirmNewPassword) {
+              alert('Kata sandi baru dan konfirmasi kata sandi tidak cocok.');
+              return;
+            }
+            
+            // In a real application, this would send a request to the backend
+            alert('Kata sandi telah berhasil diubah. Fungsi ini akan diimplementasikan di backend.');
+            changePasswordModal.style.display = 'none';
+            
+            // Reset form
+            passwordChangeForm.reset();
+          });
+        }
+      } catch (error) {
+        console.error('Error in profile page JavaScript:', error);
+      }
+    });
   </script>
 @endpush
 

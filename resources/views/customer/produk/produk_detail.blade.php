@@ -2,6 +2,10 @@
 
 @section('title', ($produk->nama ?? request('nama') ?? 'Detail Produk') . ' — AKRAB')
 
+@section('header')
+  @include('components.customer.header.header')
+@endsection
+
 @push('styles')
   {{-- CSS khusus halaman produk detail --}}
   <link href="{{ asset('css/customer/produk/produk_detail.css') }}" rel="stylesheet"/>
@@ -9,7 +13,6 @@
 @endpush
 
 @section('content')
-  <div class="main-layout">
     <main class="detail-page" role="main">
       <div class="container">
         <!-- Back button -->
@@ -211,3 +214,7 @@
     });
   </script>
 @endpush
+
+@section('footer')
+  @include('components.customer.footer.footer')
+@endsection

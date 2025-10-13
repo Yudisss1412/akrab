@@ -12,7 +12,7 @@
 @endpush
 
 @section('content')
-  <main class="page">
+    <div class="page">
     <section class="card form-card" aria-labelledby="title-edit-profile">
       <header class="form-head">
         <h1 id="title-edit-profile">Edit profil</h1>
@@ -67,7 +67,7 @@
       </form>
       <div id="formAlertContainer" class="form-alert-container"></div>
     </section>
-  </main>
+    </div>
 @endsection
 
 @push('scripts')

@@ -119,6 +119,18 @@ Route::get('/halaman_wishlist', function () {
     return view('customer.koleksi.halaman_wishlist');
 })->name('halaman_wishlist');
 
+// API endpoint untuk wishlist di halaman profil
+Route::get('/api/customer/wishlist', function () {
+    // Contoh data dummy wishlist
+    // Dalam implementasi sebenarnya, ini akan mengambil data dari database
+    $wishlist = [
+        ['id' => 1, 'title' => 'Xbox Series S With Series X', 'price' => 1008000, 'img' => asset('src/CangkirKeramik1.png'), 'shop' => 'Toko Elektronik Jaya', 'date' => '24 Agu 2025', 'liked' => true, 'url' => '/produk/1'],
+        ['id' => 2, 'title' => 'iPhone 15 128GB', 'price' => 8670000, 'img' => asset('src/PiringKayu.png'), 'shop' => 'iStore Official', 'date' => '21 Agu 2025', 'liked' => true, 'url' => '/produk/2'],
+    ];
+    
+    return response()->json($wishlist);
+})->name('api.wishlist');
+
 Route::get('/dashboard_penjual', function () {
     return view('penjual.dashboard_penjual');
 })->name('dashboard.penjual');

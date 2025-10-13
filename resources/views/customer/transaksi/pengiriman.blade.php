@@ -36,12 +36,19 @@
           <!-- Alamat Pengiriman -->
           <section class="shipping-address-summary">
             <h2>Alamat Pengiriman</h2>
-            <div class="address-card selected">
-              <div class="address-header">
-                <h3>Rumah</h3>
-                <span class="badge primary">Utama</span>
+            <div class="shipping-info">
+              <div class="info-row">
+                <span class="label">Nama Penerima</span>
+                <span class="value">Andi Saputra</span>
               </div>
-              <p class="address-detail">Andi Saputra<br>Jl. Anggrek No. 12, Bandung<br>0812-3456-7890</p>
+              <div class="info-row">
+                <span class="label">Alamat Lengkap</span>
+                <span class="value">Jl. Anggrek No. 12, Bandung</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Kontak</span>
+                <span class="value">0812-3456-7890</span>
+              </div>
             </div>
           </section>
 

@@ -184,6 +184,28 @@ section h2 {
   color: #666;
 }
 
+/* Shipping Info */
+.shipping-info {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.info-row .label {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.info-row .value {
+  text-align: right;
+  max-width: 60%;
+}
+
 /* Shipping Options */
 .shipping-options {
   display: flex;

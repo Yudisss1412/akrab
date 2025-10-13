@@ -18,15 +18,15 @@
         <div class="progress-steps">
           <div class="step active">
             <span class="step-number">1</span>
-            <span class="step-label">Checkout</span>
+            <span class="step-label">Alamat</span>
           </div>
           <div class="step">
             <span class="step-number">2</span>
-            <span class="step-label">Pembayaran</span>
+            <span class="step-label">Pengiriman</span>
           </div>
           <div class="step">
             <span class="step-number">3</span>
-            <span class="step-label">Selesai</span>
+            <span class="step-label">Pembayaran</span>
           </div>
         </div>
       </div>
@@ -159,7 +159,7 @@
               </div>
               
               <button class="btn btn-primary btn-checkout" onclick="window.location.href='{{ route("cust.pengiriman") }}'; return false;">
-                Bayar Sekarang
+                Lanjut ke Pengiriman
               </button>
             </div>
           </section>

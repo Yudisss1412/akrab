@@ -94,15 +94,22 @@ class AuthController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
+        // Get the buyer role
+        $buyerRole = \App\Models\Role::where('name', 'buyer')->first();
+        if (!$buyerRole) {
+            return back()->withErrors(['system' => 'Sistem role belum diatur. Silakan hubungi administrator.']);
+        }
+
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
+            'role_id' => $buyerRole->id, // Assign buyer role to new customer
         ]);
 
         Auth::login($user);
 
-        return redirect()->route('dashboard');
+        return redirect()->route('customer.dashboard');
     }
 
     // Logout

@@ -134,6 +134,15 @@
     <a href="javascript:history.back()" class="navbar-brand" title="Kembali ke halaman sebelumnya">
       <i class="fas fa-arrow-left me-2"></i>UMKM AKRAB Admin
     </a>
+    <div class="ms-auto">
+      <a href="{{ route('logout') }}" class="btn btn-outline-secondary btn-sm"
+         onclick="event.preventDefault(); document.getElementById('logout-form-header').submit();">
+        Keluar
+      </a>
+      <form id="logout-form-header" action="{{ route('logout') }}" method="POST" class="d-none">
+        @csrf
+      </form>
+    </div>
   </div>
     <div class="main-layout">
       <div class="content-wrapper">
@@ -158,8 +167,15 @@
                 <a href="{{ route('edit.profil.admin') }}" id="btnEditProfile" class="btn btn-primary btn-sm">
                   Edit Profil
                 </a>
+                <a href="{{ route('logout') }}" class="btn btn-outline-secondary btn-sm"
+                   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                  Keluar
+                </a>
               </div>
             </div>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+              @csrf
+            </form>
 
             <dl class="info-list" aria-label="Info Admin">
               <div>

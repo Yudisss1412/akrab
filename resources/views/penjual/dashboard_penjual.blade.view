@@ -349,7 +349,7 @@
       <main class="content admin-page-content" role="main">
         <!-- Welcome Banner -->
         <section class="welcome-banner">
-          <h1>Selamat Datang, Shoppy.gg!</h1>
+          <h1>Selamat Datang, {{ auth()->user()->name }}!</h1>
         </section>
 
         <!-- Stats Grid -->

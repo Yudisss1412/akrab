@@ -158,7 +158,7 @@
       <!-- Header Halaman -->
       <div class="page-header my-5 py-5 mb-5" style="margin-top: 2rem; margin-bottom: 3rem;">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-          <h1 class="page-title mb-0">Manajemen Promosi</h1>
+          <h1 class="page-title mb-0">Manajemen Promosi untuk {{ auth()->user()->name }}</h1>
           <button class="btn btn-primary" id="openPromotionModalBtn">
             <i class="bi bi-plus-lg"></i> Buat Promosi Baru
           </button>

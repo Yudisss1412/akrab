@@ -24,9 +24,9 @@
             <i class="dot online"></i>
           </div>
           <div class="seller-meta">
-            <h1 id="sellerTitle" class="seller-name">Kristin Watson</h1>
-            <div class="seller-mail">kristin@akrab.gg</div>
-            <div class="seller-since">Bergabung sejak <strong>2012</strong></div>
+            <h1 id="sellerTitle" class="seller-name">{{ auth()->user()->name }}</h1>
+            <div class="seller-mail">{{ auth()->user()->email }}</div>
+            <div class="seller-since">Bergabung sejak <strong>{{ auth()->user()->created_at->year }}</strong></div>
           </div>
         </div>
         <!-- kanan: aksi -->
@@ -40,27 +40,27 @@
       <dl class="info-list" aria-label="Info Toko">
         <div>
           <dt>Nama Toko</dt>
-          <dd>Shoppy.gg</dd>
+          <dd>{{ auth()->user()->name }}</dd>
         </div>
         <div>
           <dt>Email</dt>
-          <dd>kristin@akrab.gg</dd>
+          <dd>{{ auth()->user()->email }}</dd>
         </div>
         <div>
           <dt>No. HP</dt>
-          <dd>+62 812-3456-7890</dd>
+          <dd>{{ auth()->user()->phone ?? '+62 812-3456-7890' }}</dd>
         </div>
         <div>
           <dt>Alamat</dt>
-          <dd>Jl. Melati No. 12, Banyuwangi</dd>
+          <dd>{{ auth()->user()->address ?? 'Alamat belum diisi' }}</dd>
         </div>
         <div>
           <dt>Deskripsi Toko</dt>
-          <dd>Toko perlengkapan rumah & aksesoris. Buka setiap hari 09.00–21.00.</dd>
+          <dd>{{ auth()->user()->shop_description ?? 'Toko belum memiliki deskripsi' }}</dd>
         </div>
         <div>
           <dt>Bank Penerima</dt>
-          <dd>BCA • 1234567890 • a.n. Kristin Watson</dd>
+          <dd>{{ auth()->user()->bank_name ?? 'Nama Bank' }} • {{ auth()->user()->bank_account_number ?? 'Nomor Rekening' }} • a.n. {{ auth()->user()->bank_account_name ?? auth()->user()->name }}</dd>
         </div>
       </dl>
     </section>

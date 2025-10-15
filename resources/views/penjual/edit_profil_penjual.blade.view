@@ -34,37 +34,37 @@
 
           <form class="edit-form" id="editSellerProfileForm" action="{{ route('profil.penjual') }}" method="POST" novalidate>
             <div class="form-group field">
-              <input type="text" id="shopName" name="shopName" value="{{ old('shopName', 'Shoppy.gg') }}" required placeholder=" ">
+              <input type="text" id="shopName" name="shopName" value="{{ old('shopName', auth()->user()->name) }}" required placeholder=" ">
               <label for="shopName">Nama Toko</label>
               <p class="error-message" id="shopName-error"></p>
             </div>
 
             <div class="form-group field">
-              <input type="text" id="ownerName" name="ownerName" value="{{ old('ownerName', 'Kristin Watson') }}" required placeholder=" ">
+              <input type="text" id="ownerName" name="ownerName" value="{{ old('ownerName', auth()->user()->name) }}" required placeholder=" ">
               <label for="ownerName">Nama Pemilik</label>
               <p class="error-message" id="ownerName-error"></p>
             </div>
 
             <div class="form-group field">
-              <input type="email" id="email" name="email" value="{{ old('email', 'kristin@akrab.gg') }}" required placeholder=" ">
+              <input type="email" id="email" name="email" value="{{ old('email', auth()->user()->email) }}" required placeholder=" ">
               <label for="email">Email</label>
               <p class="error-message" id="email-error"></p>
             </div>
 
             <div class="form-group field">
-              <input type="tel" id="phone" name="phone" value="{{ old('phone', '+62 812-3456-7890') }}" required placeholder=" ">
+              <input type="tel" id="phone" name="phone" value="{{ old('phone', auth()->user()->phone ?? '+62 812-3456-7890') }}" required placeholder=" ">
               <label for="phone">Nomor Telepon</label>
               <p class="error-message" id="phone-error"></p>
             </div>
 
             <div class="form-group field">
-              <textarea id="address" name="address" rows="3" required placeholder=" ">{{ old('address', 'Jl. Melati No. 12, Banyuwangi') }}</textarea>
+              <textarea id="address" name="address" rows="3" required placeholder=" ">{{ old('address', auth()->user()->address ?? 'Alamat belum diisi') }}</textarea>
               <label for="address">Alamat</label>
               <p class="error-message" id="address-error"></p>
             </div>
 
             <div class="form-group field">
-              <textarea id="shopDescription" name="shopDescription" rows="3" required placeholder=" ">{{ old('shopDescription', 'Toko perlengkapan rumah & aksesoris. Buka setiap hari 09.00–21.00.') }}</textarea>
+              <textarea id="shopDescription" name="shopDescription" rows="3" required placeholder=" ">{{ old('shopDescription', auth()->user()->shop_description ?? 'Toko belum memiliki deskripsi') }}</textarea>
               <label for="shopDescription">Deskripsi Toko</label>
               <p class="error-message" id="shopDescription-error"></p>
             </div>
@@ -92,14 +92,14 @@
                 </div>
                 
                 <div class="form-group field">
-                  <input type="text" id="accountNumber" name="accountNumber" value="{{ old('accountNumber', '1234567890') }}" required placeholder=" ">
+                  <input type="text" id="accountNumber" name="accountNumber" value="{{ old('accountNumber', auth()->user()->bank_account_number ?? '1234567890') }}" required placeholder=" ">
                   <label for="accountNumber">Nomor Rekening</label>
                   <p class="error-message" id="accountNumber-error"></p>
                 </div>
               </div>
               
               <div class="form-group field">
-                <input type="text" id="accountHolder" name="accountHolder" value="{{ old('accountHolder', 'Kristin Watson') }}"" required placeholder=" ">
+                <input type="text" id="accountHolder" name="accountHolder" value="{{ old('accountHolder', auth()->user()->bank_account_name ?? auth()->user()->name) }}" required placeholder=" ">
                 <label for="accountHolder">Atas Nama</label>
                 <p class="error-message" id="accountHolder-error"></p>
               </div>

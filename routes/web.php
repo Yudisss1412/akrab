@@ -10,17 +10,17 @@ Route::get('/debug-info', function() {
         'php_version' => phpversion(),
         'environment' => app()->environment(),
         'view_exists' => view()->exists('penjual.manajemen_promosi'),
-        'file_exists' => file_exists(resource_path('views/penjual/manajemen_promosi.blade.php')),
+        'file_exists' => file_exists(resource_path('views/penjual/manajemen_promosi.blade.view')),
         'route_works' => true
     ];
 });
 
 // Route untuk Manajemen Promosi - ditempatkan di awal untuk menghindari konflik
 Route::get('/penjual/promosi', function() {
-    if(file_exists(resource_path('views/penjual/manajemen_promosi.blade.php'))) {
+    if(file_exists(resource_path('views/penjual/manajemen_promosi.blade.view'))) {
         return view('penjual.manajemen_promosi');
     } else {
-        return response()->json(['error' => 'View file tidak ditemukan', 'path' => resource_path('views/penjual/manajemen_promosi.blade.php')], 404);
+        return response()->json(['error' => 'View file tidak ditemukan', 'path' => resource_path('views/penjual/manajemen_promosi.blade.view')], 404);
     }
 })->name('penjual.promosi');
 
@@ -281,7 +281,9 @@ Route::middleware(['auth', 'admin.role'])->group(function () {
 });
 
 Route::middleware(['auth', 'seller.role'])->group(function () {
-    Route::get('/penjual/dashboard', [App\Http\Controllers\RoleDashboardController::class, 'showSellerDashboard'])->name('seller.dashboard');
+    Route::get('/penjual/dashboard', function () {
+        return view('penjual.dashboard_penjual');
+    })->name('seller.dashboard');
 });
 
 Route::middleware(['auth', 'customer.role'])->group(function () {

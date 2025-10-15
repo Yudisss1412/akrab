@@ -72,7 +72,12 @@ class AuthController extends Controller
                 return route('seller.dashboard');
             }
             
-            // Default ke customer dashboard for buyers
+            // Redirect buyers to welcome page
+            if ($user->role && $user->role->name === 'buyer') {
+                return '/cust_welcome';
+            }
+            
+            // Default ke customer dashboard for other users
             return route('customer.dashboard');
         }
         
@@ -123,11 +128,11 @@ class AuthController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Registrasi berhasil! Selamat datang di platform kami.',
-                'redirect' => route('customer.dashboard')
+                'redirect' => '/cust_welcome'
             ]);
         }
 
-        return redirect()->route('customer.dashboard');
+        return redirect('/cust_welcome');
     }
 
     // Logout
@@ -157,7 +162,12 @@ class AuthController extends Controller
                 return redirect()->route('seller.dashboard');
             }
             
-            // Default ke customer dashboard for buyers
+            // Redirect buyers to welcome page
+            if ($user->role && $user->role->name === 'buyer') {
+                return redirect('/cust_welcome');
+            }
+            
+            // Default ke customer dashboard for other users
             return redirect()->route('customer.dashboard');
         }
         

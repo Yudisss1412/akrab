@@ -288,6 +288,29 @@
       justify-content: space-between;
       align-items: center;
     }
+    
+    .close {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #aaa;
+      cursor: pointer;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      transition: all 0.2s ease;
+    }
+    
+    .close:hover,
+    .close:focus {
+      color: #000;
+      text-decoration: none;
+      background-color: #f0f0f0;
+      cursor: pointer;
+    }
 
     .modal-img-section {
       display: flex;
@@ -564,7 +587,7 @@
     <div class="modal-content-new">
         <div class="modal-title-row">
             <span id="modal-product"></span>
-            <button class="modal-close-new" id="modal-close-btn">&times;</button>
+            <span class="close" id="modal-close-btn">&times;</span>
         </div>
         <div class="modal-img-section">
             <img class="modal-img-main" id="modal-img" src="" alt="Foto Produk">

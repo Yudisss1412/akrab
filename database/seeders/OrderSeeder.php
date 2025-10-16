@@ -20,20 +20,42 @@ class OrderSeeder extends Seeder
      */
     public function run(): void
     {
-        // Ambil user dan produk untuk membuat pesanan
-        $user = User::first();
-        if (!$user) {
-            $user = User::factory()->create([
-                'name' => 'Test User',
-                'email' => 'test@example.com',
-                'password' => bcrypt('password'),
-            ]);
+        // Ensure users exist before creating orders
+        $users = User::whereHas('role', function($query) {
+            $query->where('name', 'buyer');
+        })->get();
+        
+        if ($users->count() === 0) {
+            $this->command->info('No buyers found, calling UserSeeder to create users...');
+            $this->call(UserSeeder::class);
+            $users = User::whereHas('role', function($query) {
+                $query->where('name', 'buyer');
+            })->get();
         }
 
+        // Ensure products exist before creating orders
         $products = Product::all();
         if ($products->count() === 0) {
+            $this->command->info('No products found, calling ProductSeeder to create products...');
             $this->call(ProductSeeder::class);
             $products = Product::all();
+        }
+        
+        // Check if we have enough products to create orders
+        if ($products->count() < 6) {
+            $this->command->error('Not enough products to create orders. Please ensure at least 6 products exist.');
+            return;
+        }
+
+        // Use the first available user as the customer for orders (preferably a buyer)
+        $user = $users->first();
+        if (!$user) {
+            $this->command->info('No buyer users found, creating a test user...');
+            $user = User::factory()->create([
+                'name' => 'Test Customer',
+                'email' => 'customer@example.com',
+                'password' => bcrypt('password'),
+            ]);
         }
 
         // Membuat beberapa pesanan dummy sesuai dengan contoh di manajemen pesanan

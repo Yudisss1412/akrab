@@ -21,6 +21,18 @@ class Product extends Model
         'status',
     ];
 
+    // Relasi ke kategori
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    // Relasi ke penjual
+    public function seller()
+    {
+        return $this->belongsTo(Seller::class);
+    }
+
     // Relasi ke varian produk
     public function variants()
     {

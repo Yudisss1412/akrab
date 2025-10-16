@@ -94,4 +94,61 @@ class ProductController extends Controller
         
         return view('customer.produk.halaman_produk', compact('products'));
     }
+
+    /**
+     * API endpoint untuk mendapatkan produk populer
+     */
+    public function popular()
+    {
+        // Ambil produk terbaru atau produk dengan penjualan terbanyak sebagai produk populer
+        $products = Product::with(['variants', 'seller', 'category'])
+                        ->orderBy('created_at', 'desc') // Urutkan berdasarkan tanggal terbaru
+                        ->limit(10)
+                        ->get();
+        
+        $formattedProducts = $products->map(function($product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
+                'image' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
+                'description' => $product->description,
+                'specifications' => [
+                    'Kategori: ' . ($product->category->name ?? 'Umum'),
+                    'Stok: ' . $product->stock,
+                    'Berat: ' . $product->weight . 'g'
+                ] // Spesifikasi sederhana
+            ];
+        });
+        
+        return response()->json($formattedProducts);
+    }
+
+    /**
+     * API endpoint untuk mendapatkan detail produk
+     */
+    public function apiShow($id)
+    {
+        $product = Product::with(['variants', 'seller', 'category'])->find($id);
+        
+        if (!$product) {
+            return response()->json(['error' => 'Produk tidak ditemukan'], 404);
+        }
+        
+        $formattedProduct = [
+            'id' => $product->id,
+            'name' => $product->name,
+            'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
+            'image' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
+            'description' => $product->description,
+            'specifications' => [
+                'Kategori: ' . ($product->category->name ?? 'Umum'),
+                'Stok: ' . $product->stock,
+                'Berat: ' . $product->weight . 'g',
+                'Status: ' . ucfirst($product->status)
+            ]
+        ];
+        
+        return response()->json($formattedProduct);
+    }
 }

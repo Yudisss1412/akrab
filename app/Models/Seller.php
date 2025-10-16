@@ -32,4 +32,10 @@ class Seller extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    // Relasi ke produk
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
 }

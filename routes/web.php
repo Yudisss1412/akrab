@@ -140,13 +140,11 @@ Route::put('/cart/update/{id}', [App\Http\Controllers\CartController::class, 'up
 Route::delete('/cart/remove/{id}', [App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
 Route::delete('/cart/clear', [App\Http\Controllers\CartController::class, 'clear'])->name('cart.clear');
 
-Route::get('/checkout', function () {
-    return view('customer.transaksi.checkout');
-})->name('checkout');
+Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'index'])->name('checkout');
+Route::post('/checkout', [App\Http\Controllers\CheckoutController::class, 'process'])->name('checkout.process');
 
-Route::get('/pengiriman', function () {
-    return view('customer.transaksi.pengiriman');
-})->name('cust.pengiriman');
+Route::get('/pengiriman', [App\Http\Controllers\CheckoutController::class, 'showShipping'])->name('cust.pengiriman');
+Route::get('/pengiriman/{order}', [App\Http\Controllers\CheckoutController::class, 'showShipping'])->name('cust.pengiriman.order');
 
 Route::get('/pembayaran', function () {
     return view('customer.transaksi.pembayaran');

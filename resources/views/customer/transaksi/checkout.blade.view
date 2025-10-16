@@ -31,140 +31,178 @@
         </div>
       </div>
 
-      <div class="checkout-content">
-        <div class="checkout-left">
-          <!-- Alamat Pengiriman -->
-          <section class="alamat-section">
-            <div class="section-header">
-              <h2>Alamat Pengiriman</h2>
-              <button class="btn-edit" id="editAlamatBtn">
-                <i class="bi bi-pencil"></i>
-              </button>
-            </div>
-            
-            <div class="alamat-card" id="alamatCard">
-              <div class="alamat-content">
-                <div class="primary-badge">Utama</div>
-                <h3 id="alamatNama">Budi Santoso</h3>
-                <p id="alamatDetail">
-                  Jl. Merdeka No. 123, Kel. Sukajadi, Kec. Lembursitu, <br>
-                  Kota Bandung, Jawa Barat 40235
-                </p>
-                <p class="alamat-phone" id="alamatPhone">0812-3456-7890</p>
+      <form id="checkoutForm" action="{{ route('checkout.process') }}" method="POST">
+        @csrf
+        <div class="checkout-content">
+          <div class="checkout-left">
+            <!-- Alamat Pengiriman -->
+            <section class="alamat-section">
+              <div class="section-header">
+                <h2>Alamat Pengiriman</h2>
+                <button type="button" class="btn-edit" id="editAlamatBtn">
+                  <i class="bi bi-pencil"></i>
+                </button>
               </div>
-            </div>
-          </section>
+              
+              <div class="alamat-card" id="alamatCard">
+                <div class="alamat-content">
+                  <div class="primary-badge">Utama</div>
+                  <h3 id="alamatNama">{{ $user->name ?? 'Nama Pengguna' }}</h3>
+                  <p id="alamatDetail">
+                    @if($user && $user->shipping_address)
+                      {{ $user->shipping_address->full_address ?? 'Alamat tidak ditemukan' }}
+                    @else
+                      Alamat tidak ditemukan
+                    @endif
+                  </p>
+                  <p class="alamat-phone" id="alamatPhone">{{ $user->phone ?? 'Nomor telepon tidak tersedia' }}</p>
+                </div>
+              </div>
+              
+              <!-- Form untuk alamat pengiriman -->
+              <div class="alamat-form" id="alamatFormSection" style="display: none;">
+                <div class="form-group">
+                  <label for="recipient_name">Nama Penerima</label>
+                  <input type="text" id="recipient_name" name="recipient_name" value="{{ old('recipient_name', $user->name ?? '') }}" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="phone">Nomor Telepon</label>
+                  <input type="tel" id="phone" name="phone" value="{{ old('phone', $user->phone ?? '') }}" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="province">Provinsi</label>
+                  <input type="text" id="province" name="province" value="{{ old('province', 'Jawa Barat') }}" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="city">Kota/Kabupaten</label>
+                  <input type="text" id="city" name="city" value="{{ old('city', 'Kota Bandung') }}" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="district">Kecamatan</label>
+                  <input type="text" id="district" name="district" value="{{ old('district', 'Lembursitu') }}" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="ward">Kelurahan</label>
+                  <input type="text" id="ward" name="ward" value="{{ old('ward', 'Sukajadi') }}" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="full_address">Alamat Lengkap</label>
+                  <textarea id="full_address" name="full_address" rows="3" required>{{ old('full_address', 'Jl. Merdeka No. 123') }}</textarea>
+                </div>
+              </div>
+            </section>
 
-          <!-- Metode Pengiriman -->
-          <section class="pengiriman-section">
-            <div class="section-header">
-              <h2>Metode Pengiriman</h2>
-            </div>
-            
-            <div class="pengiriman-options">
-              <label class="option-card active" data-metode="reguler">
-                <input type="radio" name="metode" value="reguler" checked />
-                <div class="option-content">
-                  <div class="option-header">
-                    <h4>REGULER</h4>
-                    <span class="harga">Rp 15.000</span>
+            <!-- Metode Pengiriman -->
+            <section class="pengiriman-section">
+              <div class="section-header">
+                <h2>Metode Pengiriman</h2>
+              </div>
+              
+              <div class="pengiriman-options">
+                <label class="option-card active" data-metode="reguler">
+                  <input type="radio" name="shipping_method" value="reguler" checked />
+                  <div class="option-content">
+                    <div class="option-header">
+                      <h4>REGULER</h4>
+                      <span class="harga">Rp 15.000</span>
+                    </div>
+                    <p>3-5 hari kerja</p>
                   </div>
-                  <p>3-5 hari kerja</p>
-                </div>
-              </label>
-              
-              <label class="option-card" data-metode="express">
-                <input type="radio" name="metode" value="express" />
-                <div class="option-content">
-                  <div class="option-header">
-                    <h4>EXPRESS</h4>
-                    <span class="harga">Rp 25.000</span>
+                </label>
+                
+                <label class="option-card" data-metode="express">
+                  <input type="radio" name="shipping_method" value="express" />
+                  <div class="option-content">
+                    <div class="option-header">
+                      <h4>EXPRESS</h4>
+                      <span class="harga">Rp 25.000</span>
+                    </div>
+                    <p>1-2 hari kerja</p>
                   </div>
-                  <p>1-2 hari kerja</p>
-                </div>
-              </label>
-            </div>
-          </section>
+                </label>
+              </div>
+            </section>
 
-          <!-- Ringkasan Pesanan -->
-          <section class="ringkasan-section">
-            <div class="section-header">
-              <h2>Ringkasan Pesanan</h2>
-            </div>
-            
-            <div class="ringkasan-content">
-              <div class="produk-item">
-                <img src="{{ asset('src/CangkirKeramik1.png') }}" alt="Cangkir Keramik" />
-                <div class="item-info">
-                  <h4>Cangkir Keramik</h4>
-                  <p>1 x Rp 45.000</p>
-                </div>
-                <div class="item-harga">Rp 45.000</div>
+            <!-- Ringkasan Pesanan -->
+            <section class="ringkasan-section">
+              <div class="section-header">
+                <h2>Ringkasan Pesanan</h2>
               </div>
               
-              <div class="produk-item">
-                <img src="{{ asset('src/PiringKayu.png') }}" alt="Piring Kayu" />
-                <div class="item-info">
-                  <h4>Piring Kayu</h4>
-                  <p>2 x Rp 75.000</p>
+              <div class="ringkasan-content">
+                @if($cartItems->count() > 0)
+                  @foreach($cartItems as $item)
+                    <div class="produk-item">
+                      <img src="{{ asset($item['product']->image ?? 'src/default-product.png') }}" alt="{{ $item['product']->name ?? 'Product' }}" />
+                      <div class="item-info">
+                        <h4>{{ $item['product']->name ?? 'Produk tidak ditemukan' }}</h4>
+                        <p>{{ $item['quantity'] }} x Rp {{ number_format($item['product']->price ?? 0, 0, ',', '.') }}</p>
+                      </div>
+                      <div class="item-harga">Rp {{ number_format(($item['product']->price ?? 0) * $item['quantity'], 0, ',', '.') }}</div>
+                    </div>
+                  @endforeach
+                @else
+                  <p>Keranjang Anda kosong.</p>
+                @endif
+                
+                <div class="biaya-detail">
+                  <div class="detail-row">
+                    <span>Subtotal</span>
+                    <span>Rp {{ number_format($subTotal, 0, ',', '.') }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span>Biaya Pengiriman</span>
+                    <span id="shippingCost">Rp {{ number_format($shippingCost, 0, ',', '.') }}</span>
+                  </div>
+                  <div class="detail-row total">
+                    <span>Total</span>
+                    <span id="totalHarga">Rp {{ number_format($total, 0, ',', '.') }}</span>
+                  </div>
                 </div>
-                <div class="item-harga">Rp 150.000</div>
               </div>
-              
-              <div class="biaya-detail">
-                <div class="detail-row">
-                  <span>Subtotal</span>
-                  <span>Rp 195.000</span>
-                </div>
-                <div class="detail-row">
-                  <span>Biaya Pengiriman</span>
-                  <span>Rp 15.000</span>
-                </div>
-                <div class="detail-row total">
-                  <span>Total</span>
-                  <span>Rp 210.000</span>
-                </div>
-              </div>
-            </div>
-          </section>
-        </div>
+            </section>
+          </div>
 
-        <div class="checkout-right">
-          <!-- Ringkasan Belanja -->
-          <section class="ringkasan-belanja">
-            <h3>Ringkasan Belanja</h3>
-            
-            <div class="produk-preview">
-              <img src="{{ asset('src/CangkirKeramik1.png') }}" alt="Cangkir Keramik" />
-              <div class="produk-info">
-                <h4>Cangkir Keramik</h4>
-                <p class="produk-harga">Rp 45.000</p>
-              </div>
-              <span class="produk-qty">1</span>
-            </div>
-            
-            <div class="produk-preview">
-              <img src="{{ asset('src/PiringKayu.png') }}" alt="Piring Kayu" />
-              <div class="produk-info">
-                <h4>Piring Kayu</h4>
-                <p class="produk-harga">Rp 75.000</p>
-              </div>
-              <span class="produk-qty">2</span>
-            </div>
-            
-            <div class="total-section">
-              <div class="total-row">
-                <span>Total Belanja</span>
-                <span>Rp 210.000</span>
-              </div>
+          <div class="checkout-right">
+            <!-- Ringkasan Belanja -->
+            <section class="ringkasan-belanja">
+              <h3>Ringkasan Belanja</h3>
               
-              <button class="btn btn-primary btn-checkout" onclick="window.location.href='{{ route("cust.pengiriman") }}'; return false;">
-                Lanjut ke Pengiriman
-              </button>
-            </div>
-          </section>
+              @if($cartItems->count() > 0)
+                @foreach($cartItems as $item)
+                  <div class="produk-preview">
+                    <img src="{{ asset($item['product']->image ?? 'src/default-product.png') }}" alt="{{ $item['product']->name ?? 'Product' }}" />
+                    <div class="produk-info">
+                      <h4>{{ $item['product']->name ?? 'Produk tidak ditemukan' }}</h4>
+                      <p class="produk-harga">Rp {{ number_format($item['product']->price ?? 0, 0, ',', '.') }}</p>
+                    </div>
+                    <span class="produk-qty">x{{ $item['quantity'] }}</span>
+                  </div>
+                @endforeach
+              @else
+                <p>Keranjang Anda kosong.</p>
+              @endif
+              
+              <div class="total-section">
+                <div class="total-row">
+                  <span>Total Belanja</span>
+                  <span>Rp {{ number_format($total, 0, ',', '.') }}</span>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-checkout">
+                  Proses Pesanan
+                </button>
+              </div>
+            </section>
+          </div>
         </div>
-      </div>
+      </form>
     </div>
   </main>
 @endsection
@@ -172,121 +210,87 @@
 @push('scripts')
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Metode pengiriman selection
+      const form = document.getElementById('checkoutForm');
       const metodeOptions = document.querySelectorAll('.option-card');
+      const shippingCostElement = document.getElementById('shippingCost');
+      const totalHargaElement = document.getElementById('totalHarga');
+      
+      // Ambil nilai awal dari data Blade
+      let subtotal = {{ $subTotal }};
+      let regulerCost = 15000;
+      let expressCost = 25000;
+      let currentShippingCost = regulerCost;
+      
+      // Metode pengiriman selection
       metodeOptions.forEach(option => {
         option.addEventListener('click', function() {
           metodeOptions.forEach(opt => opt.classList.remove('active'));
           this.classList.add('active');
           
-          // Update harga on summary
-          const harga = this.querySelector('.harga').textContent;
+          // Update harga berdasarkan metode pengiriman
           const selectedMetode = this.getAttribute('data-metode');
-          console.log('Metode pengiriman dipilih:', selectedMetode, harga);
+          if (selectedMetode === 'express') {
+            currentShippingCost = expressCost;
+          } else {
+            currentShippingCost = regulerCost;
+          }
+          
+          // Update tampilan harga
+          shippingCostElement.textContent = 'Rp ' + currentShippingCost.toLocaleString('id-ID');
+          totalHargaElement.textContent = 'Rp ' + (subtotal + currentShippingCost).toLocaleString('id-ID');
+          
+          console.log('Metode pengiriman dipilih:', selectedMetode, 'Biaya:', currentShippingCost);
         });
       });
       
       // Edit alamat functionality
       const editBtn = document.getElementById('editAlamatBtn');
+      const alamatCard = document.getElementById('alamatCard');
+      const alamatFormSection = document.getElementById('alamatFormSection');
+      
       if (editBtn) {
         editBtn.addEventListener('click', function() {
-          // Show edit address modal
-          const modal = document.createElement('div');
-          modal.className = 'modal-overlay';
-          modal.innerHTML = `
-            <div class="modal-content">
-              <div class="modal-header">
-                <h3>Edit Alamat</h3>
-                <button class="modal-close">&times;</button>
-              </div>
-              <div class="modal-body">
-                <form id="alamatForm">
-                  <div class="form-group">
-                    <label for="nama">Nama Lengkap</label>
-                    <input type="text" id="nama" value="Budi Santoso" required />
-                  </div>
-                  <div class="form-group">
-                    <label for="alamat">Alamat Lengkap</label>
-                    <textarea id="alamat" rows="3" required>Jl. Merdeka No. 123, Kel. Sukajadi, Kec. Lembursitu, Kota Bandung, Jawa Barat 40235</textarea>
-                  </div>
-                  <div class="form-group">
-                    <label for="telepon">Nomor Telepon</label>
-                    <input type="tel" id="telepon" value="0812-3456-7890" required />
-                  </div>
-                  <div class="form-actions">
-                    <button type="button" class="btn btn-outline" id="batalEdit">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          `;
+          // Tampilkan form dan sembunyikan card
+          alamatCard.style.display = 'none';
+          alamatFormSection.style.display = 'block';
           
-          document.body.appendChild(modal);
-          
-          // Close modal functions
-          const closeModal = () => {
-            document.body.removeChild(modal);
+          // Update tombol menjadi simpan
+          editBtn.innerHTML = '<i class="bi bi-save"></i>';
+          editBtn.onclick = function() {
+            // Validasi form sebelum menyimpan
+            const recipientName = document.getElementById('recipient_name').value;
+            const phone = document.getElementById('phone').value;
+            const province = document.getElementById('province').value;
+            const city = document.getElementById('city').value;
+            const district = document.getElementById('district').value;
+            const ward = document.getElementById('ward').value;
+            const fullAddress = document.getElementById('full_address').value;
+            
+            if (!recipientName || !phone || !province || !city || !district || !ward || !fullAddress) {
+              alert('Mohon lengkapi semua field alamat');
+              return;
+            }
+            
+            // Update tampilan card dengan data baru
+            document.getElementById('alamatNama').textContent = recipientName;
+            document.getElementById('alamatDetail').innerHTML = fullAddress.split(', ').join('<br>');
+            document.getElementById('alamatPhone').textContent = phone;
+            
+            // Kembali ke tampilan card
+            alamatCard.style.display = 'block';
+            alamatFormSection.style.display = 'none';
+            editBtn.innerHTML = '<i class="bi bi-pencil"></i>';
+            editBtn.onclick = function() {
+              alamatCard.style.display = 'none';
+              alamatFormSection.style.display = 'block';
+              editBtn.innerHTML = '<i class="bi bi-save"></i>';
+              editBtn.onclick = arguments.callee;
+            };
           };
-          
-          modal.querySelector('.modal-close').addEventListener('click', closeModal);
-          modal.querySelector('#batalEdit').addEventListener('click', closeModal);
-          modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal();
-          });
-          
-          // Save address
-          modal.querySelector('#alamatForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Get form values
-            const nama = document.getElementById('nama').value;
-            const alamat = document.getElementById('alamat').value;
-            const telepon = document.getElementById('telepon').value;
-            
-            // Update address card
-            document.getElementById('alamatNama').textContent = nama;
-            document.getElementById('alamatDetail').innerHTML = alamat.split(', ').join('<br>');
-            document.getElementById('alamatPhone').textContent = telepon;
-            
-            // Show success message
-            showSuccess('Alamat berhasil diperbarui!');
-            
-            // Close modal
-            closeModal();
-          });
         });
       }
     });
-    
-    // Success message function
-    function showSuccess(message) {
-      // Remove any existing alerts
-      const existingAlert = document.querySelector('.alert-success');
-      if (existingAlert) existingAlert.remove();
-      
-      // Create alert element
-      const alert = document.createElement('div');
-      alert.className = 'alert alert-success show';
-      alert.innerHTML = `
-        <div class="alert-content">
-          <i class="bi bi-check-circle"></i>
-          <span>${message}</span>
-        </div>
-      `;
-      
-      document.body.appendChild(alert);
-      
-      // Auto remove after 3 seconds
-      setTimeout(() => {
-        alert.classList.remove('show');
-        setTimeout(() => {
-          document.body.removeChild(alert);
-        }, 300);
-      }, 3000);
-    }
-  });
-</script>
+  </script>
 @endpush
 
 @section('footer')

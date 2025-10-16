@@ -36,44 +36,48 @@
           <!-- Alamat Pengiriman -->
           <section class="shipping-address-summary">
             <h2>Alamat Pengiriman</h2>
-            <div class="shipping-info">
-              <div class="info-row">
-                <span class="label">Nama Penerima</span>
-                <span class="value">Andi Saputra</span>
+            @if(isset($order) && $order)
+              <div class="shipping-info">
+                <div class="info-row">
+                  <span class="label">Nama Penerima</span>
+                  <span class="value">{{ $order->shipping_address->recipient_name }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Alamat Lengkap</span>
+                  <span class="value">{{ $order->shipping_address->full_address }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Kontak</span>
+                  <span class="value">{{ $order->shipping_address->phone }}</span>
+                </div>
               </div>
-              <div class="info-row">
-                <span class="label">Alamat Lengkap</span>
-                <span class="value">Jl. Anggrek No. 12, Bandung</span>
-              </div>
-              <div class="info-row">
-                <span class="label">Kontak</span>
-                <span class="value">0812-3456-7890</span>
-              </div>
-            </div>
+            @else
+              <p>Informasi pengiriman tidak ditemukan.</p>
+            @endif
           </section>
 
           <!-- Metode Pengiriman -->
           <section class="shipping-methods">
             <h2>Metode Pengiriman</h2>
             <div class="shipping-options">
-              <div class="shipping-option selected">
+              <div class="shipping-option @if(isset($order) && $order->shipping_courier == 'reguler') selected @endif">
                 <div class="option-header">
                   <div class="option-info">
                     <h3>Reguler</h3>
                     <p>3-5 hari kerja</p>
                   </div>
-                  <div class="option-price">Rp9.000</div>
+                  <div class="option-price">Rp15.000</div>
                 </div>
                 <p class="option-description">Layanan pengiriman reguler dengan asuransi barang.</p>
               </div>
 
-              <div class="shipping-option">
+              <div class="shipping-option @if(isset($order) && $order->shipping_courier == 'express') selected @endif">
                 <div class="option-header">
                   <div class="option-info">
                     <h3>Kilat</h3>
                     <p>1-2 hari kerja</p>
                   </div>
-                  <div class="option-price">Rp15.000</div>
+                  <div class="option-price">Rp25.000</div>
                 </div>
                 <p class="option-description">Layanan pengiriman cepat dengan prioritas pengemasan.</p>
               </div>
@@ -84,7 +88,7 @@
                     <h3>Same Day</h3>
                     <p>Hari ini juga</p>
                   </div>
-                  <div class="option-price">Rp25.000</div>
+                  <div class="option-price">Rp50.000</div>
                 </div>
                 <p class="option-description">Pengiriman dalam hari yang sama dengan kurir khusus.</p>
               </div>
@@ -96,31 +100,37 @@
           <!-- Ringkasan Pembayaran -->
           <section class="payment-summary">
             <h2>Ringkasan Pembayaran</h2>
-            <div class="summary-details">
-              <div class="summary-row">
-                <span>Subtotal (2 produk)</span>
-                <span>Rp57.000</span>
+            @if(isset($order) && $order)
+              <div class="summary-details">
+                @if($order->items->count() > 0)
+                  <div class="summary-row">
+                    <span>Subtotal ({{ $order->items->sum('quantity') }} produk)</span>
+                    <span>Rp {{ number_format($order->sub_total, 0, ',', '.') }}</span>
+                  </div>
+                @endif
+                <div class="summary-row">
+                  <span>Ongkos Kirim</span>
+                  <span>Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}</span>
+                </div>
+                <div class="summary-row">
+                  <span>Asuransi Pengiriman</span>
+                  <span>Rp 1.500</span>
+                </div>
+                <div class="summary-row discount">
+                  <span>Diskon</span>
+                  <span>-Rp 0</span>
+                </div>
+                <div class="summary-divider"></div>
+                <div class="summary-row total">
+                  <span>Total</span>
+                  <span class="total-amount">Rp {{ number_format($order->total_amount + 1500, 0, ',', '.') }}</span>
+                </div>
               </div>
-              <div class="summary-row">
-                <span>Ongkos Kirim</span>
-                <span>Rp9.000</span>
-              </div>
-              <div class="summary-row">
-                <span>Asuransi Pengiriman</span>
-                <span>Rp1.500</span>
-              </div>
-              <div class="summary-row discount">
-                <span>Diskon</span>
-                <span>-Rp5.000</span>
-              </div>
-              <div class="summary-divider"></div>
-              <div class="summary-row total">
-                <span>Total</span>
-                <span class="total-amount">Rp62.500</span>
-              </div>
-            </div>
+            @else
+              <p>Data pesanan tidak ditemukan.</p>
+            @endif
 
-            <button class="btn btn-primary btn-lanjut-pembayaran">
+            <button class="btn btn-primary btn-lanjut-pembayaran" onclick="window.location.href='{{ route("cust.pembayaran") }}'; return false;">
               Lanjut ke Pembayaran
             </button>
           </section>

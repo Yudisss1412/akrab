@@ -541,7 +541,7 @@
 
 <main class="welcome-page">
     <section class="welcome-banner">
-        <h2>Selamat datang, {{ auth()->user() ? auth()->user()->name : 'Pengunjung' }}!</h2>
+        <h2>Selamat datang, {{ auth()->user()->name }}!</h2>
         <p>Temukan produk UMKM terbaik dari seluruh Indonesia.</p>
     </section>
 

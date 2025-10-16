@@ -32,8 +32,8 @@
             <img src="{{ asset('src/profil_pembeli.png') }}" alt="Profil Pembeli">
           </div>
           <div class="profile-info">
-            <h2>Anggara Putra</h2>
-            <p class="member-since">Member sejak 2023</p>
+            <h2>{{ auth()->user()->name }}</h2>
+            <p class="member-since">Member sejak {{ auth()->user()->created_at->year }}</p>
           </div>
           <a href="{{ route('edit.profil') }}" class="btn btn-primary">Edit Profil</a>
         </div>
@@ -42,15 +42,15 @@
         <div class="profile-details">
           <div class="detail-item">
             <label>Email</label>
-            <span>anggara.putra@example.com</span>
+            <span>{{ auth()->user()->email }}</span>
           </div>
           <div class="detail-item">
             <label>Telepon</label>
-            <span>+62 812 3456 7890</span>
+            <span>{{ auth()->user()->phone ?? '+62 812 3456 7890' }}</span>
           </div>
           <div class="detail-item">
             <label>Alamat</label>
-            <span>Jl. Contoh No. 123, Kota, Provinsi</span>
+            <span>{{ auth()->user()->address ?? 'Alamat belum diisi' }}</span>
           </div>
         </div>
       </div>

@@ -86,11 +86,85 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   fillReviewStars();
 
-  /* ---------- CTA (mock) ---------- */
+  /* ---------- CTA (with API) ---------- */
   const btnAdd = document.getElementById('btnAdd');
   const btnBuy = document.getElementById('btnBuy');
-  btnAdd && btnAdd.addEventListener('click', () => alert('Ditambahkan ke keranjang (mock).'));
+  const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+  
+  btnAdd && btnAdd.addEventListener('click', async () => {
+    // Ambil ID produk dari elemen data
+    const productTitle = document.getElementById('pdTitle');
+    const productId = productTitle?.dataset.productId;
+    
+    if (!productId) {
+      alert('Produk tidak ditemukan');
+      return;
+    }
+    
+    // Ambil kuantitas dari input kuantitas
+    const qtyInput = document.querySelector('.qty-input');
+    const quantity = parseInt(qtyInput?.value) || 1;
+    
+    try {
+      const response = await fetch('/cart/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify({ 
+          product_id: productId,
+          quantity: quantity
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        showNotification(result.message, 'success');
+      } else {
+        showNotification(result.message || 'Gagal menambahkan ke keranjang', 'error');
+      }
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      showNotification('Terjadi kesalahan saat menambahkan ke keranjang', 'error');
+    }
+  });
+  
   btnBuy && btnBuy.addEventListener('click', () => alert('Beli sekarang (mock).'));
+  
+  function showNotification(message, type = 'info') {
+    // Buat elemen notifikasi
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.textContent = message;
+    
+    // Gaya dasar untuk notifikasi
+    Object.assign(notification.style, {
+      position: 'fixed',
+      top: '20px',
+      right: '20px',
+      padding: '12px 20px',
+      borderRadius: '6px',
+      color: '#fff',
+      backgroundColor: type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : '#007bff',
+      zIndex: '9999',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+      fontSize: '14px',
+      maxWidth: '400px',
+      wordWrap: 'break-word'
+    });
+    
+    // Tambahkan ke body
+    document.body.appendChild(notification);
+    
+    // Hapus notifikasi setelah 3 detik
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.parentNode.removeChild(notification);
+      }
+    }, 3000);
+  }
 
   /* ---------- Sample review bila kosong ---------- */
   const hasServerReviews = document.querySelectorAll('#reviewGrid .review-card').length > 0;

@@ -253,17 +253,91 @@ rekomPagin?.addEventListener('click', e=>{
 
 /* tombol di grid utama */
 grid?.addEventListener('click', e=>{
-  const add  = e.target.closest('.btn-add');
-  if (add){ alert(`${add.dataset.name} ditambahkan ke keranjang!`); return; }
+  const add = e.target.closest('.btn-add');
+  if (add) {
+    addToCart(add.dataset.productId);
+    return;
+  }
 });
 
 /* tombol di grid rekomendasi */
 rekomGrid?.addEventListener('click', e=>{
-  const add  = e.target.closest('.rek-btn.ghost');
+  const add = e.target.closest('.rek-btn.ghost');
   const detail = e.target.closest('.rek-btn.primary');
-  if (add){ alert(`${add.dataset.name} ditambahkan ke keranjang!`); return; }
+  if (add) {
+    addToCart(add.dataset.productId);
+    return;
+  }
   if (detail){ /* biarkan <a> navigate */ return; }
 });
+
+async function addToCart(productId) {
+  // Ambil CSRF token
+  const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+  
+  if (!productId) {
+    showNotification('Produk tidak ditemukan', 'error');
+    return;
+  }
+  
+  try {
+    const response = await fetch('/cart/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': csrfToken
+      },
+      body: JSON.stringify({ 
+        product_id: productId,
+        quantity: 1 // Default quantity
+      })
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      showNotification(result.message, 'success');
+    } else {
+      showNotification(result.message || 'Gagal menambahkan ke keranjang', 'error');
+    }
+  } catch (error) {
+    console.error('Error adding to cart:', error);
+    showNotification('Terjadi kesalahan saat menambahkan ke keranjang', 'error');
+  }
+}
+
+function showNotification(message, type = 'info') {
+  // Buat elemen notifikasi
+  const notification = document.createElement('div');
+  notification.className = `notification notification-${type}`;
+  notification.textContent = message;
+  
+  // Gaya dasar untuk notifikasi
+  Object.assign(notification.style, {
+    position: 'fixed',
+    top: '20px',
+    right: '20px',
+    padding: '12px 20px',
+    borderRadius: '6px',
+    color: '#fff',
+    backgroundColor: type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : '#007bff',
+    zIndex: '9999',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+    fontSize: '14px',
+    maxWidth: '400px',
+    wordWrap: 'break-word'
+  });
+  
+  // Tambahkan ke body
+  document.body.appendChild(notification);
+  
+  // Hapus notifikasi setelah 3 detik
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.parentNode.removeChild(notification);
+    }
+  }, 3000);
+}
 
 /* ---------- INIT ---------- */
 lastFilterKey = currentFilterKey();

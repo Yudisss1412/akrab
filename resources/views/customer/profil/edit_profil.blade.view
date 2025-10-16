@@ -32,31 +32,31 @@
 
       <form class="edit-form" id="editProfileForm" novalidate>
         <div class="form-group field">
-          <input type="text" id="name" name="name" value="{{ $user->name ?? '' }}" required placeholder=" ">
+          <input type="text" id="name" name="name" value="{{ old('name', auth()->user()->name) }}" required placeholder=" ">
           <label for="name">Nama Lengkap</label>
           <p class="error-message" id="name-error"></p>
         </div>
 
         <div class="form-group field">
-          <input type="email" id="email" name="email" value="{{ $user->email ?? '' }}" required placeholder=" ">
+          <input type="email" id="email" name="email" value="{{ old('email', auth()->user()->email) }}" required placeholder=" ">
           <label for="email">Email</label>
           <p class="error-message" id="email-error"></p>
         </div>
 
         <div class="form-group field">
-          <input type="tel" id="phone" name="phone" value="{{ $user->phone ?? '' }}" required placeholder=" ">
+          <input type="tel" id="phone" name="phone" value="{{ old('phone', auth()->user()->phone ?? '') }}" required placeholder=" ">
           <label for="phone">Nomor Telepon</label>
           <p class="error-message" id="phone-error"></p>
         </div>
 
         <div class="form-group field">
-          <textarea id="address" name="address" rows="3" required placeholder=" ">{{ $user->address ?? '' }}</textarea>
+          <textarea id="address" name="address" rows="3" required placeholder=" ">{{ old('address', auth()->user()->address ?? '') }}</textarea>
           <label for="address">Alamat</label>
           <p class="error-message" id="address-error"></p>
         </div>
 
         <div class="form-group">
-          <textarea id="bio" name="bio" rows="3" placeholder="Ceritakan sedikit tentang dirimu...">{{ $user->bio ?? '' }}</textarea>
+          <textarea id="bio" name="bio" rows="3" placeholder="Ceritakan sedikit tentang dirimu...">{{ old('bio', auth()->user()->bio ?? '') }}</textarea>
           <label for="bio">Bio</label>
         </div>
 

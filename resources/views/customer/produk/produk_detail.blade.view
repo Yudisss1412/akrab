@@ -39,7 +39,7 @@
         <!-- Product Info -->
         <section class="info-section" aria-label="Informasi produk">
           <div class="info-header">
-            <h1 class="product-title">{{ $produk->nama ?? 'Nama Produk' }}</h1>
+            <h1 class="product-title" id="pdTitle" data-product-id="{{ $produk->id ?? '' }}" data-name="{{ $produk->nama ?? 'Nama Produk' }}">{{ $produk->nama ?? 'Nama Produk' }}</h1>
             <div class="product-meta">
               <span class="product-category">{{ $produk->kategori ?? 'Kategori' }}</span>
               <div class="product-rating" aria-label="Rating {{ $produk->rating ?? '4.5' }} dari 5">

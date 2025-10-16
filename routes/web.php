@@ -77,11 +77,52 @@ Route::get('/cust_welcome', function () {
 })->name('cust.welcome');
 
 Route::get('/halaman_produk', function () {
-    return view('customer.produk.halaman_produk');
+    // Ambil semua produk dari database
+    $products = \App\Models\Product::with(['variants'])->get();
+    
+    return view('customer.produk.halaman_produk', compact('products'));
 })->name('halaman.produk');
 
 Route::get('/produk_detail', function () {
-    return view('customer.produk.produk_detail');
+    // Ambil ID produk dari query parameter
+    $productId = request('id');
+    $productName = request('nama'); // Jika menggunakan nama sebagai identifikasi
+    
+    // Ambil data produk dari database berdasarkan ID atau nama
+    $product = null;
+    
+    if ($productId) {
+        $product = \App\Models\Product::with(['variants'])->find($productId);
+    } elseif ($productName) {
+        $product = \App\Models\Product::with(['variants'])->where('name', $productName)->first();
+    }
+    
+    // Format data produk sesuai dengan struktur yang digunakan di view
+    $produk = null;
+    if ($product) {
+        $produk = [
+            'id' => $product->id,
+            'nama' => $product->name,
+            'kategori' => $product->category->name ?? 'Umum',
+            'harga' => $product->price,
+            'deskripsi' => $product->description,
+            'gambar_utama' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
+            'gambar' => [$product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png')], // Tambahkan lebih banyak gambar jika ada
+            'rating' => 4.5, // Nilai dummy untuk sekarang, bisa diganti dengan rating sebenarnya
+            'stok' => $product->stock,
+            'berat' => $product->weight,
+            'varian' => $product->variants->map(function($variant) {
+                return [
+                    'id' => $variant->id,
+                    'nama' => $variant->name,
+                    'harga_tambahan' => $variant->additional_price,
+                    'stok' => $variant->stock
+                ];
+            })->toArray()
+        ];
+    }
+    
+    return view('customer.produk.produk_detail', compact('produk'));
 })->name('produk.detail');
 
 Route::get('/profil', function () {
@@ -93,9 +134,11 @@ Route::get('/edit_profil', function () {
 })->name('edit.profil');
 
 // halaman keranjang
-Route::get('/keranjang', function () {
-    return view('customer.keranjang');
-})->name('keranjang');
+Route::get('/keranjang', [App\Http\Controllers\CartController::class, 'index'])->name('keranjang');
+Route::post('/cart/add', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add');
+Route::put('/cart/update/{id}', [App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
+Route::delete('/cart/remove/{id}', [App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
+Route::delete('/cart/clear', [App\Http\Controllers\CartController::class, 'clear'])->name('cart.clear');
 
 Route::get('/checkout', function () {
     return view('customer.transaksi.checkout');

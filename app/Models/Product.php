@@ -27,6 +27,12 @@ class Product extends Model
         return $this->hasMany(ProductVariant::class);
     }
 
+    // Relasi ke item keranjang
+    public function cartItems()
+    {
+        return $this->hasMany(Carts::class);
+    }
+
     // Relasi ke item pesanan
     public function orderItems()
     {

@@ -28,39 +28,85 @@
 
     {{-- GRID PRODUK --}}
     <div class=\"produk-grid\" id=\"produk-grid\" role=\"feed\">
-      @forelse($products as $index => $product)
-      {{-- PRODUK {{ $index + 1 }} --}}
-      <div class=\"produk-item\" role=\"article\" aria-labelledby=\"produk-{{ $index + 1 }}-title\">
+      {{-- PRODUK 1 --}}
+      <div class=\"produk-item\" role=\"article\" aria-labelledby=\"produk-1-title\">
         <div class=\"produk-img\">
-          <img alt=\"{{ $product->name }}\" src=\"{{ $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png') }}\" />
+          <img alt=\"Kecap ABC Botol Kecil\" src=\"{{ asset('src/kecap_abc.png') }}\" />
         </div>
         <div class=\"produk-info\">
-          <h2 id=\"produk-{{ $index + 1 }}-title\" class=\"produk-name\">{{ $product->name }}</h2>
-          <p class=\"produk-toko\">{{ $product->seller->name ?? 'Toko Umum' }}</p>
-          <div class=\"produk-harga\">Rp {{ number_format($product->price, 0, ',', '.') }}</div>
+          <h2 id=\"produk-1-title\" class=\"produk-name\">Kecap ABC Botol Kecil</h2>
+          <p class=\"produk-toko\">Toko Surya</p>
+          <div class=\"produk-harga\">Rp 12.000</div>
           <div class=\"produk-rating\">
-            <span aria-label=\"{{ $product->rating ?? 4.5 }} dari 5 bintang\" class=\"rating-stars\">
-              @for($i = 1; $i <= 5; $i++)
-                @if($i <= floor($product->rating ?? 4.5))
-                  ★
-                @else
-                  ☆
-                @endif
-              @endfor
-            </span>
-            <span class=\"rating-angka\">{{ $product->rating ?? 4.5 }}</span>
+            <span aria-label=\"4 dari 5 bintang\" class=\"rating-stars\">★★★★☆</span>
+            <span class=\"rating-angka\">4.0</span>
           </div>
           <div class=\"produk-aksi\">
-            <a href=\"{{ route('produk.detail', ['id' => $product->id]) }}\" class=\"btn-produk btn-primary\">Lihat Detail</a>
-            <button class=\"btn-produk btn-outline btn-add\" data-product-id=\"{{ $product->id }}\" data-name=\"{{ $product->name }}\">+ Keranjang</button>
+            <button class=\"btn-produk btn-primary\">Beli</button>
+            <button class=\"btn-produk btn-outline\">+ Keranjang</button>
           </div>
         </div>
       </div>
-      @empty
-      <div class=\"no-products\">
-        <p>Belum ada produk tersedia</p>
+
+      {{-- PRODUK 2 --}}
+      <div class=\"produk-item\" role=\"article\" aria-labelledby=\"produk-2-title\">
+        <div class=\"produk-img\">
+          <img alt=\"Sambal ABC Botol Kecil\" src=\"{{ asset('src/sambal_abc.png') }}\" />
+        </div>
+        <div class=\"produk-info\">
+          <h2 id=\"produk-2-title\" class=\"produk-name\">Sambal ABC Botol Kecil</h2>
+          <p class=\"produk-toko\">Toko Surya</p>
+          <div class=\"produk-harga\">Rp 10.000</div>
+          <div class=\"produk-rating\">
+            <span aria-label=\"4.5 dari 5 bintang\" class=\"rating-stars\">★★★★★</span>
+            <span class=\"rating-angka\">4.5</span>
+          </div>
+          <div class=\"produk-aksi\">
+            <button class=\"btn-produk btn-primary\">Beli</button>
+            <button class=\"btn-produk btn-outline\">+ Keranjang</button>
+          </div>
+        </div>
       </div>
-      @endforelse
+
+      {{-- PRODUK 3 --}}
+      <div class=\"produk-item\" role=\"article\" aria-labelledby=\"produk-3-title\">
+        <div class=\"produk-img\">
+          <img alt=\"Santan Kara Kemasan\" src=\"{{ asset('src/santan_kara.png') }}\" />
+        </div>
+        <div class=\"produk-info\">
+          <h2 id=\"produk-3-title\" class=\"produk-name\">Santan Kara Kemasan</h2>
+          <p class=\"produk-toko\">Toko Surya</p>
+          <div class=\"produk-harga\">Rp 15.000</div>
+          <div class=\"produk-rating\">
+            <span aria-label=\"3.5 dari 5 bintang\" class=\"rating-stars\">★★★☆☆</span>
+            <span class=\"rating-angka\">3.5</span>
+          </div>
+          <div class=\"produk-aksi\">
+            <button class=\"btn-produk btn-primary\">Beli</button>
+            <button class=\"btn-produk btn-outline\">+ Keranjang</button>
+          </div>
+        </div>
+      </div>
+
+      {{-- PRODUK 4 --}}
+      <div class=\"produk-item\" role=\"article\" aria-labelledby=\"produk-4-title\">
+        <div class=\"produk-img\">
+          <img alt=\"Tepung Terigu Segitiga\" src=\"{{ asset('src/tepung_terigu.png') }}\" />
+        </div>
+        <div class=\"produk-info\">
+          <h2 id=\"produk-4-title\" class=\"produk-name\">Tepung Terigu Segitiga</h2>
+          <p class=\"produk-toko\">Toko Surya</p>
+          <div class=\"produk-harga\">Rp 18.000</div>
+          <div class=\"produk-rating\">
+            <span aria-label=\"5 dari 5 bintang\" class=\"rating-stars\">★★★★★</span>
+            <span class=\"rating-angka\">5.0</span>
+          </div>
+          <div class=\"produk-aksi\">
+            <button class=\"btn-produk btn-primary\">Beli</button>
+            <button class=\"btn-produk btn-outline\">+ Keranjang</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     {{-- REKOMENDASI PRODUK --}}

@@ -3,12 +3,13 @@
 class CartManager {
   constructor() {
     this.cartItems = [];
+    this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     this.init();
   }
 
-  init() {
+  async init() {
     this.bindEvents();
-    this.calculateTotal();
+    await this.calculateTotal();
   }
 
   bindEvents() {
@@ -63,25 +64,25 @@ class CartManager {
     });
   }
 
-  incrementQuantity(button) {
+  async incrementQuantity(button) {
     const input = button.previousElementSibling;
     let value = parseInt(input.value) || 0;
     input.value = value + 1;
-    this.updateItemSubtotal(input);
-    this.calculateTotal();
+    await this.updateItemQuantity(input);
+    await this.calculateTotal();
   }
 
-  decrementQuantity(button) {
+  async decrementQuantity(button) {
     const input = button.nextElementSibling;
     let value = parseInt(input.value) || 1;
     if (value > 1) {
       input.value = value - 1;
-      this.updateItemSubtotal(input);
-      this.calculateTotal();
+      await this.updateItemQuantity(input);
+      await this.calculateTotal();
     }
   }
 
-  updateQuantity(input) {
+  async updateQuantity(input) {
     let value = parseInt(input.value);
     if (isNaN(value) || value < 1) {
       value = 1;
@@ -89,8 +90,8 @@ class CartManager {
       value = 99;
     }
     input.value = value;
-    this.updateItemSubtotal(input);
-    this.calculateTotal();
+    await this.updateItemQuantity(input);
+    await this.calculateTotal();
   }
 
   validateQuantityInput(input) {
@@ -120,9 +121,49 @@ class CartManager {
     this.calculateTotal();
   }
 
+  async updateItemQuantity(input) {
+    const row = input.closest('tr');
+    if (!row) return;
+
+    const itemId = row.dataset.itemId;
+    const quantity = parseInt(input.value);
+
+    try {
+      const response = await fetch(`/cart/update/${itemId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': this.csrfToken
+        },
+        body: JSON.stringify({ quantity: quantity })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        this.updateItemSubtotal(input);
+        this.showNotification(result.message, 'success');
+      } else {
+        this.showNotification(result.message || 'Gagal memperbarui kuantitas', 'error');
+        // Kembalikan jumlah ke nilai sebelumnya jika gagal
+        input.value = input.dataset.previousValue || 1;
+        this.updateItemSubtotal(input);
+      }
+    } catch (error) {
+      console.error('Error updating item quantity:', error);
+      this.showNotification('Terjadi kesalahan saat memperbarui kuantitas', 'error');
+      // Kembalikan jumlah ke nilai sebelumnya jika terjadi error
+      input.value = input.dataset.previousValue || 1;
+      this.updateItemSubtotal(input);
+    }
+  }
+
   updateItemSubtotal(input) {
     const row = input.closest('tr');
     if (!row) return;
+
+    // Simpan nilai kuantitas sebelumnya
+    input.dataset.previousValue = input.value;
 
     const priceText = row.querySelector('.price-col').textContent;
     // Ambil angka dari string harga (misal: "Rp 45.000" -> 45000)
@@ -135,15 +176,36 @@ class CartManager {
     subtotalElement.textContent = this.formatRupiah(subtotal);
   }
 
-  removeItem(row) {
+  async removeItem(row) {
+    const itemId = row.dataset.itemId;
+    
     if (confirm('Apakah Anda yakin ingin menghapus item ini dari keranjang?')) {
-      row.remove();
-      this.calculateTotal();
-      this.updateSelectAllCheckbox();
+      try {
+        const response = await fetch(`/cart/remove/${itemId}`, {
+          method: 'DELETE',
+          headers: {
+            'X-CSRF-TOKEN': this.csrfToken
+          }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          row.remove();
+          await this.calculateTotal();
+          this.updateSelectAllCheckbox();
+          this.showNotification(result.message, 'success');
+        } else {
+          this.showNotification(result.message || 'Gagal menghapus item', 'error');
+        }
+      } catch (error) {
+        console.error('Error removing item:', error);
+        this.showNotification('Terjadi kesalahan saat menghapus item', 'error');
+      }
     }
   }
 
-  calculateTotal() {
+  async calculateTotal() {
     let subtotal = 0;
     let itemCount = 0;
 
@@ -171,6 +233,39 @@ class CartManager {
     let ribuan = reverse.match(/\d{1,3}/g);
     ribuan = ribuan.join('.').split('').reverse().join('');
     return 'Rp ' + ribuan;
+  }
+
+  showNotification(message, type = 'info') {
+    // Buat elemen notifikasi
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.textContent = message;
+    
+    // Gaya dasar untuk notifikasi
+    Object.assign(notification.style, {
+      position: 'fixed',
+      top: '20px',
+      right: '20px',
+      padding: '12px 20px',
+      borderRadius: '6px',
+      color: '#fff',
+      backgroundColor: type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : '#007bff',
+      zIndex: '9999',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+      fontSize: '14px',
+      maxWidth: '400px',
+      wordWrap: 'break-word'
+    });
+    
+    // Tambahkan ke body
+    document.body.appendChild(notification);
+    
+    // Hapus notifikasi setelah 3 detik
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.parentNode.removeChild(notification);
+      }
+    }, 3000);
   }
 }
 

@@ -76,54 +76,10 @@ Route::get('/cust_welcome', function () {
     return view('customer.cust_welcome');
 })->name('cust.welcome');
 
-Route::get('/halaman_produk', function () {
-    // Ambil semua produk dari database
-    $products = \App\Models\Product::with(['variants'])->get();
-    
-    return view('customer.produk.halaman_produk', compact('products'));
-})->name('halaman.produk');
-
-Route::get('/produk_detail', function () {
-    // Ambil ID produk dari query parameter
-    $productId = request('id');
-    $productName = request('nama'); // Jika menggunakan nama sebagai identifikasi
-    
-    // Ambil data produk dari database berdasarkan ID atau nama
-    $product = null;
-    
-    if ($productId) {
-        $product = \App\Models\Product::with(['variants'])->find($productId);
-    } elseif ($productName) {
-        $product = \App\Models\Product::with(['variants'])->where('name', $productName)->first();
-    }
-    
-    // Format data produk sesuai dengan struktur yang digunakan di view
-    $produk = null;
-    if ($product) {
-        $produk = [
-            'id' => $product->id,
-            'nama' => $product->name,
-            'kategori' => $product->category->name ?? 'Umum',
-            'harga' => $product->price,
-            'deskripsi' => $product->description,
-            'gambar_utama' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
-            'gambar' => [$product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png')], // Tambahkan lebih banyak gambar jika ada
-            'rating' => 4.5, // Nilai dummy untuk sekarang, bisa diganti dengan rating sebenarnya
-            'stok' => $product->stock,
-            'berat' => $product->weight,
-            'varian' => $product->variants->map(function($variant) {
-                return [
-                    'id' => $variant->id,
-                    'nama' => $variant->name,
-                    'harga_tambahan' => $variant->additional_price,
-                    'stok' => $variant->stock
-                ];
-            })->toArray()
-        ];
-    }
-    
-    return view('customer.produk.produk_detail', compact('produk'));
-})->name('produk.detail');
+Route::get('/halaman_produk', [App\Http\Controllers\ProductController::class, 'index'])->name('halaman.produk');
+Route::get('/produk_detail/{id}', [App\Http\Controllers\ProductController::class, 'show'])->name('produk.detail');
+Route::get('/produk/search', [App\Http\Controllers\ProductController::class, 'search'])->name('produk.search');
+Route::get('/produk/kategori/{category}', [App\Http\Controllers\ProductController::class, 'byCategory'])->name('produk.kategori');
 
 Route::get('/profil', function () {
     return view('customer.profil.profil_pembeli');

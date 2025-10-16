@@ -65,7 +65,7 @@ const rekomGrid      = document.getElementById('rekom-grid');
 const rekomPagin     = document.getElementById('rekom-pagination');
 
 /* ---------- ROUTE DETAIL ---------- */
-const DETAIL_BASE = '/produk_detail?nama=';
+const DETAIL_BASE = '/produk_detail/';
 
 /* ---------- HELPERS ---------- */
 const debounce = (fn, wait=200) => {

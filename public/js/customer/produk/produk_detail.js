@@ -87,8 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
   fillReviewStars();
 
   /* ---------- CTA (with API) ---------- */
-  const btnAdd = document.getElementById('btnAdd');
-  const btnBuy = document.getElementById('btnBuy');
+  const btnAdd = document.querySelector('.btn-add-cart');
   const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
   
   btnAdd && btnAdd.addEventListener('click', async () => {
@@ -97,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const productId = productTitle?.dataset.productId;
     
     if (!productId) {
-      alert('Produk tidak ditemukan');
+      showNotification('Produk tidak ditemukan', 'error');
       return;
     }
     
@@ -130,8 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
       showNotification('Terjadi kesalahan saat menambahkan ke keranjang', 'error');
     }
   });
-  
-  btnBuy && btnBuy.addEventListener('click', () => alert('Beli sekarang (mock).'));
   
   function showNotification(message, type = 'info') {
     // Buat elemen notifikasi

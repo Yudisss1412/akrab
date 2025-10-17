@@ -143,13 +143,14 @@ class CheckoutController extends Controller
 
             DB::commit();
 
-            // Redirect ke halaman pengiriman dengan order number
+            // Redirect ke halaman pengiriman dengan nomor order
             return redirect()->route('cust.pengiriman.order', ['order' => $order->order_number])
                             ->with('success', 'Pesanan berhasil dibuat. Silakan lanjutkan ke pembayaran.');
 
         } catch (\Exception $e) {
             DB::rollback();
-            return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan saat proses checkout: ' . $e->getMessage()]);
+            \Log::error('Checkout process error: ' . $e->getMessage() . ' in ' . $e->getFile() . ' line ' . $e->getLine() . ' Trace: ' . $e->getTraceAsString());
+            return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan saat proses checkout: Silakan coba lagi atau hubungi admin jika masalah terus berlanjut.']);
         }
     }
 
@@ -180,19 +181,83 @@ class CheckoutController extends Controller
     /**
      * Menampilkan halaman pembayaran
      */
-    public function showPayment()
+    public function showPayment(Request $request)
     {
-        // Ambil pesanan terakhir pengguna
-        $latestOrder = Order::where('user_id', Auth::id())
-                          ->latest()
-                          ->with(['shipping_address', 'items.product', 'items.variant'])
-                          ->first();
+        // Check if an order number is passed as query parameter
+        $orderNumber = $request->get('order');
+        
+        if ($orderNumber) {
+            // Get specific order by order number
+            $order = Order::where('order_number', $orderNumber)
+                         ->where('user_id', Auth::id())
+                         ->with(['shipping_address', 'items.product', 'items.variant'])
+                         ->first();
+        } else {
+            // Get the latest order for the user
+            $order = Order::where('user_id', Auth::id())
+                         ->latest()
+                         ->with(['shipping_address', 'items.product', 'items.variant'])
+                         ->first();
+        }
         
         // Data untuk ditampilkan di halaman pembayaran
         $paymentData = [
-            'order' => $latestOrder,
+            'order' => $order,
         ];
         
+        if (!$order) {
+            return redirect()->back()->withErrors(['error' => 'Pesanan tidak ditemukan. Silakan kembali ke checkout.']);
+        }
+        
         return view('customer.transaksi.pembayaran', $paymentData);
+    }
+    
+    /**
+     * Process the payment for an order
+     */
+    public function processPayment(Request $request)
+    {
+        $request->validate([
+            'payment_method' => 'required|in:bank_transfer,e_wallet,cod',
+            'order_number' => 'nullable|string'
+        ]);
+        
+        // If order_number is provided, use that specific order; otherwise get the latest pending
+        if ($request->filled('order_number')) {
+            $order = Order::where('order_number', $request->order_number)
+                          ->where('user_id', Auth::id())
+                          ->where('status', 'pending')
+                          ->first();
+        } else {
+            $order = Order::where('user_id', Auth::id())
+                          ->where('status', 'pending')
+                          ->latest()
+                          ->first();
+        }
+        
+        if (!$order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak ada pesanan yang ditemukan.'
+            ], 404);
+        }
+        
+        // Update the order status and payment information
+        $order->update([
+            'status' => 'paid', // or 'confirmed' depending on business logic
+            'paid_at' => now()
+        ]);
+        
+        // Optional: Add order log to track payment
+        $order->logs()->create([
+            'status' => 'paid',
+            'description' => 'Pembayaran berhasil diproses melalui ' . $request->payment_method
+        ]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Pembayaran berhasil diproses',
+            'order_number' => $order->order_number
+        ]);
     }
 }

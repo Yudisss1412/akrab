@@ -302,8 +302,52 @@
         });
       }
       
-      // Tambahkan loading saat submit
+      // Tambahkan validasi sebelum submit
       form.addEventListener('submit', function(e) {
+        // Ambil semua nilai field alamat terlepas dari apakah form dalam mode tampil atau edit
+        const recipientName = document.getElementById('recipient_name').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const province = document.getElementById('province').value.trim();
+        const city = document.getElementById('city').value.trim();
+        const district = document.getElementById('district').value.trim();
+        const ward = document.getElementById('ward').value.trim();
+        const fullAddress = document.getElementById('full_address').value.trim();
+        
+        // Validasi apakah semua field alamat telah diisi
+        if (!recipientName || !phone || !province || !city || !district || !ward || !fullAddress) {
+          e.preventDefault(); // Mencegah pengiriman form
+          
+          // Tampilkan pesan notifikasi yang lebih informatif
+          alert('Mohon lengkapi semua field alamat pengiriman sebelum melanjutkan proses pesanan. Form alamat akan ditampilkan untuk Anda isi.');
+          
+          // Tampilkan form alamat (karena mungkin sedang dalam mode kartu)
+          document.getElementById('alamatCard').style.display = 'none';
+          document.getElementById('alamatFormSection').style.display = 'block';
+          
+          // Kembalikan status tombol
+          prosesPesananBtn.innerHTML = 'Proses Pesanan';
+          prosesPesananBtn.disabled = false;
+          
+          // Fokus ke field pertama yang kosong untuk membantu user
+          if (!recipientName) {
+            document.getElementById('recipient_name').focus();
+          } else if (!phone) {
+            document.getElementById('phone').focus();
+          } else if (!province) {
+            document.getElementById('province').focus();
+          } else if (!city) {
+            document.getElementById('city').focus();
+          } else if (!district) {
+            document.getElementById('district').focus();
+          } else if (!ward) {
+            document.getElementById('ward').focus();
+          } else if (!fullAddress) {
+            document.getElementById('full_address').focus();
+          }
+          
+          return false;
+        }
+        
         // Tampilkan loading pada tombol
         prosesPesananBtn.innerHTML = 'Memproses...';
         prosesPesananBtn.disabled = true;

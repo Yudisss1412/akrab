@@ -205,22 +205,52 @@
       const payBtn = document.querySelector('.btn-bayar-sekarang');
       if (payBtn) {
         payBtn.addEventListener('click', function() {
+          // Disable button to prevent double submission
+          payBtn.disabled = true;
+          payBtn.innerHTML = 'Memproses...';
+          
           // Get selected payment method
           const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
           
-          // Show confirmation based on payment method
-          let message = '';
-          if (selectedMethod === 'bank_transfer') {
-            message = 'Pesanan berhasil dibuat! Silakan transfer ke rekening yang tersedia.';
-          } else if (selectedMethod === 'e_wallet') {
-            message = 'Pesanan berhasil dibuat! Silakan bayar melalui dompet digital Anda.';
-          } else {
-            message = 'Pesanan berhasil dibuat! Siapkan uang tunai saat kurir tiba.';
-          }
+          // Prepare the data to send
+          const formData = new FormData();
+          formData.append('payment_method', selectedMethod);
+          @if(isset($order) && $order)
+            formData.append('order_number', '{{ $order->order_number }}');
+          @endif
+          formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
           
-          alert(message);
-          // Redirect to invoice page
-          window.location.href = '{{ route("invoice") }}';
+          // Make AJAX request to process payment
+          fetch('{{ route("payment.process") }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              // Show success message
+              alert('Pembayaran berhasil diproses! Terima kasih telah melakukan pembayaran.');
+              
+              // Redirect to invoice page for the specific order
+              window.location.href = '{{ route("order.invoice", ['order' => '__ORDER_NUMBER__']) }}'.replace('__ORDER_NUMBER__', data.order_number);
+            } else {
+              // Show error message
+              alert(data.message || 'Terjadi kesalahan saat memproses pembayaran.');
+              // Re-enable the button
+              payBtn.disabled = false;
+              payBtn.innerHTML = 'Bayar Sekarang';
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('Terjadi kesalahan saat memproses pembayaran. Silakan coba lagi.');
+            // Re-enable the button
+            payBtn.disabled = false;
+            payBtn.innerHTML = 'Bayar Sekarang';
+          });
         });
       }
     });

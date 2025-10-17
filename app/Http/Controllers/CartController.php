@@ -60,7 +60,7 @@ class CartController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'quantity' => 'required|integer|min:1|max:99',
+            'quantity' => 'required|integer|min:0|max:99',
         ]);
 
         $success = $this->cartService->updateItem($id, $request->quantity);
@@ -70,6 +70,14 @@ class CartController extends Controller
                 'success' => false,
                 'message' => 'Gagal memperbarui kuantitas'
             ], 404);
+        }
+
+        // If quantity is 0, the item is deleted, so we don't return updated item data
+        if ($request->quantity <= 0) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Produk berhasil dihapus dari keranjang'
+            ]);
         }
 
         // Ambil ulang item yang diperbarui untuk ditampilkan

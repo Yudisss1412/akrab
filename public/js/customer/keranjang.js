@@ -75,8 +75,15 @@ class CartManager {
   async decrementQuantity(button) {
     const input = button.nextElementSibling;
     let value = parseInt(input.value) || 1;
-    if (value > 1) {
-      input.value = value - 1;
+    input.value = value - 1;
+    
+    // If quantity reaches 0, remove the item from cart
+    if (input.value <= 0) {
+      const row = input.closest('tr');
+      if (row) {
+        await this.removeItemFromCart(row);
+      }
+    } else {
       await this.updateItemQuantity(input);
       await this.calculateTotal();
     }
@@ -84,22 +91,36 @@ class CartManager {
 
   async updateQuantity(input) {
     let value = parseInt(input.value);
-    if (isNaN(value) || value < 1) {
+    if (isNaN(value)) {
       value = 1;
     } else if (value > 99) {
       value = 99;
+    } else if (value < 0) {
+      value = 0;
     }
+    
     input.value = value;
-    await this.updateItemQuantity(input);
-    await this.calculateTotal();
+    
+    // If quantity is 0, remove the item
+    if (value <= 0) {
+      const row = input.closest('tr');
+      if (row) {
+        await this.removeItemFromCart(row);
+      }
+    } else {
+      await this.updateItemQuantity(input);
+      await this.calculateTotal();
+    }
   }
 
   validateQuantityInput(input) {
     let value = parseInt(input.value);
-    if (isNaN(value) || value < 1) {
+    if (isNaN(value)) {
       input.value = 1;
     } else if (value > 99) {
       input.value = 99;
+    } else if (value < 0) {
+      input.value = 0;
     }
   }
 
@@ -141,8 +162,16 @@ class CartManager {
       const result = await response.json();
 
       if (result.success) {
-        this.updateItemSubtotal(input);
-        this.showNotification(result.message, 'success');
+        // If quantity is 0, remove the row from the UI
+        if (quantity <= 0) {
+          row.remove();
+          await this.calculateTotal();
+          this.updateSelectAllCheckbox();
+          this.showNotification('Produk berhasil dihapus dari keranjang', 'success');
+        } else {
+          this.updateItemSubtotal(input);
+          this.showNotification(result.message, 'success');
+        }
       } else {
         this.showNotification(result.message || 'Gagal memperbarui kuantitas', 'error');
         // Kembalikan jumlah ke nilai sebelumnya jika gagal
@@ -155,6 +184,48 @@ class CartManager {
       // Kembalikan jumlah ke nilai sebelumnya jika terjadi error
       input.value = input.dataset.previousValue || 1;
       this.updateItemSubtotal(input);
+    }
+  }
+
+  // New function to remove item from cart when quantity reaches 0
+  async removeItemFromCart(row) {
+    const itemId = row.dataset.itemId;
+    
+    try {
+      const response = await fetch(`/cart/remove/${itemId}`, {
+        method: 'DELETE',
+        headers: {
+          'X-CSRF-TOKEN': this.csrfToken
+        }
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        row.remove();
+        await this.calculateTotal();
+        this.updateSelectAllCheckbox();
+        this.showNotification(result.message, 'success');
+      } else {
+        this.showNotification(result.message || 'Gagal menghapus item', 'error');
+        // If removal failed, reset back to 1
+        const input = row.querySelector('.qty-input');
+        if (input) {
+          input.value = 1;
+          await this.updateItemQuantity(input);
+          await this.calculateTotal();
+        }
+      }
+    } catch (error) {
+      console.error('Error removing item:', error);
+      this.showNotification('Terjadi kesalahan saat menghapus item', 'error');
+      // If removal failed, reset back to 1
+      const input = row.querySelector('.qty-input');
+      if (input) {
+        input.value = 1;
+        await this.updateItemQuantity(input);
+        await this.calculateTotal();
+      }
     }
   }
 

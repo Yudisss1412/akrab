@@ -210,10 +210,11 @@ async function addToCart(productId) {
     return;
   }
 
-  // Check if user is logged in by checking if there's a CSRF token
+  // Get CSRF token from the meta tag in the layout
   const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+  
   if (!csrfToken) {
-    showNotification('Silakan login terlebih dahulu', 'error');
+    showNotification('Terjadi masalah dengan keamanan, silakan refresh halaman', 'error');
     return;
   }
 
@@ -222,7 +223,8 @@ async function addToCart(productId) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': csrfToken
+        'X-CSRF-TOKEN': csrfToken,
+        'X-Requested-With': 'XMLHttpRequest' // Important for Laravel to recognize AJAX requests
       },
       body: JSON.stringify({ 
         product_id: productId,

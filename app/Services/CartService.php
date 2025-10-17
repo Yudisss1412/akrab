@@ -20,10 +20,23 @@ class CartService
     public function getCartItems()
     {
         if (Auth::check()) {
-            // Jika pengguna login, ambil dari database
-            return Carts::with(['product', 'productVariant'])
+            // Jika pengguna login, ambil dari database dan kembalikan dalam format konsisten
+            $cartItems = Carts::with(['product', 'productVariant'])
                 ->where('user_id', Auth::id())
                 ->get();
+            
+            // Format data agar konsisten dengan format session (array)
+            return $cartItems->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'product_id' => $item->product_id,
+                    'product_variant_id' => $item->product_variant_id,
+                    'quantity' => $item->quantity,
+                    'product' => $item->product,  // Relasi product sudah dimuat dengan with()
+                    'product_variant' => $item->productVariant,  // Relasi productVariant
+                    'subtotal' => ($item->product->price + ($item->productVariant->additional_price ?? 0)) * $item->quantity
+                ];
+            });
         } else {
             // Jika pengguna tidak login, ambil dari session
             $cartItems = collect(Session::get($this->sessionKey, []));

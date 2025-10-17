@@ -37,25 +37,23 @@
           <section class="order-summary">
             <h2>Ringkasan Pesanan</h2>
             <div class="order-items">
-              <div class="order-item">
-                <img src="https://picsum.photos/seed/cup/64/64" alt="Produk" class="item-image">
-                <div class="item-details">
-                  <h3 class="item-name">Hard Case Premium Hybrid Clear</h3>
-                  <p class="item-variant">Jet Black · iPhone 13</p>
-                  <p class="item-price">Rp12.000 × 1</p>
-                </div>
-                <div class="item-total">Rp12.000</div>
-              </div>
-
-              <div class="order-item">
-                <img src="https://picsum.photos/seed/charger/64/64" alt="Produk" class="item-image">
-                <div class="item-details">
-                  <h3 class="item-name">Fast Charging Adapter 20W</h3>
-                  <p class="item-variant">Putih</p>
-                  <p class="item-price">Rp45.000 × 1</p>
-                </div>
-                <div class="item-total">Rp45.000</div>
-              </div>
+              @if(isset($order) && $order && $order->items->count() > 0)
+                @foreach($order->items as $item)
+                  <div class="order-item">
+                    <img src="{{ asset($item->product->image ?? 'src/default-product.png') }}" alt="{{ $item->product->name ?? 'Produk' }}" class="item-image">
+                    <div class="item-details">
+                      <h3 class="item-name">{{ $item->product->name ?? 'Produk tidak ditemukan' }}</h3>
+                      @if($item->variant)
+                        <p class="item-variant">{{ $item->variant->name }}</p>
+                      @endif
+                      <p class="item-price">Rp{{ number_format($item->unit_price, 0, ',', '.') }} × {{ $item->quantity }}</p>
+                    </div>
+                    <div class="item-total">Rp{{ number_format($item->subtotal, 0, ',', '.') }}</div>
+                  </div>
+                @endforeach
+              @else
+                <p>Detail pesanan tidak ditemukan.</p>
+              @endif
             </div>
           </section>
 
@@ -63,14 +61,26 @@
           <section class="shipping-details">
             <h2>Detail Pengiriman</h2>
             <div class="shipping-info">
-              <div class="info-row">
-                <span class="label">Alamat Pengiriman</span>
-                <span class="value">Andi Saputra, Jl. Anggrek No. 12, Bandung, 0812-3456-7890</span>
-              </div>
-              <div class="info-row">
-                <span class="label">Metode Pengiriman</span>
-                <span class="value">Reguler (3-5 hari kerja)</span>
-              </div>
+              @if(isset($order) && $order && $order->shipping_address)
+                <div class="info-row">
+                  <span class="label">Alamat Pengiriman</span>
+                  <span class="value">{{ $order->shipping_address->recipient_name }}, {{ $order->shipping_address->full_address }}, {{ $order->shipping_address->phone }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Metode Pengiriman</span>
+                  <span class="value">
+                    @if($order->shipping_courier == 'reguler') 
+                      Reguler (3-5 hari kerja) 
+                    @elseif($order->shipping_courier == 'express') 
+                      Express (1-2 hari kerja) 
+                    @else 
+                      {{ ucfirst($order->shipping_courier) }} 
+                    @endif
+                  </span>
+                </div>
+              @else
+                <p>Informasi pengiriman tidak ditemukan.</p>
+              @endif
             </div>
           </section>
 
@@ -142,27 +152,31 @@
           <section class="payment-summary">
             <h2>Ringkasan Pembayaran</h2>
             <div class="summary-details">
-              <div class="summary-row">
-                <span>Subtotal (2 produk)</span>
-                <span>Rp57.000</span>
-              </div>
-              <div class="summary-row">
-                <span>Ongkos Kirim</span>
-                <span>Rp9.000</span>
-              </div>
-              <div class="summary-row">
-                <span>Asuransi Pengiriman</span>
-                <span>Rp1.500</span>
-              </div>
-              <div class="summary-row discount">
-                <span>Diskon</span>
-                <span>-Rp5.000</span>
-              </div>
-              <div class="summary-divider"></div>
-              <div class="summary-row total">
-                <span>Total</span>
-                <span class="total-amount">Rp62.500</span>
-              </div>
+              @if(isset($order) && $order)
+                <div class="summary-row">
+                  <span>Subtotal ({{ $order->items->sum('quantity') }} produk)</span>
+                  <span>Rp{{ number_format($order->sub_total, 0, ',', '.') }}</span>
+                </div>
+                <div class="summary-row">
+                  <span>Ongkos Kirim</span>
+                  <span>Rp{{ number_format($order->shipping_cost, 0, ',', '.') }}</span>
+                </div>
+                <div class="summary-row">
+                  <span>Asuransi Pengiriman</span>
+                  <span>Rp1.500</span>
+                </div>
+                <div class="summary-row discount">
+                  <span>Diskon</span>
+                  <span>-Rp0</span>
+                </div>
+                <div class="summary-divider"></div>
+                <div class="summary-row total">
+                  <span>Total</span>
+                  <span class="total-amount">Rp{{ number_format($order->total_amount + 1500, 0, ',', '.') }}</span>
+                </div>
+              @else
+                <p>Data pembayaran tidak ditemukan.</p>
+              @endif
             </div>
 
             <button class="btn btn-primary btn-bayar-sekarang">

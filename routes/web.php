@@ -106,9 +106,7 @@ Route::post('/checkout', [App\Http\Controllers\CheckoutController::class, 'proce
 Route::get('/pengiriman', [App\Http\Controllers\CheckoutController::class, 'showShipping'])->name('cust.pengiriman');
 Route::get('/pengiriman/{order}', [App\Http\Controllers\CheckoutController::class, 'showShipping'])->name('cust.pengiriman.order');
 
-Route::get('/pembayaran', function () {
-    return view('customer.transaksi.pembayaran');
-})->name('cust.pembayaran');
+Route::get('/pembayaran', [App\Http\Controllers\CheckoutController::class, 'showPayment'])->name('cust.pembayaran');
 
 Route::get('/halaman_ulasan', function () {
     return view('customer.koleksi.halaman_ulasan');

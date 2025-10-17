@@ -176,4 +176,23 @@ class CheckoutController extends Controller
             return view('customer.transaksi.pengiriman', compact('latestOrder'));
         }
     }
+
+    /**
+     * Menampilkan halaman pembayaran
+     */
+    public function showPayment()
+    {
+        // Ambil pesanan terakhir pengguna
+        $latestOrder = Order::where('user_id', Auth::id())
+                          ->latest()
+                          ->with(['shipping_address', 'items.product', 'items.variant'])
+                          ->first();
+        
+        // Data untuk ditampilkan di halaman pembayaran
+        $paymentData = [
+            'order' => $latestOrder,
+        ];
+        
+        return view('customer.transaksi.pembayaran', $paymentData);
+    }
 }

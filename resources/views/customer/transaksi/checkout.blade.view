@@ -33,6 +33,17 @@
 
       <form id="checkoutForm" action="{{ route('checkout.process') }}" method="POST">
         @csrf
+        
+        @if($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+        
         <div class="checkout-content">
           <div class="checkout-left">
             <!-- Alamat Pengiriman -->
@@ -139,12 +150,12 @@
                 @if($cartItems->count() > 0)
                   @foreach($cartItems as $item)
                     <div class="produk-item">
-                      <img src="{{ asset($item['product']->image ?? 'src/default-product.png') }}" alt="{{ $item['product']->name ?? 'Product' }}" />
+                      <img src="{{ asset(($item['product'] ?? $item->product)->image ?? 'src/default-product.png') }}" alt="{{ ($item['product'] ?? $item->product)->name ?? 'Product' }}" />
                       <div class="item-info">
-                        <h4>{{ $item['product']->name ?? 'Produk tidak ditemukan' }}</h4>
-                        <p>{{ $item['quantity'] }} x Rp {{ number_format($item['product']->price ?? 0, 0, ',', '.') }}</p>
+                        <h4>{{ ($item['product'] ?? $item->product)->name ?? 'Produk tidak ditemukan' }}</h4>
+                        <p>{{ $item['quantity'] ?? $item->quantity }} x Rp {{ number_format(($item['product'] ?? $item->product)->price ?? 0, 0, ',', '.') }}</p>
                       </div>
-                      <div class="item-harga">Rp {{ number_format(($item['product']->price ?? 0) * $item['quantity'], 0, ',', '.') }}</div>
+                      <div class="item-harga">Rp {{ number_format((($item['product'] ?? $item->product)->price ?? 0) * ($item['quantity'] ?? $item->quantity), 0, ',', '.') }}</div>
                     </div>
                   @endforeach
                 @else
@@ -177,12 +188,12 @@
               @if($cartItems->count() > 0)
                 @foreach($cartItems as $item)
                   <div class="produk-preview">
-                    <img src="{{ asset($item['product']->image ?? 'src/default-product.png') }}" alt="{{ $item['product']->name ?? 'Product' }}" />
+                    <img src="{{ asset(($item['product'] ?? $item->product)->image ?? 'src/default-product.png') }}" alt="{{ ($item['product'] ?? $item->product)->name ?? 'Product' }}" />
                     <div class="produk-info">
-                      <h4>{{ $item['product']->name ?? 'Produk tidak ditemukan' }}</h4>
-                      <p class="produk-harga">Rp {{ number_format($item['product']->price ?? 0, 0, ',', '.') }}</p>
+                      <h4>{{ ($item['product'] ?? $item->product)->name ?? 'Produk tidak ditemukan' }}</h4>
+                      <p class="produk-harga">Rp {{ number_format(($item['product'] ?? $item->product)->price ?? 0, 0, ',', '.') }}</p>
                     </div>
-                    <span class="produk-qty">x{{ $item['quantity'] }}</span>
+                    <span class="produk-qty">x{{ $item['quantity'] ?? $item->quantity }}</span>
                   </div>
                 @endforeach
               @else
@@ -195,7 +206,7 @@
                   <span>Rp {{ number_format($total, 0, ',', '.') }}</span>
                 </div>
                 
-                <button type="submit" class="btn btn-primary btn-checkout">
+                <button type="submit" class="btn btn-primary btn-checkout" id="prosesPesananBtn">
                   Proses Pesanan
                 </button>
               </div>
@@ -214,6 +225,7 @@
       const metodeOptions = document.querySelectorAll('.option-card');
       const shippingCostElement = document.getElementById('shippingCost');
       const totalHargaElement = document.getElementById('totalHarga');
+      const prosesPesananBtn = document.getElementById('prosesPesananBtn');
       
       // Ambil nilai awal dari data Blade
       let subtotal = {{ $subTotal }};
@@ -289,6 +301,21 @@
           };
         });
       }
+      
+      // Tambahkan loading saat submit
+      form.addEventListener('submit', function(e) {
+        // Tampilkan loading pada tombol
+        prosesPesananBtn.innerHTML = 'Memproses...';
+        prosesPesananBtn.disabled = true;
+      });
+      
+      // Reset status tombol jika ada error
+      @if($errors->any())
+        if (prosesPesananBtn) {
+          prosesPesananBtn.innerHTML = 'Proses Pesanan';
+          prosesPesananBtn.disabled = false;
+        }
+      @endif
     });
   </script>
 @endpush

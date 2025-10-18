@@ -34,6 +34,14 @@ class Order extends Model
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Get the user name safely
+     */
+    public function getUserNameAttribute()
+    {
+        return $this->user ? $this->user->name : 'Unknown User';
+    }
+
     // Relasi ke item pesanan
     public function items()
     {
@@ -50,5 +58,17 @@ class Order extends Model
     public function logs()
     {
         return $this->hasMany(OrderLog::class);
+    }
+
+    // Relasi ke pembayaran
+    public function payment()
+    {
+        return $this->hasOne(Payment::class);
+    }
+
+    // Relasi ke pengembalian dana
+    public function refund()
+    {
+        return $this->hasOne(Refund::class);
     }
 }

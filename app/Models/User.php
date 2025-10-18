@@ -61,11 +61,15 @@ class User extends Authenticatable
      */
     public function hasRole($roleName)
     {
-        if (is_string($roleName)) {
-            return $this->role && $this->role->name === $roleName;
+        if (!$this->role) {
+            return false;
         }
         
-        return $this->role && $roleName->contains($this->role->id);
+        if (is_string($roleName)) {
+            return $this->role->name === $roleName;
+        }
+        
+        return $roleName->contains($this->role->id);
     }
 
     /**
@@ -80,5 +84,61 @@ class User extends Authenticatable
         }
 
         $this->update(['role_id' => $role->id]);
+    }
+
+    // Relasi ke pesanan
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    // Relasi ke ulasan
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    // Relasi ke wishlist
+    public function wishlists()
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+
+    // Relasi ke pesan yang dikirim
+    public function sentMessages()
+    {
+        return $this->hasMany(ChatMessage::class, 'sender_id');
+    }
+
+    // Relasi ke pesan yang diterima
+    public function receivedMessages()
+    {
+        return $this->hasMany(ChatMessage::class, 'receiver_id');
+    }
+
+    // Relasi ke notifikasi
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    // Relasi ke permintaan penarikan dana (untuk penjual)
+    public function withdrawalRequests()
+    {
+        return $this->hasMany(WithdrawalRequest::class, 'seller_id');
+    }
+
+    // Relasi ke produk yang dijual (untuk penjual)
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'seller_id');
+    }
+
+    /**
+     * Get the role name safely
+     */
+    public function getRoleName()
+    {
+        return $this->role ? $this->role->name : 'No Role';
     }
 }

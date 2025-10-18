@@ -275,6 +275,43 @@ Route::get('/shipping-label/{order}', function ($order) {
     return view('shipping_label', ['order' => $orderData]);
 })->name('shipping.label');
 
+// Review Routes
+Route::middleware(['auth'])->group(function () {
+    Route::post('/reviews', [App\Http\Controllers\ReviewController::class, 'store'])->name('reviews.store');
+    Route::get('/products/{productId}/reviews', [App\Http\Controllers\ReviewController::class, 'show'])->name('reviews.show');
+});
+
+// Wishlist Routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/wishlist', [App\Http\Controllers\WishlistController::class, 'index'])->name('wishlist.index');
+    Route::post('/wishlist', [App\Http\Controllers\WishlistController::class, 'store'])->name('wishlist.store');
+    Route::delete('/wishlist/{id}', [App\Http\Controllers\WishlistController::class, 'destroy'])->name('wishlist.destroy');
+    Route::post('/wishlist/{id}/move-to-cart', [App\Http\Controllers\WishlistController::class, 'moveToCart'])->name('wishlist.move-to-cart');
+});
+
+// Payment Routes
+Route::middleware(['auth'])->group(function () {
+    Route::post('/payment/process', [App\Http\Controllers\PaymentController::class, 'process'])->name('payment.process');
+    Route::post('/payment/callback', [App\Http\Controllers\PaymentController::class, 'callback'])->name('payment.callback');
+    Route::get('/payment/{order}', [App\Http\Controllers\PaymentController::class, 'show'])->name('payment.show');
+});
+
+// Withdrawal Routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/withdrawal', [App\Http\Controllers\WithdrawalController::class, 'index'])->name('withdrawal.index');
+    Route::post('/withdrawal', [App\Http\Controllers\WithdrawalController::class, 'store'])->name('withdrawal.store');
+    Route::get('/withdrawal/{id}', [App\Http\Controllers\WithdrawalController::class, 'show'])->name('withdrawal.show');
+    Route::post('/withdrawal/{id}/cancel', [App\Http\Controllers\WithdrawalController::class, 'cancel'])->name('withdrawal.cancel');
+});
+
+// Chat Routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/chat/{userId}', [App\Http\Controllers\ChatController::class, 'getMessages'])->name('chat.messages');
+    Route::post('/chat/send', [App\Http\Controllers\ChatController::class, 'sendMessage'])->name('chat.send');
+    Route::get('/chat/contacts', [App\Http\Controllers\ChatController::class, 'getContacts'])->name('chat.contacts');
+    Route::post('/chat/{userId}/mark-as-read', [App\Http\Controllers\ChatController::class, 'markAsRead'])->name('chat.mark-as-read');
+});
+
 // Role-based Dashboards
 Route::middleware(['auth', 'admin.role'])->group(function () {
     Route::get('/admin/dashboard', [App\Http\Controllers\RoleDashboardController::class, 'showAdminDashboard'])->name('admin.dashboard');

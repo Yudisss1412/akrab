@@ -32,8 +32,8 @@
             <img src="{{ asset('src/profil_pembeli.png') }}" alt="Profil Pembeli">
           </div>
           <div class="profile-info">
-            <h2>{{ auth()->user()->name }}</h2>
-            <p class="member-since">Member sejak {{ auth()->user()->created_at->year }}</p>
+            <h2>{{ auth()->user() ? auth()->user() ? auth()->user()->name : "Guest" : 'Guest' }}</h2>
+            <p class="member-since">Member sejak {{ auth()->user() ? auth()->user()->created_at->year : date("Y") }}</p>
           </div>
           <a href="{{ route('edit.profil') }}" class="btn btn-primary">Edit Profil</a>
         </div>
@@ -42,15 +42,15 @@
         <div class="profile-details">
           <div class="detail-item">
             <label>Email</label>
-            <span>{{ auth()->user()->email }}</span>
+            <span>{{ auth()->user() ? auth()->user() ? auth()->user()->email : "Email belum tersedia" : 'Email belum tersedia' }}</span>
           </div>
           <div class="detail-item">
             <label>Telepon</label>
-            <span>{{ auth()->user()->phone ?? '+62 812 3456 7890' }}</span>
+            <span>{{ auth()->user() ? (auth()->user()->phone ?? '+62 812 3456 7890') : '+62 812 3456 7890' }}</span>
           </div>
           <div class="detail-item">
             <label>Alamat</label>
-            <span>{{ auth()->user()->address ?? 'Alamat belum diisi' }}</span>
+            <span>{{ auth()->user() ? (auth()->user()->address ?? 'Alamat belum diisi') : 'Alamat belum diisi' }}</span>
           </div>
         </div>
       </div>
@@ -472,3 +472,5 @@
 @section('footer')
   @include('components.customer.footer.footer')
 @endsection
+
+

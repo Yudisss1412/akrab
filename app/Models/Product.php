@@ -30,7 +30,15 @@ class Product extends Model
     // Relasi ke penjual
     public function seller()
     {
-        return $this->belongsTo(Seller::class);
+        return $this->belongsTo(User::class, 'seller_id');
+    }
+
+    /**
+     * Get the seller name safely
+     */
+    public function getSellerNameAttribute()
+    {
+        return $this->seller ? $this->seller->name : 'Unknown Seller';
     }
 
     // Relasi ke varian produk
@@ -49,5 +57,23 @@ class Product extends Model
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    // Relasi ke ulasan
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    // Relasi ke wishlist
+    public function wishlists()
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+
+    // Relasi ke gambar produk
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class);
     }
 }

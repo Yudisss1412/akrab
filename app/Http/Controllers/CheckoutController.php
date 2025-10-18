@@ -64,7 +64,7 @@ class CheckoutController extends Controller
             'district' => 'required|string|max:255',
             'ward' => 'required|string|max:255',
             'full_address' => 'required|string|max:500',
-            'shipping_method' => 'required|in:reguler,express',
+            'shipping_method' => 'required|in:reguler,express,same_day',
         ]);
 
         DB::beginTransaction();
@@ -79,20 +79,28 @@ class CheckoutController extends Controller
             // Hitung subtotal
             $subTotal = $this->cartService->getSubtotal();
 
-            // Tentukan biaya pengiriman berdasarkan metode
-            $shippingCost = $request->shipping_method === 'express' ? 25000 : 15000;
+            // Determine shipping cost based on method
+            $shippingCostMap = [
+                'reguler' => 15000,
+                'express' => 25000,
+                'same_day' => 50000,
+            ];
+            
+            $shippingCost = $shippingCostMap[$request->shipping_method] ?? 15000;
 
             // Buat nomor pesanan
             $orderNumber = 'ORD-' . date('Ymd') . '-' . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
 
             // Buat pesanan
+            $insuranceCost = 1500; // Insurance cost
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'order_number' => $orderNumber,
                 'status' => 'pending', // Awalnya pesanan pending
                 'sub_total' => $subTotal,
                 'shipping_cost' => $shippingCost,
-                'total_amount' => $subTotal + $shippingCost,
+                'insurance_cost' => $insuranceCost,
+                'total_amount' => $subTotal + $shippingCost + $insuranceCost,
                 'notes' => $request->notes ?? '',
                 'shipping_courier' => $request->shipping_method
             ]);
@@ -176,6 +184,66 @@ class CheckoutController extends Controller
             
             return view('customer.transaksi.pengiriman', compact('latestOrder'));
         }
+    }
+
+    /**
+     * Update shipping method and total for an order
+     */
+    public function updateShipping(Request $request)
+    {
+        $request->validate([
+            'order_number' => 'required|string',
+            'shipping_method' => 'required|in:reguler,express,same_day',
+        ]);
+
+        $order = Order::where('order_number', $request->order_number)
+                      ->where('user_id', Auth::id())
+                      ->first();
+
+        if (!$order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pesanan tidak ditemukan.'
+            ], 404);
+        }
+
+        // Determine shipping cost based on method
+        $shippingCostMap = [
+            'reguler' => 15000,
+            'express' => 25000,
+            'same_day' => 50000,
+        ];
+
+        $shippingCost = $shippingCostMap[$request->shipping_method];
+        $insuranceCost = 1500; // Insurance cost remains constant
+        
+        // Calculate new total
+        $newTotal = $order->sub_total + $shippingCost + $insuranceCost;
+
+        // Update the order
+        $order->update([
+            'shipping_cost' => $shippingCost,
+            'insurance_cost' => $insuranceCost, // Store insurance cost for consistency
+            'total_amount' => $newTotal,
+            'shipping_courier' => $request->shipping_method
+        ]);
+
+        // Update the order
+        $order->update([
+            'shipping_cost' => $shippingCost,
+            'total_amount' => $newTotal,
+            'shipping_courier' => $request->shipping_method
+        ]);
+
+        // Refresh the order data to return
+        $order->refresh();
+        $order->load(['shipping_address', 'items.product', 'items.variant']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Metode pengiriman berhasil diperbarui',
+            'order' => $order
+        ]);
     }
 
     /**

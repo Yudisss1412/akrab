@@ -60,7 +60,7 @@
           <section class="shipping-methods">
             <h2>Metode Pengiriman</h2>
             <div class="shipping-options">
-              <div class="shipping-option @if(isset($order) && $order->shipping_courier == 'reguler') selected @endif">
+              <div class="shipping-option @if(isset($order) && $order->shipping_courier == 'reguler') selected @endif" data-shipping-method="reguler" data-shipping-cost="15000">
                 <div class="option-header">
                   <div class="option-info">
                     <h3>Reguler</h3>
@@ -71,7 +71,7 @@
                 <p class="option-description">Layanan pengiriman reguler dengan asuransi barang.</p>
               </div>
 
-              <div class="shipping-option @if(isset($order) && $order->shipping_courier == 'express') selected @endif">
+              <div class="shipping-option @if(isset($order) && $order->shipping_courier == 'express') selected @endif" data-shipping-method="express" data-shipping-cost="25000">
                 <div class="option-header">
                   <div class="option-info">
                     <h3>Kilat</h3>
@@ -82,7 +82,7 @@
                 <p class="option-description">Layanan pengiriman cepat dengan prioritas pengemasan.</p>
               </div>
 
-              <div class="shipping-option">
+              <div class="shipping-option" data-shipping-method="same_day" data-shipping-cost="50000">
                 <div class="option-header">
                   <div class="option-info">
                     <h3>Same Day</h3>
@@ -105,26 +105,27 @@
                 @if($order->items->count() > 0)
                   <div class="summary-row">
                     <span>Subtotal ({{ $order->items->sum('quantity') }} produk)</span>
-                    <span>Rp {{ number_format($order->sub_total, 0, ',', '.') }}</span>
+                    <span class="subtotal-amount">Rp {{ number_format($order->sub_total, 0, ',', '.') }}</span>
                   </div>
                 @endif
                 <div class="summary-row">
                   <span>Ongkos Kirim</span>
-                  <span>Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}</span>
+                  <span class="shipping-cost-amount">Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}</span>
                 </div>
                 <div class="summary-row">
                   <span>Asuransi Pengiriman</span>
-                  <span>Rp 1.500</span>
+                  <span>Rp {{ number_format(1500, 0, ',', '.') }}</span>
                 </div>
                 <div class="summary-row discount">
                   <span>Diskon</span>
-                  <span>-Rp 0</span>
+                  <span>-Rp {{ number_format(0, 0, ',', '.') }}</span>
                 </div>
                 <div class="summary-divider"></div>
                 <div class="summary-row total">
                   <span>Total</span>
-                  <span class="total-amount">Rp {{ number_format($order->total_amount + 1500, 0, ',', '.') }}</span>
+                  <span class="total-amount">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
                 </div>
+              </div>
               </div>
             @else
               <p>Data pesanan tidak ditemukan.</p>
@@ -145,12 +146,92 @@
     document.addEventListener('DOMContentLoaded', function() {
       // Shipping option selection
       const shippingOptions = document.querySelectorAll('.shipping-option');
+      const orderNumber = @json($order->order_number ?? null);
+      
       shippingOptions.forEach(option => {
         option.addEventListener('click', function() {
           shippingOptions.forEach(opt => opt.classList.remove('selected'));
           this.classList.add('selected');
+          
+          // Get the selected shipping method and cost
+          const shippingMethod = this.getAttribute('data-shipping-method');
+          const shippingCost = parseInt(this.getAttribute('data-shipping-cost'));
+          
+          // Update the summary with new shipping cost and total
+          updateShippingSummary(shippingMethod, shippingCost);
         });
       });
+
+      // Function to update shipping summary via AJAX
+      function updateShippingSummary(shippingMethod, shippingCost) {
+        if (!orderNumber) {
+          console.error('Order number not found');
+          return;
+        }
+        
+        // Show loading indicator
+        const totalAmountElement = document.querySelector('.total-amount');
+        if (totalAmountElement) {
+          totalAmountElement.innerHTML = 'Memperbarui...';
+        }
+        
+        // Send AJAX request to update shipping method
+        fetch('{{ route("cust.pengiriman.update") }}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') || '{{ csrf_token() }}'
+          },
+          body: JSON.stringify({
+            order_number: orderNumber,
+            shipping_method: shippingMethod
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Update the summary with new values
+            updateSummaryDisplay(data.order);
+          } else {
+            console.error('Error updating shipping method:', data.message);
+            // Revert to previous state if there was an error
+            alert('Terjadi kesalahan: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Terjadi kesalahan saat memperbarui metode pengiriman');
+        });
+      }
+      
+      // Function to update the payment summary display
+      function updateSummaryDisplay(order) {
+        const subtotalElement = document.querySelector('.subtotal-amount');
+        const shippingCostElement = document.querySelector('.shipping-cost-amount');
+        const totalElement = document.querySelector('.total-amount');
+        
+        if (subtotalElement) {
+          subtotalElement.textContent = 'Rp ' + formatCurrency(order.sub_total);
+        }
+        
+        if (shippingCostElement) {
+          shippingCostElement.textContent = 'Rp ' + formatCurrency(order.shipping_cost);
+        }
+        
+        if (totalElement) {
+          totalElement.textContent = 'Rp ' + formatCurrency(order.total_amount);
+        }
+      }
+      
+      // Currency formatting function for Indonesian Rupiah format (without currency symbol to avoid duplication)
+      // Format: 15.000 (with dots for thousands separator, commas are for decimals)
+      function formatCurrency(amount) {
+        // Format with thousands separator using dots (.) 
+        return new Intl.NumberFormat('id-ID', {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0
+        }).format(amount).replace('Rp', '').trim();
+      }
 
       // Lanjut ke pembayaran button
       const paymentBtn = document.querySelector('.btn-lanjut-pembayaran');

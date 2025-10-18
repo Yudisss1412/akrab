@@ -33,6 +33,8 @@
 
       <form id="checkoutForm" action="{{ route('checkout.process') }}" method="POST">
         @csrf
+        <!-- Field tersembunyi untuk metode pengiriman default -->
+        <input type="hidden" name="shipping_method" value="reguler" id="hiddenShippingMethod" />
         
         @if($errors->any())
         <div class="alert alert-danger">
@@ -109,37 +111,6 @@
               </div>
             </section>
 
-            <!-- Metode Pengiriman -->
-            <section class="pengiriman-section">
-              <div class="section-header">
-                <h2>Metode Pengiriman</h2>
-              </div>
-              
-              <div class="pengiriman-options">
-                <label class="option-card active" data-metode="reguler">
-                  <input type="radio" name="shipping_method" value="reguler" checked />
-                  <div class="option-content">
-                    <div class="option-header">
-                      <h4>REGULER</h4>
-                      <span class="harga">Rp 15.000</span>
-                    </div>
-                    <p>3-5 hari kerja</p>
-                  </div>
-                </label>
-                
-                <label class="option-card" data-metode="express">
-                  <input type="radio" name="shipping_method" value="express" />
-                  <div class="option-content">
-                    <div class="option-header">
-                      <h4>EXPRESS</h4>
-                      <span class="harga">Rp 25.000</span>
-                    </div>
-                    <p>1-2 hari kerja</p>
-                  </div>
-                </label>
-              </div>
-            </section>
-
             <!-- Ringkasan Pesanan -->
             <section class="ringkasan-section">
               <div class="section-header">
@@ -183,22 +154,26 @@
           <div class="checkout-right">
             <!-- Ringkasan Belanja -->
             <section class="ringkasan-belanja">
-              <h3>Ringkasan Belanja</h3>
+              <div class="section-header">
+                <h3>Ringkasan Belanja</h3>
+              </div>
               
-              @if($cartItems->count() > 0)
-                @foreach($cartItems as $item)
-                  <div class="produk-preview">
-                    <img src="{{ asset(($item['product'] ?? $item->product)->image ?? 'src/default-product.png') }}" alt="{{ ($item['product'] ?? $item->product)->name ?? 'Product' }}" />
-                    <div class="produk-info">
-                      <h4>{{ ($item['product'] ?? $item->product)->name ?? 'Produk tidak ditemukan' }}</h4>
-                      <p class="produk-harga">Rp {{ number_format(($item['product'] ?? $item->product)->price ?? 0, 0, ',', '.') }}</p>
+              <div class="ringkasan-content">
+                @if($cartItems->count() > 0)
+                  @foreach($cartItems as $item)
+                    <div class="produk-preview">
+                      <img src="{{ asset(($item['product'] ?? $item->product)->image ?? 'src/default-product.png') }}" alt="{{ ($item['product'] ?? $item->product)->name ?? 'Product' }}" />
+                      <div class="produk-info">
+                        <h4>{{ ($item['product'] ?? $item->product)->name ?? 'Produk tidak ditemukan' }}</h4>
+                        <p class="produk-harga">Rp {{ number_format(($item['product'] ?? $item->product)->price ?? 0, 0, ',', '.') }}</p>
+                      </div>
+                      <span class="produk-qty">x{{ $item['quantity'] ?? $item->quantity }}</span>
                     </div>
-                    <span class="produk-qty">x{{ $item['quantity'] ?? $item->quantity }}</span>
-                  </div>
-                @endforeach
-              @else
-                <p>Keranjang Anda kosong.</p>
-              @endif
+                  @endforeach
+                @else
+                  <p>Keranjang Anda kosong.</p>
+                @endif
+              </div>
               
               <div class="total-section">
                 <div class="total-row">
@@ -222,38 +197,28 @@
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const form = document.getElementById('checkoutForm');
-      const metodeOptions = document.querySelectorAll('.option-card');
       const shippingCostElement = document.getElementById('shippingCost');
       const totalHargaElement = document.getElementById('totalHarga');
       const prosesPesananBtn = document.getElementById('prosesPesananBtn');
       
       // Ambil nilai awal dari data Blade
       let subtotal = {{ $subTotal }};
-      let regulerCost = 15000;
-      let expressCost = 25000;
-      let currentShippingCost = regulerCost;
+      // Gunakan biaya pengiriman default untuk tampilan awal
+      let shippingCost = {{ $shippingCost }};
       
-      // Metode pengiriman selection
-      metodeOptions.forEach(option => {
-        option.addEventListener('click', function() {
-          metodeOptions.forEach(opt => opt.classList.remove('active'));
-          this.classList.add('active');
-          
-          // Update harga berdasarkan metode pengiriman
-          const selectedMetode = this.getAttribute('data-metode');
-          if (selectedMetode === 'express') {
-            currentShippingCost = expressCost;
-          } else {
-            currentShippingCost = regulerCost;
-          }
-          
-          // Update tampilan harga
-          shippingCostElement.textContent = 'Rp ' + currentShippingCost.toLocaleString('id-ID');
-          totalHargaElement.textContent = 'Rp ' + (subtotal + currentShippingCost).toLocaleString('id-ID');
-          
-          console.log('Metode pengiriman dipilih:', selectedMetode, 'Biaya:', currentShippingCost);
-        });
-      });
+      // Update tampilan harga awal
+      shippingCostElement.textContent = new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(shippingCost).replace('Rp', '').trim();
+      totalHargaElement.textContent = new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(subtotal + shippingCost).replace('Rp', '').trim();
       
       // Edit alamat functionality
       const editBtn = document.getElementById('editAlamatBtn');
@@ -261,15 +226,18 @@
       const alamatFormSection = document.getElementById('alamatFormSection');
       
       if (editBtn) {
+        // Gunakan state untuk melacak mode tombol
+        let isEditMode = false;
+        
         editBtn.addEventListener('click', function() {
-          // Tampilkan form dan sembunyikan card
-          alamatCard.style.display = 'none';
-          alamatFormSection.style.display = 'block';
-          
-          // Update tombol menjadi simpan
-          editBtn.innerHTML = '<i class="bi bi-save"></i>';
-          editBtn.onclick = function() {
-            // Validasi form sebelum menyimpan
+          if (!isEditMode) {
+            // Mode edit: tampilkan form, sembunyikan card
+            alamatCard.style.display = 'none';
+            alamatFormSection.style.display = 'block';
+            editBtn.innerHTML = '<i class="bi bi-save"></i>';
+            isEditMode = true;
+          } else {
+            // Mode simpan: validasi dan kembalikan ke card
             const recipientName = document.getElementById('recipient_name').value;
             const phone = document.getElementById('phone').value;
             const province = document.getElementById('province').value;
@@ -292,13 +260,8 @@
             alamatCard.style.display = 'block';
             alamatFormSection.style.display = 'none';
             editBtn.innerHTML = '<i class="bi bi-pencil"></i>';
-            editBtn.onclick = function() {
-              alamatCard.style.display = 'none';
-              alamatFormSection.style.display = 'block';
-              editBtn.innerHTML = '<i class="bi bi-save"></i>';
-              editBtn.onclick = arguments.callee;
-            };
-          };
+            isEditMode = false;
+          }
         });
       }
       

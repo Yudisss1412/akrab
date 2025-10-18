@@ -105,6 +105,7 @@ Route::post('/checkout', [App\Http\Controllers\CheckoutController::class, 'proce
 
 Route::get('/pengiriman', [App\Http\Controllers\CheckoutController::class, 'showShipping'])->name('cust.pengiriman');
 Route::get('/pengiriman/{order}', [App\Http\Controllers\CheckoutController::class, 'showShipping'])->name('cust.pengiriman.order');
+Route::post('/pengiriman/update-shipping', [App\Http\Controllers\CheckoutController::class, 'updateShipping'])->name('cust.pengiriman.update');
 
 Route::get('/pembayaran', [App\Http\Controllers\CheckoutController::class, 'showPayment'])->name('cust.pembayaran');
 Route::post('/pembayaran/process', [App\Http\Controllers\CheckoutController::class, 'processPayment'])->name('payment.process');

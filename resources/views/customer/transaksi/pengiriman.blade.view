@@ -17,15 +17,15 @@
         <h1>Pengiriman</h1>
         <div class="progress-steps">
           <div class="step">
-            <span class="step-number">1</span>
+            <div class="step-number">1</div>
             <span class="step-label">Alamat</span>
           </div>
           <div class="step active">
-            <span class="step-number">2</span>
+            <div class="step-number">2</div>
             <span class="step-label">Pengiriman</span>
           </div>
           <div class="step">
-            <span class="step-number">3</span>
+            <div class="step-number">3</div>
             <span class="step-label">Pembayaran</span>
           </div>
         </div>
@@ -34,7 +34,7 @@
       <div class="pengiriman-content">
         <div class="main-content">
           <!-- Alamat Pengiriman -->
-          <section class="shipping-address-summary">
+          <section>
             <h2>Alamat Pengiriman</h2>
             @if(isset($order) && $order)
               <div class="shipping-info">
@@ -57,7 +57,7 @@
           </section>
 
           <!-- Metode Pengiriman -->
-          <section class="shipping-methods">
+          <section>
             <h2>Metode Pengiriman</h2>
             <div class="shipping-options">
               <div class="shipping-option @if(isset($order) && $order->shipping_courier == 'reguler') selected @endif" data-shipping-method="reguler" data-shipping-cost="15000">
@@ -126,23 +126,20 @@
                   <span class="total-amount">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
                 </div>
               </div>
-              </div>
             @else
               <p>Data pesanan tidak ditemukan.</p>
             @endif
 
-            <button class="btn btn-primary btn-lanjut-pembayaran" onclick="window.location.href='{{ route("cust.pembayaran") }}'; return false;">
+            <button class="btn btn-primary btn-lanjut-pembayaran">
               Lanjut ke Pembayaran
             </button>
           </section>
         </div>
       </div>
-    </div>
-    
-    <!-- Review Section - only show if order is delivered -->
-    @if(isset($order) && $order && $order->status === 'delivered')
-    <div class="review-section">
-      <div class="container">
+      
+      <!-- Review Section - only show if order is delivered -->
+      @if(isset($order) && $order && $order->status === 'delivered')
+      <div class="review-section">
         <h2 class="section-title">Beri Ulasan untuk Pesanan Ini</h2>
         <div class="products-to-review">
           @foreach($order->items as $item)
@@ -169,8 +166,8 @@
           @endforeach
         </div>
       </div>
+      @endif
     </div>
-    @endif
   </main>
 @endsection
 

@@ -1,0 +1,211 @@
+@extends('layouts.seller-layout')
+
+@section('title', 'Tambah Produk - UMKM AKRAB')
+
+@section('content')
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="h3 mb-4">Tambah Produk Baru</h1>
+            
+            <div class="card">
+                <div class="card-body">
+                    <form action="{{ route('penjual.produk.store') }}" method="POST" enctype="multipart/form-data" id="productForm">
+                        @csrf
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                <!-- Informasi Dasar Produk -->
+                                <div class="mb-4">
+                                    <h5>Informasi Dasar Produk</h5>
+                                    <hr>
+                                    
+                                    <div class="mb-3">
+                                        <label for="name" class="form-label">Nama Produk *</label>
+                                        <input type="text" class="form-control @error('name') is-invalid @enderror" 
+                                               id="name" name="name" value="{{ old('name') }}" required>
+                                        @error('name')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="description" class="form-label">Deskripsi Produk *</label>
+                                        <textarea class="form-control @error('description') is-invalid @enderror" 
+                                                  id="description" name="description" rows="5" required>{{ old('description') }}</textarea>
+                                        @error('description')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                
+                                <!-- Gambar Produk -->
+                                <div class="mb-4">
+                                    <h5>Gambar Produk</h5>
+                                    <hr>
+                                    
+                                    <div class="mb-3">
+                                        <label for="images" class="form-label">Foto Produk *</label>
+                                        <input type="file" class="form-control @error('images') is-invalid @enderror" 
+                                               id="images" name="images[]" multiple accept="image/*">
+                                        <div class="form-text">Anda dapat memilih beberapa gambar. Format yang didukung: JPG, PNG, GIF. Maksimal 2MB per gambar.</div>
+                                        @error('images')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                        @error('images.*')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    
+                                    <!-- Preview Gambar -->
+                                    <div id="imagePreview" class="row g-2 mt-2"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <!-- Harga dan Stok -->
+                                <div class="mb-4">
+                                    <h5>Harga & Stok</h5>
+                                    <hr>
+                                    
+                                    <div class="mb-3">
+                                        <label for="price" class="form-label">Harga (Rp) *</label>
+                                        <input type="number" class="form-control @error('price') is-invalid @enderror" 
+                                               id="price" name="price" value="{{ old('price') }}" min="0" step="100" required>
+                                        @error('price')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="stock" class="form-label">Stok *</label>
+                                        <input type="number" class="form-control @error('stock') is-invalid @enderror" 
+                                               id="stock" name="stock" value="{{ old('stock', 0) }}" min="0" required>
+                                        @error('stock')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="weight" class="form-label">Berat (gram) *</label>
+                                        <input type="number" class="form-control @error('weight') is-invalid @enderror" 
+                                               id="weight" name="weight" value="{{ old('weight', 0) }}" min="0" step="1" required>
+                                        <div class="form-text">Berat dalam gram</div>
+                                        @error('weight')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                
+                                <!-- Kategori -->
+                                <div class="mb-4">
+                                    <h5>Kategori</h5>
+                                    <hr>
+                                    
+                                    <div class="mb-3">
+                                        <label for="category_id" class="form-label">Kategori *</label>
+                                        <select class="form-select @error('category_id') is-invalid @enderror" 
+                                                id="category_id" name="category_id" required>
+                                            <option value="">Pilih Kategori</option>
+                                            @foreach($categories as $category)
+                                                <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                                    {{ $category->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('category_id')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                
+                                <!-- Status -->
+                                <div class="mb-4">
+                                    <h5>Status</h5>
+                                    <hr>
+                                    
+                                    <div class="mb-3">
+                                        <label for="status" class="form-label">Status Produk</label>
+                                        <select class="form-select" id="status" name="status">
+                                            <option value="aktif" {{ old('status', 'aktif') == 'aktif' ? 'selected' : '' }}>Aktif</option>
+                                            <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Draft</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Tombol Aksi -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ route('penjual.produk') }}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Kembali
+                            </a>
+                            <div>
+                                <button type="submit" class="btn btn-primary" id="saveProductBtn">
+                                    <span id="buttonText">Simpan Produk</span>
+                                    <span id="loadingSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Image preview functionality
+    const imagesInput = document.getElementById('images');
+    const imagePreview = document.getElementById('imagePreview');
+    
+    imagesInput.addEventListener('change', function() {
+        imagePreview.innerHTML = '';
+        
+        if (this.files) {
+            for (let i = 0; i < this.files.length; i++) {
+                const file = this.files[i];
+                if (!file.type.match('image.*')) {
+                    continue;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const colDiv = document.createElement('div');
+                    colDiv.className = 'col-6 col-md-4';
+                    
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'img-thumbnail';
+                    img.style.height = '150px';
+                    img.style.objectFit = 'cover';
+                    
+                    colDiv.appendChild(img);
+                    imagePreview.appendChild(colDiv);
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+    });
+    
+    // Form submission with loading state
+    const productForm = document.getElementById('productForm');
+    const saveProductBtn = document.getElementById('saveProductBtn');
+    const buttonText = document.getElementById('buttonText');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    
+    productForm.addEventListener('submit', function(e) {
+        // Show loading state
+        buttonText.textContent = 'Menyimpan...';
+        loadingSpinner.classList.remove('d-none');
+        saveProductBtn.disabled = true;
+        
+        // Allow form to submit normally
+        return true;
+    });
+});
+</script>
+@endpush

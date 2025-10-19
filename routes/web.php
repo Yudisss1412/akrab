@@ -249,6 +249,16 @@ Route::get('/penjual/produk', function () {
     return view('penjual.manajemen_produk');
 })->name('penjual.produk');
 
+Route::get('/penjual/produk', [App\Http\Controllers\Seller\ProductController::class, 'index'])->name('penjual.produk');
+Route::get('/penjual/produk/create', [App\Http\Controllers\Seller\ProductController::class, 'create'])->name('penjual.produk.create');
+Route::post('/penjual/produk', [App\Http\Controllers\Seller\ProductController::class, 'store'])->name('penjual.produk.store');
+Route::get('/penjual/produk/{id}', [App\Http\Controllers\Seller\ProductController::class, 'show'])->name('penjual.produk.show');
+Route::get('/penjual/produk/{id}/edit', [App\Http\Controllers\Seller\ProductController::class, 'edit'])->name('penjual.produk.edit');
+Route::put('/penjual/produk/{id}', [App\Http\Controllers\Seller\ProductController::class, 'update'])->name('penjual.produk.update');
+Route::delete('/penjual/produk/{id}', [App\Http\Controllers\Seller\ProductController::class, 'destroy'])->name('penjual.produk.destroy');
+Route::put('/penjual/produk/{id}/stock', [App\Http\Controllers\Seller\ProductController::class, 'updateStock'])->name('penjual.produk.stock.update');
+Route::delete('/penjual/product-image/{id}', [App\Http\Controllers\Seller\ProductController::class, 'destroyImage'])->name('penjual.product.image.delete');
+
 Route::get('/penjual/pesanan', function () {
     return view('penjual.manajemen_pesanan');
 })->name('penjual.pesanan');

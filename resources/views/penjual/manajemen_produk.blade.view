@@ -455,6 +455,20 @@
     .modal {
       z-index: 1000;
     }
+    
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
   </style>
   <script>
     // Modal functionality
@@ -489,293 +503,67 @@
           document.body.style.overflow = '';
         }
       });
-    });
-  </script>
-</head>
-<body>
-  @include('components.admin_penjual.header')
-
-  <div class="main-layout">
-    <div class="content-wrapper">
-      <main class="content admin-page-content" role="main">
-        <!-- Page Header -->
-        <section class="page-header">
-          <h1>Manajemen Produk untuk {{ auth()->user()->name }}</h1>
-        </section>
-
-        <!-- Control Bar -->
-        <div class="control-bar">
-          <div class="control-bar-left">
-            <button class="btn btn-primary" id="openModalBtn">+ Tambah Produk</button>
-          </div>
-          <div class="search">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <input type="text" placeholder="Cari di Akrab...">
-          </div>
-        </div>
-
-        <!-- Product Table -->
-        <section class="table-card">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Nama Produk</th>
-                <th>Harga</th>
-                <th>Kategori</th>
-                <th>Stok</th>
-                <th>Status</th>
-                <th>Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <div class="product-cell">
-                    <img src="https://placehold.co/40x40" alt="Produk" class="product-thumb">
-                    <span>Kaos Polos Premium</span>
-                  </div>
-                </td>
-                <td>Rp 75.000</td>
-                <td>Pakaian</td>
-                <td>25</td>
-                <td><span class="status-badge status-active">Aktif</span></td>
-                <td>
-                  <div class="action-buttons">
-                    <button class="action-btn" title="Edit">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M16.44 7.875L15.12 6.555C14.7313 6.16629 14.2054 5.9536 13.6557 5.9536C13.106 5.9536 12.5801 6.16629 12.1914 6.555L4.25137 14.495C4.10967 14.6367 4.00687 14.812 3.95154 15.0075L3.00137 18.755C2.92658 19.0539 3.01586 19.3738 3.23538 19.5933C3.4549 19.8128 3.7748 19.9021 4.07367 19.8273L7.8212 18.8771C8.0167 18.8218 8.19202 18.719 8.33372 18.5773L16.2737 10.6373C16.6624 10.2486 16.8751 9.72269 16.8751 9.17297C16.8751 8.62325 16.6624 8.09734 16.2737 7.70863L16.44 7.875ZM17.34 6.975L16.02 5.655C15.6313 5.26629 15.1054 5.0536 14.5557 5.0536C14.006 5.0536 13.4801 5.26629 13.0914 5.655L5.15137 13.595C4.76266 13.9837 4.54998 14.5096 4.54998 15.0593C4.54998 15.609 4.76266 16.1349 5.15137 16.5236L6.62137 18.005L10.3714 16.5236L11.8414 15.0593L17.34 9.575C17.7287 9.18629 17.9414 8.66038 17.9414 8.11066C17.9414 7.56094 17.7287 7.03503 17.34 6.64632V6.975Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </button>
-                    <button class="action-btn" title="Hapus">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4 7H20M10 11V17M14 11V17M5 7L6 19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19L19 7M9 7V4C9 3.44772 9.44772 3 10 3H14C14.5523 3 15 3.44772 15 4V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="product-cell">
-                    <img src="https://placehold.co/40x40" alt="Produk" class="product-thumb">
-                    <span>Celana Jeans Premium</span>
-                  </div>
-                </td>
-                <td>Rp 150.000</td>
-                <td>Pakaian</td>
-                <td>12</td>
-                <td><span class="status-badge status-active">Aktif</span></td>
-                <td>
-                  <div class="action-buttons">
-                    <button class="action-btn" title="Edit">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M16.44 7.875L15.12 6.555C14.7313 6.16629 14.2054 5.9536 13.6557 5.9536C13.106 5.9536 12.5801 6.16629 12.1914 6.555L4.25137 14.495C4.10967 14.6367 4.00687 14.812 3.95154 15.0075L3.00137 18.755C2.92658 19.0539 3.01586 19.3738 3.23538 19.5933C3.4549 19.8128 3.7748 19.9021 4.07367 19.8273L7.8212 18.8771C8.0167 18.8218 8.19202 18.719 8.33372 18.5773L16.2737 10.6373C16.6624 10.2486 16.8751 9.72269 16.8751 9.17297C16.8751 8.62325 16.6624 8.09734 16.2737 7.70863L16.44 7.875ZM17.34 6.975L16.02 5.655C15.6313 5.26629 15.1054 5.0536 14.5557 5.0536C14.006 5.0536 13.4801 5.26629 13.0914 5.655L5.15137 13.595C4.76266 13.9837 4.54998 14.5096 4.54998 15.0593C4.54998 15.609 4.76266 16.1349 5.15137 16.5236L6.62137 18.005L10.3714 16.5236L11.8414 15.0593L17.34 9.575C17.7287 9.18629 17.9414 8.66038 17.9414 8.11066C17.9414 7.56094 17.7287 7.03503 17.34 6.64632V6.975Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </button>
-                    <button class="action-btn" title="Hapus">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4 7H20M10 11V17M14 11V17M5 7L6 19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19L19 7M9 7V4C9 3.44772 9.44772 3 10 3H14C14.5523 3 15 3.44772 15 4V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="product-cell">
-                    <img src="https://placehold.co/40x40" alt="Produk" class="product-thumb">
-                    <span>Sepatu Sneakers Casual</span>
-                  </div>
-                </td>
-                <td>Rp 225.000</td>
-                <td>Elektronik</td>
-                <td>8</td>
-                <td><span class="status-badge status-pending">Menunggu Persetujuan</span></td>
-                <td>
-                  <div class="action-buttons">
-                    <button class="action-btn" title="Edit">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M16.44 7.875L15.12 6.555C14.7313 6.16629 14.2054 5.9536 13.6557 5.9536C13.106 5.9536 12.5801 6.16629 12.1914 6.555L4.25137 14.495C4.10967 14.6367 4.00687 14.812 3.95154 15.0075L3.00137 18.755C2.92658 19.0539 3.01586 19.3738 3.23538 19.5933C3.4549 19.8128 3.7748 19.9021 4.07367 19.8273L7.8212 18.8771C8.0167 18.8218 8.19202 18.719 8.33372 18.5773L16.2737 10.6373C16.6624 10.2486 16.8751 9.72269 16.8751 9.17297C16.8751 8.62325 16.6624 8.09734 16.2737 7.70863L16.44 7.875ZM17.34 6.975L16.02 5.655C15.6313 5.26629 15.1054 5.0536 14.5557 5.0536C14.006 5.0536 13.4801 5.26629 13.0914 5.655L5.15137 13.595C4.76266 13.9837 4.54998 14.5096 4.54998 15.0593C4.54998 15.609 4.76266 16.1349 5.15137 16.5236L6.62137 18.005L10.3714 16.5236L11.8414 15.0593L17.34 9.575C17.7287 9.18629 17.9414 8.66038 17.9414 8.11066C17.9414 7.56094 17.7287 7.03503 17.34 6.64632V6.975Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </button>
-                    <button class="action-btn" title="Hapus">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4 7H20M10 11V17M14 11V17M5 7L6 19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19L19 7M9 7V4C9 3.44772 9.44772 3 10 3H14C14.5523 3 15 3.44772 15 4V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="product-cell">
-                    <img src="https://placehold.co/40x40" alt="Produk" class="product-thumb">
-                    <span>Topi Baseball Trendy</span>
-                  </div>
-                </td>
-                <td>Rp 85.000</td>
-                <td>Aksesoris</td>
-                <td>15</td>
-                <td><span class="status-badge status-suspended">Ditangguhkan</span></td>
-                <td>
-                  <div class="action-buttons">
-                    <button class="action-btn" title="Edit">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M16.44 7.875L15.12 6.555C14.7313 6.16629 14.2054 5.9536 13.6557 5.9536C13.106 5.9536 12.5801 6.16629 12.1914 6.555L4.25137 14.495C4.10967 14.6367 4.00687 14.812 3.95154 15.0075L3.00137 18.755C2.92658 19.0539 3.01586 19.3738 3.23538 19.5933C3.4549 19.8128 3.7748 19.9021 4.07367 19.8273L7.8212 18.8771C8.0167 18.8218 8.19202 18.719 8.33372 18.5773L16.2737 10.6373C16.6624 10.2486 16.8751 9.72269 16.8751 9.17297C16.8751 8.62325 16.6624 8.09734 16.2737 7.70863L16.44 7.875ZM17.34 6.975L16.02 5.655C15.6313 5.26629 15.1054 5.0536 14.5557 5.0536C14.006 5.0536 13.4801 5.26629 13.0914 5.655L5.15137 13.595C4.76266 13.9837 4.54998 14.5096 4.54998 15.0593C4.54998 15.609 4.76266 16.1349 5.15137 16.5236L6.62137 18.005L10.3714 16.5236L11.8414 15.0593L17.34 9.575C17.7287 9.18629 17.9414 8.66038 17.9414 8.11066C17.9414 7.56094 17.7287 7.03503 17.34 6.64632V6.975Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </button>
-                    <button class="action-btn" title="Hapus">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4 7H20M10 11V17M14 11V17M5 7L6 19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19L19 7M9 7V4C9 3.44772 9.44772 3 10 3H14C14.5523 3 15 3.44772 15 4V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
-
-        <!-- Pagination -->
-        <section class="pagination">
-          <div class="pagination-info">
-            Menampilkan 1-10 dari 50 produk
-          </div>
-          <div class="pagination-nav">
-            <button class="pagination-btn">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M15 19L8 12L15 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-            <button class="pagination-btn active">1</button>
-            <button class="pagination-btn">2</button>
-            <button class="pagination-btn">3</button>
-            <div class="pagination-separator">...</div>
-            <button class="pagination-btn">5</button>
-            <button class="pagination-btn">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-          </div>
-        </section>
+      
+      // Function to handle adding/updating products via AJAX
+      document.getElementById('saveProductBtn').addEventListener('click', function() {
+        const saveBtn = document.getElementById('saveProductBtn');
+        const originalText = saveBtn.textContent;
         
-        <!-- Product Modal -->
-        <div id="productModal" class="modal">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h3 class="modal-title">Tambah Produk Baru</h3>
-              <button class="modal-close">&times;</button>
-            </div>
-            <div class="modal-body">
-              <form id="productForm">
-                <div class="form-group">
-                  <label for="productName">Nama Produk</label>
-                  <input type="text" id="productName" class="form-control" placeholder="Masukkan nama produk">
-                </div>
-                
-                <div class="form-group">
-                  <label for="productDescription">Deskripsi Produk</label>
-                  <textarea id="productDescription" class="form-control" rows="3" placeholder="Masukkan deskripsi produk"></textarea>
-                </div>
-                
-                <div class="form-row">
-                  <div class="form-group">
-                    <label for="productPrice">Harga (Rp)</label>
-                    <input type="number" id="productPrice" class="form-control" placeholder="0">
-                  </div>
-                  
-                  <div class="form-group">
-                    <label for="productStock">Stok</label>
-                    <input type="number" id="productStock" class="form-control" placeholder="0">
-                  </div>
-                </div>
-                
-                <div class="form-row">
-                  <div class="form-group">
-                    <label for="productCategory">Kategori</label>
-                    <select id="productCategory" class="form-control">
-                      <option value="">Pilih kategori</option>
-                      <option value="pakaian">Pakaian</option>
-                      <option value="aksesoris">Aksesoris</option>
-                      <option value="elektronik">Elektronik</option>
-                      <option value="lainnya">Lainnya</option>
-                    </select>
-                  </div>
-                  
-                  <div class="form-group">
-                    <label for="productWeight">Berat (gram)</label>
-                    <input type="number" id="productWeight" class="form-control" placeholder="0">
-                  </div>
-                </div>
-                
-                <div class="form-group">
-                  <label>Foto Produk</label>
-                  <div class="image-upload" id="imageUploadArea">
-                    <p>Klik atau seret gambar ke sini</p>
-                    <input type="file" id="productImage" accept="image/*">
-                    <div class="image-preview" id="imagePreview">
-                      <span>Preview gambar akan muncul di sini</span>
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </div>
-            <div class="modal-footer">
-              <button class="btn" id="cancelBtn">Batal</button>
-              <button class="btn btn-primary" id="saveProductBtn">Simpan Produk</button>
-            </div>
-          </div>
-        </div>
-      </main>
-    </div>
-  </div>
-
-  @include('components.admin_penjual.footer')
-  
-  <script>
-    // Extended modal functionality
-    document.addEventListener('DOMContentLoaded', function() {
-      const modal = document.getElementById('productModal');
-      const openModalBtn = document.getElementById('openModalBtn');
-      const closeModalBtn = document.querySelector('.modal-close');
-      const cancelBtn = document.getElementById('cancelBtn');
-      const modalBackdrop = modal.querySelector('.modal');
-      const imageUploadArea = document.getElementById('imageUploadArea');
-      const imageInput = document.getElementById('productImage');
-      const imagePreview = document.getElementById('imagePreview');
-      const saveProductBtn = document.getElementById('saveProductBtn');
-      
-      openModalBtn.addEventListener('click', function() {
-        const modal = document.getElementById('productModal');
-        modal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-      });
-      
-      closeModalBtn.addEventListener('click', function() {
-        const modal = document.getElementById('productModal');
-        modal.classList.remove('active');
-        document.body.style.overflow = '';
-      });
-      
-      cancelBtn.addEventListener('click', function() {
-        const modal = document.getElementById('productModal');
-        modal.classList.remove('active');
-        document.body.style.overflow = '';
-      });
-      
-      // Use event delegation for modal close
-      document.getElementById('productModal').addEventListener('click', function(e) {
-        if (e.target === this) { // this refers to the modal backdrop
-          const modal = document.getElementById('productModal');
-          modal.classList.remove('active');
-          document.body.style.overflow = '';
+        // Show loading state
+        saveBtn.innerHTML = '<div class="loading"></div>';
+        saveBtn.disabled = true;
+        
+        // Get form data
+        const formData = new FormData();
+        formData.append('name', document.getElementById('productName').value);
+        formData.append('description', document.getElementById('productDescription').value);
+        formData.append('price', document.getElementById('productPrice').value);
+        formData.append('category_id', document.getElementById('productCategory').value);
+        formData.append('stock', document.getElementById('productStock').value);
+        formData.append('weight', document.getElementById('productWeight').value);
+        
+        // Get all selected images
+        const imageInput = document.getElementById('productImage');
+        for (let i = 0; i < imageInput.files.length; i++) {
+          formData.append('images[]', imageInput.files[i]);
         }
+        
+        // Add variants if needed (simplified for now)
+        const isEdit = document.querySelector('.modal-title').textContent.includes('Edit');
+        const productId = document.querySelector('.modal-title').dataset.productId;
+        
+        fetch(isEdit ? `/penjual/produk/${productId}` : '/penjual/produk', {
+          method: isEdit ? 'PUT' : 'POST',
+          headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+          },
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert(data.message);
+            location.reload(); // Reload the page to show updated products
+          } else {
+            alert('Error: ' + (data.message || 'Unknown error occurred'));
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Error occurred while saving product');
+        })
+        .finally(() => {
+          // Restore button state
+          saveBtn.textContent = originalText;
+          saveBtn.disabled = false;
+        });
       });
       
       // Image preview functionality
+      const imageUploadArea = document.getElementById('imageUploadArea');
+      const imageInput = document.getElementById('productImage');
+      const imagePreview = document.getElementById('imagePreview');
+      
       imageUploadArea.addEventListener('click', function() {
         imageInput.click();
       });
@@ -817,142 +605,250 @@
           reader.readAsDataURL(e.dataTransfer.files[0]);
         }
       });
-      
-      // Close modal with Escape key
-      document.addEventListener('keydown', function(e) {
-        const modal = document.getElementById('productModal');
-        if (e.key === 'Escape' && modal.classList.contains('active')) {
-          modal.classList.remove('active');
-          document.body.style.overflow = '';
-        }
-      });
-      
-      // Form submission for adding new products
-      function addProductHandler() {
-        // Here you would typically send the form data to the server
-        const productName = document.getElementById('productName').value;
-        alert('Produk "' + productName + '" berhasil ditambahkan!');
-        
-        // Reset modal title and button
-        document.querySelector('.modal-title').textContent = 'Tambah Produk Baru';
-        document.getElementById('saveProductBtn').textContent = 'Simpan Produk';
-        document.getElementById('productName').value = '';
-        document.getElementById('productPrice').value = '';
-        document.getElementById('productStock').value = '';
-        document.getElementById('productCategory').value = '';
-        document.getElementById('productDescription').value = '';
-        document.getElementById('productWeight').value = '';
-        
-        // Get modal and hide it - ensure modal is retrieved fresh each time
-        const modal = document.getElementById('productModal');
-        modal.classList.remove('active');
-        document.body.style.overflow = '';
-      }
-      
-      // Set the original event handler for adding products
-      saveProductBtn.addEventListener('click', addProductHandler);
-      
-      // Search functionality
-      const searchInput = document.querySelector('.search input');
-      searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
-        const tableRows = document.querySelectorAll('.table tbody tr');
-        
-        tableRows.forEach(function(row) {
-          const productName = row.querySelector('.product-cell span').textContent.toLowerCase();
-          const productCategory = row.cells[2].textContent.toLowerCase(); // Kategori
-          const productStatus = row.cells[4].textContent.toLowerCase(); // Status
-          
-          if (productName.includes(searchTerm) || 
-              productCategory.includes(searchTerm) || 
-              productStatus.includes(searchTerm)) {
-            row.style.display = '';
-          } else {
-            row.style.display = 'none';
-          }
-        });
-      });
-      
-      // Edit and delete functionality using event delegation
-      document.querySelector('.table tbody').addEventListener('click', function(e) {
-        // Check if the clicked element is an edit button
-        if (e.target.closest('.action-btn[title="Edit"]')) {
-          e.preventDefault();
-          const button = e.target.closest('.action-btn[title="Edit"]');
-          const row = button.closest('tr');
-          const productName = row.querySelector('.product-cell span').textContent;
-          const productPrice = row.cells[1].textContent;
-          const productCategory = row.cells[2].textContent;
-          const productStock = row.cells[3].textContent;
-          
-          // Debug: Log to console to confirm the click is registered
-          console.log('Edit button clicked for product:', productName);
-          
-          // Fill modal form with product data
-          document.getElementById('productName').value = productName;
-          document.getElementById('productPrice').value = productPrice.replace(/[^\d]/g, '');
-          document.getElementById('productStock').value = productStock;
-          document.getElementById('productCategory').value = productCategory.toLowerCase();
-          document.getElementById('productDescription').value = 'Deskripsi produk ' + productName;
-          
-          // Change modal title and button
-          document.querySelector('.modal-title').textContent = 'Edit Produk';
-          document.getElementById('saveProductBtn').textContent = 'Update Produk';
-          
-          // Get modal and show it - ensure modal is retrieved fresh each time
-          const modal = document.getElementById('productModal');
-          modal.classList.add('active');
-          document.body.style.overflow = 'hidden';
-          
-          // Set up save functionality for edit
-          const updateBtn = document.getElementById('saveProductBtn');
-          
-          // Store reference to the current row being edited
-          updateBtn.onclick = function() {
-            // Here you would typically send the updated data to the server
-            alert('Produk "' + productName + '" berhasil diperbarui!');
-            
-            // Update row data (simulate update)
-            row.querySelector('.product-cell span').textContent = document.getElementById('productName').value;
-            row.cells[1].textContent = 'Rp ' + parseInt(document.getElementById('productPrice').value).toLocaleString('id-ID');
-            row.cells[2].textContent = document.getElementById('productCategory').value.charAt(0).toUpperCase() + document.getElementById('productCategory').value.slice(1);
-            row.cells[3].textContent = document.getElementById('productStock').value;
-            
-            // Reset modal title and button
-            document.querySelector('.modal-title').textContent = 'Tambah Produk Baru';
-            document.getElementById('saveProductBtn').textContent = 'Simpan Produk';
-            document.getElementById('productName').value = '';
-            document.getElementById('productPrice').value = '';
-            document.getElementById('productStock').value = '';
-            document.getElementById('productCategory').value = '';
-            document.getElementById('productDescription').value = '';
-            document.getElementById('productWeight').value = '';
-            
-            // Get modal and hide it - ensure modal is retrieved fresh each time
-            const modal = document.getElementById('productModal');
-            modal.classList.remove('active');
-            document.body.style.overflow = '';
-            
-            // Restore original event handler (addProductHandler)
-            updateBtn.onclick = addProductHandler;
-          };
-        }
-        
-        // Check if the clicked element is a delete button
-        if (e.target.closest('.action-btn[title="Hapus"]')) {
-          e.preventDefault();
-          const button = e.target.closest('.action-btn[title="Hapus"]');
-          const row = button.closest('tr');
-          const productName = row.querySelector('.product-cell span').textContent;
-          
-          if (confirm('Apakah Anda yakin ingin menghapus produk "' + productName + '"?')) {
-            // Here you would typically send a delete request to the server
-            row.remove();
-            alert('Produk "' + productName + '" berhasil dihapus!');
-          }
-        }
-      });
     });
+    
+    // Function to handle editing a product
+    function editProduct(productId, productName, productPrice, productStock, productCategory, productDescription, productWeight) {
+      document.querySelector('.modal-title').textContent = 'Edit Produk';
+      document.querySelector('.modal-title').dataset.productId = productId;
+      document.getElementById('productName').value = productName;
+      document.getElementById('productPrice').value = productPrice;
+      document.getElementById('productStock').value = productStock;
+      document.getElementById('productCategory').value = productCategory;
+      document.getElementById('productDescription').value = productDescription;
+      document.getElementById('productWeight').value = productWeight;
+      document.getElementById('saveProductBtn').textContent = 'Update Produk';
+      
+      const modal = document.getElementById('productModal');
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    
+    // Function to handle deleting a product
+    function deleteProduct(productId, productName) {
+      if (confirm(`Apakah Anda yakin ingin menghapus produk "${productName}"?`)) {
+        fetch(`/penjual/produk/${productId}`, {
+          method: 'DELETE',
+          headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert(data.message);
+            location.reload(); // Reload the page to reflect changes
+          } else {
+            alert('Error: ' + (data.message || 'Unknown error occurred'));
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Error occurred while deleting product');
+        });
+      }
+    }
+    
+    // Search functionality with debounce
+    const searchInput = document.getElementById('searchInput');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    let searchTimeout;
+    
+    // Function to update URL with filters
+    function updateFilters() {
+        const url = new URL(window.location);
+        const searchTerm = searchInput.value.trim();
+        const category = categoryFilter.value;
+        const status = statusFilter.value;
+        
+        // Clear existing params
+        url.searchParams.delete('search');
+        url.searchParams.delete('category');
+        url.searchParams.delete('status');
+        url.searchParams.delete('page');
+        
+        // Set new params
+        if (searchTerm) {
+            url.searchParams.set('search', searchTerm);
+        }
+        if (category) {
+            url.searchParams.set('category', category);
+        }
+        if (status) {
+            url.searchParams.set('status', status);
+        }
+        
+        window.location = url.toString();
+    }
+    
+    // Search input handler
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(updateFilters, 500); // Debounce for 500ms
+    });
+    
+    // Enter key to trigger search immediately
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            clearTimeout(searchTimeout);
+            updateFilters();
+        }
+    });
+    
+    // Filter change handlers
+    categoryFilter.addEventListener('change', updateFilters);
+    statusFilter.addEventListener('change', updateFilters);
   </script>
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+</head>
+<body>
+  @include('components.admin_penjual.header')
+
+  <div class="main-layout">
+    <div class="content-wrapper">
+      <main class="content admin-page-content" role="main">
+        <!-- Page Header -->
+        <section class="page-header">
+          <h1>Manajemen Produk untuk {{ auth()->user()->name }}</h1>
+        </section>
+
+        <!-- Control Bar -->
+        <div class="control-bar">
+          <div class="control-bar-left">
+            <a href="{{ route('penjual.produk.create') }}" class="btn btn-primary">+ Tambah Produk</a>
+            
+            <!-- Filter Kategori -->
+            <select class="form-control" id="categoryFilter" style="width: 200px; margin-left: 1rem;">
+              <option value="">Semua Kategori</option>
+              @foreach($categories as $category)
+                <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                  {{ $category->name }}
+                </option>
+              @endforeach
+            </select>
+            
+            <!-- Filter Status -->
+            <select class="form-control" id="statusFilter" style="width: 150px; margin-left: 1rem;">
+              <option value="">Semua Status</option>
+              <option value="aktif" {{ request('status') == 'aktif' ? 'selected' : '' }}>Aktif</option>
+              <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>Draft</option>
+              <option value="suspended" {{ request('status') == 'suspended' ? 'selected' : '' }}>Ditangguhkan</option>
+            </select>
+          </div>
+          
+          <div class="search">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <input type="text" placeholder="Cari produk..." id="searchInput" value="{{ request('search') }}">
+          </div>
+        </div>
+
+        <!-- Product Table -->
+        <section class="table-card">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Nama Produk</th>
+                <th>Harga</th>
+                <th>Kategori</th>
+                <th>Stok</th>
+                <th>Status</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              @forelse($products as $product)
+              <tr>
+                <td>
+                  <div class="product-cell">
+                    @if($product->images->first())
+                      <img src="{{ asset('storage/' . $product->images->first()->image_path) }}" alt="{{ $product->name }}" class="product-thumb">
+                    @else
+                      <img src="https://placehold.co/40x40" alt="{{ $product->name }}" class="product-thumb">
+                    @endif
+                    <span>{{ $product->name }}</span>
+                  </div>
+                </td>
+                <td>Rp {{ number_format($product->price, 0, ',', '.') }}</td>
+                <td>{{ $product->category ? $product->category->name : 'N/A' }}</td>
+                <td>{{ $product->stock }}</td>
+                <td>
+                  <span class="status-badge 
+                    @if($product->status === 'aktif') status-active 
+                    @elseif($product->status === 'pending') status-pending 
+                    @else status-suspended @endif">
+                    {{ ucfirst($product->status) }}
+                  </span>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <a href="{{ route('penjual.produk.edit', $product->id) }}" class="action-btn" title="Edit">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16.44 7.875L15.12 6.555C14.7313 6.16629 14.2054 5.9536 13.6557 5.9536C13.106 5.9536 12.5801 6.16629 12.1914 6.555L4.25137 14.495C4.10967 14.6367 4.00687 14.812 3.95154 15.0075L3.00137 18.755C2.92658 19.0539 3.01586 19.3738 3.23538 19.5933C3.4549 19.8128 3.7748 19.9021 4.07367 19.8273L7.8212 18.8771C8.0167 18.8218 8.19202 18.719 8.33372 18.5773L16.2737 10.6373C16.6624 10.2486 16.8751 9.72269 16.8751 9.17297C16.8751 8.62325 16.6624 8.09734 16.2737 7.70863L16.44 7.875ZM17.34 6.975L16.02 5.655C15.6313 5.26629 15.1054 5.0536 14.5557 5.0536C14.006 5.0536 13.4801 5.26629 13.0914 5.655L5.15137 13.595C4.76266 13.9837 4.54998 14.5096 4.54998 15.0593C4.54998 15.609 4.76266 16.1349 5.15137 16.5236L6.62137 18.005L10.3714 16.5236L11.8414 15.0593L17.34 9.575C17.7287 9.18629 17.9414 8.66038 17.9414 8.11066C17.9414 7.56094 17.7287 7.03503 17.34 6.64632V6.975Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </a>
+                    <button class="action-btn" title="Hapus" onclick="deleteProduct({{ $product->id }}, '{{ $product->name }}')">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 7H20M10 11V17M14 11V17M5 7L6 19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19L19 7M9 7V4C9 3.44772 9.44772 3 10 3H14C14.5523 3 15 3.44772 15 4V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              @empty
+              <tr>
+                <td colspan="6" style="text-align: center;">Tidak ada produk ditemukan</td>
+              </tr>
+              @endforelse
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Pagination -->
+        <section class="pagination">
+          <div class="pagination-info">
+            Menampilkan {{ $products->firstItem() }}-{{ $products->lastItem() }} dari {{ $products->total() }} produk
+          </div>
+          <div class="pagination-nav">
+            @if ($products->onFirstPage())
+              <button class="pagination-btn" disabled>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M15 19L8 12L15 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            @else
+              <a href="{{ $products->previousPageUrl() }}" class="pagination-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M15 19L8 12L15 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+            @endif
+            
+            @for ($i = 1; $i <= $products->lastPage(); $i++)
+              <a href="{{ $products->url($i) }}" class="pagination-btn {{ $i == $products->currentPage() ? 'active' : '' }}">{{ $i }}</a>
+            @endfor
+            
+            @if ($products->hasMorePages())
+              <a href="{{ $products->nextPageUrl() }}" class="pagination-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+            @else
+              <button class="pagination-btn" disabled>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            @endif
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  @include('components.admin_penjual.footer')
 </body>
 </html>

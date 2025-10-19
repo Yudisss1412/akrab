@@ -1,0 +1,170 @@
+.reviews-page {
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.product-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.product-header img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.product-details h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.shop-name {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.overall-rating {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.average-rating {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.rating-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.rating-stars {
+  margin: 0.5rem 0;
+}
+
+.rating-stars .star {
+  font-size: 1.5rem;
+  color: #ddd;
+}
+
+.rating-stars .star.filled {
+  color: #ffc107;
+}
+
+.rating-stars .star.half-filled {
+  color: #ffc107;
+  position: relative;
+}
+
+.rating-stars .star.half-filled:before {
+  content: "★";
+  position: absolute;
+  left: 0;
+  width: 50%;
+  overflow: hidden;
+  color: #ddd;
+}
+
+.review-count {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.reviews-list {
+  margin-top: 2rem;
+}
+
+.review-item {
+  padding: 1.5rem;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  background: white;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #007bff;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.user-details h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.review-date {
+  margin: 0;
+  color: #999;
+  font-size: 0.8rem;
+}
+
+.rating .star {
+  font-size: 1.2rem;
+  color: #ddd;
+}
+
+.rating .star.filled {
+  color: #ffc107;
+}
+
+.review-content p {
+  margin: 0;
+  color: #555;
+  line-height: 1.5;
+}
+
+.no-reviews {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  .product-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .review-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .reviews-page {
+    padding: 0 0.5rem;
+  }
+}

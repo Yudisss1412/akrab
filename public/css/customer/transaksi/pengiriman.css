@@ -1,365 +1,294 @@
-:root {
-  --primary-color: #a8d5c9;
-  --primary-color-dark: #006E5C;
-  --secondary-color: #fff;
-  --border-color: #e9ecef;
-  --bg: #f0fdfa;
-  --text: #333;
-  --success: #10b981;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --gray-100: #f8f9fa;
-  --gray-200: #e9ecef;
-  --gray-300: #dee2e6;
-  --gray-500: #adb5bd;
-  --radius: 12px;
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+/* Existing pengiriman.css styles */
+.pengiriman-page {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  padding: 2rem 0;
 }
 
-* {
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Poppins', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  margin: 0;
-  line-height: 1.5;
-}
-
-/* Container */
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 0 1rem;
 }
 
-/* Page Header */
 .page-header {
-  margin-bottom: 30px;
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .page-header h1 {
-  font-size: 24px;
-  font-weight: 700;
-  margin: 0 0 20px 0;
-  color: var(--text);
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.5rem;
 }
 
-/* Progress Steps */
 .progress-steps {
   display: flex;
-  justify-content: space-between;
-  position: relative;
-  margin-bottom: 40px;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
-.progress-steps::before {
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.step:not(:last-child):after {
   content: '';
   position: absolute;
-  top: 18px;
-  left: 0;
-  right: 0;
+  top: 20px;
+  left: 50%;
+  width: 50px;
   height: 2px;
-  background: var(--gray-200);
-  z-index: 1;
+  background: #ccc;
+  transform: translateX(-50%);
 }
 
-.progress-steps .step {
-  position: relative;
-  z-index: 2;
-  text-align: center;
-  flex: 1;
-}
-
-.progress-steps .step.active .step-number {
-  background: var(--primary-color-dark);
+.step.active .step-number {
+  background: #006e5c;
   color: white;
-  border-color: var(--primary-color-dark);
 }
 
-.progress-steps .step.active .step-label {
-  color: var(--primary-color-dark);
-  font-weight: 600;
-}
-
-.progress-steps .step-number {
+.step .step-number {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: white;
-  border: 2px solid var(--gray-200);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 10px;
-  font-weight: 600;
-  color: var(--gray-500);
+  background: #e9ecef;
+  color: #6c757d;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
 }
 
-.progress-steps .step-label {
-  font-size: 14px;
-  color: var(--gray-500);
+.step-label {
+  font-size: 0.875rem;
+  color: #6c757d;
 }
 
-/* Pengiriman Content */
+.step.active .step-label {
+  color: #006e5c;
+  font-weight: 500;
+}
+
 .pengiriman-content {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: 30px;
+  gap: 1.5rem;
 }
 
-/* Sections */
-section {
+.main-content {
   background: white;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-  padding: 24px;
-  margin-bottom: 24px;
-  box-shadow: var(--shadow);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-section h2 {
-  font-size: 18px;
-  font-weight: 700;
-  margin: 0 0 20px 0;
-  color: var(--text);
-}
-
-/* Address Card */
-.address-card {
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-  padding: 20px;
-  position: relative;
-}
-
-.address-card.selected {
-  border-color: var(--primary-color-dark);
-  background: rgba(168, 213, 201, 0.1);
-}
-
-.address-card.selected::after {
-  content: '✓';
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  color: var(--primary-color-dark);
-  font-weight: 700;
-  font-size: 18px;
-}
-
-.address-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 12px;
-}
-
-.address-header h3 {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0;
-  color: var(--text);
-}
-
-.badge {
-  display: inline-block;
-  padding: 4px 8px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.badge.primary {
-  background: var(--primary-color);
-  color: var(--primary-color-dark);
-}
-
-.address-detail {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.5;
-  color: #666;
-}
-
-/* Shipping Info */
-.shipping-info {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.shipping-address-summary h2,
+.shipping-methods h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #333;
+  font-size: 1.2rem;
 }
 
 .info-row {
   display: flex;
   justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
 }
 
-.info-row .label {
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.label {
   font-weight: 500;
-  color: var(--text);
+  color: #666;
 }
 
-.info-row .value {
-  text-align: right;
-  max-width: 60%;
+.value {
+  color: #333;
 }
 
-/* Shipping Options */
 .shipping-options {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 1rem;
 }
 
 .shipping-option {
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s;
 }
 
 .shipping-option:hover {
-  border-color: var(--primary-color);
-  box-shadow: 0 2px 8px rgba(0, 110, 92, 0.1);
+  border-color: #006e5c;
+  background-color: #f8f9fa;
 }
 
 .shipping-option.selected {
-  border-color: var(--primary-color-dark);
-  background: rgba(168, 213, 201, 0.1);
-}
-
-.shipping-option.selected::after {
-  content: '✓';
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  color: var(--primary-color-dark);
-  font-weight: 700;
-  font-size: 18px;
+  border-color: #006e5c;
+  background-color: #e8f4f2;
 }
 
 .option-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 12px;
+  align-items: center;
+  margin-bottom: 0.5rem;
 }
 
 .option-info h3 {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0 0 4px 0;
-  color: var(--text);
+  margin: 0;
+  color: #333;
 }
 
 .option-info p {
-  font-size: 13px;
-  color: #666;
   margin: 0;
+  color: #666;
+  font-size: 0.9rem;
 }
 
 .option-price {
-  font-weight: 700;
-  font-size: 16px;
-  color: var(--text);
+  font-weight: bold;
+  color: #006e5c;
 }
 
 .option-description {
   margin: 0;
-  font-size: 14px;
   color: #666;
-  line-height: 1.4;
+  font-size: 0.875rem;
 }
 
-/* Payment Summary */
-.payment-summary .summary-details {
-  margin-bottom: 20px;
+.sidebar {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.payment-summary h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.summary-details {
+  margin-bottom: 1.5rem;
 }
 
 .summary-row {
   display: flex;
   justify-content: space-between;
-  padding: 8px 0;
-  font-size: 14px;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
 }
 
-.summary-row.discount {
-  color: var(--success);
+.summary-row:last-child {
+  font-weight: bold;
+  color: #333;
+}
+
+.summary-row.total {
+  font-size: 1.1rem;
+}
+
+.discount {
+  color: #dc3545;
 }
 
 .summary-divider {
   height: 1px;
-  background: var(--border-color);
-  margin: 12px 0;
+  background: #eee;
+  margin: 0.5rem 0;
 }
 
-.summary-row.total {
-  font-weight: 700;
-  font-size: 16px;
-  border-top: 1px solid var(--border-color);
-  padding-top: 16px;
-  margin-top: 8px;
-}
-
-.total-amount {
-  color: var(--primary-color-dark);
-  font-size: 18px;
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 14px;
-  cursor: pointer;
-  border: 1px solid transparent;
-  transition: all 0.2s ease;
-  text-decoration: none;
-}
-
-.btn-primary {
+.btn-lanjut-pembayaran {
   width: 100%;
-  padding: 16px;
-  background: var(--primary-color-dark);
-  color: white;
-  border: none;
+}
+
+/* New styles for review section */
+.review-section {
+  background: white;
   border-radius: 8px;
-  font-weight: 700;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background 0.2s ease;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.btn-primary:hover {
-  background: #005a4a;
+.review-section .section-title {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: #333;
+  text-align: center;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .container {
-    padding: 16px;
-  }
-  
+.products-to-review {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.product-review-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.product-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.product-info img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.product-details h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.product-details .shop-name {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+@media (max-width: 992px) {
   .pengiriman-content {
     grid-template-columns: 1fr;
-    gap: 20px;
   }
   
-  .page-header h1 {
-    font-size: 20px;
+  .products-to-review {
+    flex-direction: column;
   }
   
-  .progress-steps {
-    margin-bottom: 30px;
-  }
-  
-  section {
-    padding: 20px;
+  .product-review-card {
+    max-width: none;
   }
 }

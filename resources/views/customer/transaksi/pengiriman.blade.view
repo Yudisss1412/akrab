@@ -138,6 +138,39 @@
         </div>
       </div>
     </div>
+    
+    <!-- Review Section - only show if order is delivered -->
+    @if(isset($order) && $order && $order->status === 'delivered')
+    <div class="review-section">
+      <div class="container">
+        <h2 class="section-title">Beri Ulasan untuk Pesanan Ini</h2>
+        <div class="products-to-review">
+          @foreach($order->items as $item)
+            @php
+              // Check if user has already reviewed this product in this order
+              $existingReview = \App\Models\Review::where('user_id', auth()->id())
+                                                   ->where('product_id', $item->product_id)
+                                                   ->where('order_id', $order->id)
+                                                   ->first();
+            @endphp
+            
+            @if(!$existingReview)
+            <div class="product-review-card">
+              <div class="product-info">
+                <img src="{{ $item->product->image ? asset('storage/' . $item->product->image) : asset('src/placeholder_produk.png') }}" alt="{{ $item->product->name }}">
+                <div class="product-details">
+                  <h3>{{ $item->product->name }}</h3>
+                  <p class="shop-name">Toko: {{ $item->product->seller->name ?? 'Toko Tidak Diketahui' }}</p>
+                </div>
+              </div>
+              <a href="{{ route('ulasan.create', $item->id) }}" class="btn btn-primary">Beri Ulasan</a>
+            </div>
+            @endif
+          @endforeach
+        </div>
+      </div>
+    </div>
+    @endif
   </main>
 @endsection
 

@@ -75,4 +75,16 @@ class Product extends Model
     {
         return $this->hasMany(ProductImage::class);
     }
+
+    // Method untuk mendapatkan rata-rata rating
+    public function getAverageRatingAttribute()
+    {
+        return $this->reviews()->where('status', 'approved')->avg('rating') ?? 0;
+    }
+
+    // Method untuk mendapatkan jumlah ulasan
+    public function getReviewsCountAttribute()
+    {
+        return $this->reviews()->where('status', 'approved')->count();
+    }
 }

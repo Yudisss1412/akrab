@@ -36,7 +36,7 @@ class ProductController extends Controller
     public function show($id)
     {
         // Ambil produk berdasarkan ID dengan relasi yang diperlukan
-        $product = Product::with(['variants', 'seller', 'category'])->find($id);
+        $product = Product::with(['variants', 'seller', 'category', 'reviews.user'])->find($id);
         
         if (!$product) {
             abort(404, 'Produk tidak ditemukan');
@@ -51,7 +51,17 @@ class ProductController extends Controller
             'deskripsi' => $product->description,
             'gambar_utama' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
             'gambar' => [$product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png')], // Tambahkan lebih banyak gambar jika ada
-            'rating' => $product->rating ?? 4.5, // Nilai dummy untuk sekarang, bisa diganti dengan rating sebenarnya
+            'rating' => $product->averageRating, // Gunakan averageRating dari accessor
+            'jumlah_ulasan' => $product->reviews_count, // Gunakan reviews_count dari accessor
+            'ulasan' => $product->reviews->where('status', 'approved')->map(function($review) {
+                return [
+                    'id' => $review->id,
+                    'user' => $review->user->name,
+                    'rating' => $review->rating,
+                    'review_text' => $review->review_text,
+                    'created_at' => $review->created_at->format('d M Y')
+                ];
+            })->toArray(),
             'stok' => $product->stock,
             'berat' => $product->weight,
             'varian' => $product->variants->map(function($variant) {

@@ -1,0 +1,43 @@
+.rating-stars {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+
+.rating-stars input[type="radio"] {
+  display: none;
+}
+
+.rating-stars label {
+  color: #ddd;
+  cursor: pointer;
+  font-size: 2rem;
+  transition: color 0.2s;
+  margin: 0;
+  padding: 0 2px;
+}
+
+/* Default state for labels */
+.rating-stars label {
+  color: #ddd;
+}
+
+/* When hovering over a label, highlight it and all labels to the right (lower values) */
+.rating-stars label:hover,
+.rating-stars label:hover ~ label {
+  color: #ffc107;
+}
+
+/* When a radio button is checked, highlight its label and all labels to the right */
+#star5:checked ~ label[for="star5"],
+#star4:checked ~ label[for="star4"],
+#star3:checked ~ label[for="star3"],
+#star2:checked ~ label[for="star2"],
+#star1:checked ~ label[for="star1"],
+/* Also highlight the labels to the right of the checked star */
+#star4:checked ~ label[for="star5"],
+#star3:checked ~ label[for="star4"], #star3:checked ~ label[for="star5"],
+#star2:checked ~ label[for="star3"], #star2:checked ~ label[for="star4"], #star2:checked ~ label[for="star5"],
+#star1:checked ~ label[for="star2"], #star1:checked ~ label[for="star3"], #star1:checked ~ label[for="star4"], #star1:checked ~ label[for="star5"] {
+  color: #ffc107;
+}

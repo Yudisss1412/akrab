@@ -1,0 +1,132 @@
+.my-reviews-page {
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  font-size: 1.8rem;
+  color: #333;
+}
+
+.reviews-list {
+  margin-bottom: 2rem;
+}
+
+.review-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1.5rem;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  background: white;
+}
+
+.product-info {
+  flex: 1;
+  display: flex;
+  gap: 1rem;
+}
+
+.product-info img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.product-details h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.shop-name {
+  margin: 0 0 0.5rem 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.review-date {
+  margin: 0;
+  color: #999;
+  font-size: 0.8rem;
+}
+
+.review-rating {
+  width: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.rating-stars .star {
+  font-size: 1.5rem;
+  color: #ddd;
+}
+
+.rating-stars .star.filled {
+  color: #ffc107;
+}
+
+.review-status {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.status-approved {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.review-content {
+  flex: 2;
+  display: flex;
+  align-items: center;
+}
+
+.review-content p {
+  margin: 0;
+  color: #555;
+  line-height: 1.5;
+}
+
+.no-reviews {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  .review-item {
+    flex-direction: column;
+  }
+  
+  .review-rating {
+    width: auto;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+  
+  .review-content {
+    align-self: flex-start;
+  }
+  
+  .my-reviews-page {
+    padding: 0 0.5rem;
+  }
+}

@@ -110,6 +110,37 @@ Route::post('/pengiriman/update-shipping', [App\Http\Controllers\CheckoutControl
 Route::get('/pembayaran', [App\Http\Controllers\CheckoutController::class, 'showPayment'])->name('cust.pembayaran');
 Route::post('/pembayaran/process', [App\Http\Controllers\CheckoutController::class, 'processPayment'])->name('payment.process');
 
+// Routes untuk ulasan
+Route::get('/ulasan', [App\Http\Controllers\ReviewController::class, 'index'])->name('ulasan.index');
+Route::post('/ulasan', [App\Http\Controllers\ReviewController::class, 'store'])->name('ulasan.store');
+Route::get('/ulasan/{orderItemId}/create', [App\Http\Controllers\ReviewController::class, 'create'])->name('ulasan.create');
+Route::get('/ulasan/produk/{productId}', [App\Http\Controllers\ReviewController::class, 'showByProduct'])->name('ulasan.show_by_product');
+
+// API endpoint untuk mengambil ulasan pengguna
+Route::get('/api/reviews', function() {
+    if (!auth()->check()) {
+        return response()->json(['reviews' => []]);
+    }
+    
+    $reviews = \App\Models\Review::with(['product', 'product.seller'])
+        ->where('user_id', auth()->id())
+        ->latest()
+        ->get()
+        ->map(function($review) {
+            return [
+                'id' => $review->id,
+                'product_name' => $review->product->name ?? 'Produk Tidak Ditemukan',
+                'shop_name' => $review->product->seller->name ?? 'Toko Tidak Diketahui',
+                'product_image' => $review->product->image ? asset('storage/' . $review->product->image) : asset('src/placeholder_produk.png'),
+                'rating' => $review->rating,
+                'review_text' => $review->review_text,
+                'created_at' => $review->created_at->format('d M Y')
+            ];
+        });
+    
+    return response()->json(['reviews' => $reviews]);
+})->name('api.reviews');
+
 Route::get('/halaman_ulasan', function () {
     return view('customer.koleksi.halaman_ulasan');
 })->name('halaman_ulasan');

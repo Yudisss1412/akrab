@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', ($produk->nama ?? request('nama') ?? 'Detail Produk') . ' — AKRAB')
+@section('title', ($produk['nama'] ?? request('nama') ?? 'Detail Produk') . ' — AKRAB')
 
 @section('header')
   @include('components.customer.header.header')
@@ -26,11 +26,11 @@
         <!-- Product Gallery -->
         <section class="gallery-section" aria-label="Galeri produk">
           <div class="gallery-main">
-            <img id="mainImage" src="{{ $produk->gambar_utama ?? 'https://via.placeholder.com/600x600' }}" alt="{{ $produk->nama ?? 'Produk' }}" class="gallery-img">
+            <img id="mainImage" src="{{ $produk['gambar_utama'] ?? 'https://via.placeholder.com/600x600' }}" alt="{{ $produk['nama'] ?? 'Produk' }}" class="gallery-img">
           </div>
           <div class="gallery-thumbs" id="thumbnails">
-            @foreach(($produk->gambar ?? []) as $index => $img)
-              <img src="{{ $img }}" alt="{{ $produk->nama ?? 'Produk' }} {{ $index + 1 }}" 
+            @foreach(($produk['gambar'] ?? []) as $index => $img)
+              <img src="{{ $img }}" alt="{{ $produk['nama'] ?? 'Produk' }} {{ $index + 1 }}" 
                    class="thumb {{ $index === 0 ? 'active' : '' }}" data-index="{{ $index }}">
             @endforeach
           </div>
@@ -39,27 +39,27 @@
         <!-- Product Info -->
         <section class="info-section" aria-label="Informasi produk">
           <div class="info-header">
-            <h1 class="product-title" id="pdTitle" data-product-id="{{ $produk->id ?? '' }}" data-name="{{ $produk->nama ?? 'Nama Produk' }}">{{ $produk->nama ?? 'Nama Produk' }}</h1>
+            <h1 class="product-title" id="pdTitle" data-product-id="{{ $produk['id'] ?? '' }}" data-name="{{ $produk['nama'] ?? 'Nama Produk' }}">{{ $produk['nama'] ?? 'Nama Produk' }}</h1>
             <div class="product-meta">
-              <span class="product-category">{{ $produk->kategori ?? 'Kategori' }}</span>
-              <div class="product-rating" aria-label="Rating {{ $produk->rating ?? '4.5' }} dari 5">
+              <span class="product-category">{{ $produk['kategori'] ?? 'Kategori' }}</span>
+              <div class="product-rating" aria-label="Rating {{ $produk['rating'] ?? '4.5' }} dari 5">
                 @for($i = 1; $i <= 5; $i++)
-                  @if($i <= floor($produk->rating ?? 4.5))
+                  @if($i <= floor($produk['rating'] ?? 4.5))
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
                   @else
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="#E0E0E0"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
                   @endif
                 @endfor
-                <span class="rating-text">({{ $produk->jumlah_ulasan ?? '128' }} ulasan)</span>
+                <span class="rating-text">({{ $produk['jumlah_ulasan'] ?? '128' }} ulasan)</span>
               </div>
             </div>
           </div>
 
           <div class="price-section">
-            <div class="price-current">Rp<span class="price-number">{{ number_format($produk->harga ?? 100000, 0, ',', '.') }}</span></div>
-            @if($produk->harga_diskon ?? false)
-              <div class="price-original">Rp{{ number_format($produk->harga_asli ?? 120000, 0, ',', '.') }}</div>
-              <div class="discount-tag">-{{ round((($produk->harga_asli ?? 120000) - ($produk->harga ?? 100000)) / ($produk->harga_asli ?? 120000) * 100) }}%</div>
+            <div class="price-current">Rp<span class="price-number">{{ number_format($produk['harga'] ?? 100000, 0, ',', '.') }}</span></div>
+            @if($produk['harga_diskon'] ?? false)
+              <div class="price-original">Rp{{ number_format($produk['harga_asli'] ?? 120000, 0, ',', '.') }}</div>
+              <div class="discount-tag">-{{ round((($produk['harga_asli'] ?? 120000) - ($produk['harga'] ?? 100000)) / ($produk['harga_asli'] ?? 120000) * 100) }}%</div>
             @endif
           </div>
 
@@ -77,7 +77,7 @@
               </svg>
               + Keranjang
             </button>
-            <button class="btn btn-wishlist {{ $produk->di_wishlist ?? false ? 'active' : '' }}" type="button" aria-label="Wishlist">
+            <button class="btn btn-wishlist {{ $produk['di_wishlist'] ?? false ? 'active' : '' }}" type="button" aria-label="Wishlist">
               <svg class="heart-outline" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
               </svg>
@@ -92,7 +92,7 @@
         <section class="desc-section" aria-label="Deskripsi produk">
           <h2 class="section-title">Deskripsi Produk</h2>
           <div class="product-description">
-            {{ $produk->deskripsi ?? 'Deskripsi lengkap produk akan muncul di sini. Ini adalah contoh deskripsi produk yang menjelaskan fitur-fitur, spesifikasi, dan manfaat dari produk ini.' }}
+            {{ $produk['deskripsi'] ?? 'Deskripsi lengkap produk akan muncul di sini. Ini adalah contoh deskripsi produk yang menjelaskan fitur-fitur, spesifikasi, dan manfaat dari produk ini.' }}
           </div>
         </section>
 
@@ -100,7 +100,7 @@
         <section class="specs-section" aria-label="Spesifikasi produk">
           <h2 class="section-title">Spesifikasi</h2>
           <ul class="specs-list">
-            @foreach(($produk->spesifikasi ?? []) as $spec)
+            @foreach(($produk['spesifikasi'] ?? []) as $spec)
               <li class="spec-item">
                 <span class="spec-key">{{ $spec['nama'] ?? 'Spesifikasi' }}</span>
                 <span class="spec-value">{{ $spec['nilai'] ?? '-' }}</span>
@@ -117,26 +117,26 @@
           </div>
           <div class="reviews-summary">
             <div class="avg-rating">
-              <span class="rating-score">{{ $produk->rating ?? '4.5' }}</span>
+              <span class="rating-score">{{ $produk['rating'] ?? '4.5' }}</span>
               <div class="rating-stars">
                 @for($i = 1; $i <= 5; $i++)
-                  @if($i <= floor($produk->rating ?? 4.5))
+                  @if($i <= floor($produk['rating'] ?? 4.5))
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="#FFD700"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
                   @else
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="#E0E0E0"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
                   @endif
-                @endfor>
+                @endfor
               </div>
-              <span class="review-count">({{ $produk->jumlah_ulasan ?? '128' }} ulasan)</span>
+              <span class="review-count">({{ $produk['jumlah_ulasan'] ?? '128' }} ulasan)</span>
             </div>
           </div>
           <div class="reviews-list">
-            @foreach(($produk->ulasan ?? []) as $review)
+            @foreach(($produk['ulasan'] ?? []) as $review)
               <article class="review-card">
                 <div class="review-header">
                   <div class="reviewer-info">
-                    <span class="reviewer-name">{{ $review['nama'] ?? 'Nama Pembeli' }}</span>
-                    <time class="review-date">{{ $review['tanggal'] ?? '1 Jan 2023' }}</time>
+                    <span class="reviewer-name">{{ $review['user'] ?? 'Nama Pembeli' }}</span>
+                    <time class="review-date">{{ $review['created_at'] ?? '1 Jan 2023' }}</time>
                   </div>
                   <div class="review-rating">
                     @for($i = 1; $i <= 5; $i++)
@@ -148,7 +148,7 @@
                     @endfor>
                   </div>
                 </div>
-                <p class="review-content">{{ $review['komentar'] ?? 'Ulasan pelanggan tentang produk ini.' }}</p>
+                <p class="review-content">{{ $review['review_text'] ?? 'Ulasan pelanggan tentang produk ini.' }}</p>
               </article>
             @endforeach
           </div>

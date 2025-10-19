@@ -466,6 +466,83 @@
 
     // ====== Init ======
     document.addEventListener('DOMContentLoaded', fetchWishlist);
+    
+    // ====== Fetch and Render User Reviews ======
+    async function fetchUserReviews() {
+      try {
+        const response = await fetch('/api/reviews');
+        if(response.ok) {
+          const data = await response.json();
+          renderReviews(data.reviews || []);
+        } else {
+          // Fallback to empty array if API fails
+          renderReviews([]);
+        }
+      } catch (error) {
+        console.error('Error fetching reviews:', error);
+        renderReviews([]);
+      }
+    }
+
+    // Template function for a single review
+    function reviewCardTemplate(review) {
+      // Create stars based on rating
+      let starsHTML = '';
+      for (let i = 1; i <= 5; i++) {
+        if (i <= review.rating) {
+          starsHTML += '<i class="bi bi-star-fill"></i>';
+        } else {
+          starsHTML += '<i class="bi bi-star"></i>';
+        }
+      }
+
+      return `<article class="review-card">
+        <div class="review-product">
+          <img src="${review.product_image || '{{ asset("src/placeholder_produk.png") }}'}" alt="${review.product_name || 'Produk'}">
+          <div class="product-info">
+            <h4>${review.product_name || 'Nama Produk'}</h4>
+            <p class="shop-name">${review.shop_name || 'Nama Toko'}</p>
+            <div class="rating">
+              ${starsHTML}
+              <span>(${review.rating || 0})</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="review-content">
+          <p>${review.review_text || 'Ulasan tidak tersedia'}</p>
+        </div>
+        
+        <div class="review-actions">
+          <button class="btn btn-icon" title="Edit Ulasan" data-review-id="${review.id}">
+            <i class="bi bi-pencil"></i>
+          </button>
+        </div>
+      </article>`;
+    }
+
+    // Render reviews to the page
+    function renderReviews(reviews) {
+      const reviewsList = document.getElementById('reviewsList');
+      const reviewsLoading = document.getElementById('reviewsLoading');
+      
+      if (!reviewsList) return;
+      
+      if (reviewsLoading) {
+        reviewsLoading.remove();
+      }
+      
+      if (reviews.length > 0) {
+        reviewsList.innerHTML = reviews.map(reviewCardTemplate).join('');
+      } else {
+        reviewsList.innerHTML = '<p class="no-reviews">Anda belum memberikan ulasan untuk produk apapun.</p>';
+      }
+    }
+    
+    // Fetch reviews when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      fetchUserReviews();
+    });
   </script>
 @endpush
 

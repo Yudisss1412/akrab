@@ -184,31 +184,276 @@ Route::get('/kategori', function () {
 })->name('kategori');
 
 Route::get('/kategori/kuliner', function () {
-    return view('customer.kategori.kuliner');
+    // Ambil produk dari database sesuai kategori
+    $category = \App\Models\Category::where('name', 'Kuliner')->first();
+    
+    $products = collect(); // Inisialisasi sebagai collection kosong
+    if ($category) {
+        $products = \App\Models\Product::with(['variants', 'seller', 'category'])
+                     ->where('category_id', $category->id)
+                     ->where('status', 'active')
+                     ->get();
+    }
+    
+    // Format data produk
+    $formattedProducts = $products->map(function($product) {
+        return [
+            'id' => $product->id,
+            'name' => $product->name,
+            'description' => $product->description,
+            'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
+            'image' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
+        ];
+    });
+    
+    // Bagi produk ke dalam chunk untuk pagination
+    $productChunks = $formattedProducts->chunk(8);
+    
+    // Siapkan data untuk setiap halaman
+    $pageData = [];
+    for ($i = 1; $i <= min(5, count($productChunks)); $i++) {
+        $chunk = $productChunks->get($i - 1, collect([]))->values();
+        $pageData["page_{$i}_products"] = $chunk->toArray();
+    }
+    
+    return view('customer.kategori.kuliner', array_merge([
+        'categoryTitle' => 'Kuliner',
+        'categoryDescription' => 'Temukan berbagai produk kuliner menarik dari UMKM lokal',
+    ], $pageData));
 })->name('kategori.kuliner');
 
 Route::get('/kategori/fashion', function () {
-    return view('customer.kategori.fashion');
+    // Ambil produk dari database sesuai kategori
+    $category = \App\Models\Category::where('name', 'Fashion')->first();
+    
+    $products = collect(); // Inisialisasi sebagai collection kosong
+    if ($category) {
+        $products = \App\Models\Product::with(['variants', 'seller', 'category'])
+                     ->where('category_id', $category->id)
+                     ->where('status', 'active')
+                     ->get();
+    }
+    
+    // Format data produk
+    $formattedProducts = $products->map(function($product) {
+        return [
+            'id' => $product->id,
+            'name' => $product->name,
+            'description' => $product->description,
+            'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
+            'image' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
+        ];
+    });
+    
+    // Bagi produk ke dalam chunk untuk pagination
+    $productChunks = $formattedProducts->chunk(8);
+    
+    // Siapkan data untuk setiap halaman
+    $pageData = [];
+    for ($i = 1; $i <= min(5, count($productChunks)); $i++) {
+        $chunk = $productChunks->get($i - 1, collect([]))->values();
+        $pageData["page_{$i}_products"] = $chunk->toArray();
+    }
+    
+    return view('customer.kategori.fashion', array_merge([
+        'categoryTitle' => 'Fashion',
+        'categoryDescription' => 'Temukan berbagai produk fashion menarik dari UMKM lokal',
+    ], $pageData));
 })->name('kategori.fashion');
 
 Route::get('/kategori/kerajinan', function () {
-    return view('customer.kategori.kerajinan');
+    // Ambil produk dari database sesuai kategori
+    $category = \App\Models\Category::where('name', 'Kerajinan Tangan')->first();
+    
+    $products = collect(); // Inisialisasi sebagai collection kosong
+    if ($category) {
+        $products = \App\Models\Product::with(['variants', 'seller', 'category'])
+                     ->where('category_id', $category->id)
+                     ->where('status', 'active')
+                     ->get();
+    }
+    
+    // Format data produk
+    $formattedProducts = $products->map(function($product) {
+        return [
+            'id' => $product->id,
+            'name' => $product->name,
+            'description' => $product->description,
+            'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
+            'image' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
+        ];
+    });
+    
+    // Bagi produk ke dalam chunk untuk pagination
+    $productChunks = $formattedProducts->chunk(8);
+    
+    // Siapkan data untuk setiap halaman
+    $pageData = [];
+    for ($i = 1; $i <= min(5, count($productChunks)); $i++) {
+        $chunk = $productChunks->get($i - 1, collect([]))->values();
+        $pageData["page_{$i}_products"] = $chunk->toArray();
+    }
+    
+    return view('customer.kategori.kerajinan', array_merge([
+        'categoryTitle' => 'Kerajinan Tangan',
+        'categoryDescription' => 'Temukan berbagai produk kerajinan tangan unik dari UMKM lokal',
+    ], $pageData));
 })->name('kategori.kerajinan');
 
 Route::get('/kategori/berkebun', function () {
-    return view('customer.kategori.berkebun');
+    // Ambil produk dari database sesuai kategori
+    $category = \App\Models\Category::where('name', 'Berkebun')->first();
+    
+    $products = collect(); // Inisialisasi sebagai collection kosong
+    if ($category) {
+        $products = \App\Models\Product::with(['variants', 'seller', 'category'])
+                     ->where('category_id', $category->id)
+                     ->where('status', 'active')
+                     ->get();
+    }
+    
+    // Format data produk
+    $formattedProducts = $products->map(function($product) {
+        return [
+            'id' => $product->id,
+            'name' => $product->name,
+            'description' => $product->description,
+            'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
+            'image' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
+        ];
+    });
+    
+    // Bagi produk ke dalam chunk untuk pagination
+    $productChunks = $formattedProducts->chunk(8);
+    
+    // Siapkan data untuk setiap halaman
+    $pageData = [];
+    for ($i = 1; $i <= min(5, count($productChunks)); $i++) {
+        $chunk = $productChunks->get($i - 1, collect([]))->values();
+        $pageData["page_{$i}_products"] = $chunk->toArray();
+    }
+    
+    return view('customer.kategori.berkebun', array_merge([
+        'categoryTitle' => 'Produk Berkebun',
+        'categoryDescription' => 'Temukan berbagai produk berkebun alami dari UMKM lokal',
+    ], $pageData));
 })->name('kategori.berkebun');
 
 Route::get('/kategori/kesehatan', function () {
-    return view('customer.kategori.kesehatan');
+    // Ambil produk dari database sesuai kategori
+    $category = \App\Models\Category::where('name', 'Kesehatan')->first();
+    
+    $products = collect(); // Inisialisasi sebagai collection kosong
+    if ($category) {
+        $products = \App\Models\Product::with(['variants', 'seller', 'category'])
+                     ->where('category_id', $category->id)
+                     ->where('status', 'active')
+                     ->get();
+    }
+    
+    // Format data produk
+    $formattedProducts = $products->map(function($product) {
+        return [
+            'id' => $product->id,
+            'name' => $product->name,
+            'description' => $product->description,
+            'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
+            'image' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
+        ];
+    });
+    
+    // Bagi produk ke dalam chunk untuk pagination
+    $productChunks = $formattedProducts->chunk(8);
+    
+    // Siapkan data untuk setiap halaman
+    $pageData = [];
+    for ($i = 1; $i <= min(5, count($productChunks)); $i++) {
+        $chunk = $productChunks->get($i - 1, collect([]))->values();
+        $pageData["page_{$i}_products"] = $chunk->toArray();
+    }
+    
+    return view('customer.kategori.kesehatan', array_merge([
+        'categoryTitle' => 'Produk Kesehatan',
+        'categoryDescription' => 'Temukan berbagai produk kesehatan alami dari UMKM lokal',
+    ], $pageData));
 })->name('kategori.kesehatan');
 
 Route::get('/kategori/mainan', function () {
-    return view('customer.kategori.mainan');
+    // Ambil produk dari database sesuai kategori
+    $category = \App\Models\Category::where('name', 'Mainan')->first();
+    
+    $products = collect(); // Inisialisasi sebagai collection kosong
+    if ($category) {
+        $products = \App\Models\Product::with(['variants', 'seller', 'category'])
+                     ->where('category_id', $category->id)
+                     ->where('status', 'active')
+                     ->get();
+    }
+    
+    // Format data produk
+    $formattedProducts = $products->map(function($product) {
+        return [
+            'id' => $product->id,
+            'name' => $product->name,
+            'description' => $product->description,
+            'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
+            'image' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
+        ];
+    });
+    
+    // Bagi produk ke dalam chunk untuk pagination
+    $productChunks = $formattedProducts->chunk(8);
+    
+    // Siapkan data untuk setiap halaman
+    $pageData = [];
+    for ($i = 1; $i <= min(5, count($productChunks)); $i++) {
+        $chunk = $productChunks->get($i - 1, collect([]))->values();
+        $pageData["page_{$i}_products"] = $chunk->toArray();
+    }
+    
+    return view('customer.kategori.mainan', array_merge([
+        'categoryTitle' => 'Mainan',
+        'categoryDescription' => 'Temukan berbagai produk mainan edukatif dari UMKM lokal',
+    ], $pageData));
 })->name('kategori.mainan');
 
 Route::get('/kategori/hampers', function () {
-    return view('customer.kategori.hampers');
+    // Ambil produk dari database sesuai kategori
+    $category = \App\Models\Category::where('name', 'Hampers')->first();
+    
+    $products = collect(); // Inisialisasi sebagai collection kosong
+    if ($category) {
+        $products = \App\Models\Product::with(['variants', 'seller', 'category'])
+                     ->where('category_id', $category->id)
+                     ->where('status', 'active')
+                     ->get();
+    }
+    
+    // Format data produk
+    $formattedProducts = $products->map(function($product) {
+        return [
+            'id' => $product->id,
+            'name' => $product->name,
+            'description' => $product->description,
+            'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
+            'image' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
+        ];
+    });
+    
+    // Bagi produk ke dalam chunk untuk pagination
+    $productChunks = $formattedProducts->chunk(8);
+    
+    // Siapkan data untuk setiap halaman
+    $pageData = [];
+    for ($i = 1; $i <= min(5, count($productChunks)); $i++) {
+        $chunk = $productChunks->get($i - 1, collect([]))->values();
+        $pageData["page_{$i}_products"] = $chunk->toArray();
+    }
+    
+    return view('customer.kategori.hampers', array_merge([
+        'categoryTitle' => 'Hampers',
+        'categoryDescription' => 'Temukan berbagai produk hampers menarik dari UMKM lokal',
+    ], $pageData));
 })->name('kategori.hampers');
 
 Route::get('/dashboard_admin', function () {

@@ -18,6 +18,29 @@ class Product extends Model
         'category_id',
         'seller_id',
         'status',
+        'specifications',
+        'material',
+        'size',
+        'color',
+        'brand',
+        'features',
+        'additional_images',
+        'min_order',
+        'ready_stock',
+        'origin',
+        'warranty',
+        'view_count',
+        'discount_price',
+        'discount_start_date',
+        'discount_end_date',
+    ];
+
+    protected $casts = [
+        'specifications' => 'array',
+        'features' => 'array',
+        'additional_images' => 'array',
+        'discount_start_date' => 'date',
+        'discount_end_date' => 'date',
     ];
 
     // Relasi ke kategori

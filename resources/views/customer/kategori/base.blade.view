@@ -8,6 +8,173 @@
 
 @push('styles')
   <link rel="stylesheet" href="{{ asset('css/customer/kategori/kategori.css') }}">
+  <style>
+    /* ========== Modal Produk ========== */
+    .modal-detail-produk {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.20);
+      overflow-y: hidden !important;
+    }
+
+    .modal-content-new {
+      max-width: 420px;
+      width: 100%;
+      background: #fff;
+      border-radius: 25px;
+      box-shadow: 0 8px 38px rgba(0, 0, 0, 0.22);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .modal-title-row {
+      padding: 1.2rem 2rem 0.5rem 2rem;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .close {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #aaa;
+      cursor: pointer;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      transition: all 0.2s ease;
+    }
+    
+    .close:hover,
+    .close:focus {
+      color: #000;
+      text-decoration: none;
+      background-color: #f0f0f0;
+      cursor: pointer;
+    }
+
+    .modal-img-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #fafbfc;
+      padding: 0 0 1.2rem 0;
+    }
+
+    .modal-img-main {
+      width: 90%;
+      max-width: 220px;
+      height: auto;
+      object-fit: cover;
+      border-radius: 16px;
+      background: #e5e5e5;
+      margin: 0.5rem 0 0.7rem 0;
+    }
+
+    .modal-thumbs-new {
+      display: flex;
+      gap: 0.6rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-thumbs-new img {
+      width: 48px;
+      height: 36px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 2px solid #eee;
+      background: #eaeaea;
+      cursor: pointer;
+      transition: border 0.18s;
+    }
+
+    .modal-thumbs-new img.active {
+      border-color: var(--primary-color-dark);
+    }
+
+    .modal-price-new {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--primary-color-dark);
+      margin: 0 0 0.6rem 0;
+      padding: 0 2rem;
+    }
+
+    .modal-desc-box-new {
+      background: #f2fbf7;
+      border-radius: 15px;
+      padding: 1rem 1.3rem 0.8rem 1.3rem;
+      margin: 0 2rem 1.1rem 2rem;
+      color: #444;
+      font-size: 1rem;
+    }
+
+    .modal-desc {
+      margin: 0 0 0.7rem 0;
+    }
+
+    .modal-detail-list {
+      margin: 0;
+      padding-left: 1.1rem;
+    }
+
+    .modal-detail-list li {
+      margin-bottom: 0.2rem;
+      font-size: 1rem;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 1.1rem;
+      padding: 0 2rem 1.2rem 2rem;
+    }
+
+    .modal-btn {
+      flex: 1;
+      border: none;
+      padding: 0.6rem 0;
+      font-size: 1.07rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.12s;
+    }
+
+    .modal-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .modal-btn-primary {
+      background: var(--primary-color-dark);
+      color: #fff;
+    }
+
+    .modal-btn-primary:hover {
+      background: var(--primary-color);
+      color: var(--primary-color-dark);
+    }
+
+    .modal-btn-secondary {
+      background: #fff;
+      border: 1.5px solid var(--primary-color-dark);
+      color: var(--primary-color-dark);
+    }
+  </style>
 @endpush
 
 @section('content')
@@ -216,17 +383,7 @@
         content.style.display = 'none';
       });
       
-      // Add to cart functionality
-      const viewProductButtons = document.querySelectorAll('.view-product');
-      viewProductButtons.forEach(button => {
-        button.addEventListener('click', function() {
-          const productCard = this.closest('.product-card');
-          const productName = productCard.querySelector('.product-name').textContent;
-          alert(`Anda akan diarahkan ke halaman detail produk untuk ${productName}`);
-          // Here you would normally redirect to the product detail page
-          // window.location.href = '/produk-detail?product=' + encodeURIComponent(productName);
-        });
-      });
+      // View product modal functionality is handled by event delegation in the added script
       
       // Apply filter button functionality
       document.getElementById('apply-filter').addEventListener('click', function() {
@@ -318,29 +475,21 @@
         products.forEach(product => {
           const productCard = document.createElement('div');
           productCard.className = 'product-card';
+          // Add data-product-id attribute to the product card to make the modal work
+          productCard.setAttribute('data-product-id', product.id || 1);
           productCard.innerHTML = `
             <img src="\${product.image}" alt="Produk" class="product-image">
             <div class="product-info">
               <h3 class="product-name">\${product.name}</h3>
               <p class="product-description">\${product.description}</p>
               <div class="product-price">\${product.price}</div>
-              <button class="btn btn-primary view-product">Pratinjau</button>
+              <button class="btn btn-primary view-product" data-product-id="\${product.id || 1}">Pratinjau</button>
             </div>
           `;
           productsContainer.appendChild(productCard);
         });
         
-        // Reattach event listeners to new view product buttons
-        const newViewProductButtons = productsContainer.querySelectorAll('.view-product');
-        newViewProductButtons.forEach(button => {
-          button.addEventListener('click', function() {
-            const productCard = this.closest('.product-card');
-            const productName = productCard.querySelector('.product-name').textContent;
-            alert(\`Anda akan diarahkan ke halaman detail produk untuk \${productName}\`);
-            // Here you would normally redirect to the product detail page
-            // window.location.href = '/produk-detail?product=' + encodeURIComponent(productName);
-          });
-        });
+        // Event listener is handled by event delegation, no need to attach here
       }
       
       // Update active page button
@@ -401,7 +550,380 @@
           renderProducts(totalPages);
         }
       });
+      
+      // Function to show product detail modal
+      function showModalDetail(name, image, price, description) {
+        // Create modal elements if they don't exist
+        let modal = document.getElementById('product-detail-modal');
+        if (!modal) {
+          // Create modal overlay
+          const overlay = document.createElement('div');
+          overlay.id = 'product-detail-modal';
+          overlay.className = 'modal-overlay';
+          overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+          `;
+          
+          // Create modal container
+          const container = document.createElement('div');
+          container.className = 'modal-container';
+          container.style.cssText = `
+            background: #fff;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.3s ease;
+          `;
+          
+          // Create close button
+          const closeBtn = document.createElement('button');
+          closeBtn.innerHTML = '&times;';
+          closeBtn.style.cssText = `
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 10;
+          `;
+          closeBtn.onclick = () => hideModal();
+          
+          // Create modal content
+          const content = document.createElement('div');
+          content.className = 'modal-content';
+          content.style.padding = '20px';
+          
+          // Create modal structure
+          content.innerHTML = `
+            <div class="modal-product-image" style="text-align: center; margin-bottom: 15px;">
+              <img id="modal-product-image" src="" alt="" style="max-width: 100%; max-height: 300px; border-radius: 4px;">
+            </div>
+            <h3 id="modal-product-name" style="margin: 10px 0;"></h3>
+            <div id="modal-product-price" style="font-size: 1.5em; color: #e74c3c; font-weight: bold; margin: 10px 0;"></div>
+            <p id="modal-product-description" style="color: #555; margin: 15px 0; line-height: 1.5;"></p>
+            <div class="modal-actions" style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+              <button id="modal-view-detail-btn" class="btn btn-primary" style="padding: 8px 16px; border-radius: 4px;">Lihat Detail</button>
+              <button id="modal-add-cart-btn" class="btn btn-outline" style="padding: 8px 16px; border-radius: 4px;">Tambah ke Keranjang</button>
+            </div>
+          `;
+          
+          container.appendChild(closeBtn);
+          container.appendChild(content);
+          overlay.appendChild(container);
+          document.body.appendChild(overlay);
+          
+          modal = overlay;
+          
+          // Add event listener to close modal when clicking on overlay
+          modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+              hideModal();
+            }
+          });
+          
+          // Add close button functionality
+          document.getElementById('modal-view-detail-btn').addEventListener('click', function() {
+            alert('Menuju halaman detail produk');
+            hideModal();
+            // In a real implementation, this would redirect to the product detail page
+            // window.location.href = '/produk_detail/' + productId;
+          });
+          
+          document.getElementById('modal-add-cart-btn').addEventListener('click', function() {
+            alert('Produk ditambahkan ke keranjang');
+            hideModal();
+            // In a real implementation, this would add product to cart
+          });
+        }
+        
+        // Set modal content
+        document.getElementById('modal-product-image').src = image;
+        document.getElementById('modal-product-name').textContent = name;
+        document.getElementById('modal-product-price').textContent = price;
+        document.getElementById('modal-product-description').textContent = description;
+        
+        // Show modal
+        modal.style.display = 'flex';
+        setTimeout(() => {
+          modal.style.opacity = '1';
+          modal.querySelector('.modal-container').style.opacity = '1';
+          modal.querySelector('.modal-container').style.transform = 'scale(1)';
+        }, 10);
+        
+        // Add Escape key listener
+        document.addEventListener('keydown', handleEscKey, true);
+      }
+      
+      function hideModal() {
+        const modal = document.getElementById('product-detail-modal');
+        if (modal) {
+          modal.style.opacity = '0';
+          modal.querySelector('.modal-container').style.opacity = '0';
+          modal.querySelector('.modal-container').style.transform = 'scale(0.8)';
+          
+          setTimeout(() => {
+            modal.style.display = 'none';
+          }, 300);
+        }
+        document.removeEventListener('keydown', handleEscKey, true);
+      }
+      
+      function handleEscKey(e) {
+        if (e.key === 'Escape') {
+          hideModal();
+        }
+      }
     });
+  </script>
+
+  <!-- Modal Produk -->
+  <div class="modal-detail-produk" id="modal-detail-produk" style="display: none;">
+    <div class="modal-overlay"></div>
+    <div class="modal-content-new">
+        <div class="modal-title-row">
+            <span id="modal-product"></span>
+            <span class="close" id="modal-close-btn">&times;</span>
+        </div>
+        <div class="modal-img-section">
+            <img class="modal-img-main" id="modal-img" src="" alt="Foto Produk">
+            <div class="modal-thumbs-new" id="modal-thumbs"></div>
+        </div>
+        <div class="modal-price-new" id="modal-price"></div>
+        <div class="modal-desc-box-new">
+            <div class="modal-desc" id="modal-desc"></div>
+            <ul class="modal-detail-list" id="modal-specs"></ul>
+        </div>
+        <div class="modal-actions">
+            <button class="modal-btn modal-btn-primary" id="modal-addcart-btn">Tambah ke Keranjang</button>
+            <button class="modal-btn modal-btn-secondary" id="modal-lihatdetail-btn">Lihat Detail</button>
+        </div>
+    </div>
+  </div>
+
+  <script>
+    // ----- Modal Handling for Categories -----
+    const modal = document.getElementById('modal-detail-produk');
+    const modalImg = document.getElementById('modal-img');
+    const modalProduct = document.getElementById('modal-product');
+    const modalPrice = document.getElementById('modal-price');
+    const modalDesc = document.getElementById('modal-desc');
+    const modalSpecs = document.getElementById('modal-specs');
+    const modalThumbs = document.getElementById('modal-thumbs');
+    const modalAddCart = document.getElementById('modal-addcart-btn');
+    const modalLihatDetail = document.getElementById('modal-lihatdetail-btn');
+    const modalCloseBtn = document.getElementById('modal-close-btn');
+
+    let currentProduk = null;
+
+    // Buka modal via event delegation
+    document.addEventListener('click', function(e) {
+      if (e.target.classList.contains('view-product')) {
+        const productId = e.target.getAttribute('data-product-id') || e.target.closest('.product-card').getAttribute('data-product-id') || 1;
+        openProdukModal(null, productId);
+      }
+    });
+
+    // Tutup dengan klik di area overlay
+    if (modal) {
+      modal.addEventListener('mousedown', function(e) {
+        if (e.target === modal) closeProdukModal();
+      });
+    }
+
+    // Tutup dengan tombol close (jika ditampilkan di CSS)
+    if (modalCloseBtn) {
+      modalCloseBtn.addEventListener('click', closeProdukModal);
+    }
+
+    // Tutup dengan tombol Esc
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeProdukModal();
+    });
+
+    function openProdukModal(idx, productId) {
+      if (!modal) return;
+
+      // Fetch product data
+      fetch(`/api/products/${productId}`)
+        .then(response => response.json())
+        .then(produk => {
+          currentProduk = produk;
+
+          modalProduct.textContent = produk.name;
+          modalImg.src = produk.image;
+          modalImg.alt = produk.name;
+          modalPrice.textContent = produk.price;
+          modalDesc.textContent = produk.description;
+
+          // Specifications
+          modalSpecs.innerHTML = '';
+          (produk.specifications || produk.spesifikasi || []).forEach(spec => {
+            const li = document.createElement('li');
+            li.textContent = spec;
+            modalSpecs.appendChild(li);
+          });
+
+          // Thumbnails - for now using single image, but could be extended
+          modalThumbs.innerHTML = '';
+          const thumb = document.createElement('img');
+          thumb.src = produk.image;
+          thumb.alt = `Thumbnail`;
+          thumb.classList.add('active');
+          thumb.onclick = () => {
+            modalImg.src = produk.image;
+            [...modalThumbs.children].forEach(img => img.classList.remove('active'));
+            thumb.classList.add('active');
+          };
+          modalThumbs.appendChild(thumb);
+
+          // Store product ID in the add to cart button for easy access
+          if (modalAddCart) {
+            modalAddCart.setAttribute('data-product-id', productId);
+          }
+
+          modal.style.display = 'flex';
+          document.body.style.overflow = 'hidden';
+        })
+        .catch(error => {
+          console.error('Error loading product details:', error);
+          // Fallback to dummy data approach if API fails
+          const produk = {
+            name: "Produk Tidak Ditemukan",
+            image: "src/product_1.png",
+            price: "Rp 0",
+            description: "Produk tidak ditemukan di sistem.",
+            specifications: []
+          };
+          
+          currentProduk = produk;
+          modalProduct.textContent = produk.name;
+          modalImg.src = produk.image;
+          modalImg.alt = produk.name;
+          modalPrice.textContent = produk.price;
+          modalDesc.textContent = produk.description;
+          modalSpecs.innerHTML = '';
+          
+          modal.style.display = 'flex';
+          document.body.style.overflow = 'hidden';
+        });
+    }
+
+    function closeProdukModal() {
+      if (!modal) return;
+      modal.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    // Add to cart functionality
+    if (modalAddCart) {
+      modalAddCart.onclick = function() {
+        const productId = this.getAttribute('data-product-id');
+        addToCart(productId);
+      };
+    }
+
+    if (modalLihatDetail) {
+      modalLihatDetail.onclick = () => {
+        if (currentProduk && currentProduk.id) {
+          window.location.href = `/produk_detail/${currentProduk.id}`;
+        } else {
+          alert('Menuju halaman detail produk (demo)');
+        }
+      };
+    }
+
+    // Function to add item to cart
+    async function addToCart(productId) {
+      if (!productId) {
+        showNotification('Produk tidak ditemukan', 'error');
+        return;
+      }
+
+      // Get CSRF token from the meta tag in the layout
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+      
+      if (!csrfToken) {
+        showNotification('Terjadi masalah dengan keamanan, silakan refresh halaman', 'error');
+        return;
+      }
+
+      try {
+        const response = await fetch('/cart/add', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken,
+            'X-Requested-With': 'XMLHttpRequest' // Important for Laravel to recognize AJAX requests
+          },
+          body: JSON.stringify({ 
+            product_id: productId,
+            quantity: 1 // Default quantity
+          })
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          showNotification(result.message || 'Produk berhasil ditambahkan ke keranjang', 'success');
+        } else {
+          showNotification(result.message || 'Gagal menambahkan ke keranjang', 'error');
+        }
+      } catch (error) {
+        console.error('Error adding to cart:', error);
+        showNotification('Terjadi kesalahan saat menambahkan ke keranjang', 'error');
+      }
+    }
+
+    function showNotification(message, type = 'info') {
+      // Buat elemen notifikasi
+      const notification = document.createElement('div');
+      notification.className = `notification notification-${type}`;
+      notification.textContent = message;
+      
+      // Gaya dasar untuk notifikasi
+      Object.assign(notification.style, {
+        position: 'fixed',
+        top: '20px',
+        right: '20px',
+        padding: '12px 20px',
+        borderRadius: '6px',
+        color: '#fff',
+        backgroundColor: type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : '#007bff',
+        zIndex: '9999',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+        fontSize: '14px',
+        maxWidth: '400px',
+        wordWrap: 'break-word'
+      });
+      
+      // Tambahkan ke body
+      document.body.appendChild(notification);
+      
+      // Hapus notifikasi setelah 3 detik
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.parentNode.removeChild(notification);
+        }
+      }, 3000);
+    }
   </script>
 @endpush
 

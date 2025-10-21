@@ -104,6 +104,69 @@ class ProductController extends Controller
         
         return view('customer.produk.halaman_produk', compact('products'));
     }
+    
+    /**
+     * Tampilkan halaman kategori berdasarkan nama kategori
+     */
+    public function showCategoryPage($categoryName)
+    {
+        // Mapping antara nama route dan nama kategori di database
+        $categoryNameMap = [
+            'kuliner' => 'Kuliner',
+            'fashion' => 'Fashion',
+            'kerajinan' => 'Kerajinan Tangan',
+            'berkebun' => 'Berkebun',
+            'kesehatan' => 'Kesehatan',
+            'mainan' => 'Mainan',
+            'hampers' => 'Hampers',
+        ];
+        
+        $categoryNameInDB = $categoryNameMap[$categoryName] ?? $categoryName;
+        
+        // Ambil kategori berdasarkan nama
+        $category = Category::where('name', $categoryNameInDB)->first();
+        
+        if (!$category) {
+            abort(404, 'Kategori tidak ditemukan');
+        }
+        
+        // Ambil produk berdasarkan kategori dengan informasi lengkap
+        $products = Product::with(['variants', 'seller', 'category'])
+                         ->where('category_id', $category->id)
+                         ->where('status', 'active')
+                         ->get();
+        
+        // Format data produk untuk ditampilkan di halaman kategori
+        $formattedProducts = $products->map(function($product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'description' => $product->description,
+                'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
+                'image' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
+            ];
+        });
+        
+        // Bagi produk ke dalam chunk untuk pagination
+        $productChunks = $formattedProducts->chunk(8);
+        
+        // Siapkan data untuk setiap halaman
+        $pageData = [];
+        for ($i = 1; $i <= min(5, count($productChunks)); $i++) { // Maksimal 5 halaman
+            $chunk = $productChunks->get($i - 1, collect([]))->values();
+            $pageData["page_{$i}_products"] = $chunk->toArray();
+        }
+        
+        // Tentukan nama kategori untuk ditampilkan
+        $categoryTitle = ucfirst(str_replace('-', ' ', $categoryName));
+        $categoryDescription = "Temukan berbagai produk {$categoryTitle} dari UMKM lokal";
+        
+        // Kirim data ke view base
+        return view('customer.kategori.base', array_merge([
+            'categoryTitle' => $categoryTitle,
+            'categoryDescription' => $categoryDescription,
+        ], $pageData));
+    }
 
     /**
      * API endpoint untuk mendapatkan produk populer
@@ -145,18 +208,61 @@ class ProductController extends Controller
             return response()->json(['error' => 'Produk tidak ditemukan'], 404);
         }
         
+        // Format spesifikasi produk
+        $specs = [];
+        if ($product->specifications) {
+            foreach ($product->specifications as $key => $value) {
+                $specs[] = "$key: $value";
+            }
+        }
+        
+        // Tambahkan informasi kategori dan spesifikasi dasar jika tidak ada spesifikasi khusus
+        if (empty($specs)) {
+            $specs = [
+                'Kategori: ' . ($product->category->name ?? 'Umum'),
+                'Stok: ' . $product->stock,
+                'Berat: ' . $product->weight . 'g',
+                'Status: ' . ucfirst($product->status)
+            ];
+            
+            // Tambahkan informasi tambahan jika tersedia
+            if ($product->material) $specs[] = 'Bahan: ' . $product->material;
+            if ($product->size) $specs[] = 'Ukuran: ' . $product->size;
+            if ($product->color) $specs[] = 'Warna: ' . $product->color;
+            if ($product->brand) $specs[] = 'Merek: ' . $product->brand;
+            if ($product->origin) $specs[] = 'Asal: ' . $product->origin;
+            if ($product->warranty) $specs[] = 'Garansi: ' . $product->warranty;
+        }
+        
+        // Format fitur produk
+        $features = [];
+        if ($product->features) {
+            $features = array_values($product->features);
+        }
+        
         $formattedProduct = [
             'id' => $product->id,
             'name' => $product->name,
             'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
             'image' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
             'description' => $product->description,
-            'specifications' => [
-                'Kategori: ' . ($product->category->name ?? 'Umum'),
-                'Stok: ' . $product->stock,
-                'Berat: ' . $product->weight . 'g',
-                'Status: ' . ucfirst($product->status)
-            ]
+            'specifications' => $specs,
+            'features' => $features,
+            'material' => $product->material,
+            'size' => $product->size,
+            'color' => $product->color,
+            'brand' => $product->brand,
+            'origin' => $product->origin,
+            'warranty' => $product->warranty,
+            'min_order' => $product->min_order,
+            'ready_stock' => $product->ready_stock,
+            'stock' => $product->stock,
+            'weight' => $product->weight,
+            'status' => $product->status,
+            'view_count' => $product->view_count,
+            'discount_price' => $product->discount_price ? 'Rp ' . number_format($product->discount_price, 0, ',', '.') : null,
+            'discount_start_date' => $product->discount_start_date,
+            'discount_end_date' => $product->discount_end_date,
         ];
         
         return response()->json($formattedProduct);

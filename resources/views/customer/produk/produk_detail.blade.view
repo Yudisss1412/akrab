@@ -22,7 +22,7 @@
       Kembali
     </a>
 
-    <div class="pd-wrap">
+    <div class="pd-wrap" data-product-id="{{ $produk['id'] }}">
       <div class="pd-top">
         <!-- Product Gallery -->
         <div class="gallery-card card">
@@ -138,23 +138,95 @@
       // Wishlist button
       const wishlistBtn = document.querySelector('.wish-small');
       if (wishlistBtn) {
-        wishlistBtn.addEventListener('click', function() {
+        // Store product ID in the wishlist button
+        const productId = '{{ $produk['id'] }}';
+        wishlistBtn.dataset.productId = productId;
+        
+        wishlistBtn.addEventListener('click', async function() {
           const heartIcon = this.querySelector('.heart-icon');
+          const productId = this.dataset.productId;
+          const wasActive = this.classList.contains('active');
+          
+          // Toggle visual state immediately for better UX
           this.classList.toggle('active');
           
-          // Toggle the heart icon between filled and outlined
-          if (this.classList.contains('active')) {
-            // Product added to wishlist
+          if (!wasActive) {
+            // Add to wishlist
             heartIcon.setAttribute('fill', '#FF4757');
             heartIcon.setAttribute('stroke', '#FF4757');
             heartIcon.classList.remove('heart-outline');
             heartIcon.classList.add('heart-fill');
           } else {
-            // Product removed from wishlist
+            // Remove from wishlist
             heartIcon.setAttribute('fill', 'none');
             heartIcon.setAttribute('stroke', 'currentColor');
             heartIcon.classList.remove('heart-fill');
             heartIcon.classList.add('heart-outline');
+          }
+          
+          try {
+            let response;
+            if (!wasActive) {
+              // Add to wishlist
+              response = await fetch('/wishlist', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                  'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                  product_id: productId
+                })
+              });
+            } else {
+              // Remove from wishlist using product_id
+              response = await fetch(`/wishlist/product/${productId}`, {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                  'X-Requested-With': 'XMLHttpRequest'
+                }
+              });
+            }
+            
+            const result = await response.json();
+            
+            if (!response.ok) {
+              // Revert visual state if request failed
+              this.classList.toggle('active');
+              if (!wasActive) {
+                heartIcon.setAttribute('fill', 'none');
+                heartIcon.setAttribute('stroke', 'currentColor');
+                heartIcon.classList.remove('heart-fill');
+                heartIcon.classList.add('heart-outline');
+              } else {
+                heartIcon.setAttribute('fill', '#FF4757');
+                heartIcon.setAttribute('stroke', '#FF4757');
+                heartIcon.classList.remove('heart-outline');
+                heartIcon.classList.add('heart-fill');
+              }
+              
+            alert('Gagal memperbarui wishlist: ' + (result?.message || 'Terjadi kesalahan'));
+            }
+          } catch (error) {
+            // Revert visual state if request failed
+            this.classList.toggle('active');
+            if (!wasActive) {
+              heartIcon.setAttribute('fill', 'none');
+              heartIcon.setAttribute('stroke', 'currentColor');
+              heartIcon.classList.remove('heart-fill');
+              heartIcon.classList.add('heart-outline');
+            } else {
+              heartIcon.setAttribute('fill', '#FF4757');
+              heartIcon.setAttribute('stroke', '#FF4757');
+              heartIcon.classList.remove('heart-outline');
+              heartIcon.classList.add('heart-fill');
+            }
+            
+            console.error('Error updating wishlist:', error);
+            alert('Terjadi kesalahan saat memperbarui wishlist: ' + (error.message || 'Terjadi kesalahan'));
           }
         });
       }
@@ -164,6 +236,10 @@
       if (wishlistSmall) {
         const heartIcon = wishlistSmall.querySelector('.heart-icon');
         const isInWishlist = wishlistSmall.classList.contains('active');
+        const productId = '{{ $produk['id'] }}';
+        
+        // Store product ID in the wishlist button
+        wishlistSmall.dataset.productId = productId;
         
         if (isInWishlist) {
           // Ensure the filled heart is shown when page loads

@@ -148,20 +148,59 @@ Route::get('/halaman_ulasan', function () {
 Route::view('/halaman-ulasan', 'customer.koleksi.halaman_ulasan')->name('halaman-ulasan');
 
 Route::get('/halaman_wishlist', function () {
-    return view('customer.koleksi.halaman_wishlist');
-})->name('halaman_wishlist');
+    // Ambil data wishlist dari database untuk user yang sedang login
+    if (!auth()->check()) {
+        return redirect()->route('login');
+    }
+    
+    $wishlists = \App\Models\Wishlist::with(['product.seller', 'product.images'])
+        ->where('user_id', auth()->id())
+        ->get()
+        ->map(function($wishlist) {
+            $product = $wishlist->product;
+            return [
+                'id' => $wishlist->id,
+                'product_id' => $product->id,
+                'title' => $product->name,
+                'price' => $product->price,
+                'img' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
+                'shop' => $product->seller ? $product->seller->name : 'Toko Tidak Diketahui',
+                'date' => $wishlist->created_at->format('d M Y'),
+                'liked' => true,
+                'url' => '/produk/' . $product->id
+            ];
+        });
+    
+    return view('customer.koleksi.halaman_wishlist', compact('wishlists'));
+})->name('halaman_wishlist')->middleware('auth');
 
 // API endpoint untuk wishlist di halaman profil
 Route::get('/api/customer/wishlist', function () {
-    // Contoh data dummy wishlist
-    // Dalam implementasi sebenarnya, ini akan mengambil data dari database
-    $wishlist = [
-        ['id' => 1, 'title' => 'Xbox Series S With Series X', 'price' => 1008000, 'img' => asset('src/CangkirKeramik1.png'), 'shop' => 'Toko Elektronik Jaya', 'date' => '24 Agu 2025', 'liked' => true, 'url' => '/produk/1'],
-        ['id' => 2, 'title' => 'iPhone 15 128GB', 'price' => 8670000, 'img' => asset('src/PiringKayu.png'), 'shop' => 'iStore Official', 'date' => '21 Agu 2025', 'liked' => true, 'url' => '/produk/2'],
-    ];
+    // Ambil data wishlist dari database untuk user yang sedang login
+    if (!auth()->check()) {
+        return response()->json([]);
+    }
     
-    return response()->json($wishlist);
-})->name('api.wishlist');
+    $wishlists = \App\Models\Wishlist::with(['product.seller'])
+        ->where('user_id', auth()->id())
+        ->get()
+        ->map(function($wishlist) {
+            $product = $wishlist->product;
+            return [
+                'id' => $wishlist->id,
+                'product_id' => $product->id,
+                'title' => $product->name,
+                'price' => $product->price,
+                'img' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
+                'shop' => $product->seller ? $product->seller->name : 'Toko Tidak Diketahui',
+                'date' => $wishlist->created_at->format('d M Y'),
+                'liked' => true,
+                'url' => '/produk/' . $product->id
+            ];
+        });
+    
+    return response()->json($wishlists);
+})->name('api.wishlist')->middleware('auth');
 
 Route::get('/dashboard_penjual', function () {
     return view('penjual.dashboard_penjual');
@@ -573,6 +612,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/wishlist', [App\Http\Controllers\WishlistController::class, 'index'])->name('wishlist.index');
     Route::post('/wishlist', [App\Http\Controllers\WishlistController::class, 'store'])->name('wishlist.store');
     Route::delete('/wishlist/{id}', [App\Http\Controllers\WishlistController::class, 'destroy'])->name('wishlist.destroy');
+    Route::delete('/wishlist/product/{productId}', [App\Http\Controllers\WishlistController::class, 'destroyByProductId'])->name('wishlist.destroy-by-product');
     Route::post('/wishlist/{id}/move-to-cart', [App\Http\Controllers\WishlistController::class, 'moveToCart'])->name('wishlist.move-to-cart');
 });
 

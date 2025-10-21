@@ -382,25 +382,21 @@
     // Ambil data wishlist dari API
     async function fetchWishlist() {
       try {
-        // Ganti dengan endpoint API yang sesuai
-        // Dalam pengembangan ini, kita gunakan data dummy sebagai contoh
-        const response = await fetch('{{ route("api.wishlist") }}');
+        const response = await fetch('{{ route("api.wishlist") }}', {
+          headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          }
+        });
         if(response.ok) {
           WISHLIST = await response.json();
         } else {
-          // Jika API belum tersedia, gunakan data dummy
-          WISHLIST = [
-            { id:1, title:'Xbox Series S With Series X', price:1008000,  img:'{{ asset("src/CangkirKeramik1.png") }}',  shop:'Toko Elektronik Jaya',     date:'24 Agu 2025', liked:true,  url:'/produk/1' },
-            { id:2, title:'iPhone 15 128GB',             price:8670000,  img:'{{ asset("src/PiringKayu.png") }}', shop:'iStore Official',        date:'21 Agu 2025', liked:true,  url:'/produk/2' },
-          ];
+          WISHLIST = [];
         }
         renderWishlist();
       } catch (error) {
-        // Jika API gagal, gunakan data dummy
-        WISHLIST = [
-          { id:1, title:'Xbox Series S With Series X', price:1008000,  img:'{{ asset("src/CangkirKeramik1.png") }}',  shop:'Toko Elektronik Jaya',     date:'24 Agu 2025', liked:true,  url:'/produk/1' },
-          { id:2, title:'iPhone 15 128GB',             price:8670000,  img:'{{ asset("src/PiringKayu.png") }}', shop:'iStore Official',        date:'21 Agu 2025', liked:true,  url:'/produk/2' },
-        ];
+        WISHLIST = [];
         renderWishlist();
       }
     }
@@ -450,19 +446,89 @@
       }
     }
 
+    // ====== API Functions ======
+    async function removeFromWishlist(wishlistId) {
+      try {
+        const response = await fetch(`/wishlist/${wishlistId}`, {
+          method: 'DELETE',
+          headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Gagal menghapus dari wishlist');
+        }
+        
+        return await response.json();
+      } catch (error) {
+        console.error('Error removing from wishlist:', error);
+        throw error;
+      }
+    }
+
     // ====== Events ======
-    document.addEventListener('click', (e)=>{
+    document.addEventListener('click', async (e)=>{
       const btn = e.target.closest('.wl-like');
       if (!btn) return;
       const art = btn.closest('.wl-card');
-      const id  = Number(art?.dataset.id);
-      const idx = WISHLIST.findIndex(it => it.id === id);
-      if (idx !== -1) {
-        // Dalam pengembangan real, ini akan memanggil API untuk menghapus dari wishlist
-        WISHLIST.splice(idx, 1); // remove dari wishlist
-        renderWishlist();
+      const wishlistId = btn.dataset.wishlistId || art?.dataset.wishlistId;
+      
+      if (!wishlistId) return;
+      
+      try {
+        // Hapus dari wishlist di backend
+        await removeFromWishlist(wishlistId);
+        
+        // Hapus dari state lokal
+        const idx = WISHLIST.findIndex(it => it.id == wishlistId);
+        if (idx !== -1) {
+          WISHLIST.splice(idx, 1);
+          renderWishlist();
+          
+          // Tampilkan notifikasi
+          showNotification('Produk berhasil dihapus dari wishlist', 'success');
+        }
+      } catch (error) {
+        showNotification('Gagal menghapus produk dari wishlist: ' + (error.message || 'Terjadi kesalahan'), 'error');
       }
     });
+
+    // ====== Notification ======
+    function showNotification(message, type = 'info') {
+      // Buat elemen notifikasi
+      const notification = document.createElement('div');
+      notification.className = `notification notification-${type}`;
+      notification.textContent = message;
+      
+      // Gaya dasar untuk notifikasi
+      Object.assign(notification.style, {
+        position: 'fixed',
+        top: '20px',
+        right: '20px',
+        padding: '12px 20px',
+        borderRadius: '6px',
+        color: '#fff',
+        backgroundColor: type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : '#007bff',
+        zIndex: '9999',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+        fontSize: '14px',
+        maxWidth: '400px',
+        wordWrap: 'break-word'
+      });
+      
+      // Tambahkan ke body
+      document.body.appendChild(notification);
+      
+      // Hapus notifikasi setelah 3 detik
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.parentNode.removeChild(notification);
+        }
+      }, 3000);
+    }
 
     // ====== Init ======
     document.addEventListener('DOMContentLoaded', fetchWishlist);

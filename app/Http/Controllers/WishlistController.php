@@ -9,20 +9,34 @@ use Illuminate\Support\Facades\Auth;
 
 class WishlistController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     /**
      * Menampilkan daftar wishlist pengguna
      */
     public function index()
     {
-        $wishlists = Wishlist::with(['product' => function($query) {
-            $query->with(['seller', 'images']);
-        }])
-        ->where('user_id', Auth::id())
-        ->paginate(10);
+        $wishlists = Wishlist::with(['product.seller'])
+            ->where('user_id', Auth::id())
+            ->get()
+            ->map(function($wishlist) {
+                $product = $wishlist->product;
+                return [
+                    'id' => $wishlist->id,
+                    'product_id' => $product->id,
+                    'title' => $product->name,
+                    'price' => $product->price,
+                    'img' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
+                    'shop' => $product->seller ? $product->seller->name : 'Toko Tidak Diketahui',
+                    'date' => $wishlist->created_at->format('d M Y'),
+                    'liked' => true,
+                    'url' => '/produk/' . $product->id
+                ];
+            });
 
-        return response()->json([
-            'wishlists' => $wishlists
-        ]);
+        return response()->json($wishlists);
     }
 
     /**
@@ -50,24 +64,38 @@ class WishlistController extends Controller
             'product_id' => $request->product_id
         ]);
 
+        // Format data untuk dikembalikan
+        $product = $wishlist->product;
+        $wishlistData = [
+            'id' => $wishlist->id,
+            'product_id' => $product->id,
+            'title' => $product->name,
+            'price' => $product->price,
+            'img' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
+            'shop' => $product->seller ? $product->seller->name : 'Toko Tidak Diketahui',
+            'date' => $wishlist->created_at->format('d M Y'),
+            'liked' => true,
+            'url' => '/produk/' . $product->id
+        ];
+
         return response()->json([
             'message' => 'Produk berhasil ditambahkan ke wishlist',
-            'wishlist' => $wishlist->load(['product'])
+            'wishlist' => $wishlistData
         ]);
     }
 
     /**
-     * Menghapus produk dari wishlist
+     * Menghapus produk dari wishlist berdasarkan product_id
      */
-    public function destroy($id)
+    public function destroyByProductId(Request $request, $productId)
     {
-        $wishlist = Wishlist::where('id', $id)
+        $wishlist = Wishlist::where('product_id', $productId)
                            ->where('user_id', Auth::id())
                            ->first();
 
         if (!$wishlist) {
             return response()->json([
-                'message' => 'Wishlist tidak ditemukan'
+                'message' => 'Produk tidak ditemukan di wishlist'
             ], 404);
         }
 

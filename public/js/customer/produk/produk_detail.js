@@ -55,19 +55,101 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   paintHeart();
 
-  wishBtn?.addEventListener('click', () => {
+  // ====== Broadcast Channel for Wishlist Sync ======
+  const wishlistChannel = new BroadcastChannel('wishlist_sync');
+  
+  wishBtn?.addEventListener('click', async () => {
     if (!PROD_NAME) return;
+    const isAdding = !wl.has(PROD_NAME);
     wl.has(PROD_NAME) ? wl.delete(PROD_NAME) : wl.add(PROD_NAME);
     saveWishlist(wl);
     paintHeart();
+    
+    // Notify other tabs about the change
+    wishlistChannel.postMessage({
+      type: 'WISHLIST_UPDATE',
+      timestamp: Date.now()
+    });
+    
+    // Also update the server with the wishlist change
+    try {
+      const productId = document.getElementById('pdTitle')?.dataset.productId;
+      if (productId) {
+        const response = await fetch('/wishlist', {
+          method: isAdding ? 'POST' : 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          },
+          body: JSON.stringify({ 
+            product_id: productId 
+          })
+        });
+        
+        if (!response.ok) {
+          // If server request fails, revert the change
+          if (isAdding) {
+            wl.add(PROD_NAME);
+          } else {
+            wl.delete(PROD_NAME);
+          }
+          saveWishlist(wl);
+          paintHeart();
+          showNotification('Gagal memperbarui wishlist', 'error');
+        }
+      }
+    } catch (error) {
+      console.error('Error updating wishlist on server:', error);
+      showNotification('Gagal memperbarui wishlist', 'error');
+    }
   });
 
+  // Listen for changes from other tabs/windows via BroadcastChannel
+  wishlistChannel.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'WISHLIST_UPDATE') {
+      // Refresh from server to get latest state
+      refreshWishlistFromServer();
+    }
+  });
+  
+  // Fallback to storage event for compatibility
   window.addEventListener('storage', (ev)=>{
     if (ev.key !== WISHLIST_KEY) return;
     const latest = loadWishlist();
     wl.clear(); latest.forEach(v=>wl.add(v));
     paintHeart();
   });
+  
+  // Function to refresh wishlist from server
+  async function refreshWishlistFromServer() {
+    try {
+      const response = await fetch('/api/customer/wishlist', {
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        const wishlistArray = Array.isArray(data) ? data : [];
+        
+        // Update our localStorage based on server data
+        const updatedWishlist = new Set();
+        wishlistArray.forEach(item => {
+          updatedWishlist.add(item.title); // Using title as the identifier
+        });
+        
+        saveWishlist(updatedWishlist);
+        wl.clear();
+        updatedWishlist.forEach(v => wl.add(v));
+        paintHeart();
+      }
+    } catch (error) {
+      console.error('Error refreshing wishlist from server:', error);
+    }
+  }
 
   /* ---------- Rating bintang ---------- */
   const starsRow = document.getElementById('pdStars');

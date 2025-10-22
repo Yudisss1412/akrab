@@ -127,6 +127,9 @@ document.addEventListener('click', async (e)=>{
       
       // Tampilkan notifikasi
       showNotification('Produk berhasil dihapus dari wishlist', 'success');
+      
+      // Notify other tabs about the change
+      notifyWishlistChange();
     }
   } catch (error) {
     // Handle unauthenticated error specifically
@@ -173,6 +176,46 @@ function showNotification(message, type = 'info') {
       notification.parentNode.removeChild(notification);
     }
   }, 3000);
+}
+
+// ====== Broadcast Channel for Wishlist Sync ======
+const wishlistChannel = new BroadcastChannel('wishlist_sync');
+
+// Listen for changes from other tabs/windows
+wishlistChannel.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'WISHLIST_UPDATE') {
+    // Refresh the wishlist from server when changes happen in other tabs
+    refreshWishlist();
+  }
+});
+
+// Function to refresh wishlist from server
+async function refreshWishlist() {
+  try {
+    const response = await fetch('/api/customer/wishlist', {
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      }
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      STATE = Array.isArray(data) ? data : [];
+      render();
+    }
+  } catch (error) {
+    console.error('Error refreshing wishlist:', error);
+  }
+}
+
+// Function to notify other tabs about wishlist changes
+function notifyWishlistChange() {
+  wishlistChannel.postMessage({
+    type: 'WISHLIST_UPDATE',
+    timestamp: Date.now()
+  });
 }
 
 // ====== Init ======

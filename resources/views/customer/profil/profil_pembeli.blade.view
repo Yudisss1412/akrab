@@ -648,6 +648,34 @@
     // Ganti fungsi renderWishlist dengan fungsi yang benar
     renderWishlist = renderWishlistCorrected;
     
+    // ====== Broadcast Channel for Wishlist Sync ======
+    const wishlistChannel = new BroadcastChannel('wishlist_sync');
+
+    // Listen for changes from other tabs/windows
+    wishlistChannel.addEventListener('message', (event) => {
+      if (event.data && event.data.type === 'WISHLIST_UPDATE') {
+        // Refresh the wishlist from server when changes happen in other tabs
+        fetchWishlist();
+      }
+    });
+
+    // Function to notify other tabs about wishlist changes
+    function notifyWishlistChange() {
+      wishlistChannel.postMessage({
+        type: 'WISHLIST_UPDATE',
+        timestamp: Date.now()
+      });
+    }
+
+    // Override the removeFromWishlist function to notify other tabs
+    const originalRemoveFromWishlist = removeFromWishlist;
+    removeFromWishlist = async function(wishlistId) {
+      const result = await originalRemoveFromWishlist(wishlistId);
+      // Notify other tabs after successful removal
+      notifyWishlistChange();
+      return result;
+    };
+
     // Fetch reviews when DOM is loaded
     document.addEventListener('DOMContentLoaded', function() {
       fetchUserReviews();

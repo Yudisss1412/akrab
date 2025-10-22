@@ -390,7 +390,8 @@
           }
         });
         if(response.ok) {
-          WISHLIST = await response.json();
+          const data = await response.json();
+          WISHLIST = Array.isArray(data) ? data : [];
         } else {
           WISHLIST = [];
         }
@@ -438,10 +439,14 @@
     function renderWishlist(){
       if (!grid) return;
       
-      if (WISHLIST.length > 0) {
-        grid.innerHTML = WISHLIST.map(wishlistCardTemplate).join('');
+      // Pastikan WISHLIST adalah array
+      const wishlistArray = Array.isArray(WISHLIST) ? WISHLIST : [];
+      
+      if (wishlistArray.length > 0) {
+        grid.innerHTML = wishlistArray.map(wishlistCardTemplate).join('');
         if (emptyBox) emptyBox.hidden = true;
       } else {
+        grid.innerHTML = '';
         if (emptyBox) emptyBox.hidden = false;
       }
     }
@@ -458,12 +463,21 @@
         });
         
         if (!response.ok) {
+          if (response.status === 401 || response.status === 403) {
+            alert('Anda harus login terlebih dahulu untuk mengakses wishlist');
+            window.location.href = '/login';
+            throw new Error('Unauthenticated');
+          }
           const errorData = await response.json();
           throw new Error(errorData.message || 'Gagal menghapus dari wishlist');
         }
         
         return await response.json();
       } catch (error) {
+        // Handle authentication error in catch block as well
+        if (error.message === 'Unauthenticated' || error.message.includes('401') || error.message.includes('403')) {
+          throw error;
+        }
         console.error('Error removing from wishlist:', error);
         throw error;
       }
@@ -488,11 +502,18 @@
           WISHLIST.splice(idx, 1);
           renderWishlist();
           
-          // Tampilkan notifikasi
+          // Tampilkan notifikasi sukses bahwa produk telah dihapus dari wishlist
           showNotification('Produk berhasil dihapus dari wishlist', 'success');
         }
       } catch (error) {
-        showNotification('Gagal menghapus produk dari wishlist: ' + (error.message || 'Terjadi kesalahan'), 'error');
+        // Handle unauthenticated error specifically
+        if (error.message === 'Unauthenticated' || error.message.includes('401') || error.message.includes('403')) {
+          // Error already handled in removeFromWishlist function
+          return;
+        }
+        // Tampilkan notifikasi error dengan pesan yang lebih informatif
+        const errorMessage = error.message || error.toString() || 'Terjadi kesalahan tidak terduga saat menghapus produk dari wishlist';
+        showNotification('Gagal menghapus produk dari wishlist: ' + errorMessage, 'error');
       }
     });
 
@@ -531,7 +552,10 @@
     }
 
     // ====== Init ======
-    document.addEventListener('DOMContentLoaded', fetchWishlist);
+    document.addEventListener('DOMContentLoaded', function() {
+      fetchWishlist();
+      fetchUserReviews();
+    });
     
     // ====== Fetch and Render User Reviews ======
     async function fetchUserReviews() {
@@ -605,9 +629,29 @@
       }
     }
     
+    // Tambahkan fungsi renderWishlist yang benar
+    function renderWishlistCorrected(){
+      if (!grid) return;
+      
+      // Pastikan WISHLIST adalah array
+      const wishlistArray = Array.isArray(WISHLIST) ? WISHLIST : [];
+      
+      if (wishlistArray.length > 0) {
+        grid.innerHTML = wishlistArray.map(wishlistCardTemplate).join('');
+        if (emptyBox) emptyBox.hidden = true;
+      } else {
+        grid.innerHTML = '';
+        if (emptyBox) emptyBox.hidden = false;
+      }
+    }
+    
+    // Ganti fungsi renderWishlist dengan fungsi yang benar
+    renderWishlist = renderWishlistCorrected;
+    
     // Fetch reviews when DOM is loaded
     document.addEventListener('DOMContentLoaded', function() {
       fetchUserReviews();
+      fetchWishlist(); // Tambahkan pemanggilan fetchWishlist
     });
   </script>
 @endpush

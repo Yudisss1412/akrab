@@ -48,40 +48,46 @@ class WishlistController extends Controller
             'product_id' => 'required|exists:products,id'
         ]);
 
-        // Cek apakah produk sudah ada di wishlist
-        $existingWishlist = Wishlist::where('user_id', Auth::id())
-                                   ->where('product_id', $request->product_id)
-                                   ->first();
-        
-        if ($existingWishlist) {
+        try {
+            // Cek apakah produk sudah ada di wishlist
+            $existingWishlist = Wishlist::where('user_id', Auth::id())
+                                       ->where('product_id', $request->product_id)
+                                       ->first();
+            
+            if ($existingWishlist) {
+                return response()->json([
+                    'message' => 'Produk sudah ada di wishlist'
+                ], 400);
+            }
+
+            $wishlist = Wishlist::create([
+                'user_id' => Auth::id(),
+                'product_id' => $request->product_id
+            ]);
+
+            // Format data untuk dikembalikan
+            $product = $wishlist->product;
+            $wishlistData = [
+                'id' => $wishlist->id,
+                'product_id' => $product->id,
+                'title' => $product->name,
+                'price' => $product->price,
+                'img' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
+                'shop' => $product->seller ? $product->seller->name : 'Toko Tidak Diketahui',
+                'date' => $wishlist->created_at->format('d M Y'),
+                'liked' => true,
+                'url' => '/produk/' . $product->id
+            ];
+
             return response()->json([
-                'message' => 'Produk sudah ada di wishlist'
-            ], 400);
+                'message' => 'Produk berhasil ditambahkan ke wishlist',
+                'wishlist' => $wishlistData
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Gagal menambahkan produk ke wishlist: ' . $e->getMessage()
+            ], 500);
         }
-
-        $wishlist = Wishlist::create([
-            'user_id' => Auth::id(),
-            'product_id' => $request->product_id
-        ]);
-
-        // Format data untuk dikembalikan
-        $product = $wishlist->product;
-        $wishlistData = [
-            'id' => $wishlist->id,
-            'product_id' => $product->id,
-            'title' => $product->name,
-            'price' => $product->price,
-            'img' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
-            'shop' => $product->seller ? $product->seller->name : 'Toko Tidak Diketahui',
-            'date' => $wishlist->created_at->format('d M Y'),
-            'liked' => true,
-            'url' => '/produk/' . $product->id
-        ];
-
-        return response()->json([
-            'message' => 'Produk berhasil ditambahkan ke wishlist',
-            'wishlist' => $wishlistData
-        ]);
     }
 
     /**
@@ -99,11 +105,17 @@ class WishlistController extends Controller
             ], 404);
         }
 
-        $wishlist->delete();
+        try {
+            $wishlist->delete();
 
-        return response()->json([
-            'message' => 'Produk berhasil dihapus dari wishlist'
-        ]);
+            return response()->json([
+                'message' => 'Produk berhasil dihapus dari wishlist'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Gagal menghapus produk dari wishlist: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -121,15 +133,49 @@ class WishlistController extends Controller
             ], 404);
         }
 
-        // Tambahkan ke keranjang
-        $cartService = app('App\Services\CartService');
-        $cartService->add(Auth::id(), $wishlist->product_id, 1);
+        try {
+            // Tambahkan ke keranjang
+            $cartService = app('App\Services\CartService');
+            $cartService->add(Auth::id(), $wishlist->product_id, 1);
 
-        // Hapus dari wishlist
-        $wishlist->delete();
+            // Hapus dari wishlist
+            $wishlist->delete();
 
-        return response()->json([
-            'message' => 'Produk berhasil dipindahkan ke keranjang'
-        ]);
+            return response()->json([
+                'message' => 'Produk berhasil dipindahkan ke keranjang'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Gagal memindahkan produk ke keranjang: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Menghapus produk dari wishlist
+     */
+    public function destroy($id)
+    {
+        $wishlist = Wishlist::where('id', $id)
+                           ->where('user_id', Auth::id())
+                           ->first();
+
+        if (!$wishlist) {
+            return response()->json([
+                'message' => 'Produk tidak ditemukan di wishlist'
+            ], 404);
+        }
+
+        try {
+            $wishlist->delete();
+
+            return response()->json([
+                'message' => 'Produk berhasil dihapus dari wishlist'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Gagal menghapus produk dari wishlist: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

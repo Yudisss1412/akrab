@@ -208,25 +208,51 @@
                 heartIcon.classList.add('heart-fill');
               }
               
-            alert('Gagal memperbarui wishlist: ' + (result?.message || 'Terjadi kesalahan'));
+              // Handle unauthenticated case
+              if (response.status === 401 || response.status === 403) {
+                alert('Anda harus login terlebih dahulu untuk menambahkan produk ke wishlist');
+                window.location.href = '/login';
+              } else {
+                alert('Gagal memperbarui wishlist: ' + (result?.message || 'Terjadi kesalahan saat memperbarui wishlist'));
+              }
             }
           } catch (error) {
-            // Revert visual state if request failed
-            this.classList.toggle('active');
-            if (!wasActive) {
-              heartIcon.setAttribute('fill', 'none');
-              heartIcon.setAttribute('stroke', 'currentColor');
-              heartIcon.classList.remove('heart-fill');
-              heartIcon.classList.add('heart-outline');
+            // Check if it's an authentication error
+            if (error.message && (error.message.includes('401') || error.message.includes('403'))) {
+              // Revert visual state
+              this.classList.toggle('active');
+              if (!wasActive) {
+                heartIcon.setAttribute('fill', 'none');
+                heartIcon.setAttribute('stroke', 'currentColor');
+                heartIcon.classList.remove('heart-fill');
+                heartIcon.classList.add('heart-outline');
+              } else {
+                heartIcon.setAttribute('fill', '#FF4757');
+                heartIcon.setAttribute('stroke', '#FF4757');
+                heartIcon.classList.remove('heart-outline');
+                heartIcon.classList.add('heart-fill');
+              }
+              
+              alert('Anda harus login terlebih dahulu untuk menambahkan produk ke wishlist');
+              window.location.href = '/login';
             } else {
-              heartIcon.setAttribute('fill', '#FF4757');
-              heartIcon.setAttribute('stroke', '#FF4757');
-              heartIcon.classList.remove('heart-outline');
-              heartIcon.classList.add('heart-fill');
+              // Revert visual state if request failed
+              this.classList.toggle('active');
+              if (!wasActive) {
+                heartIcon.setAttribute('fill', 'none');
+                heartIcon.setAttribute('stroke', 'currentColor');
+                heartIcon.classList.remove('heart-fill');
+                heartIcon.classList.add('heart-outline');
+              } else {
+                heartIcon.setAttribute('fill', '#FF4757');
+                heartIcon.setAttribute('stroke', '#FF4757');
+                heartIcon.classList.remove('heart-outline');
+                heartIcon.classList.add('heart-fill');
+              }
+              
+              console.error('Error updating wishlist:', error);
+              alert('Terjadi kesalahan saat memperbarui wishlist: ' + (error.message || error.toString() || 'Terjadi kesalahan tidak terduga'));
             }
-            
-            console.error('Error updating wishlist:', error);
-            alert('Terjadi kesalahan saat memperbarui wishlist: ' + (error.message || 'Terjadi kesalahan'));
           }
         });
       }
@@ -241,18 +267,20 @@
         // Store product ID in the wishlist button
         wishlistSmall.dataset.productId = productId;
         
-        if (isInWishlist) {
-          // Ensure the filled heart is shown when page loads
-          heartIcon.setAttribute('fill', '#FF4757');
-          heartIcon.setAttribute('stroke', '#FF4757');
-          heartIcon.classList.remove('heart-outline');
-          heartIcon.classList.add('heart-fill');
-        } else {
-          // Ensure the outlined heart is shown when page loads
-          heartIcon.setAttribute('fill', 'none');
-          heartIcon.setAttribute('stroke', 'currentColor');
-          heartIcon.classList.remove('heart-fill');
-          heartIcon.classList.add('heart-outline');
+        if (heartIcon) {
+          if (isInWishlist) {
+            // Ensure the filled heart is shown when page loads
+            heartIcon.setAttribute('fill', '#FF4757');
+            heartIcon.setAttribute('stroke', '#FF4757');
+            heartIcon.classList.remove('heart-outline');
+            heartIcon.classList.add('heart-fill');
+          } else {
+            // Ensure the outlined heart is shown when page loads
+            heartIcon.setAttribute('fill', 'none');
+            heartIcon.setAttribute('stroke', 'currentColor');
+            heartIcon.classList.remove('heart-fill');
+            heartIcon.classList.add('heart-outline');
+          }
         }
       }
       

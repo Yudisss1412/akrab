@@ -1,6 +1,6 @@
 // ====== Utils ======
 const $  = (s,root=document)=>root.querySelector(s);
-const $ = (s,root=document)=>[...root.querySelectorAll(s)];
+const $$ = (s,root=document)=>[...root.querySelectorAll(s)];
 const fmtIDR = n => (Number(n)||0).toLocaleString('id-ID');
 
 // ====== Elements ======
@@ -11,6 +11,11 @@ const toolbar  = document.querySelector('.wl-toolbar');
 
 // ====== State ======
 let STATE = Array.isArray(window.__WISHLIST__) ? window.__WISHLIST__.slice() : [];
+
+// Ensure STATE is always an array
+if (!Array.isArray(STATE)) {
+  STATE = [];
+}
 
 // ====== Templates ======
 function cardTemplate(item){
@@ -58,12 +63,21 @@ async function removeFromWishlist(wishlistId) {
     });
     
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        alert('Anda harus login terlebih dahulu untuk mengakses wishlist');
+        window.location.href = '/login';
+        throw new Error('Unauthenticated');
+      }
       const errorData = await response.json();
       throw new Error(errorData.message || 'Gagal menghapus dari wishlist');
     }
     
     return await response.json();
   } catch (error) {
+    // Handle authentication error in catch block as well
+    if (error.message === 'Unauthenticated' || error.message.includes('401') || error.message.includes('403')) {
+      throw error;
+    }
     console.error('Error removing from wishlist:', error);
     throw error;
   }
@@ -115,7 +129,13 @@ document.addEventListener('click', async (e)=>{
       showNotification('Produk berhasil dihapus dari wishlist', 'success');
     }
   } catch (error) {
-    showNotification('Gagal menghapus produk dari wishlist: ' + (error.message || 'Terjadi kesalahan'), 'error');
+    // Handle unauthenticated error specifically
+    if (error.message === 'Unauthenticated' || error.message.includes('401') || error.message.includes('403')) {
+      // Error already handled in removeFromWishlist function
+      return;
+    }
+    // Tampilkan notifikasi error dengan pesan yang lebih informatif
+    showNotification('Gagal menghapus produk dari wishlist: ' + (error.message || 'Terjadi kesalahan tidak terduga'), 'error');
   }
 });
 

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Voucher Toko - ' . $promotion['name'])
+@section('title', 'Edit Voucher Toko - ' . ($promotion->name ?? 'Voucher Toko'))
 
 @section('header')
   @include('components.header_compact')
@@ -108,24 +108,26 @@
           <a href="{{ route('penjual.promosi') }}" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left"></i> Kembali
           </a>
-          <h1 class="page-title mb-0">Edit Voucher Toko: {{ $promotion['name'] }}</h1>
+          <h1 class="page-title mb-0">Edit Voucher Toko: {{ $promotion->name ?? 'Voucher Toko' }}</h1>
         </div>
       </div>
       
       <!-- Formulir Voucher -->
-      <form id="editVoucherForm">
+      <form id="editVoucherForm" action="{{ route('penjual.promosi.update', ['id' => $promotion->id]) }}" method="POST">
+        @csrf
+        @method('PUT')
         <!-- Bagian Informasi Dasar -->
         <div class="form-card">
           <h5 class="card-title mb-3">Informasi Dasar</h5>
           <div class="form-group">
             <label for="voucherName" class="form-label">Nama Voucher</label>
-            <input type="text" id="voucherName" class="form-control" value="{{ $promotion['name'] }}" placeholder="Contoh: Voucher Hemat Akhir Tahun">
+            <input type="text" id="voucherName" name="name" class="form-control" value="{{ old('name', $promotion->name ?? '') }}" placeholder="Contoh: Voucher Hemat Akhir Tahun">
           </div>
           
           <div class="form-group">
             <label for="voucherCode" class="form-label">Kode Voucher</label>
             <div class="input-group">
-              <input type="text" id="voucherCode" class="form-control" value="VOUCHER2024" placeholder="Contoh: HEMAT2024">
+              <input type="text" id="voucherCode" name="code" class="form-control" value="{{ old('code', $promotion->code ?? '') }}" placeholder="Contoh: HEMAT2024">
               <button type="button" class="btn btn-outline-secondary" id="generateCodeBtn">Buat Kode Acak</button>
             </div>
           </div>
@@ -138,24 +140,28 @@
             <label class="form-label">Tipe Voucher</label>
             <div class="radio-group">
               <div class="radio-option">
-                <input type="radio" id="typePercentage" name="discountType" value="percentage" {{ $promotion['discount_type'] === 'percentage' ? 'checked' : '' }}>
+                <input type="radio" id="typePercentage" name="type" value="percentage" {{ old('type', $promotion->type ?? '') === 'percentage' ? 'checked' : '' }}>
                 <label for="typePercentage">Persentase (%)</label>
               </div>
               <div class="radio-option">
-                <input type="radio" id="typeFixed" name="discountType" value="fixed" {{ $promotion['discount_type'] === 'fixed' ? 'checked' : '' }}>
+                <input type="radio" id="typeFixed" name="type" value="fixed_amount" {{ old('type', $promotion->type ?? '') === 'fixed_amount' ? 'checked' : '' }}>
                 <label for="typeFixed">Potongan Harga Tetap (Rp)</label>
+              </div>
+              <div class="radio-option">
+                <input type="radio" id="typeFreeShipping" name="type" value="free_shipping" {{ old('type', $promotion->type ?? '') === 'free_shipping' ? 'checked' : '' }}>
+                <label for="typeFreeShipping">Gratis Ongkir</label>
               </div>
             </div>
           </div>
           
           <div class="form-group">
             <label for="discountValue" class="form-label">Besar Diskon/Potongan</label>
-            <input type="number" id="discountValue" class="form-control" value="{{ $promotion['discount_value'] }}" placeholder="Masukkan besar diskon">
+            <input type="number" id="discountValue" name="discount_value" class="form-control" value="{{ old('discount_value', $promotion->discount_value ?? '') }}" placeholder="Masukkan besar diskon">
           </div>
           
           <div class="form-group max-discount-group" id="maxDiscountGroup">
             <label for="maxDiscount" class="form-label">Maksimum Potongan (Rp)</label>
-            <input type="number" id="maxDiscount" class="form-control" value="50000" placeholder="Masukkan maksimum potongan">
+            <input type="number" id="maxDiscount" name="max_discount_amount" class="form-control" value="{{ old('max_discount_amount', $promotion->max_discount_amount ?? '') }}" placeholder="Masukkan maksimum potongan">
           </div>
         </div>
         
@@ -164,12 +170,12 @@
           <h5 class="card-title mb-3">Syarat & Ketentuan</h5>
           <div class="form-group">
             <label for="minPurchase" class="form-label">Minimum Pembelian (Rp)</label>
-            <input type="number" id="minPurchase" class="form-control" value="{{ $promotion['min_purchase'] }}" placeholder="Rp 0">
+            <input type="number" id="minPurchase" name="min_order_amount" class="form-control" value="{{ old('min_order_amount', $promotion->min_order_amount ?? 0) }}" placeholder="Rp 0">
           </div>
           
           <div class="form-group">
             <label for="quota" class="form-label">Kuota Penggunaan</label>
-            <input type="number" id="quota" class="form-control" value="{{ $promotion['quota'] }}" placeholder="Jumlah total voucher yang tersedia">
+            <input type="number" id="quota" name="usage_limit" class="form-control" value="{{ old('usage_limit', $promotion->usage_limit ?? 0) }}" placeholder="Jumlah total voucher yang tersedia (0 untuk unlimited)">
           </div>
         </div>
         
@@ -180,13 +186,13 @@
             <div class="col-md-6">
               <div class="form-group">
                 <label for="startDate" class="form-label">Tanggal & Waktu Mulai</label>
-                <input type="datetime-local" id="startDate" class="form-control" value="{{ $promotion['start_date'] }}">
+                <input type="datetime-local" id="startDate" name="start_date" class="form-control" value="{{ old('start_date', $promotion->start_date ? $promotion->start_date->format('Y-m-d\\TH:i') : '') }}">
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-group">
                 <label for="endDate" class="form-label">Tanggal & Waktu Selesai</label>
-                <input type="datetime-local" id="endDate" class="form-control" value="{{ $promotion['end_date'] }}">
+                <input type="datetime-local" id="endDate" name="end_date" class="form-control" value="{{ old('end_date', $promotion->end_date ? $promotion->end_date->format('Y-m-d\\TH:i') : '') }}">
               </div>
             </div>
           </div>
@@ -269,9 +275,8 @@
           return;
         }
         
-        // Di sini Anda akan menambahkan logika untuk menyimpan perubahan voucher
-        alert('Perubahan voucher berhasil disimpan!');
-        // form.submit(); // Uncomment this line to actually submit the form
+        // Submit form
+        form.submit();
       });
     });
   </script>

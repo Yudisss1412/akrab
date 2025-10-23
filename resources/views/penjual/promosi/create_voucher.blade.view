@@ -113,7 +113,8 @@
       </div>
       
       <!-- Formulir Voucher -->
-      <form id="createVoucherForm">
+      <form id="createVoucherForm" action="{{ route('penjual.promosi.voucher.store') }}" method="POST">
+        @csrf
         <!-- Bagian Informasi Dasar -->
         <div class="form-card">
           <h5 class="card-title mb-3">Informasi Dasar</h5>
@@ -269,9 +270,8 @@
           return;
         }
         
-        // Di sini Anda akan menambahkan logika untuk menyimpan voucher
-        alert('Voucher berhasil disimpan!');
-        // form.submit(); // Uncomment this line to actually submit the form
+        // Submit form
+        form.submit();
       });
     });
   </script>

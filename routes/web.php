@@ -27,9 +27,15 @@ resource_path('views/penjual/manajemen_promosi.blade.view')], 404);
 
 Route::get('/penjual/promosi/diskon', [App\Http\Controllers\PromotionController::class, 
 'createDiscount'])->name('penjual.promosi.diskon');
+Route::post('/penjual/promosi/diskon', [App\Http\Controllers\PromotionController::class, 
+'storeDiscount'])->name('penjual.promosi.diskon.store');
 Route::get('/penjual/promosi/voucher', [App\Http\Controllers\PromotionController::class, 
 'createVoucher'])->name('penjual.promosi.voucher');
+Route::post('/penjual/promosi/voucher', [App\Http\Controllers\PromotionController::class, 
+'storeVoucher'])->name('penjual.promosi.voucher.store');
 Route::get('/penjual/promosi/{id}/edit', [App\Http\Controllers\PromotionController::class, 'edit'])->name('penjual.promosi.edit');
+Route::put('/penjual/promosi/{id}/update', [App\Http\Controllers\PromotionController::class, 'updateVoucher'])->name('penjual.promosi.update');
+Route::put('/penjual/promosi/{id}/update/discount', [App\Http\Controllers\PromotionController::class, 'updateDiscount'])->name('penjual.promosi.discount.update');
 Route::post('/penjual/promosi/{id}/nonaktifkan', [App\Http\Controllers\PromotionController::class, 
 'nonaktifkan'])->name('penjual.promosi.nonaktifkan');
 Route::delete('/penjual/promosi/{id}', [App\Http\Controllers\PromotionController::class, 

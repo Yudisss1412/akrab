@@ -155,7 +155,8 @@
       </div>
       
       <!-- Formulir Diskon -->
-      <form id="createDiscountForm">
+      <form id="createDiscountForm" action="{{ route('penjual.promosi.diskon.store') }}" method="POST">
+        @csrf
         <!-- Bagian Informasi Dasar -->
         <div class="form-card">
           <h5 class="card-title mb-3">Informasi Dasar</h5>
@@ -231,6 +232,163 @@
           </div>
         </div>
       </form>
+      
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          // Produk dummy untuk pencarian
+          const products = [
+          @foreach($products as $product)
+            { id: {{ $product->id }}, name: '{{ $product->name }}', category: 'Kategori' },
+          @endforeach
+          ];
+          
+          // Fungsi pencarian produk
+          const productSearchInput = document.getElementById('productSearch');
+          const productSuggestions = document.getElementById('productSuggestions');
+          const selectedProductsContainer = document.getElementById('selectedProductsContainer');
+          
+          // Produk yang telah dipilih
+          let selectedProducts = [];
+          
+          // Fungsi untuk menampilkan saran produk
+          function showProductSuggestions(searchTerm) {
+            // Filter produk berdasarkan nama
+            const filteredProducts = products.filter(product => 
+              product.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            
+            // Kosongkan saran sebelumnya
+            productSuggestions.innerHTML = '';
+            
+            // Tampilkan saran produk
+            if (filteredProducts.length > 0) {
+              filteredProducts.forEach(product => {
+                const suggestionItem = document.createElement('div');
+                suggestionItem.className = 'product-suggestion-item';
+                suggestionItem.textContent = product.name;
+                suggestionItem.dataset.productId = product.id;
+                
+                suggestionItem.addEventListener('click', function() {
+                  addProductToSelection(product);
+                  productSearchInput.value = '';
+                  productSuggestions.style.display = 'none';
+                });
+                
+                productSuggestions.appendChild(suggestionItem);
+              });
+              
+              productSuggestions.style.display = 'block';
+            } else {
+              productSuggestions.innerHTML = '<div class="product-suggestion-item">Produk tidak ditemukan</div>';
+              productSuggestions.style.display = 'block';
+            }
+          }
+          
+          // Fungsi untuk menambahkan produk ke daftar yang dipilih
+          function addProductToSelection(product) {
+            // Cek apakah produk sudah dipilih sebelumnya
+            if (!selectedProducts.some(p => p.id === product.id)) {
+              selectedProducts.push(product);
+              updateSelectedProductsDisplay();
+            }
+          }
+          
+          // Fungsi untuk menghapus produk dari daftar yang dipilih
+          function removeProductFromSelection(productId) {
+            selectedProducts = selectedProducts.filter(product => product.id !== productId);
+            updateSelectedProductsDisplay();
+          }
+          
+          // Fungsi untuk memperbarui tampilan produk yang dipilih
+          function updateSelectedProductsDisplay() {
+            selectedProductsContainer.innerHTML = '';
+            
+            if (selectedProducts.length === 0) {
+              selectedProductsContainer.innerHTML = '<p class="text-muted mb-0">Belum ada produk yang dipilih</p>';
+            } else {
+              selectedProducts.forEach(product => {
+                const productItem = document.createElement('div');
+                productItem.className = 'selected-product-item';
+                productItem.innerHTML = `
+                  <span>${product.name}</span>
+                  <button type="button" class="remove-product-btn" data-product-id="${product.id}">Hapus</button>
+                `;
+                
+                selectedProductsContainer.appendChild(productItem);
+              });
+              
+              // Tambahkan event listener untuk tombol hapus
+              document.querySelectorAll('.remove-product-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                  const productId = parseInt(this.getAttribute('data-product-id'));
+                  removeProductFromSelection(productId);
+                });
+              });
+            }
+          }
+          
+          // Event listener untuk input pencarian produk
+          productSearchInput.addEventListener('input', function() {
+            const searchTerm = this.value.trim();
+            if (searchTerm) {
+              showProductSuggestions(searchTerm);
+            } else {
+              productSuggestions.style.display = 'none';
+            }
+          });
+          
+          // Event listener untuk menyembunyikan saran saat input kehilangan fokus
+          productSearchInput.addEventListener('blur', function() {
+            // Memberi sedikit delay agar bisa klik saran
+            setTimeout(() => {
+              productSuggestions.style.display = 'none';
+            }, 200);
+          });
+          
+          // Event listener untuk form
+          const form = document.getElementById('createDiscountForm');
+          form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validasi sederhana
+            const discountName = document.getElementById('discountName').value;
+            const discountValue = document.getElementById('discountValue').value;
+            
+            if (!discountName) {
+              alert('Harap masukkan Nama Promosi');
+              return;
+            }
+            
+            if (!discountValue) {
+              alert('Harap masukkan Besar Diskon');
+              return;
+            }
+            
+            if (selectedProducts.length === 0) {
+              alert('Harap pilih setidaknya satu produk');
+              return;
+            }
+            
+            if (!document.getElementById('startDate').value || !document.getElementById('endDate').value) {
+              alert('Harap atur periode promosi');
+              return;
+            }
+            
+            // Tambahkan produk yang dipilih ke form sebagai input tersembunyi
+            const productIdsInput = document.createElement('input');
+            productIdsInput.type = 'hidden';
+            productIdsInput.name = 'product_ids[]';
+            selectedProducts.forEach(product => {
+              const input = productIdsInput.cloneNode(true);
+              input.value = product.id;
+              form.appendChild(input);
+            });
+            
+            // Submit form
+            form.submit();
+          });
+        });
+      </script>
     </div>
   </main>
 @endsection

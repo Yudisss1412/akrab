@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Diskon Produk - ' . $promotion['name'])
+@section('title', 'Edit Diskon Produk - ' . ($promotionData['name'] ?? 'Diskon Produk'))
 
 @section('header')
   @include('components.header_compact')
@@ -150,18 +150,20 @@
           <a href="{{ route('penjual.promosi') }}" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left"></i> Kembali
           </a>
-          <h1 class="page-title mb-0">Edit Diskon Produk: {{ $promotion['name'] }}</h1>
+          <h1 class="page-title mb-0">Edit Diskon Produk: {{ $promotionData['name'] ?? 'Diskon Produk' }}</h1>
         </div>
       </div>
       
       <!-- Formulir Diskon -->
-      <form id="editDiscountForm">
+      <form id="editDiscountForm" action="{{ route('penjual.promosi.discount.update', ['id' => $promotionData['id']]) }}" method="POST">
+        @csrf
+        @method('PUT')
         <!-- Bagian Informasi Dasar -->
         <div class="form-card">
           <h5 class="card-title mb-3">Informasi Dasar</h5>
           <div class="form-group">
             <label for="discountName" class="form-label">Nama Promosi</label>
-            <input type="text" id="discountName" class="form-control" value="{{ $promotion['name'] }}" placeholder="Contoh: Diskon Akhir Tahun">
+            <input type="text" id="discountName" name="name" class="form-control" value="{{ old('name', $promotionData['name'] ?? '') }}" placeholder="Contoh: Diskon Akhir Tahun">
           </div>
         </div>
         
@@ -172,11 +174,11 @@
             <label class="form-label">Tipe Diskon</label>
             <div class="radio-group">
               <div class="radio-option">
-                <input type="radio" id="typePercentage" name="discountType" value="percentage" {{ $promotion['discount_type'] === 'percentage' ? 'checked' : '' }}>
+                <input type="radio" id="typePercentage" name="type" value="percentage" {{ old('type', $promotionData['discount_type'] ?? '') === 'percentage' ? 'checked' : '' }}>
                 <label for="typePercentage">Persentase (%)</label>
               </div>
               <div class="radio-option">
-                <input type="radio" id="typeFixed" name="discountType" value="fixed" {{ $promotion['discount_type'] === 'fixed' ? 'checked' : '' }}>
+                <input type="radio" id="typeFixed" name="type" value="fixed_amount" {{ old('type', $promotionData['discount_type'] ?? '') === 'fixed_amount' ? 'checked' : '' }}>
                 <label for="typeFixed">Potongan Harga Tetap (Rp)</label>
               </div>
             </div>
@@ -184,7 +186,7 @@
           
           <div class="form-group">
             <label for="discountValue" class="form-label">Besar Diskon</label>
-            <input type="number" id="discountValue" class="form-control" value="{{ $promotion['discount_value'] }}" placeholder="Masukkan besar diskon">
+            <input type="number" id="discountValue" name="discount_value" class="form-control" value="{{ old('discount_value', $promotionData['discount_value'] ?? '') }}" placeholder="Masukkan besar diskon">
           </div>
         </div>
         
@@ -192,14 +194,11 @@
         <div class="form-card">
           <h5 class="card-title mb-3">Pemilihan Produk</h5>
           <div class="form-group">
-            <label for="productSearch" class="form-label">Pilih Produk yang akan Didiskon</label>
-            <div class="product-search-container">
-              <input type="text" id="productSearch" class="form-control" placeholder="Cari di Akrab...">
-              <div class="product-suggestions" id="productSuggestions"></div>
-            </div>
-            
+            <label class="form-label">Produk yang Didiskon</label>
             <div class="selected-products" id="selectedProductsContainer">
-              <p class="text-muted mb-0">Belum ada produk yang dipilih</p>
+              <div class="selected-product-item">
+                <span>{{ $promotionData['product']->name ?? 'Produk Tidak Ditemukan' }}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -211,13 +210,13 @@
             <div class="col-md-6">
               <div class="form-group">
                 <label for="startDate" class="form-label">Tanggal & Waktu Mulai</label>
-                <input type="datetime-local" id="startDate" class="form-control" value="{{ $promotion['start_date'] }}">
+                <input type="datetime-local" id="startDate" name="start_date" class="form-control" value="{{ old('start_date', $promotionData['start_date'] ?? '') }}">
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-group">
                 <label for="endDate" class="form-label">Tanggal & Waktu Selesai</label>
-                <input type="datetime-local" id="endDate" class="form-control" value="{{ $promotion['end_date'] }}">
+                <input type="datetime-local" id="endDate" name="end_date" class="form-control" value="{{ old('end_date', $promotionData['end_date'] ?? '') }}">
               </div>
             </div>
           </div>
@@ -377,19 +376,13 @@
           return;
         }
         
-        if (selectedProducts.length === 0) {
-          alert('Harap pilih setidaknya satu produk');
-          return;
-        }
-        
         if (!document.getElementById('startDate').value || !document.getElementById('endDate').value) {
           alert('Harap atur periode promosi');
           return;
         }
         
-        // Di sini Anda akan menambahkan logika untuk menyimpan perubahan diskon
-        alert('Perubahan diskon berhasil disimpan!');
-        // form.submit(); // Uncomment this line to actually submit the form
+        // Submit form
+        form.submit();
       });
     });
   </script>

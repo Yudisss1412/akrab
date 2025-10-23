@@ -103,57 +103,15 @@
       <section id="order-history" class="order-history card active-content">
         <div class="section-header">
           <h3>Riwayat Pesanan</h3>
-          <a href="#" class="view-all">Lihat Semua</a>
+          <a href="{{ route('customer.order.history') }}" class="view-all">Lihat Semua</a>
         </div>
         
-        <div class="order-list">
-          <!-- Order 1 -->
-          <article class="order-card">
-            <div class="order-header">
-              <div class="order-id">INV-2023-001</div>
-              <div class="order-status status-completed">Selesai</div>
-            </div>
-            
-            <div class="order-details">
-              <div class="order-date">15 Mar 2023</div>
-              <div class="order-amount">Rp 245.000</div>
-            </div>
-            
-            <div class="order-items">
-              <div class="item-preview">
-                <img src="{{ asset('src/CangkirKeramik1.png') }}" alt="Cangkir Keramik">
-                <span class="item-count">+2 item lainnya</span>
-              </div>
-              <div class="order-actions">
-                <a href="{{ $u1 }}" class="btn btn-outline">Lihat Detail</a>
-                <!-- Tombol Lacak Pesanan hanya muncul jika status "Dikirim" -->
-              </div>
-            </div>
-          </article>
-          
-          <!-- Order 2 -->
-          <article class="order-card">
-            <div class="order-header">
-              <div class="order-id">INV-2023-002</div>
-              <div class="order-status status-shipping">Dikirim</div>
-            </div>
-            
-            <div class="order-details">
-              <div class="order-date">22 Mar 2023</div>
-              <div class="order-amount">Rp 180.000</div>
-            </div>
-            
-            <div class="order-items">
-              <div class="item-preview">
-                <img src="{{ asset('src/PiringKayu.png') }}" alt="Piring Kayu">
-                <span class="item-count">+1 item lainnya</span>
-              </div>
-              <div class="order-actions">
-                <a href="{{ $u2 }}" class="btn btn-outline">Lihat Detail</a>
-                <a href="#" class="btn btn-primary">Lacak Pesanan</a>
-              </div>
-            </div>
-          </article>
+        <div id="ordersLoading" class="loading-state">
+          <p>Memuat pesanan...</p>
+        </div>
+        
+        <div id="ordersList" class="order-list">
+          <!-- Orders will be loaded here dynamically -->
         </div>
       </section>
 
@@ -633,9 +591,103 @@
       return result;
     };
 
+    // ====== Fetch and Render User Orders ======
+    async function fetchUserOrders() {
+      try {
+        const response = await fetch('/api/orders');
+        if(response.ok) {
+          const data = await response.json();
+          renderOrders(data.orders || []);
+        } else {
+          // Fallback to empty array if API fails
+          renderOrders([]);
+        }
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+        renderOrders([]);
+      }
+    }
+
+    // Template function for a single order
+    function orderCardTemplate(order) {
+      // Determine status class based on order status
+      let statusClass = '';
+      let statusText = order.status;
+      switch(order.status) {
+        case 'completed':
+          statusClass = 'status-completed';
+          statusText = 'Selesai';
+          break;
+        case 'shipped':
+          statusClass = 'status-shipping';
+          statusText = 'Dikirim';
+          break;
+        case 'processing':
+          statusClass = 'status-processing';
+          statusText = 'Diproses';
+          break;
+        case 'cancelled':
+          statusClass = 'status-cancelled';
+          statusText = 'Dibatalkan';
+          break;
+        default:
+          statusClass = 'status-pending';
+          statusText = 'Menunggu';
+      }
+
+      // Get first item image and count for display
+      const firstItem = order.items && order.items.length > 0 ? order.items[0] : null;
+      const additionalItemsCount = order.items ? order.items.length - 1 : 0;
+      
+      // Format total amount with proper number formatting
+      const formattedAmount = new Intl.NumberFormat('id-ID').format(order.total_amount);
+      
+      return `<article class="order-card">
+        <div class="order-header">
+          <div class="order-id">#${order.order_number}</div>
+          <div class="order-status ${statusClass}">${statusText}</div>
+        </div>
+        
+        <div class="order-details">
+          <div class="order-date">${order.created_at}</div>
+          <div class="order-amount">Rp ${formattedAmount}</div>
+        </div>
+        
+        <div class="order-items">
+          <div class="item-preview">
+            ${firstItem ? `<img src="${firstItem.image}" alt="${firstItem.product_name}">` : ''}
+            ${additionalItemsCount > 0 ? `<span class="item-count">+${additionalItemsCount} item lainnya</span>` : ''}
+          </div>
+          <div class="order-actions">
+            <a href="/invoice/${order.order_number}" class="btn btn-outline">Lihat Detail</a>
+            ${order.status === 'shipped' ? '<a href="#" class="btn btn-primary">Lacak Pesanan</a>' : ''}
+          </div>
+        </div>
+      </article>`;
+    }
+
+    // Render orders to the page
+    function renderOrders(orders) {
+      const ordersList = document.getElementById('ordersList');
+      const ordersLoading = document.getElementById('ordersLoading');
+      
+      if (!ordersList) return;
+      
+      if (ordersLoading) {
+        ordersLoading.remove();
+      }
+      
+      if (orders.length > 0) {
+        ordersList.innerHTML = orders.map(orderCardTemplate).join('');
+      } else {
+        ordersList.innerHTML = '<p class="no-orders">Belum ada riwayat pesanan.</p>';
+      }
+    }
+    
     // Fetch reviews when DOM is loaded
     document.addEventListener('DOMContentLoaded', function() {
       fetchUserReviews();
+      fetchUserOrders();  // Add this to fetch orders as well
       fetchWishlist(); // Tambahkan pemanggilan fetchWishlist
     });
   </script>

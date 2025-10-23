@@ -20,15 +20,20 @@ Route::get('/penjual/promosi', function() {
     if(file_exists(resource_path('views/penjual/manajemen_promosi.blade.view'))) {
         return view('penjual.manajemen_promosi');
     } else {
-        return response()->json(['error' => 'View file tidak ditemukan', 'path' => resource_path('views/penjual/manajemen_promosi.blade.view')], 404);
+        return response()->json(['error' => 'View file tidak ditemukan', 'path' => 
+resource_path('views/penjual/manajemen_promosi.blade.view')], 404);
     }
 })->name('penjual.promosi');
 
-Route::get('/penjual/promosi/diskon', [App\Http\Controllers\PromotionController::class, 'createDiscount'])->name('penjual.promosi.diskon');
-Route::get('/penjual/promosi/voucher', [App\Http\Controllers\PromotionController::class, 'createVoucher'])->name('penjual.promosi.voucher');
+Route::get('/penjual/promosi/diskon', [App\Http\Controllers\PromotionController::class, 
+'createDiscount'])->name('penjual.promosi.diskon');
+Route::get('/penjual/promosi/voucher', [App\Http\Controllers\PromotionController::class, 
+'createVoucher'])->name('penjual.promosi.voucher');
 Route::get('/penjual/promosi/{id}/edit', [App\Http\Controllers\PromotionController::class, 'edit'])->name('penjual.promosi.edit');
-Route::post('/penjual/promosi/{id}/nonaktifkan', [App\Http\Controllers\PromotionController::class, 'nonaktifkan'])->name('penjual.promosi.nonaktifkan');
-Route::delete('/penjual/promosi/{id}', [App\Http\Controllers\PromotionController::class, 'destroy'])->name('penjual.promosi.destroy');
+Route::post('/penjual/promosi/{id}/nonaktifkan', [App\Http\Controllers\PromotionController::class, 
+'nonaktifkan'])->name('penjual.promosi.nonaktifkan');
+Route::delete('/penjual/promosi/{id}', [App\Http\Controllers\PromotionController::class, 
+'destroy'])->name('penjual.promosi.destroy');
 
 /*
 |--------------------------------------------------------------------------
@@ -61,8 +66,8 @@ Route::prefix('admin')->name('sellers.')->group(function () {
 });
 
 Route::get('/welcome', function () {
-    return view('welcome');
-})->name('welcome');
+    return view('customer.cust_welcome');
+})->name('cust.welcome');
 
 Route::get('/login', function () {
     return view('auth.login');
@@ -105,7 +110,8 @@ Route::post('/checkout', [App\Http\Controllers\CheckoutController::class, 'proce
 
 Route::get('/pengiriman', [App\Http\Controllers\CheckoutController::class, 'showShipping'])->name('cust.pengiriman');
 Route::get('/pengiriman/{order}', [App\Http\Controllers\CheckoutController::class, 'showShipping'])->name('cust.pengiriman.order');
-Route::post('/pengiriman/update-shipping', [App\Http\Controllers\CheckoutController::class, 'updateShipping'])->name('cust.pengiriman.update');
+Route::post('/pengiriman/update-shipping', [App\Http\Controllers\CheckoutController::class, 
+'updateShipping'])->name('cust.pengiriman.update');
 
 Route::get('/pembayaran', [App\Http\Controllers\CheckoutController::class, 'showPayment'])->name('cust.pembayaran');
 Route::post('/pembayaran/process', [App\Http\Controllers\CheckoutController::class, 'processPayment'])->name('payment.process');
@@ -114,7 +120,8 @@ Route::post('/pembayaran/process', [App\Http\Controllers\CheckoutController::cla
 Route::get('/ulasan', [App\Http\Controllers\ReviewController::class, 'index'])->name('ulasan.index');
 Route::post('/ulasan', [App\Http\Controllers\ReviewController::class, 'store'])->name('ulasan.store');
 Route::get('/ulasan/{orderItemId}/create', [App\Http\Controllers\ReviewController::class, 'create'])->name('ulasan.create');
-Route::get('/ulasan/produk/{productId}', [App\Http\Controllers\ReviewController::class, 'showByProduct'])->name('ulasan.show_by_product');
+Route::get('/ulasan/produk/{productId}', [App\Http\Controllers\ReviewController::class, 
+'showByProduct'])->name('ulasan.show_by_product');
 
 // API endpoint untuk mengambil ulasan pengguna
 Route::get('/api/reviews', function() {
@@ -131,7 +138,8 @@ Route::get('/api/reviews', function() {
                 'id' => $review->id,
                 'product_name' => $review->product->name ?? 'Produk Tidak Ditemukan',
                 'shop_name' => $review->product->seller->name ?? 'Toko Tidak Diketahui',
-                'product_image' => $review->product->image ? asset('storage/' . $review->product->image) : asset('src/placeholder_produk.png'),
+                'product_image' => $review->product->image ? asset('storage/' . $review->product->image) : 
+asset('src/placeholder_produk.png'),
                 'rating' => $review->rating,
                 'review_text' => $review->review_text,
                 'media' => $review->media ? array_map(function($path) {
@@ -144,6 +152,48 @@ Route::get('/api/reviews', function() {
     return response()->json(['reviews' => $reviews]);
 })->name('api.reviews');
 
+// API endpoint untuk mengambil riwayat pesanan pengguna
+Route::get('/api/orders', function() {
+    if (!auth()->check()) {
+        return response()->json(['orders' => []]);
+    }
+    
+    $orders = \App\Models\Order::with(['items.product', 'shipping_address', 'logs'])
+        ->where('user_id', auth()->id())
+        ->latest()
+        ->limit(5) // Ambil 5 pesanan terbaru
+        ->get()
+        ->map(function($order) {
+            return [
+                'id' => $order->id,
+                'order_number' => $order->order_number,
+                'status' => $order->status,
+                'total_amount' => $order->total_amount,
+                'created_at' => $order->created_at->format('d M Y'),
+                'items' => $order->items->map(function($item) {
+                    return [
+                        'id' => $item->id,
+                        'product_name' => $item->product->name,
+                        'quantity' => $item->quantity,
+                        'price' => $item->price,
+                        'image' => $item->product->image ? asset('storage/' . $item->product->image) : asset('src/placeholder_produk.png'),
+                    ];
+                }),
+                'shipping_address' => $order->shipping_address ? [
+                    'name' => $order->shipping_address->name,
+                    'phone' => $order->shipping_address->phone,
+                    'address' => $order->shipping_address->address,
+                    'city' => $order->shipping_address->city,
+                    'province' => $order->shipping_address->province,
+                    'postal_code' => $order->shipping_address->postal_code,
+                ] : null,
+                'latest_log' => $order->logs->sortByDesc('created_at')->first(),
+            ];
+        });
+    
+    return response()->json(['orders' => $orders]);
+})->name('api.orders');
+
 Route::get('/halaman_ulasan', [App\Http\Controllers\ReviewController::class, 'halamanUlasan'])->name('halaman_ulasan');
 
 Route::view('/halaman-ulasan', 'customer.koleksi.halaman_ulasan')->name('halaman-ulasan');
@@ -155,7 +205,8 @@ Route::get('/api/user-reviews', [App\Http\Controllers\ReviewController::class, '
 Route::put('/api/reviews/{reviewId}', [App\Http\Controllers\ReviewController::class, 'updateReview'])->name('api.update_review');
 
 // API endpoint for deleting user's review
-Route::delete('/api/reviews/{reviewId}', [App\Http\Controllers\ReviewController::class, 'deleteReview'])->name('api.delete_review');
+Route::delete('/api/reviews/{reviewId}', [App\Http\Controllers\ReviewController::class, 
+'deleteReview'])->name('api.delete_review');
 
 Route::get('/halaman_wishlist', function () {
     // Ambil data wishlist dari database untuk user yang sedang login
@@ -532,7 +583,8 @@ Route::get('/support/tickets', function () {
 })->name('support.tickets');
 
 Route::get('/withdrawal/requests', function () {
-    return '<h1>Daftar Permintaan Penarikan Dana</h1><p>Halaman ini menampilkan daftar permintaan penarikan dana dari penjual.</p>';
+    return '<h1>Daftar Permintaan Penarikan Dana</h1><p>Halaman ini menampilkan daftar permintaan penarikan dana dari 
+penjual.</p>';
 })->name('withdrawal.requests');
 
 
@@ -575,14 +627,20 @@ Route::get('/penjual/produk', function () {
 })->name('penjual.produk');
 
 Route::get('/penjual/produk', [App\Http\Controllers\Seller\ProductController::class, 'index'])->name('penjual.produk');
-Route::get('/penjual/produk/create', [App\Http\Controllers\Seller\ProductController::class, 'create'])->name('penjual.produk.create');
+Route::get('/penjual/produk/create', [App\Http\Controllers\Seller\ProductController::class, 
+'create'])->name('penjual.produk.create');
 Route::post('/penjual/produk', [App\Http\Controllers\Seller\ProductController::class, 'store'])->name('penjual.produk.store');
 Route::get('/penjual/produk/{id}', [App\Http\Controllers\Seller\ProductController::class, 'show'])->name('penjual.produk.show');
-Route::get('/penjual/produk/{id}/edit', [App\Http\Controllers\Seller\ProductController::class, 'edit'])->name('penjual.produk.edit');
-Route::put('/penjual/produk/{id}', [App\Http\Controllers\Seller\ProductController::class, 'update'])->name('penjual.produk.update');
-Route::delete('/penjual/produk/{id}', [App\Http\Controllers\Seller\ProductController::class, 'destroy'])->name('penjual.produk.destroy');
-Route::put('/penjual/produk/{id}/stock', [App\Http\Controllers\Seller\ProductController::class, 'updateStock'])->name('penjual.produk.stock.update');
-Route::delete('/penjual/product-image/{id}', [App\Http\Controllers\Seller\ProductController::class, 'destroyImage'])->name('penjual.product.image.delete');
+Route::get('/penjual/produk/{id}/edit', [App\Http\Controllers\Seller\ProductController::class, 
+'edit'])->name('penjual.produk.edit');
+Route::put('/penjual/produk/{id}', [App\Http\Controllers\Seller\ProductController::class, 
+'update'])->name('penjual.produk.update');
+Route::delete('/penjual/produk/{id}', [App\Http\Controllers\Seller\ProductController::class, 
+'destroy'])->name('penjual.produk.destroy');
+Route::put('/penjual/produk/{id}/stock', [App\Http\Controllers\Seller\ProductController::class, 
+'updateStock'])->name('penjual.produk.stock.update');
+Route::delete('/penjual/product-image/{id}', [App\Http\Controllers\Seller\ProductController::class, 
+'destroyImage'])->name('penjual.product.image.delete');
 
 Route::get('/penjual/pesanan', function () {
     return view('penjual.manajemen_pesanan');
@@ -622,8 +680,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/wishlist', [App\Http\Controllers\WishlistController::class, 'index'])->name('wishlist.index');
     Route::post('/wishlist', [App\Http\Controllers\WishlistController::class, 'store'])->name('wishlist.store');
     Route::delete('/wishlist/{id}', [App\Http\Controllers\WishlistController::class, 'destroy'])->name('wishlist.destroy');
-    Route::delete('/wishlist/product/{productId}', [App\Http\Controllers\WishlistController::class, 'destroyByProductId'])->name('wishlist.destroy-by-product');
-    Route::post('/wishlist/{id}/move-to-cart', [App\Http\Controllers\WishlistController::class, 'moveToCart'])->name('wishlist.move-to-cart');
+    Route::delete('/wishlist/product/{productId}', [App\Http\Controllers\WishlistController::class, 
+'destroyByProductId'])->name('wishlist.destroy-by-product');
+    Route::post('/wishlist/{id}/move-to-cart', [App\Http\Controllers\WishlistController::class, 
+'moveToCart'])->name('wishlist.move-to-cart');
 });
 
 // Payment Routes
@@ -638,7 +698,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/withdrawal', [App\Http\Controllers\WithdrawalController::class, 'index'])->name('withdrawal.index');
     Route::post('/withdrawal', [App\Http\Controllers\WithdrawalController::class, 'store'])->name('withdrawal.store');
     Route::get('/withdrawal/{id}', [App\Http\Controllers\WithdrawalController::class, 'show'])->name('withdrawal.show');
-    Route::post('/withdrawal/{id}/cancel', [App\Http\Controllers\WithdrawalController::class, 'cancel'])->name('withdrawal.cancel');
+    Route::post('/withdrawal/{id}/cancel', [App\Http\Controllers\WithdrawalController::class, 
+'cancel'])->name('withdrawal.cancel');
 });
 
 // Chat Routes
@@ -646,12 +707,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/chat/{userId}', [App\Http\Controllers\ChatController::class, 'getMessages'])->name('chat.messages');
     Route::post('/chat/send', [App\Http\Controllers\ChatController::class, 'sendMessage'])->name('chat.send');
     Route::get('/chat/contacts', [App\Http\Controllers\ChatController::class, 'getContacts'])->name('chat.contacts');
-    Route::post('/chat/{userId}/mark-as-read', [App\Http\Controllers\ChatController::class, 'markAsRead'])->name('chat.mark-as-read');
+    Route::post('/chat/{userId}/mark-as-read', [App\Http\Controllers\ChatController::class, 
+'markAsRead'])->name('chat.mark-as-read');
 });
 
 // Role-based Dashboards
 Route::middleware(['auth', 'admin.role'])->group(function () {
-    Route::get('/admin/dashboard', [App\Http\Controllers\RoleDashboardController::class, 'showAdminDashboard'])->name('admin.dashboard');
+    Route::get('/admin/dashboard', [App\Http\Controllers\RoleDashboardController::class, 
+'showAdminDashboard'])->name('admin.dashboard');
 });
 
 Route::middleware(['auth', 'seller.role'])->group(function () {
@@ -661,7 +724,9 @@ Route::middleware(['auth', 'seller.role'])->group(function () {
 });
 
 Route::middleware(['auth', 'customer.role'])->group(function () {
-    Route::get('/customer/dashboard', [App\Http\Controllers\RoleDashboardController::class, 'showCustomerDashboard'])->name('customer.dashboard');
+    Route::get('/customer/dashboard', [App\Http\Controllers\RoleDashboardController::class, 
+'showCustomerDashboard'])->name('customer.dashboard');
+    Route::get('/customer/riwayat-pesanan', [App\Http\Controllers\OrderHistoryController::class, 'index'])->name('customer.order.history');
 });
 
 // Authentication Routes
@@ -672,4 +737,5 @@ Route::post('/register', [App\Http\Controllers\AuthController::class, 'register'
 Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout'])->name('logout');
 
 // General dashboard route that shows different content based on role
-Route::middleware(['auth'])->get('/dashboard', [App\Http\Controllers\RoleDashboardController::class, 'showRoleBasedDashboard'])->name('dashboard');
+Route::middleware(['auth'])->get('/dashboard', [App\Http\Controllers\RoleDashboardController::class, 
+'showRoleBasedDashboard'])->name('dashboard');

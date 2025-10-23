@@ -1,0 +1,223 @@
+/* Riwayat Pesanan Styles */
+
+:root {
+  --border: #e5e7eb;
+  --brand: #007bff;
+  --ok: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --radius: 8px;
+  --radius-lg: 12px;
+}
+
+* { 
+  box-sizing: border-box; 
+}
+
+.order-list-section {
+  padding: 1rem 1.5rem;
+}
+
+.order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.order-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  transition: box-shadow 0.2s ease;
+}
+
+.order-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.order-id {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.9rem;
+}
+
+.order-status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.status-pending {
+  background: #fef3c7;
+  color: #f59e0b;
+  border: 1px solid #fbbf24;
+}
+
+.status-processing {
+  background: #ffedd5;
+  color: #f97316;
+  border: 1px solid #fdba74;
+}
+
+.status-shipping {
+  background: #dbeafe;
+  color: #3b82f6;
+  border: 1px solid #93c5fd;
+}
+
+.status-completed {
+  background: #dcfce7;
+  color: #22c55e;
+  border: 1px solid #86efac;
+}
+
+.status-cancelled {
+  background: #fee2e2;
+  color: #ef4444;
+  border: 1px solid #fca5a5;
+}
+
+.order-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.order-amount {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 0.9rem;
+}
+
+.order-items {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item-preview {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.item-preview img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.item-count {
+  font-size: 0.8rem;
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+.order-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.btn-outline {
+  background: none;
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+.btn-outline:hover {
+  background: var(--brand);
+  color: #fff;
+}
+
+.btn-primary {
+  background: var(--brand);
+  color: #fff;
+  border-color: var(--brand);
+}
+
+.btn-primary:hover {
+  background: #005a9e;
+  border-color: #005a9e;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  text-align: center;
+  color: #6b7280;
+}
+
+.empty-img {
+  margin-bottom: 1rem;
+}
+
+.empty-text {
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  color: #4b5563;
+}
+
+.empty-state .btn {
+  max-width: 200px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .order-details {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+  
+  .order-amount {
+    align-self: flex-end;
+  }
+  
+  .order-items {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .item-preview {
+    justify-content: center;
+  }
+  
+  .order-actions {
+    justify-content: center;
+  }
+}

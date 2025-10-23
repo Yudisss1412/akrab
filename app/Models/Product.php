@@ -110,4 +110,23 @@ class Product extends Model
     {
         return $this->reviews()->where('status', 'approved')->count();
     }
+
+    // Relasi ke promosi produk
+    public function productPromotions()
+    {
+        return $this->hasMany(ProductPromotion::class);
+    }
+
+    // Method untuk mendapatkan promosi aktif untuk produk ini
+    public function getActivePromotionAttribute()
+    {
+        return $this->productPromotions()
+                   ->where('status', 'active')
+                   ->where('start_date', '<=', now())
+                   ->where(function($query) {
+                       $query->whereNull('end_date')
+                             ->orWhere('end_date', '>=', now());
+                   })
+                   ->first();
+    }
 }

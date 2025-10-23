@@ -122,16 +122,16 @@ class User extends Authenticatable
         return $this->hasMany(Notification::class);
     }
 
-    // Relasi ke permintaan penarikan dana (untuk penjual)
+    // Relasi ke permintaan penarikan dana (untuk penjual) melalui seller
     public function withdrawalRequests()
     {
-        return $this->hasMany(WithdrawalRequest::class, 'seller_id');
+        return $this->hasManyThrough(WithdrawalRequest::class, Seller::class, 'user_id', 'seller_id');
     }
 
-    // Relasi ke produk yang dijual (untuk penjual)
+    // Relasi ke produk yang dijual (untuk penjual) melalui seller
     public function products()
     {
-        return $this->hasMany(Product::class, 'seller_id');
+        return $this->hasManyThrough(Product::class, Seller::class, 'user_id', 'seller_id');
     }
 
     /**

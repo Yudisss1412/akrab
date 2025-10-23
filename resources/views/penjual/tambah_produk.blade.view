@@ -131,8 +131,9 @@
                                     <div class="mb-3">
                                         <label for="status" class="form-label">Status Produk</label>
                                         <select class="form-select" id="status" name="status">
-                                            <option value="aktif" {{ old('status', 'aktif') == 'aktif' ? 'selected' : '' }}>Aktif</option>
+                                            <option value="active" {{ old('status', 'active') == 'active' ? 'selected' : '' }}>Aktif</option>
                                             <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Draft</option>
+                                            <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Tidak Aktif</option>
                                         </select>
                                     </div>
                                 </div>

@@ -52,7 +52,7 @@ class Product extends Model
     // Relasi ke penjual
     public function seller()
     {
-        return $this->belongsTo(User::class, 'seller_id');
+        return $this->belongsTo(Seller::class, 'seller_id');
     }
 
     /**
@@ -60,7 +60,7 @@ class Product extends Model
      */
     public function getSellerNameAttribute()
     {
-        return $this->seller ? $this->seller->name : 'Unknown Seller';
+        return $this->seller ? $this->seller->store_name : 'Unknown Seller';
     }
 
     // Relasi ke varian produk

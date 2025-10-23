@@ -24,8 +24,17 @@ class ProductController extends Controller
             abort(403, 'Akses ditolak. Hanya penjual yang dapat mengakses halaman ini.');
         }
 
+        // Ambil ID penjual dari tabel sellers berdasarkan user_id
+        $seller = \App\Models\Seller::where('user_id', $user->id)->first();
+        if (!$seller) {
+            // Jika tidak ada seller record, kembalikan koleksi kosong
+            $products = collect();
+            $categories = \App\Models\Category::all();
+            return view('penjual.manajemen_produk', compact('products', 'categories'));
+        }
+        
         // Query builder untuk produk milik penjual saat ini
-        $query = Product::where('seller_id', $user->id)
+        $query = Product::where('seller_id', $seller->id)
             ->with(['variants', 'category', 'images']);
 
         // Filter berdasarkan pencarian jika ada
@@ -94,7 +103,7 @@ class ProductController extends Controller
             'weight' => 'required|numeric|min:0',
             'images' => 'required|array|min:1',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // max 2MB per image
-            'status' => 'sometimes|in:aktif,draft,suspended',
+            'status' => 'sometimes|in:active,inactive,draft',
         ]);
 
         if ($validator->fails()) {
@@ -105,6 +114,22 @@ class ProductController extends Controller
             // Mulai transaksi database
             DB::beginTransaction();
 
+            // Konversi status dari bahasa Indonesia ke bahasa Inggris jika diperlukan
+            $status = $request->status;
+            if ($status === 'aktif') {
+                $status = 'active';
+            } elseif ($status === 'draft') {
+                $status = 'draft';
+            } else {
+                $status = $status ?? 'active';
+            }
+            
+            // Ambil ID penjual dari tabel sellers berdasarkan user_id
+            $seller = \App\Models\Seller::where('user_id', $user->id)->first();
+            if (!$seller) {
+                throw new \Exception('Seller record not found for this user');
+            }
+            
             // Buat produk
             $product = Product::create([
                 'name' => $request->name,
@@ -113,8 +138,8 @@ class ProductController extends Controller
                 'category_id' => $request->category_id,
                 'stock' => $request->stock,
                 'weight' => $request->weight,
-                'seller_id' => $user->id,
-                'status' => $request->status ?? 'aktif'
+                'seller_id' => $seller->id,
+                'status' => $status
             ]);
 
             // Upload gambar
@@ -151,8 +176,14 @@ class ProductController extends Controller
             abort(403, 'Akses ditolak. Hanya penjual yang dapat mengakses halaman ini.');
         }
 
+        // Ambil ID penjual dari tabel sellers berdasarkan user_id
+        $seller = \App\Models\Seller::where('user_id', $user->id)->first();
+        if (!$seller) {
+            abort(403, 'Akses ditolak. Seller record tidak ditemukan.');
+        }
+
         $product = Product::where('id', $id)
-            ->where('seller_id', $user->id)
+            ->where('seller_id', $seller->id)
             ->with(['variants', 'category', 'images', 'reviews.user'])
             ->firstOrFail();
 
@@ -175,8 +206,14 @@ class ProductController extends Controller
             abort(403, 'Akses ditolak. Hanya penjual yang dapat mengakses halaman ini.');
         }
 
+        // Ambil ID penjual dari tabel sellers berdasarkan user_id
+        $seller = \App\Models\Seller::where('user_id', $user->id)->first();
+        if (!$seller) {
+            abort(403, 'Akses ditolak. Seller record tidak ditemukan.');
+        }
+
         $product = Product::where('id', $id)
-            ->where('seller_id', $user->id)
+            ->where('seller_id', $seller->id)
             ->with(['variants', 'category', 'images'])
             ->firstOrFail();
         
@@ -208,7 +245,7 @@ class ProductController extends Controller
             'weight' => 'required|numeric|min:0',
             'images' => 'array',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            'status' => 'sometimes|in:aktif,draft,suspended',
+            'status' => 'sometimes|in:active,inactive,draft',
         ]);
 
         if ($validator->fails()) {
@@ -219,6 +256,16 @@ class ProductController extends Controller
             // Mulai transaksi database
             DB::beginTransaction();
 
+            // Konversi status dari bahasa Indonesia ke bahasa Inggris jika diperlukan
+            $status = $request->status;
+            if ($status === 'aktif') {
+                $status = 'active';
+            } elseif ($status === 'draft') {
+                $status = 'draft';
+            } else {
+                $status = $status ?? $product->status;
+            }
+            
             // Update produk
             $product->update([
                 'name' => $request->name,
@@ -227,7 +274,7 @@ class ProductController extends Controller
                 'category_id' => $request->category_id,
                 'stock' => $request->stock,
                 'weight' => $request->weight,
-                'status' => $request->status ?? $product->status,
+                'status' => $status,
             ]);
 
             // Upload gambar baru jika ada
@@ -264,8 +311,14 @@ class ProductController extends Controller
             return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
         }
 
+        // Ambil ID penjual dari tabel sellers berdasarkan user_id
+        $seller = \App\Models\Seller::where('user_id', $user->id)->first();
+        if (!$seller) {
+            return response()->json(['success' => false, 'message' => 'Akses ditolak. Seller record tidak ditemukan.'], 403);
+        }
+
         $product = Product::where('id', $id)
-            ->where('seller_id', $user->id)
+            ->where('seller_id', $seller->id)
             ->firstOrFail();
 
         try {
@@ -305,8 +358,14 @@ class ProductController extends Controller
             abort(403, 'Akses ditolak. Hanya penjual yang dapat mengakses halaman ini.');
         }
 
+        // Ambil ID penjual dari tabel sellers berdasarkan user_id
+        $seller = \App\Models\Seller::where('user_id', $user->id)->first();
+        if (!$seller) {
+            abort(403, 'Akses ditolak. Seller record tidak ditemukan.');
+        }
+
         $product = Product::where('id', $id)
-            ->where('seller_id', $user->id)
+            ->where('seller_id', $seller->id)
             ->firstOrFail();
 
         $request->validate([
@@ -333,9 +392,15 @@ class ProductController extends Controller
         }
         
         // Temukan gambar produk yang dimiliki oleh penjual ini
+        // Ambil ID penjual dari tabel sellers berdasarkan user_id
+        $seller = \App\Models\Seller::where('user_id', $user->id)->first();
+        if (!$seller) {
+            return response()->json(['success' => false, 'message' => 'Akses ditolak. Seller record tidak ditemukan.'], 403);
+        }
+        
         $image = \App\Models\ProductImage::where('id', $id)
-            ->whereHas('product', function ($query) use ($user) {
-                $query->where('seller_id', $user->id);
+            ->whereHas('product', function ($query) use ($seller) {
+                $query->where('seller_id', $seller->id);
             })
             ->first();
         

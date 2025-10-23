@@ -150,9 +150,9 @@
                                     <div class="mb-3">
                                         <label for="status" class="form-label">Status Produk</label>
                                         <select class="form-select" id="status" name="status">
-                                            <option value="aktif" {{ old('status', $product->status) == 'aktif' ? 'selected' : '' }}>Aktif</option>
+                                            <option value="active" {{ old('status', $product->status) == 'active' ? 'selected' : '' }}>Aktif</option>
                                             <option value="draft" {{ old('status', $product->status) == 'draft' ? 'selected' : '' }}>Draft</option>
-                                            <option value="suspended" {{ old('status', $product->status) == 'suspended' ? 'selected' : '' }}>Ditangguhkan</option>
+                                            <option value="inactive" {{ old('status', $product->status) == 'inactive' ? 'selected' : '' }}>Tidak Aktif</option>
                                         </select>
                                     </div>
                                 </div>

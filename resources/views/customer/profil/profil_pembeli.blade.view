@@ -147,13 +147,7 @@
               <button class="btn btn-outline" id="changePasswordBtn">Ubah</button>
             </div>
             
-            <div class="settings-item">
-              <div class="settings-label">Autentikasi Dua Faktor</div>
-              <div class="settings-controls">
-                <span class="badge status-inactive">Tidak Aktif</span>
-                <button class="btn btn-outline">Kelola</button>
-              </div>
-            </div>
+
             
             <div class="settings-item">
               <div class="settings-label">Sesi Login Aktif</div>

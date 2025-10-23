@@ -38,7 +38,7 @@ class RoleDashboardController extends Controller
             case 'customer':
                 return view('customer.dashboard');
             default:
-                return redirect()->route('welcome');
+                return redirect()->route('cust.welcome');
         }
     }
 }

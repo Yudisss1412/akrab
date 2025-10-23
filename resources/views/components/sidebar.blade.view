@@ -135,7 +135,7 @@
                 <h6 class="nav-header text-uppercase text-muted small px-2">Navigasi</h6>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('welcome') ? 'active' : '' }}" href="{{ route('welcome') }}">
+                <a class="nav-link {{ request()->routeIs('cust.welcome') ? 'active' : '' }}" href="{{ route('cust.welcome') }}">
                     <i class="fas fa-home me-2"></i>Beranda
                 </a>
             </li>

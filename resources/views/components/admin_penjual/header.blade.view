@@ -1,6 +1,6 @@
 <header class="ak-navbar">
   <div class="ak-navbar__inner">
-    <a href="{{ route('welcome') }}" aria-label="Ke beranda">
+    <a href="{{ route('cust.welcome') }}" aria-label="Ke beranda">
       <img class="ak-logo" src="{{ asset('src/Logo_UMKM.png') }}" alt="AKRAB" />
     </a>
     <div class="header-right">

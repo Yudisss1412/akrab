@@ -729,6 +729,35 @@ Route::middleware(['auth', 'admin.role'])->group(function () {
     Route::get('/api/admin/dashboard/stats', [App\Http\Controllers\Admin\AdminDashboardController::class, 'getDashboardStats'])->name('api.admin.dashboard.stats');
     Route::get('/api/admin/dashboard/users', [App\Http\Controllers\Admin\AdminDashboardController::class, 'getUserStats'])->name('api.admin.dashboard.users');
     Route::get('/api/admin/dashboard/products', [App\Http\Controllers\Admin\AdminDashboardController::class, 'getProductStats'])->name('api.admin.dashboard.products');
+    
+    // Test endpoint for creating a product
+    Route::post('/api/admin/test-create-product', function () {
+        try {
+            $product = \App\Models\Product::create([
+                'name' => 'Test Produk',
+                'description' => 'Deskripsi test produk',
+                'price' => 100000,
+                'category_id' => 1,
+                'stock' => 10,
+                'weight' => 500,
+                'seller_id' => 2,
+                'status' => 'aktif',
+                'min_order' => 1,
+                'ready_stock' => 10
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Produk berhasil dibuat',
+                'product' => $product
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal membuat produk: ' . $e->getMessage()
+            ], 500);
+        }
+    })->name('api.admin.test.create.product');
 });
 
 Route::middleware(['auth', 'seller.role'])->group(function () {

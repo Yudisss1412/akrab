@@ -1,55 +1,14 @@
-/* ======= Dummy data (bisa di-API-kan nanti) ======= */
+/* ======= Data will be loaded from API ======= */
 // Utilities
 // Menghindari konflik dengan script.js yang sudah mendefinisikan $
 const $q = (sel, el = document) => el.querySelector(sel);
 const $qa = (sel, el = document) => Array.from(el.querySelectorAll(sel));
 
-const data = {
-  user: { name: "yudistiradwianggara" },
-  belumDinilai: [
-    {
-      id: "b1",
-      timeISO: "2025-08-29T19:50:00+07:00",
-      product: {
-        title: "Kaki Kursi Kantor 280 Tanpa Roda (Baru)",
-        variant: "",
-        url: "#"
-      }
-    }
-  ],
-  dinilai: [
-    {
-      id: "r1",
-      timeISO: "2025-07-19T15:37:00+07:00",
-      rating: 5,
-      kv: [
-        ["Fungsi", "beroprasi dengan lancar"],
-        ["Fitur", "bagus dan berguna"],
-        ["Desain", "menarik dan modern"],
-      ],
-      product: {
-        title: "【MG】 Stick Stik DS4 LightBar + DUS ASLI",
-        variant: "Variasi: Hitam, SAMA BOX + KABEL",
-        url: "#"
-      },
-      images: [
-        { name: "produk1.jpg", size: 123456, type: "image/jpeg" },
-        { name: "produk2.jpg", size: 234567, type: "image/jpeg" }
-      ]
-    },
-    {
-      id: "r2",
-      timeISO: "2024-12-04T19:39:00+07:00",
-      rating: 5,
-      kv: [],
-      product: {
-        title: "Gedi Luxury 13011 Jam Tangan Wanita Rantai",
-        variant: "Variasi: Full Black",
-        url: "#"
-      },
-      images: []
-    }
-  ]
+// Define data object that will be populated from API
+let data = {
+  user: { name: "" },
+  belumDinilai: [],
+  dinilai: []
 };
 
 console.log('=== DUMMY DATA LOADED ===');
@@ -801,9 +760,69 @@ function handleFormSubmit(e) {
 
 // Fungsi terpisah untuk menangani hapus ulasan
 function handleDeleteReview() {
-  // Hapus ulasan (implementasi sesuai kebutuhan)
-  console.log('Deleting review');
-  closeReviewModal();
+  if (confirm('Apakah Anda yakin ingin menghapus ulasan ini?')) {
+    const reviewId = document.getElementById('reviewId').value.trim();
+    if (reviewId) {
+      deleteReviewFromServer(reviewId)
+        .then(response => {
+          if (response.success) {
+            // Close modal and remove the review from the UI
+            closeReviewModal();
+            
+            // Remove the review from local data
+            removeFromLocalData(reviewId);
+            
+            // Show success message
+            alert('Ulasan berhasil dihapus');
+          } else {
+            console.error('Error deleting review:', response.message);
+            alert('Gagal menghapus ulasan: ' + response.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error deleting review:', error);
+          alert('Terjadi kesalahan saat menghapus ulasan');
+        });
+    }
+  }
+}
+
+// Function to delete review from server
+async function deleteReviewFromServer(reviewId) {
+  const response = await fetch(`/api/reviews/${reviewId}`, {
+    method: 'DELETE',
+    headers: {
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').content : ''
+    }
+  });
+  
+  return await response.json();
+}
+
+// Function to remove the review from local data
+function removeFromLocalData(reviewId) {
+  // Find the review in the local data and remove it
+  const reviewIndex = data.dinilai.findIndex(r => r.id == reviewId);
+  if (reviewIndex !== -1) {
+    data.dinilai.splice(reviewIndex, 1);
+    
+    // Remove the card from the UI
+    if (currentEditCard && currentEditCard.parentNode) {
+      currentEditCard.parentNode.removeChild(currentEditCard);
+    }
+    
+    // Check if there are no more reviews and show empty state
+    const reviewList = $q('#reviewList');
+    if (reviewList && reviewList.children.length === 0) {
+      const parentSection = reviewList.closest('.tab-content');
+      if (parentSection) {
+        const emptyState = parentSection.querySelector('.empty-state');
+        if (emptyState) {
+          emptyState.hidden = false;
+        }
+      }
+    }
+  }
 }
 
 function saveReviewChanges() {
@@ -902,18 +921,36 @@ function saveReviewChanges() {
   console.log('Review ID:', reviewId);
   console.log('Review card dataset ID:', reviewCard ? reviewCard.dataset.id : 'N/A');
   
-  // Tutup modal
-  closeReviewModal();
-  
-  // Reset referensi card
-  currentEditCard = null;
-  
-  // Reset image files
-  window.currentReviewImages = [];
-  
-  // Tampilkan pesan sukses (opsional)
-  console.log('Review changes saved successfully');
-  console.log('Updated rating:', rating);
+  // Update review di backend (for now, just show a message)
+  updateReviewOnServer(reviewId, rating, reviewText, selectedFiles)
+    .then(response => {
+      if (response.success) {
+        // Tutup modal
+        closeReviewModal();
+        
+        // Reset referensi card
+        currentEditCard = null;
+        
+        // Reset image files
+        window.currentReviewImages = [];
+        
+        // Update local data and UI
+        updateLocalReviewData(reviewId, rating, reviewText, response.review);
+        
+        console.log('Review changes saved successfully');
+        console.log('Updated rating:', rating);
+        
+        // Show success message
+        alert('Ulasan berhasil diperbarui');
+      } else {
+        console.error('Error saving review:', response.message);
+        alert('Gagal menyimpan ulasan: ' + response.message);
+      }
+    })
+    .catch(error => {
+      console.error('Error saving review:', error);
+      alert('Terjadi kesalahan saat menyimpan ulasan');
+    });
   
   // Reset form setelah perubahan disimpan
   const editReviewForm = $q('#editReviewForm');
@@ -925,6 +962,60 @@ function saveReviewChanges() {
   const reviewIdInput = document.getElementById('reviewId');
   if (reviewIdInput) {
     reviewIdInput.value = '';
+  }
+}
+
+// Function to update review on server
+async function updateReviewOnServer(reviewId, rating, reviewText, files) {
+  const formData = new FormData();
+  formData.append('rating', rating);
+  formData.append('review_text', reviewText);
+  formData.append('_token', document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').content : '');
+  
+  // Add files to form data if any
+  if (files.length > 0) {
+    for (let i = 0; i < files.length; i++) {
+      // If the file is an actual File object, add it. Otherwise, it might be a placeholder
+      if (files[i] instanceof File) {
+        formData.append('media[]', files[i], files[i].name);
+      } else if (files[i].file && files[i].file instanceof File) {
+        // If it's a wrapper object containing the file
+        formData.append('media[]', files[i].file, files[i].file.name);
+      } else if (files[i].name && files[i].dataURL) {
+        // If it's a placeholder object, we may need to handle differently
+        console.log('File is a placeholder with dataURL - need to handle image update separately if implemented');
+      }
+    }
+  }
+  
+  const response = await fetch(`/api/reviews/${reviewId}`, {
+    method: 'POST', // Using POST with _method PUT for Laravel compatibility
+    body: formData
+  });
+  
+  return await response.json();
+}
+
+// Function to update local data after successful API call
+function updateLocalReviewData(reviewId, rating, reviewText, reviewData) {
+  // Find the review in the local data and update it
+  const reviewIndex = data.dinilai.findIndex(r => r.id == reviewId);
+  if (reviewIndex !== -1) {
+    // Update the review data
+    data.dinilai[reviewIndex].rating = rating;
+    if (reviewData.review_text) {
+      // Update kv array with the new review text
+      data.dinilai[reviewIndex].kv = [['Ulasan', reviewData.review_text]];
+    }
+    
+    // Re-render the affected review card
+    if (currentEditCard) {
+      // Update card rating display
+      updateCardRating(currentEditCard, rating);
+      
+      // For now we won't update the review text in the card to avoid complex DOM manipulation
+      // The card shows kv pairs, which we've already updated in the data
+    }
   }
 }
 
@@ -1335,7 +1426,7 @@ function setupDragAndDrop() {
 }
 
 /* ======= Init ======= */
-document.addEventListener('DOMContentLoaded', ()=>{
+document.addEventListener('DOMContentLoaded', async ()=>{  // Changed to async
   try {
     console.log('=== INITIALIZING HALAMAN ULASAN ===');
     console.log('Document loaded, starting initialization');
@@ -1359,8 +1450,39 @@ document.addEventListener('DOMContentLoaded', ()=>{
       return;
     }
     
-    console.log('Dummy data:', data);
-    console.log('Data dinilai:', data.dinilai);
+    // Fetch real data from API
+    try {
+      console.log('Fetching user reviews data...');
+      const response = await fetch('/api/user-reviews');
+      const result = await response.json();
+      
+      if (result.success) {
+        // Update global data object with fetched data
+        data = {
+          user: result.user,
+          belumDinilai: [], // For now, we're only focusing on existing reviews
+          dinilai: result.reviews || [] // All reviews are shown in 'dinilai' section
+        };
+        
+        console.log('Data fetched successfully:', data);
+      } else {
+        console.error('API request failed:', result.message);
+        // Use empty data as fallback
+        data = {
+          user: { name: "" },
+          belumDinilai: [],
+          dinilai: []
+        };
+      }
+    } catch (error) {
+      console.error('Error fetching user reviews:', error);
+      // Use empty data as fallback
+      data = {
+        user: { name: "" },
+        belumDinilai: [],
+        dinilai: []
+      };
+    }
     
     // renderStats(); // Stats section has been removed from HTML, so we skip this
     
@@ -1404,16 +1526,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
     console.log('Setting up search and sort...');
     setupSearchAndSort();
 
-    // Add test button for debugging (remove in production)
-    // const testBtn = document.createElement('button');
-    // testBtn.textContent = 'Test Images';
-    // testBtn.style.position = 'fixed';
-    // testBtn.style.bottom = '20px';
-    // testBtn.style.right = '20px';
-    // testBtn.style.zIndex = '10000';
-    // testBtn.addEventListener('click', testImageDisplay);
-    // document.body.appendChild(testBtn);
-    
     console.log('=== INITIALIZATION COMPLETE ===');
   } catch (error) {
     console.error('FATAL ERROR in document initialization:', error);

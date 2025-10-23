@@ -134,6 +134,9 @@ Route::get('/api/reviews', function() {
                 'product_image' => $review->product->image ? asset('storage/' . $review->product->image) : asset('src/placeholder_produk.png'),
                 'rating' => $review->rating,
                 'review_text' => $review->review_text,
+                'media' => $review->media ? array_map(function($path) {
+                    return asset('storage/' . $path);
+                }, json_decode($review->media, true)) : null,
                 'created_at' => $review->created_at->format('d M Y')
             ];
         });
@@ -141,11 +144,18 @@ Route::get('/api/reviews', function() {
     return response()->json(['reviews' => $reviews]);
 })->name('api.reviews');
 
-Route::get('/halaman_ulasan', function () {
-    return view('customer.koleksi.halaman_ulasan');
-})->name('halaman_ulasan');
+Route::get('/halaman_ulasan', [App\Http\Controllers\ReviewController::class, 'halamanUlasan'])->name('halaman_ulasan');
 
 Route::view('/halaman-ulasan', 'customer.koleksi.halaman_ulasan')->name('halaman-ulasan');
+
+// API endpoint for fetching user's reviews
+Route::get('/api/user-reviews', [App\Http\Controllers\ReviewController::class, 'getUserReviews'])->name('api.user_reviews');
+
+// API endpoint for updating user's review
+Route::put('/api/reviews/{reviewId}', [App\Http\Controllers\ReviewController::class, 'updateReview'])->name('api.update_review');
+
+// API endpoint for deleting user's review
+Route::delete('/api/reviews/{reviewId}', [App\Http\Controllers\ReviewController::class, 'deleteReview'])->name('api.delete_review');
 
 Route::get('/halaman_wishlist', function () {
     // Ambil data wishlist dari database untuk user yang sedang login

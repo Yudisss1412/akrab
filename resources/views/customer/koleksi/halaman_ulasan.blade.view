@@ -100,5 +100,9 @@
 @endsection
 
 @push('scripts')
+  <script>
+    // Add CSRF token for API requests
+    document.head.innerHTML += '<meta name="csrf-token" content="{{ csrf_token() }}">';
+  </script>
   <script src="{{ asset('js/customer/koleksi/halaman_ulasan.js') }}"></script>
 @endpush

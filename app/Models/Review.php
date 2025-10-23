@@ -13,6 +13,7 @@ class Review extends Model
         'rating',
         'review_text',
         'status',
+        'media',
     ];
 
     // Relasi ke user

@@ -164,64 +164,12 @@
           <a href="{{ route('halaman_ulasan') }}" class="view-all">Lihat Semua</a>
         </div>
         
-        <div class="review-list">
-          <!-- Review 1 -->
-          <article class="review-card">
-            <div class="review-product">
-              <img src="{{ asset('src/CangkirKeramik1.png') }}" alt="Cangkir Keramik">
-              <div class="product-info">
-                <h4>Cangkir Keramik 250ml</h4>
-                <p class="shop-name">Toko Keramik Bagus</p>
-                <div class="rating">
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-half"></i>
-                  <span>(4.5)</span>
-                </div>
-              </div>
-            </div>
-            
-            <div class="review-content">
-              <p>Kualitas bagus, sesuai pesanan. Pengiriman cepat dan aman.</p>
-            </div>
-            
-            <div class="review-actions">
-              <button class="btn btn-icon" title="Edit Ulasan">
-                <i class="bi bi-pencil"></i>
-              </button>
-            </div>
-          </article>
-          
-          <!-- Review 2 -->
-          <article class="review-card">
-            <div class="review-product">
-              <img src="{{ asset('src/PiringKayu.png') }}" alt="Piring Kayu">
-              <div class="product-info">
-                <h4>Piring Kayu Jati</h4>
-                <p class="shop-name">Toko Mebel Jati</p>
-                <div class="rating">
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star"></i>
-                  <span>(4.0)</span>
-                </div>
-              </div>
-            </div>
-            
-            <div class="review-content">
-              <p>Desainnya unik dan elegan. Cocok untuk penggunaan sehari-hari.</p>
-            </div>
-            
-            <div class="review-actions">
-              <button class="btn btn-icon" title="Edit Ulasan">
-                <i class="bi bi-pencil"></i>
-              </button>
-            </div>
-          </article>
+        <div id="reviewsLoading" class="loading-state">
+          <p>Memuat ulasan...</p>
+        </div>
+        
+        <div id="reviewsList" class="review-list">
+          <!-- Reviews will be loaded here dynamically -->
         </div>
       </section>
       
@@ -604,7 +552,7 @@
         </div>
         
         <div class="review-actions">
-          <button class="btn btn-icon" title="Edit Ulasan" data-review-id="${review.id}">
+          <button class="btn btn-icon edit-review-btn" title="Edit Ulasan" data-review-id="${review.id}">
             <i class="bi bi-pencil"></i>
           </button>
         </div>
@@ -624,6 +572,15 @@
       
       if (reviews.length > 0) {
         reviewsList.innerHTML = reviews.map(reviewCardTemplate).join('');
+        
+        // Add event listeners for edit buttons
+        document.querySelectorAll('.edit-review-btn').forEach(button => {
+          button.addEventListener('click', function() {
+            const reviewId = this.getAttribute('data-review-id');
+            // Redirect to the review editing page
+            window.location.href = `/halaman_ulasan`;
+          });
+        });
       } else {
         reviewsList.innerHTML = '<p class="no-reviews">Anda belum memberikan ulasan untuk produk apapun.</p>';
       }

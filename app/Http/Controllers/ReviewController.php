@@ -51,6 +51,7 @@ class ReviewController extends Controller
             'order_id' => 'required|exists:orders,id',
             'rating' => 'required|integer|min:1|max:5',
             'review_text' => 'nullable|string|max:1000',
+            'media.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120' // Max 5MB per image
         ]);
 
         // Pastikan order milik user ini
@@ -78,6 +79,17 @@ class ReviewController extends Controller
             ], 400);
         }
 
+        // Handle media uploads
+        $mediaPaths = [];
+        if ($request->hasFile('media')) {
+            foreach ($request->file('media') as $mediaFile) {
+                if ($mediaFile->isValid()) {
+                    $path = $mediaFile->store('reviews', 'public');
+                    $mediaPaths[] = $path;
+                }
+            }
+        }
+
         // Buat ulasan
         $review = Review::create([
             'user_id' => Auth::id(),
@@ -85,6 +97,7 @@ class ReviewController extends Controller
             'order_id' => $request->order_id,
             'rating' => $request->rating,
             'review_text' => $request->review_text,
+            'media' => !empty($mediaPaths) ? $mediaPaths : null,
             'status' => 'approved' // Otomatis disetujui untuk user
         ]);
 
@@ -137,6 +150,141 @@ class ReviewController extends Controller
         return response()->json([
             'success' => true,
             'reviews' => $reviews
+        ]);
+    }
+
+    /**
+     * Menampilkan halaman ulasan
+     */
+    public function halamanUlasan()
+    {
+        return view('customer.koleksi.halaman_ulasan');
+    }
+
+    /**
+     * API endpoint untuk mendapatkan ulasan milik user
+     */
+    public function getUserReviews()
+    {
+        $reviews = Review::with(['product', 'order'])
+                        ->where('user_id', Auth::id())
+                        ->orderBy('created_at', 'desc')
+                        ->get();
+
+        // Format data untuk frontend
+        $formattedReviews = $reviews->map(function($review) {
+            return [
+                'id' => $review->id,
+                'timeISO' => $review->created_at->toISOString(),
+                'rating' => $review->rating,
+                'kv' => $review->review_text ? [['Ulasan', $review->review_text]] : [],
+                'product' => [
+                    'title' => $review->product->name ?? 'Produk Tidak Ditemukan',
+                    'variant' => '', // Jika ada varian bisa ditambahkan
+                    'url' => $review->product ? route('produk.detail', $review->product->id) : '#'
+                ],
+                'images' => $review->media ? collect(json_decode($review->media))->map(function($path) {
+                    return [
+                        'name' => basename($path),
+                        'size' => 0, // Tidak ada info ukuran dari storage
+                        'type' => 'image',
+                        'url' => asset('storage/' . $path)
+                    ];
+                })->toArray() : []
+            ];
+        });
+
+        $user = [
+            'name' => Auth::user()->name
+        ];
+
+        return response()->json([
+            'success' => true,
+            'user' => $user,
+            'reviews' => $formattedReviews
+        ]);
+    }
+
+    /**
+     * Update user's review
+     */
+    public function updateReview(Request $request, $reviewId)
+    {
+        $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'review_text' => 'nullable|string|max:1000',
+            'media.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120' // Max 5MB per image
+        ]);
+
+        $review = Review::where('id', $reviewId)
+                        ->where('user_id', Auth::id())
+                        ->first();
+
+        if (!$review) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ulasan tidak ditemukan atau Anda tidak memiliki izin untuk mengedit ulasan ini'
+            ], 404);
+        }
+
+        // Handle media uploads
+        $mediaPaths = $review->media ? json_decode($review->media, true) : [];
+        if ($request->hasFile('media')) {
+            foreach ($request->file('media') as $mediaFile) {
+                if ($mediaFile->isValid()) {
+                    $path = $mediaFile->store('reviews', 'public');
+                    $mediaPaths[] = $path;
+                }
+            }
+        }
+
+        // Update review
+        $review->update([
+            'rating' => $request->rating,
+            'review_text' => $request->review_text,
+            'media' => !empty($mediaPaths) ? $mediaPaths : null,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Ulasan berhasil diperbarui',
+            'review' => $review
+        ]);
+    }
+
+    /**
+     * Delete user's review
+     */
+    public function deleteReview($reviewId)
+    {
+        $review = Review::where('id', $reviewId)
+                        ->where('user_id', Auth::id())
+                        ->first();
+
+        if (!$review) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ulasan tidak ditemukan atau Anda tidak memiliki izin untuk menghapus ulasan ini'
+            ], 404);
+        }
+
+        // Delete media files if they exist
+        if ($review->media) {
+            $mediaPaths = json_decode($review->media, true);
+            foreach ($mediaPaths as $path) {
+                $fullPath = storage_path('app/public/' . $path);
+                if (file_exists($fullPath)) {
+                    unlink($fullPath);
+                }
+            }
+        }
+
+        // Delete the review
+        $review->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Ulasan berhasil dihapus'
         ]);
     }
 }

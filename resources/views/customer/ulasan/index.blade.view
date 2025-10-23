@@ -46,6 +46,14 @@
             
             <div class="review-content">
               <p>{{ $review->review_text ?? 'Tidak ada komentar' }}</p>
+              
+              @if($review->media)
+                <div class="review-media">
+                  @foreach(json_decode($review->media) as $mediaPath)
+                    <img src="{{ asset('storage/' . $mediaPath) }}" alt="Foto ulasan" class="review-media-item">
+                  @endforeach
+                </div>
+              @endif
             </div>
           </div>
         @endforeach

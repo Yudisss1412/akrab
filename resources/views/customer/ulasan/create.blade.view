@@ -24,7 +24,7 @@
         </div>
       </div>
       
-      <form id="reviewForm" action="{{ route('ulasan.store') }}" method="POST">
+      <form id="reviewForm" action="{{ route('ulasan.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <input type="hidden" name="product_id" value="{{ $orderItem->product_id }}">
         <input type="hidden" name="order_id" value="{{ $orderItem->order_id }}">
@@ -51,6 +51,22 @@
             name="review_text" 
             rows="5" 
             placeholder="Tulis ulasan Anda tentang produk ini...">{{ old('review_text') }}</textarea>
+        </div>
+        
+        <div class="form-group">
+          <label for="media">Tambahkan Foto Ulasan (Opsional)</label>
+          <div class="media-upload-container">
+            <div class="media-preview" id="mediaPreview"></div>
+            <div class="upload-area" id="uploadArea">
+              <div class="upload-icon">
+                <i class="bi bi-cloud-upload"></i>
+              </div>
+              <p>Drag & drop foto di sini, atau klik untuk memilih</p>
+              <p class="upload-hint">Maksimal 5 foto, ukuran maksimal 5MB per foto</p>
+              <input type="file" id="mediaInput" name="media[]" accept="image/*" multiple style="display: none;">
+              <button type="button" class="btn btn-outline" id="browseMediaBtn">Pilih Foto</button>
+            </div>
+          </div>
         </div>
         
         <div class="form-actions">

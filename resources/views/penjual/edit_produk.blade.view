@@ -1,6 +1,10 @@
-@extends('layouts.seller-layout')
+@extends('layouts.seller-form-layout')
 
 @section('title', 'Edit Produk - UMKM AKRAB')
+
+@push('styles')
+  <link rel="stylesheet" href="{{ asset('css/penjual/tambah_produk.css') }}">
+@endpush
 
 @section('content')
 <div class="container-fluid">

@@ -710,7 +710,12 @@
       <main class="content admin-page-content" role="main">
         <!-- Page Header -->
         <section class="page-header">
-          <h1>Manajemen Produk untuk {{ auth()->user()->name }}</h1>
+          <h1>
+            <a href="{{ route('seller.dashboard') }}" class="btn btn-sm" style="margin-right: 1rem; vertical-align: middle; background: var(--ak-primary); color: white; border: none; width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;">
+              <i class="fas fa-arrow-left"></i>
+            </a>
+            Manajemen Produk untuk {{ auth()->user()->name }}
+          </h1>
         </section>
 
         <!-- Control Bar -->

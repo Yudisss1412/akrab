@@ -631,9 +631,6 @@ Route::get('/admin/produk', function () {
     return view('admin.produk.index');
 })->name('produk.index');
 
-Route::get('/penjual/produk', function () {
-    return view('penjual.manajemen_produk');
-})->name('penjual.produk');
 
 Route::get('/penjual/produk', [App\Http\Controllers\Seller\ProductController::class, 'index'])->name('penjual.produk');
 Route::get('/penjual/produk/create', [App\Http\Controllers\Seller\ProductController::class, 
@@ -651,9 +648,7 @@ Route::put('/penjual/produk/{id}/stock', [App\Http\Controllers\Seller\ProductCon
 Route::delete('/penjual/product-image/{id}', [App\Http\Controllers\Seller\ProductController::class, 
 'destroyImage'])->name('penjual.product.image.delete');
 
-Route::get('/penjual/pesanan', function () {
-    return view('penjual.manajemen_pesanan');
-})->name('penjual.pesanan');
+Route::get('/penjual/pesanan', [App\Http\Controllers\Seller\SellerOrderController::class, 'index'])->name('penjual.pesanan');
 
 Route::get('/penjual/saldo', function () {
     return view('penjual.saldo_penarikan');
@@ -666,7 +661,8 @@ Route::get('/penjual/ulasan', function () {
 
 
 // Order Detail Route - parameter sebagai string karena menggunakan order number
-Route::get('/penjual/pesanan/{order}', [App\Http\Controllers\OrderDetailController::class, 'show'])->name('orders.show');
+Route::get('/penjual/pesanan/{order}', [App\Http\Controllers\Seller\SellerOrderController::class, 'show'])->name('penjual.pesanan.show');
+Route::put('/penjual/pesanan/{order}/status', [App\Http\Controllers\Seller\SellerOrderController::class, 'updateStatus'])->name('penjual.pesanan.status.update');
 
 // Order Invoice Route
 Route::get('/invoice/{order}', [App\Http\Controllers\OrderDetailController::class, 'invoice'])->name('order.invoice');

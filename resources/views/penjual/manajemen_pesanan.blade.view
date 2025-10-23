@@ -385,221 +385,145 @@
       <main class="content admin-page-content" role="main">
         <!-- Page Header -->
         <section class="page-header">
-          <h1>Manajemen Pesanan untuk {{ auth()->user()->name }}</h1>
+          <h1>
+            <a href="{{ route('seller.dashboard') }}" class="btn btn-sm" style="margin-right: 1rem; vertical-align: middle; background: var(--ak-primary); color: white; border: none; width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;">
+              <i class="fas fa-arrow-left"></i>
+            </a>
+            Manajemen Pesanan untuk {{ auth()->user()->name }}
+          </h1>
         </section>
 
         <!-- Tab Navigation -->
         <div class="tab-nav">
           <div class="tab-item active" data-status="all">Semua</div>
-          <div class="tab-item" data-status="pending_payment">Belum Dibayar <span class="badge">3</span></div>
-          <div class="tab-item" data-status="processing">Perlu Diproses <span class="badge">5</span></div>
-          <div class="tab-item" data-status="shipping">Sedang Dikirim <span class="badge">2</span></div>
-          <div class="tab-item" data-status="completed">Selesai <span class="badge">42</span></div>
-          <div class="tab-item" data-status="cancelled">Dibatalkan <span class="badge">1</span></div>
+          <div class="tab-item" data-status="pending_payment">Belum Dibayar <span class="badge">{{ $statusData['pending_payment'] ?? 0 }}</span></div>
+          <div class="tab-item" data-status="processing">Perlu Diproses <span class="badge">{{ $statusData['processing'] ?? 0 }}</span></div>
+          <div class="tab-item" data-status="shipping">Sedang Dikirim <span class="badge">{{ $statusData['shipping'] ?? 0 }}</span></div>
+          <div class="tab-item" data-status="completed">Selesai <span class="badge">{{ $statusData['completed'] ?? 0 }}</span></div>
+          <div class="tab-item" data-status="cancelled">Dibatalkan <span class="badge">{{ $statusData['cancelled'] ?? 0 }}</span></div>
         </div>
 
         <!-- Control Bar -->
         <div class="control-bar">
-          <div class="search-box">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <input type="text" placeholder="Cari di Akrab...">
-          </div>
-          <div class="date-filter">
-            <select>
-              <option>Filter Tanggal</option>
-              <option>Hari Ini</option>
-              <option>Minggu Ini</option>
-              <option>Bulan Ini</option>
-              <option>Tahun Ini</option>
-              <option>Custom</option>
-            </select>
-          </div>
-          <div class="bulk-action">
-            <select>
-              <option>Aksi Massal</option>
-              <option>Tandai sebagai diproses</option>
-              <option>Cetak label</option>
-              <option>Batalkan pesanan</option>
-            </select>
-          </div>
+          <form method="GET" action="{{ route('penjual.pesanan') }}" id="filterForm">
+            <div class="search-box">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <input type="text" name="search" placeholder="Cari pesanan..." value="{{ request('search') }}">
+            </div>
+            <div class="date-filter">
+              <select name="date_filter" onchange="document.getElementById('filterForm').submit();">
+                <option value="">Filter Tanggal</option>
+                <option value="today" {{ request('date_filter') == 'today' ? 'selected' : '' }}>Hari Ini</option>
+                <option value="this_week" {{ request('date_filter') == 'this_week' ? 'selected' : '' }}>Minggu Ini</option>
+                <option value="this_month" {{ request('date_filter') == 'this_month' ? 'selected' : '' }}>Bulan Ini</option>
+                <option value="this_year" {{ request('date_filter') == 'this_year' ? 'selected' : '' }}>Tahun Ini</option>
+              </select>
+            </div>
+            <div class="bulk-action">
+              <select name="status" onchange="document.getElementById('filterForm').submit();">
+                <option value="">Semua Status</option>
+                <option value="pending_payment" {{ request('status') == 'pending_payment' ? 'selected' : '' }}>Belum Dibayar</option>
+                <option value="processing" {{ request('status') == 'processing' ? 'selected' : '' }}>Perlu Diproses</option>
+                <option value="shipping" {{ request('status') == 'shipping' ? 'selected' : '' }}>Sedang Dikirim</option>
+                <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Selesai</option>
+                <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Dibatalkan</option>
+              </select>
+            </div>
+          </form>
         </div>
 
         <!-- Orders Container -->
         <section class="orders-container" id="ordersContainer">
-          <!-- Order Card 1 - Pending Payment -->
-          <div class="order-card" data-status="pending_payment">
+          @forelse($orders as $order)
+          <div class="order-card" data-status="{{ $order->status }}">
             <div class="order-header">
               <div>
-                <div class="order-id">#ORD-202301001</div>
-                <div class="order-date">15 Okt 2024, 14:30</div>
+                <div class="order-id">#{{ $order->order_number }}</div>
+                <div class="order-date">{{ \Carbon\Carbon::parse($order->created_at)->format('d M Y, H:i') }}</div>
               </div>
-              <div class="customer-name">Budi Santoso</div>
+              <div class="customer-name">{{ $order->user->name ?? 'Customer' }}</div>
             </div>
             <div class="order-content">
+              @foreach($order->items as $item)
               <div class="product-item">
-                <img src="https://placehold.co/50x50" alt="Produk" class="product-thumb">
+                <img src="{{ $item->product->image ? asset('storage/' . $item->product->image) : asset('src/placeholder_produk.png') }}" alt="{{ $item->product->name }}" class="product-thumb">
                 <div class="product-info">
-                  <div class="product-name">Kaos Polos Premium</div>
-                  <div class="product-quantity">Jumlah: 2</div>
+                  <div class="product-name">{{ $item->product->name }}</div>
+                  <div class="product-quantity">Jumlah: {{ $item->quantity }}</div>
+                </div>
               </div>
-              </div>
+              @endforeach
             </div>
             <div class="order-footer">
               <div>
-                <span class="status-badge status-pending-payment">Belum Dibayar</span>
+                <span class="status-badge 
+                  @if($order->status === 'pending_payment') status-pending-payment 
+                  @elseif($order->status === 'processing') status-processing 
+                  @elseif($order->status === 'shipping') status-shipping 
+                  @elseif($order->status === 'completed') status-completed 
+                  @elseif($order->status === 'cancelled') status-cancelled 
+                  @else status-pending-payment @endif">
+                  {{ ucfirst(str_replace('_', ' ', $order->status)) }}
+                </span>
               </div>
               <div class="action-buttons">
-                <a href="{{ route('orders.show', ['order' => 'ORD-202301001']) }}" class="btn btn-outline">Lihat Detail</a>
-                <button class="btn btn-primary">Konfirmasi Pembayaran</button>
+                <a href="{{ route('penjual.pesanan.show', $order->id) }}" class="btn btn-outline">Lihat Detail</a>
+                @if($order->status === 'pending_payment')
+                  <button class="btn btn-primary" onclick="updateOrderStatus({{ $order->id }}, 'processing')">Konfirmasi Pembayaran</button>
+                @elseif($order->status === 'processing')
+                  <button class="btn btn-primary" onclick="updateOrderStatus({{ $order->id }}, 'shipping')">Proses Pesanan</button>
+                @elseif($order->status === 'shipping')
+                  <button class="btn btn-primary">Lacak Pengiriman</button>
+                @endif
               </div>
             </div>
           </div>
-
-          <!-- Order Card 2 - Processing -->
-          <div class="order-card" data-status="processing">
-            <div class="order-header">
-              <div>
-                <div class="order-id">#ORD-202301002</div>
-                <div class="order-date">16 Okt 2024, 09:15</div>
-              </div>
-              <div class="customer-name">Siti Aminah</div>
-            </div>
-            <div class="order-content">
-              <div class="product-item">
-                <img src="https://placehold.co/50x50" alt="Produk" class="product-thumb">
-                <div class="product-info">
-                  <div class="product-name">Celana Jeans Premium</div>
-                  <div class="product-quantity">Jumlah: 1</div>
-                </div>
-              </div>
-              <div class="product-item">
-                <img src="https://placehold.co/50x50" alt="Produk" class="product-thumb">
-                <div class="product-info">
-                  <div class="product-name">Topi Baseball Trendy</div>
-                  <div class="product-quantity">Jumlah: 1</div>
-                </div>
-              </div>
-            </div>
-            <div class="order-footer">
-              <div>
-                <span class="status-badge status-processing">Perlu Diproses</span>
-              </div>
-              <div class="action-buttons">
-                <a href="{{ route('orders.show', ['order' => 'ORD-202301002']) }}" class="btn btn-outline">Lihat Detail</a>
-                <button class="btn btn-primary">Proses Pesanan</button>
-              </div>
-            </div>
+          @empty
+          <div class="text-center p-4">
+            <p>Tidak ada pesanan ditemukan</p>
           </div>
-
-          <!-- Order Card 3 - Shipping -->
-          <div class="order-card" data-status="shipping">
-            <div class="order-header">
-              <div>
-                <div class="order-id">#ORD-202301003</div>
-                <div class="order-date">16 Okt 2024, 15:45</div>
-              </div>
-              <div class="customer-name">Ahmad Fauzi</div>
-            </div>
-            <div class="order-content">
-              <div class="product-item">
-                <img src="https://placehold.co/50x50" alt="Produk" class="product-thumb">
-                <div class="product-info">
-                  <div class="product-name">Sepatu Sneakers Casual</div>
-                  <div class="product-quantity">Jumlah: 1</div>
-                </div>
-              </div>
-            </div>
-            <div class="order-footer">
-              <div>
-                <span class="status-badge status-shipping">Sedang Dikirim</span>
-              </div>
-              <div class="action-buttons">
-                <a href="{{ route('orders.show', ['order' => 'ORD-202301003']) }}" class="btn btn-outline">Lihat Detail</a>
-                <button class="btn btn-primary">Lacak Pengiriman</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Order Card 4 - Completed -->
-          <div class="order-card" data-status="completed">
-            <div class="order-header">
-              <div>
-                <div class="order-id">#ORD-202301004</div>
-                <div class="order-date">17 Okt 2024, 10:30</div>
-              </div>
-              <div class="customer-name">Dewi Lestari</div>
-            </div>
-            <div class="order-content">
-              <div class="product-item">
-                <img src="https://placehold.co/50x50" alt="Produk" class="product-thumb">
-                <div class="product-info">
-                  <div class="product-name">Jam Tangan Digital</div>
-                  <div class="product-quantity">Jumlah: 1</div>
-                </div>
-              </div>
-            </div>
-            <div class="order-footer">
-              <div>
-                <span class="status-badge status-completed">Selesai</span>
-              </div>
-              <div class="action-buttons">
-                <a href="{{ route('orders.show', ['order' => 'ORD-202301004']) }}" class="btn btn-outline">Lihat Detail</a>
-              </div>
-            </div>
-          </div>
-
-          <!-- Order Card 5 - Cancelled -->
-          <div class="order-card" data-status="cancelled">
-            <div class="order-header">
-              <div>
-                <div class="order-id">#ORD-202301005</div>
-                <div class="order-date">18 Okt 2024, 11:15</div>
-              </div>
-              <div class="customer-name">Rina Kartika</div>
-            </div>
-            <div class="order-content">
-              <div class="product-item">
-                <img src="https://placehold.co/50x50" alt="Produk" class="product-thumb">
-                <div class="product-info">
-                  <div class="product-name">Dompet Kulit Asli</div>
-                  <div class="product-quantity">Jumlah: 1</div>
-                </div>
-              </div>
-            </div>
-            <div class="order-footer">
-              <div>
-                <span class="status-badge status-cancelled">Dibatalkan</span>
-              </div>
-              <div class="action-buttons">
-                <a href="{{ route('orders.show', ['order' => 'ORD-202301005']) }}" class="btn btn-outline">Lihat Detail</a>
-              </div>
-            </div>
-          </div>
+          @endforelse
         </section>
 
         <!-- Pagination -->
         <section class="pagination">
           <div class="pagination-info">
-            Menampilkan 1-5 dari 50 pesanan
+            Menampilkan {{ $orders->firstItem() ?? 0 }}-{{ $orders->lastItem() ?? 0 }} dari {{ $orders->total() }} pesanan
           </div>
           <div class="pagination-nav">
-            <button class="pagination-btn">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M15 19L8 12L15 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-            <button class="pagination-btn active">1</button>
-            <button class="pagination-btn">2</button>
-            <button class="pagination-btn">3</button>
-            <div class="pagination-separator">...</div>
-            <button class="pagination-btn">5</button>
-            <button class="pagination-btn">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
+            @if ($orders->onFirstPage())
+              <button class="pagination-btn" disabled>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M15 19L8 12L15 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            @else
+              <a href="{{ $orders->previousPageUrl() }}" class="pagination-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M15 19L8 12L15 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+            @endif
+            
+            @for ($i = 1; $i <= $orders->lastPage(); $i++)
+              <a href="{{ $orders->url($i) }}" class="pagination-btn {{ $i == $orders->currentPage() ? 'active' : '' }}">{{ $i }}</a>
+            @endfor
+            
+            @if ($orders->hasMorePages())
+              <a href="{{ $orders->nextPageUrl() }}" class="pagination-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+            @else
+              <button class="pagination-btn" disabled>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            @endif
           </div>
         </section>
       </main>
@@ -641,6 +565,36 @@
         });
       });
     });
+    
+    // Function to update order status
+    function updateOrderStatus(orderId, newStatus) {
+      if (confirm('Apakah Anda yakin ingin mengubah status pesanan ini?')) {
+        fetch(`/penjual/pesanan/${orderId}/status`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          },
+          body: JSON.stringify({
+            status: newStatus
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert(data.message);
+            // Refresh page to show updated status
+            location.reload();
+          } else {
+            alert('Gagal mengubah status: ' + (data.message || 'Unknown error'));
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Terjadi kesalahan saat mengubah status pesanan');
+        });
+      }
+    }
   </script>
 </body>
 </html>

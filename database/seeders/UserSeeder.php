@@ -115,7 +115,7 @@ class UserSeeder extends Seeder
             ],
             [
                 'name' => 'Rudi Firmansyah',
-                'email' => 'rudi@elektromurah.com',
+                'email' => '',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
                 'role_id' => $sellerRole->id,
@@ -144,7 +144,7 @@ class UserSeeder extends Seeder
             Seller::create($sellerData);
         }
 
-        // Create Buyer Users (regular users without seller records)
+        // Create Buyer Users (regular usersrudi@elektromurah.com without seller records)
         $buyerUsers = [
             [
                 'name' => 'John Doe',

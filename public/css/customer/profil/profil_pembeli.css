@@ -924,6 +924,85 @@ a.btn{
 .rev-text{ color:#2f3437; margin-bottom: .5rem; }
 .rev-actions{ display:flex; gap:.5rem; flex-wrap:wrap; }
 
-/* scrollbar rapi */
-.reviews-viewport::-webkit-scrollbar{ width:6px; }
-.reviews-viewport::-webkit-scrollbar-thumb{ background:#d1d5db; border-radius:3px; }
+/* Session Styles */
+.sessions-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.session-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  margin-bottom: 0.75rem;
+  background: #fff;
+  transition: all 0.3s ease;
+}
+
+.session-item:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+
+.session-item.current-session {
+  border-color: var(--primary-color-dark);
+  background-color: #f0fdf4;
+}
+
+.session-info {
+  flex: 1;
+}
+
+.session-device {
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 0.25rem;
+}
+
+.session-location {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.session-time {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.session-actions {
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
+}
+
+.status-active {
+  background-color: #e6f4ea;
+  color: #0a7e3a;
+}
+
+/* Scrollbar for sessions list */
+.sessions-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sessions-list::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+/* Media queries for responsive design */
+@media (max-width: 768px) {
+  .session-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .session-actions {
+    margin-left: 0;
+    margin-top: 0.75rem;
+    align-self: flex-end;
+  }
+}

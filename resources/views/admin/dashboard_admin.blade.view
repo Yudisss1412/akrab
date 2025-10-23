@@ -378,7 +378,86 @@
       updateCharts(selectedRange);
     });
     
-    function updateMetrics(range) {
+    // Fetch initial dashboard data
+    document.addEventListener('DOMContentLoaded', function() {
+      // Load initial data
+      updateMetrics('7days');
+      updateCharts('7days');
+    });
+    
+    async function updateMetrics(range) {
+      try {
+        // Show loading state
+        showLoadingState();
+        
+        // Fetch data from API
+        const response = await fetch(`/api/admin/dashboard/stats?range=${range}`);
+        const result = await response.json();
+        
+        if (result.success) {
+          const data = result.data;
+          
+          // Update GMV
+          document.querySelector('.metric-card:nth-child(1) .metric-value').textContent = formatCurrency(data.metrics.gmv);
+          
+          // Update Revenue
+          document.querySelector('.metric-card:nth-child(2) .metric-value').textContent = formatCurrency(data.metrics.revenue);
+          
+          // Update growth percentage
+          const growthElement = document.querySelector('.metric-card:nth-child(1) .metric-title');
+          if (growthElement) {
+            // Add growth indicator
+            const growthIndicator = data.metrics.growth_percentage >= 0 ? '↗' : '↘';
+            growthElement.innerHTML = `Gross Merchandise Volume (GMV) <span style="float: right; color: ${data.metrics.growth_percentage >= 0 ? 'green' : 'red'}">${growthIndicator} ${Math.abs(data.metrics.growth_percentage)}%</span>`;
+          }
+          
+          // Update the stat cards
+          const statCards = document.querySelectorAll('.stat-card');
+          if (statCards.length >= 6) {
+            statCards[0].querySelector('.stat-value').textContent = data.seller_stats.total;
+            statCards[1].querySelector('.stat-value').textContent = data.seller_stats.new;
+            statCards[2].querySelector('.stat-value').textContent = '42'; // Violations - dummy data
+            statCards[3].querySelector('.stat-value').textContent = '24'; // Pending verifications - dummy data
+            statCards[4].querySelector('.stat-value').textContent = '8,950'; // Active buyers - dummy data
+            statCards[5].querySelector('.stat-value').textContent = data.metrics.total_orders;
+          }
+          
+          // Hide loading state
+          hideLoadingState();
+        } else {
+          console.error('Failed to load dashboard data:', result.message);
+          hideLoadingState();
+        }
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        hideLoadingState();
+        // Fallback to static data
+        fallbackToStaticData(range);
+      }
+    }
+    
+    function updateCharts(range) {
+      // This will be implemented later when we have real chart data
+      console.log('Updating charts for range:', range);
+    }
+    
+    function showLoadingState() {
+      // Add loading indicators to metric values
+      const metricValues = document.querySelectorAll('.metric-value');
+      metricValues.forEach(value => {
+        value.innerHTML = '<span class="loading-spinner">Loading...</span>';
+      });
+    }
+    
+    function hideLoadingState() {
+      // Remove loading indicators
+      const loadingSpinners = document.querySelectorAll('.loading-spinner');
+      loadingSpinners.forEach(spinner => {
+        spinner.parentElement.innerHTML = spinner.parentElement.innerHTML.replace(/<span class="loading-spinner">Loading...<\/span>/g, '');
+      });
+    }
+    
+    function fallbackToStaticData(range) {
       // Sample data for different time ranges
       const metricsData = {
         'today': {
@@ -389,7 +468,8 @@
           suspendedSellers: '2',
           pendingVerification: '1',
           activeBuyers: '450',
-          totalTransactions: '150'
+          totalTransactions: '150',
+          growthPercentage: '12.5'
         },
         '7days': {
           gmv: 'Rp 840,750,000',
@@ -399,7 +479,8 @@
           suspendedSellers: '15',
           pendingVerification: '8',
           activeBuyers: '3,200',
-          totalTransactions: '1,100'
+          totalTransactions: '1,100',
+          growthPercentage: '8.3'
         },
         'month': {
           gmv: 'Rp 2,450,780,000',
@@ -409,7 +490,8 @@
           suspendedSellers: '42',
           pendingVerification: '24',
           activeBuyers: '8,950',
-          totalTransactions: '3,240'
+          totalTransactions: '3,240',
+          growthPercentage: '5.7'
         }
       };
       
@@ -419,13 +501,32 @@
       document.querySelector('.metric-card:nth-child(1) .metric-value').textContent = data.gmv;
       document.querySelector('.metric-card:nth-child(2) .metric-value').textContent = data.revenue;
       
+      // Update growth percentage
+      const growthElement = document.querySelector('.metric-card:nth-child(1) .metric-title');
+      if (growthElement) {
+        growthElement.innerHTML = `Gross Merchandise Volume (GMV) <span style="float: right; color: green">↗ ${data.growthPercentage}%</span>`;
+      }
+      
       // Update the stat cards
-      document.querySelectorAll('.stat-card .stat-value')[0].textContent = data.activeSellers;
-      document.querySelectorAll('.stat-card .stat-value')[1].textContent = data.newSellers;
-      document.querySelectorAll('.stat-card .stat-value')[2].textContent = data.suspendedSellers;
-      document.querySelectorAll('.stat-card .stat-value')[3].textContent = data.pendingVerification;
-      document.querySelectorAll('.stat-card .stat-value')[4].textContent = data.activeBuyers;
-      document.querySelectorAll('.stat-card .stat-value')[5].textContent = data.totalTransactions;
+      const statCards = document.querySelectorAll('.stat-card');
+      if (statCards.length >= 6) {
+        statCards[0].querySelector('.stat-value').textContent = data.activeSellers;
+        statCards[1].querySelector('.stat-value').textContent = data.newSellers;
+        statCards[2].querySelector('.stat-value').textContent = data.suspendedSellers;
+        statCards[3].querySelector('.stat-value').textContent = data.pendingVerification;
+        statCards[4].querySelector('.stat-value').textContent = data.activeBuyers;
+        statCards[5].querySelector('.stat-value').textContent = data.totalTransactions;
+      }
+    }
+    
+    function formatCurrency(amount) {
+      // Convert to Indonesian Rupiah format
+      return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(amount);
     }
     
     function updateCharts(range) {
@@ -462,12 +563,25 @@
       }).join(' ');
       
       // Update the chart SVGs
-      document.querySelectorAll('svg')[0].querySelectorAll('polyline')[1].setAttribute('points', gmvPoints);
-      document.querySelectorAll('svg')[1].querySelectorAll('polyline')[1].setAttribute('points', revenuePoints);
+      const svgs = document.querySelectorAll('svg');
+      if (svgs.length >= 2) {
+        const gmvPolylines = svgs[0].querySelectorAll('polyline');
+        const revenuePolylines = svgs[1].querySelectorAll('polyline');
+        
+        if (gmvPolylines.length >= 2) {
+          gmvPolylines[1].setAttribute('points', gmvPoints);
+        }
+        
+        if (revenuePolylines.length >= 2) {
+          revenuePolylines[1].setAttribute('points', revenuePoints);
+        }
+      }
     }
     
     // Initialize with the default selection
-    updateMetrics('7days');
-    updateCharts('7days');
+    document.addEventListener('DOMContentLoaded', function() {
+      updateMetrics('7days');
+      updateCharts('7days');
+    });
   </script>
 @endsection

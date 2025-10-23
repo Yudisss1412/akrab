@@ -724,6 +724,11 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', 'admin.role'])->group(function () {
     Route::get('/admin/dashboard', [App\Http\Controllers\RoleDashboardController::class, 
 'showAdminDashboard'])->name('admin.dashboard');
+    
+    // API endpoints for admin dashboard
+    Route::get('/api/admin/dashboard/stats', [App\Http\Controllers\Admin\AdminDashboardController::class, 'getDashboardStats'])->name('api.admin.dashboard.stats');
+    Route::get('/api/admin/dashboard/users', [App\Http\Controllers\Admin\AdminDashboardController::class, 'getUserStats'])->name('api.admin.dashboard.users');
+    Route::get('/api/admin/dashboard/products', [App\Http\Controllers\Admin\AdminDashboardController::class, 'getProductStats'])->name('api.admin.dashboard.products');
 });
 
 Route::middleware(['auth', 'seller.role'])->group(function () {

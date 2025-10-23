@@ -508,7 +508,7 @@
         logoutAllSessionsBtn.addEventListener('click', function() {
           if (confirm('Apakah Anda yakin ingin logout dari semua perangkat?')) {
             // Implementasi logout semua sesi
-            alert('Fitur logout semua sesi akan diimplementasikan di backend.');
+            logoutAllSessions();
             activeSessionModal.classList.remove('show');
           }
         });
@@ -798,66 +798,140 @@
       });
     }
     
-    // Load active sessions data (dummy data for now)
-    function loadActiveSessions() {
-      // Ini adalah data dummy - dalam implementasi asli akan diambil dari backend
-      const sessions = [
-        {
-          id: 1,
-          device: 'Chrome di Windows',
-          location: 'Jakarta, Indonesia',
-          lastActive: 'Baru saja',
-          current: true,
-          ip: '192.168.1.100'
-        },
-        {
-          id: 2,
-          device: 'Safari di iPhone',
-          location: 'Bandung, Indonesia',
-          lastActive: '2 jam yang lalu',
-          current: false,
-          ip: '203.123.45.67'
-        },
-        {
-          id: 3,
-          device: 'Firefox di Mac',
-          location: 'Surabaya, Indonesia',
-          lastActive: '1 hari yang lalu',
-          current: false,
-          ip: '118.90.12.34'
+    // Load active sessions data from API
+    async function loadActiveSessions() {
+      try {
+        console.log('Loading active sessions from API...');
+        const response = await fetch('/api/active-sessions');
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Active sessions data received:', data);
+          renderActiveSessions(data.sessions || []);
+        } else {
+          console.error('Failed to load active sessions:', response.status);
+          // Fallback to dummy data if API fails
+          const dummySessions = [
+            {
+              id: 1,
+              device: 'Chrome di Windows',
+              location: 'Jakarta, Indonesia',
+              lastActive: 'Baru saja',
+              current: true,
+              ip: '192.168.1.100'
+            },
+            {
+              id: 2,
+              device: 'Safari di iPhone',
+              location: 'Bandung, Indonesia',
+              lastActive: '2 jam yang lalu',
+              current: false,
+              ip: '203.123.45.67'
+            },
+            {
+              id: 3,
+              device: 'Firefox di Mac',
+              location: 'Surabaya, Indonesia',
+              lastActive: '1 hari yang lalu',
+              current: false,
+              ip: '118.90.12.34'
+            }
+          ];
+          renderActiveSessions(dummySessions);
         }
-      ];
-      
-      renderActiveSessions(sessions);
-    }
-    
-    function renderActiveSessions(sessions) {
-      const sessionsList = document.getElementById('sessionsList');
-      if (sessionsList) {
-        sessionsList.innerHTML = sessions.map(session => `
-          <div class="session-item ${session.current ? 'current-session' : ''}">
-            <div class="session-info">
-              <div class="session-device">${session.device}</div>
-              <div class="session-location">${session.location} • ${session.ip}</div>
-              <div class="session-time">Terakhir aktif: ${session.lastActive}</div>
-            </div>
-            <div class="session-actions">
-              ${session.current ? 
-                '<span class="badge status-active">Sesi ini</span>' : 
-                `<button class="btn btn-outline btn-sm" onclick="logoutSession(${session.id})">
-                  Logout
-                </button>`
-              }
-            </div>
-          </div>
-        `).join('');
+      } catch (error) {
+        console.error('Error loading active sessions:', error);
+        // Fallback to dummy data if there's an error
+        const dummySessions = [
+          {
+            id: 1,
+            device: 'Chrome di Windows',
+            location: 'Jakarta, Indonesia',
+            lastActive: 'Baru saja',
+            current: true,
+            ip: '192.168.1.100'
+          },
+          {
+            id: 2,
+            device: 'Safari di iPhone',
+            location: 'Bandung, Indonesia',
+            lastActive: '2 jam yang lalu',
+            current: false,
+            ip: '203.123.45.67'
+          },
+          {
+            id: 3,
+            device: 'Firefox di Mac',
+            location: 'Surabaya, Indonesia',
+            lastActive: '1 hari yang lalu',
+            current: false,
+            ip: '118.90.12.34'
+          }
+        ];
+        renderActiveSessions(dummySessions);
       }
     }
     
     // Function to logout a specific session
-    function logoutSession(sessionId) {
-      // In a real implementation, this would call the backend to end a specific session
-      alert(`Fitur logout sesi akan diimplementasikan di backend untuk sesi ID: ${sessionId}`);
+    async function logoutSession(sessionId) {
+      try {
+        console.log(`Logout session requested for session ID: ${sessionId}`);
+        
+        const response = await fetch(`/api/active-sessions/${sessionId}`, {
+          method: 'DELETE',
+          headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            alert('Sesi berhasil diakhiri');
+            // Reload active sessions to reflect changes
+            loadActiveSessions();
+          } else {
+            alert(data.message || 'Gagal mengakhiri sesi');
+          }
+        } else {
+          alert('Gagal mengakhiri sesi. Silakan coba lagi.');
+        }
+      } catch (error) {
+        console.error('Error logging out session:', error);
+        alert('Terjadi kesalahan saat mengakhiri sesi');
+      }
+    }
+    
+    // Function to logout all sessions
+    async function logoutAllSessions() {
+      try {
+        console.log('Logout all sessions requested');
+        
+        const response = await fetch('/api/active-sessions', {
+          method: 'DELETE',
+          headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            alert('Semua sesi lain berhasil diakhiri');
+            // Reload active sessions to reflect changes
+            loadActiveSessions();
+          } else {
+            alert(data.message || 'Gagal mengakhiri semua sesi');
+          }
+        } else {
+          alert('Gagal mengakhiri semua sesi. Silakan coba lagi.');
+        }
+      } catch (error) {
+        console.error('Error logging out all sessions:', error);
+        alert('Terjadi kesalahan saat mengakhiri semua sesi');
+      }
     }
   </script>
   

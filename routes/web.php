@@ -194,6 +194,15 @@ Route::get('/api/orders', function() {
     return response()->json(['orders' => $orders]);
 })->name('api.orders');
 
+// API endpoint untuk mengambil sesi login aktif pengguna
+Route::get('/api/active-sessions', [App\Http\Controllers\ActiveSessionController::class, 'index'])->name('api.active_sessions')->middleware('auth');
+
+// API endpoint untuk mengakhiri sesi tertentu
+Route::delete('/api/active-sessions/{sessionId}', [App\Http\Controllers\ActiveSessionController::class, 'destroy'])->name('api.active_sessions.destroy')->middleware('auth');
+
+// API endpoint untuk mengakhiri semua sesi kecuali sesi saat ini
+Route::delete('/api/active-sessions', [App\Http\Controllers\ActiveSessionController::class, 'destroyAll'])->name('api.active_sessions.destroy_all')->middleware('auth');
+
 Route::get('/halaman_ulasan', [App\Http\Controllers\ReviewController::class, 'halamanUlasan'])->name('halaman_ulasan');
 
 Route::view('/halaman-ulasan', 'customer.koleksi.halaman_ulasan')->name('halaman-ulasan');

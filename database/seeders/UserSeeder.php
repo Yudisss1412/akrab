@@ -115,7 +115,7 @@ class UserSeeder extends Seeder
             ],
             [
                 'name' => 'Rudi Firmansyah',
-                'email' => '',
+                'email' => 'rudi@elektromurah.com',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
                 'role_id' => $sellerRole->id,

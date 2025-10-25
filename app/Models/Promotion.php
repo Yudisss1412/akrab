@@ -34,4 +34,12 @@ class Promotion extends Model
     {
         return $this->belongsTo(Seller::class);
     }
+    
+    /**
+     * Get the product promotions for this promotion.
+     */
+    public function productPromotions()
+    {
+        return $this->hasMany(ProductPromotion::class);
+    }
 }

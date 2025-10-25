@@ -19,53 +19,113 @@ class PromotionController extends Controller
      */
     public function index()
     {
-        $seller = Seller::where('user_id', Auth::id())->firstOrFail();
-        
-        // Get all promotions (vouchers) for this seller
-        $vouchers = Promotion::where('seller_id', $seller->id)
-                           ->orderBy('created_at', 'desc')
-                           ->get();
+        try {
+            // Debug: Check if user is authenticated
+            if (!Auth::check()) {
+                abort(403, 'Akses ditolak. Anda harus login terlebih dahulu.');
+            }
+            
+            $seller = Seller::where('user_id', Auth::id())->first();
+            \Log::info('Authenticated user ID: ' . Auth::id());
+            \Log::info('Seller found: ' . ($seller ? 'Yes, ID: ' . $seller->id : 'No'));
+            
+            // If no seller found, create a helpful error message
+            if (!$seller) {
+                \Log::warning('No seller found for user ID: ' . Auth::id());
+                // Return view with empty data if no seller
+                $vouchers = collect([]);
+                $productDiscounts = collect([]);
+                $statusData = ['active' => 0, 'inactive' => 0, 'expired' => 0];
+                $productStatusData = ['active' => 0, 'inactive' => 0, 'expired' => 0];
+                
+                return view('penjual.manajemen_promosi', compact(
+                    'vouchers', 
+                    'productDiscounts', 
+                    'statusData', 
+                    'productStatusData'
+                ));
+            }
+            
+            // Get all promotions that are NOT associated with any product (pure vouchers) for this seller
+            $vouchers = Promotion::where('seller_id', $seller->id)
+                               ->whereNotIn('id', function($query) {
+                                   $query->select('promotion_id')
+                                         ->from('product_promotions')
+                                         ->whereNotNull('promotion_id');
+                               })
+                               ->orderBy('created_at', 'desc')
+                               ->get();
+            
+            \Log::info('Fetched ' . $vouchers->count() . ' vouchers for seller: ' . $seller->id);
 
-        // Get all product promotions for this seller
-        $productDiscounts = ProductPromotion::with(['product', 'promotion'])
-                           ->whereHas('product', function($query) use ($seller) {
-                               $query->where('seller_id', $seller->id);
-                           })
-                           ->orderBy('created_at', 'desc')
-                           ->get();
+            // Get all product promotions for this seller - get seller's product IDs first
+            $sellerProductIds = Product::where('seller_id', $seller->id)->pluck('id');
+            \Log::info('Seller product IDs: ' . $sellerProductIds->count() . ' items');
+            \Log::info('Seller product IDs list: ' . json_encode($sellerProductIds->toArray()));
+            
+            // Get all product promotions associated with seller's products
+            $productDiscounts = ProductPromotion::with(['product', 'promotion'])
+                               ->whereIn('product_id', $sellerProductIds)
+                               ->orderBy('created_at', 'desc')
+                               ->get();
+            
+            \Log::info('Fetched ' . $productDiscounts->count() . ' product discounts');
+            
+            // Log each product discount to see what's being fetched
+            foreach($productDiscounts as $pd) {
+                \Log::info('Product discount ID: ' . $pd->id . ', Product ID: ' . $pd->product_id . ', Product: ' . ($pd->product ? $pd->product->name : 'NULL') . ', Promotion: ' . ($pd->promotion ? $pd->promotion->name : 'NULL'));
+            }
 
-        // Calculate statistics for different promotion statuses
-        $statusCounts = Promotion::where('seller_id', $seller->id)
-                                ->selectRaw('status, count(*) as count')
-                                ->groupBy('status')
-                                ->pluck('count', 'status');
+            // Calculate statistics for different promotion statuses (for vouchers only)
+            $statusCounts = Promotion::where('seller_id', $seller->id)
+                                    ->whereNotIn('id', function($query) {
+                                        $query->select('promotion_id')
+                                              ->from('product_promotions')
+                                              ->whereNotNull('promotion_id');
+                                    })
+                                    ->selectRaw('status, count(*) as count')
+                                    ->groupBy('status')
+                                    ->pluck('count', 'status');
 
-        // Define all possible statuses with default values
-        $allStatus = ['active', 'inactive', 'expired'];
-        $statusData = [];
-        foreach ($allStatus as $status) {
-            $statusData[$status] = $statusCounts[$status] ?? 0;
+            // Define all possible statuses with default values
+            $allStatus = ['active', 'inactive', 'expired'];
+            $statusData = [];
+            foreach ($allStatus as $status) {
+                $statusData[$status] = $statusCounts[$status] ?? 0;
+            }
+
+            // Calculate status counts for product discounts
+            $productStatusCounts = ProductPromotion::join('products', 'product_promotions.product_id', '=', 'products.id')
+            ->whereIn('products.id', $sellerProductIds)  // Use the already calculated seller product IDs
+            ->selectRaw('product_promotions.status, count(*) as count')
+            ->groupBy('product_promotions.status')
+            ->pluck('count', 'status');
+
+            $productStatusData = [];
+            foreach ($allStatus as $status) {
+                $productStatusData[$status] = $productStatusCounts[$status] ?? 0;
+            }
+
+            \Log::info('Final counts - Vouchers: ' . $vouchers->count() . ', Product Discounts: ' . $productDiscounts->count());
+            
+            return view('penjual.manajemen_promosi', compact(
+                'vouchers', 
+                'productDiscounts', 
+                'statusData', 
+                'productStatusData'
+            ));
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            \Log::error('Error in PromotionController@index: ' . $e->getMessage());
+            
+            // Return with empty data to prevent undefined variable errors
+            return view('penjual.manajemen_promosi', [
+                'vouchers' => collect([]),
+                'productDiscounts' => collect([]),
+                'statusData' => ['active' => 0, 'inactive' => 0, 'expired' => 0],
+                'productStatusData' => ['active' => 0, 'inactive' => 0, 'expired' => 0]
+            ]);
         }
-
-        // Calculate status counts for product discounts
-        $productStatusCounts = ProductPromotion::whereHas('product', function($query) use ($seller) {
-            $query->where('seller_id', $seller->id);
-        })
-        ->selectRaw('status, count(*) as count')
-        ->groupBy('status')
-        ->pluck('count', 'status');
-
-        $productStatusData = [];
-        foreach ($allStatus as $status) {
-            $productStatusData[$status] = $productStatusCounts[$status] ?? 0;
-        }
-
-        return view('penjual.manajemen_promosi', compact(
-            'vouchers', 
-            'productDiscounts', 
-            'statusData', 
-            'productStatusData'
-        ));
     }
     
     /**
@@ -75,7 +135,12 @@ class PromotionController extends Controller
      */
     public function createDiscount()
     {
-        $seller = Seller::where('user_id', Auth::id())->firstOrFail();
+        $seller = Seller::where('user_id', Auth::id())->first();
+        
+        if (!$seller) {
+            \Log::error('Seller not found for user ID: ' . Auth::id() . ' when trying to access create discount page');
+            abort(403, 'Seller tidak ditemukan. Silakan cek profil penjual Anda.');
+        }
         
         // Get products for this seller
         $products = Product::where('seller_id', $seller->id)
@@ -104,6 +169,9 @@ class PromotionController extends Controller
      */
     public function storeDiscount(Request $request)
     {
+        // Log data yang diterima untuk debugging
+        \Log::info('Store discount request data:', $request->all());
+        
         $request->validate([
             'name' => 'required|string|max:255',
             'type' => 'required|in:percentage,fixed_amount',
@@ -114,12 +182,20 @@ class PromotionController extends Controller
             'product_ids.*' => 'exists:products,id',
         ]);
 
-        $seller = Seller::where('user_id', Auth::id())->firstOrFail();
+        $seller = Seller::where('user_id', Auth::id())->first();
+        
+        if (!$seller) {
+            \Log::error('Seller not found for user ID: ' . Auth::id());
+            return redirect()->back()->with('error', 'Seller tidak ditemukan. Silakan cek profil penjual Anda.');
+        }
+        
+        \Log::info('Creating discount for seller: ' . $seller->id . ' with data: ' . json_encode($request->all()));
 
         // Create a base promotion record
         $promotion = Promotion::create([
             'name' => $request->name . ' (Diskon Produk)',
             'type' => $request->type,
+            'category' => 'product_discount',  // Explicitly set category for product discount
             'code' => strtoupper(substr(uniqid(), -8)), // Generate unique code for tracking
             'discount_value' => $request->discount_value,
             'start_date' => $request->start_date,
@@ -127,17 +203,32 @@ class PromotionController extends Controller
             'seller_id' => $seller->id,
             'status' => Carbon::now()->between($request->start_date, $request->end_date) ? 'active' : 'inactive',
         ]);
+        
+        \Log::info('Base promotion created successfully with ID: ' . $promotion->id);
 
         // Create product promotion records for each selected product
+        \Log::info('Creating product promotions for discount. Total products: ' . count($request->product_ids));
+        
         foreach ($request->product_ids as $productId) {
-            ProductPromotion::create([
-                'product_id' => $productId,
-                'promotion_id' => $promotion->id,
-                'discount_value' => $request->discount_value,
-                'start_date' => $request->start_date,
-                'end_date' => $request->end_date,
-                'status' => Carbon::now()->between($request->start_date, $request->end_date) ? 'active' : 'inactive',
-            ]);
+            \Log::info('Processing product ID: ' . $productId);
+            
+            // Verify the product belongs to the seller
+            $product = Product::where('id', $productId)->where('seller_id', $seller->id)->first();
+            
+            if ($product) {
+                $productPromotion = ProductPromotion::create([
+                    'product_id' => $productId,
+                    'promotion_id' => $promotion->id,
+                    'discount_value' => $request->discount_value,
+                    'start_date' => $request->start_date,
+                    'end_date' => $request->end_date,
+                    'status' => Carbon::now()->between($request->start_date, $request->end_date) ? 'active' : 'inactive',
+                ]);
+                
+                \Log::info('Created ProductPromotion: ' . $productPromotion->id . ' for product: ' . $productId . ' and promotion: ' . $promotion->id);
+            } else {
+                \Log::warning('Product ID ' . $productId . ' does not belong to seller ID ' . $seller->id);
+            }
         }
 
         return redirect()->route('penjual.promosi')->with('success', 'Diskon produk berhasil dibuat.');
@@ -163,11 +254,19 @@ class PromotionController extends Controller
             'usage_limit' => 'nullable|integer|min:0',
         ]);
 
-        $seller = Seller::where('user_id', Auth::id())->firstOrFail();
+        $seller = Seller::where('user_id', Auth::id())->first();
+        
+        if (!$seller) {
+            \Log::error('Seller not found for user ID: ' . Auth::id());
+            return redirect()->back()->with('error', 'Seller tidak ditemukan. Silakan cek profil penjual Anda.');
+        }
+        
+        \Log::info('Creating voucher for seller: ' . $seller->id . ' with data: ' . json_encode($request->all()));
 
-        Promotion::create([
+        $promotion = Promotion::create([
             'name' => $request->name,
             'type' => $request->type,
+            'category' => 'voucher',  // Explicitly set category for voucher
             'code' => $request->code,
             'discount_value' => $request->discount_value,
             'start_date' => $request->start_date,
@@ -178,6 +277,8 @@ class PromotionController extends Controller
             'seller_id' => $seller->id,
             'status' => Carbon::now()->between($request->start_date, $request->end_date) ? 'active' : 'inactive',
         ]);
+        
+        \Log::info('Voucher created successfully with ID: ' . $promotion->id);
 
         return redirect()->route('penjual.promosi')->with('success', 'Voucher berhasil dibuat.');
     }
@@ -190,7 +291,12 @@ class PromotionController extends Controller
      */
     public function edit($id)
     {
-        $seller = Seller::where('user_id', Auth::id())->firstOrFail();
+        $seller = Seller::where('user_id', Auth::id())->first();
+        
+        if (!$seller) {
+            \Log::error('Seller not found for user ID: ' . Auth::id() . ' when trying to edit promotion ID: ' . $id);
+            abort(403, 'Seller tidak ditemukan. Silakan cek profil penjual Anda.');
+        }
         
         // First, try to find as a general promotion (voucher)
         $promotion = Promotion::where('id', $id)
@@ -208,7 +314,11 @@ class PromotionController extends Controller
                                               $query->where('seller_id', $seller->id);
                                           })
                                           ->with('product', 'promotion')
-                                          ->firstOrFail();
+                                          ->first();
+        
+        if (!$productPromotion) {
+            abort(404, 'Promosi tidak ditemukan atau Anda tidak memiliki akses ke promosi ini.');
+        }
         
         // Format data to match expected structure
         $promotionData = [
@@ -247,12 +357,23 @@ class PromotionController extends Controller
             'end_date' => 'required|date|after:start_date',
         ]);
 
-        $seller = Seller::where('user_id', Auth::id())->firstOrFail();
+        $seller = Seller::where('user_id', Auth::id())->first();
+        
+        if (!$seller) {
+            \Log::error('Seller not found for user ID: ' . Auth::id() . ' when trying to update product promotion ID: ' . $id);
+            return redirect()->back()->with('error', 'Seller tidak ditemukan. Silakan cek profil penjual Anda.');
+        }
+        
         $productPromotion = ProductPromotion::where('id', $id)
                                           ->whereHas('product', function($query) use ($seller) {
                                               $query->where('seller_id', $seller->id);
                                           })
-                                          ->firstOrFail();
+                                          ->first();
+        
+        if (!$productPromotion) {
+            \Log::error('Product promotion not found or does not belong to seller: ' . $seller->id . ' for product promotion ID: ' . $id);
+            abort(404, 'Promosi produk tidak ditemukan atau Anda tidak memiliki akses ke promosi ini.');
+        }
 
         $productPromotion->update([
             'discount_value' => $request->discount_value,
@@ -266,6 +387,7 @@ class PromotionController extends Controller
             $productPromotion->promotion->update([
                 'name' => $request->name,
                 'type' => $request->type,
+                'category' => 'product_discount',  // This is a product discount
                 'discount_value' => $request->discount_value,
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
@@ -297,14 +419,26 @@ class PromotionController extends Controller
             'usage_limit' => 'nullable|integer|min:0',
         ]);
 
-        $seller = Seller::where('user_id', Auth::id())->firstOrFail();
+        $seller = Seller::where('user_id', Auth::id())->first();
+        
+        if (!$seller) {
+            \Log::error('Seller not found for user ID: ' . Auth::id() . ' when trying to update voucher ID: ' . $id);
+            return redirect()->back()->with('error', 'Seller tidak ditemukan. Silakan cek profil penjual Anda.');
+        }
+        
         $promotion = Promotion::where('id', $id)
                             ->where('seller_id', $seller->id)
-                            ->firstOrFail();
+                            ->first();
+        
+        if (!$promotion) {
+            \Log::error('Promotion not found or does not belong to seller: ' . $seller->id . ' for promotion ID: ' . $id);
+            abort(404, 'Promosi tidak ditemukan atau Anda tidak memiliki akses ke promosi ini.');
+        }
 
         $promotion->update([
             'name' => $request->name,
             'type' => $request->type,
+            'category' => 'voucher',  // This is a voucher
             'code' => $request->code,
             'discount_value' => $request->discount_value,
             'start_date' => $request->start_date,
@@ -326,7 +460,12 @@ class PromotionController extends Controller
      */
     public function nonaktifkan($id)
     {
-        $seller = Seller::where('user_id', Auth::id())->firstOrFail();
+        $seller = Seller::where('user_id', Auth::id())->first();
+        
+        if (!$seller) {
+            \Log::error('Seller not found for user ID: ' . Auth::id() . ' when trying to deactivate promotion ID: ' . $id);
+            return redirect()->back()->with('error', 'Seller tidak ditemukan. Silakan cek profil penjual Anda.');
+        }
         
         // Check if it's a general promotion (voucher)
         $promotion = Promotion::where('id', $id)
@@ -380,7 +519,12 @@ class PromotionController extends Controller
      */
     public function destroy($id)
     {
-        $seller = Seller::where('user_id', Auth::id())->firstOrFail();
+        $seller = Seller::where('user_id', Auth::id())->first();
+        
+        if (!$seller) {
+            \Log::error('Seller not found for user ID: ' . Auth::id() . ' when trying to delete promotion ID: ' . $id);
+            return redirect()->back()->with('error', 'Seller tidak ditemukan. Silakan cek profil penjual Anda.');
+        }
         
         // Check if it's a general promotion (voucher)
         $promotion = Promotion::where('id', $id)

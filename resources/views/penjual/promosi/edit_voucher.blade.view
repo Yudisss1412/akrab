@@ -3,7 +3,7 @@
 @section('title', 'Edit Voucher Toko - ' . ($promotion->name ?? 'Voucher Toko'))
 
 @section('header')
-  @include('components.header_compact')
+  @include('components.penjual.header_compact')
 @endsection
 
 @push('styles')
@@ -214,12 +214,12 @@
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Event listener untuk radio button tipe voucher
-      const discountTypeRadios = document.querySelectorAll('input[name="discountType"]');
+      const discountTypeRadios = document.querySelectorAll('input[name="type"]');
       const maxDiscountGroup = document.getElementById('maxDiscountGroup');
       
       // Fungsi untuk mengatur tampilan maksimum potongan
       function toggleMaxDiscountField() {
-        const selectedType = document.querySelector('input[name="discountType"]:checked').value;
+        const selectedType = document.querySelector('input[name="type"]:checked').value;
         if (selectedType === 'percentage') {
           maxDiscountGroup.classList.add('show');
         } else {

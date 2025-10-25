@@ -16,14 +16,7 @@ Route::get('/debug-info', function() {
 });
 
 // Route untuk Manajemen Promosi - ditempatkan di awal untuk menghindari konflik
-Route::get('/penjual/promosi', function() {
-    if(file_exists(resource_path('views/penjual/manajemen_promosi.blade.view'))) {
-        return view('penjual.manajemen_promosi');
-    } else {
-        return response()->json(['error' => 'View file tidak ditemukan', 'path' => 
-resource_path('views/penjual/manajemen_promosi.blade.view')], 404);
-    }
-})->name('penjual.promosi');
+Route::get('/penjual/promosi', [App\Http\Controllers\PromotionController::class, 'index'])->name('penjual.promosi');
 
 Route::get('/penjual/promosi/diskon', [App\Http\Controllers\PromotionController::class, 
 'createDiscount'])->name('penjual.promosi.diskon');

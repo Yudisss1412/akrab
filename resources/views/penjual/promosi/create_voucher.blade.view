@@ -3,7 +3,7 @@
 @section('title', 'Buat Voucher Toko Baru')
 
 @section('header')
-  @include('components.header_compact')
+  @include('components.penjual.header_compact')
 @endsection
 
 @push('styles')
@@ -120,13 +120,13 @@
           <h5 class="card-title mb-3">Informasi Dasar</h5>
           <div class="form-group">
             <label for="voucherName" class="form-label">Nama Voucher</label>
-            <input type="text" id="voucherName" class="form-control" placeholder="Contoh: Voucher Hemat Akhir Tahun">
+            <input type="text" id="voucherName" name="name" class="form-control" placeholder="Contoh: Voucher Hemat Akhir Tahun">
           </div>
           
           <div class="form-group">
             <label for="voucherCode" class="form-label">Kode Voucher</label>
             <div class="input-group">
-              <input type="text" id="voucherCode" class="form-control" placeholder="Contoh: HEMAT2024">
+              <input type="text" id="voucherCode" name="code" class="form-control" placeholder="Contoh: HEMAT2024">
               <button type="button" class="btn btn-outline-secondary" id="generateCodeBtn">Buat Kode Acak</button>
             </div>
           </div>
@@ -139,11 +139,11 @@
             <label class="form-label">Tipe Voucher</label>
             <div class="radio-group">
               <div class="radio-option">
-                <input type="radio" id="typePercentage" name="discountType" value="percentage" checked>
+                <input type="radio" id="typePercentage" name="type" value="percentage" checked>
                 <label for="typePercentage">Persentase (%)</label>
               </div>
               <div class="radio-option">
-                <input type="radio" id="typeFixed" name="discountType" value="fixed">
+                <input type="radio" id="typeFixed" name="type" value="fixed">
                 <label for="typeFixed">Potongan Harga Tetap (Rp)</label>
               </div>
             </div>
@@ -151,12 +151,12 @@
           
           <div class="form-group">
             <label for="discountValue" class="form-label">Besar Diskon/Potongan</label>
-            <input type="number" id="discountValue" class="form-control" placeholder="Masukkan besar diskon">
+            <input type="number" id="discountValue" name="discount_value" class="form-control" placeholder="Masukkan besar diskon">
           </div>
           
           <div class="form-group max-discount-group" id="maxDiscountGroup">
             <label for="maxDiscount" class="form-label">Maksimum Potongan (Rp)</label>
-            <input type="number" id="maxDiscount" class="form-control" placeholder="Masukkan maksimum potongan">
+            <input type="number" id="maxDiscount" name="max_discount_amount" class="form-control" placeholder="Masukkan maksimum potongan">
           </div>
         </div>
         
@@ -165,12 +165,12 @@
           <h5 class="card-title mb-3">Syarat & Ketentuan</h5>
           <div class="form-group">
             <label for="minPurchase" class="form-label">Minimum Pembelian (Rp)</label>
-            <input type="number" id="minPurchase" class="form-control" placeholder="Rp 0">
+            <input type="number" id="minPurchase" name="min_order_amount" class="form-control" placeholder="Rp 0">
           </div>
           
           <div class="form-group">
             <label for="quota" class="form-label">Kuota Penggunaan</label>
-            <input type="number" id="quota" class="form-control" placeholder="Jumlah total voucher yang tersedia">
+            <input type="number" id="quota" name="usage_limit" class="form-control" placeholder="Jumlah total voucher yang tersedia">
           </div>
         </div>
         
@@ -181,13 +181,13 @@
             <div class="col-md-6">
               <div class="form-group">
                 <label for="startDate" class="form-label">Tanggal & Waktu Mulai</label>
-                <input type="datetime-local" id="startDate" class="form-control">
+                <input type="datetime-local" id="startDate" name="start_date" class="form-control">
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-group">
                 <label for="endDate" class="form-label">Tanggal & Waktu Selesai</label>
-                <input type="datetime-local" id="endDate" class="form-control">
+                <input type="datetime-local" id="endDate" name="end_date" class="form-control">
               </div>
             </div>
           </div>
@@ -209,12 +209,12 @@
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Event listener untuk radio button tipe voucher
-      const discountTypeRadios = document.querySelectorAll('input[name="discountType"]');
+      const discountTypeRadios = document.querySelectorAll('input[name="type"]');
       const maxDiscountGroup = document.getElementById('maxDiscountGroup');
       
       // Fungsi untuk mengatur tampilan maksimum potongan
       function toggleMaxDiscountField() {
-        const selectedType = document.querySelector('input[name="discountType"]:checked').value;
+        const selectedType = document.querySelector('input[name="type"]:checked').value;
         if (selectedType === 'percentage') {
           maxDiscountGroup.classList.add('show');
         } else {

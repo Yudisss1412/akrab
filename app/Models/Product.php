@@ -48,7 +48,7 @@ class Product extends Model
     {
         return $this->belongsTo(Category::class);
     }
-
+    
     // Relasi ke penjual
     public function seller()
     {

@@ -105,7 +105,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('penjual.ulasan') ? 'active' : '' }}" href="{{ route('penjual.ulasan') }}">
+                <a class="nav-link {{ request()->routeIs('seller.reviews.index') ? 'active' : '' }}" href="{{ route('seller.reviews.index') }}">
                     <i class="fas fa-comments me-2"></i>Ulasan Produk
                 </a>
             </li>

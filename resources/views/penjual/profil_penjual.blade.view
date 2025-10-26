@@ -181,7 +181,7 @@
         
         <!-- Tombol untuk melihat semua ulasan -->
         <div class="view-all-btn" style="padding: 1rem; text-align: center; border-top: 1px solid var(--ak-border);">
-          <a href="{{ route('penjual.ulasan') }}" class="btn btn-primary" aria-label="Lihat dan kelola semua ulasan">
+          <a href="{{ route('seller.reviews.index') }}" class="btn btn-primary" aria-label="Lihat dan kelola semua ulasan">
             Lihat & Kelola Semua Ulasan →
           </a>
         </div>

@@ -647,15 +647,18 @@ Route::put('/penjual/produk/{id}/stock', [App\Http\Controllers\Seller\ProductCon
 Route::delete('/penjual/product-image/{id}', [App\Http\Controllers\Seller\ProductController::class, 
 'destroyImage'])->name('penjual.product.image.delete');
 
+// Route untuk manajemen ulasan penjual
+Route::get('/penjual/ulasan', [App\Http\Controllers\Seller\ReviewController::class, 'index'])->name('seller.reviews.index');
+Route::post('/penjual/reviews/{reviewId}/reply', [App\Http\Controllers\Seller\ReviewController::class, 'reply'])->name('seller.reviews.reply');
+Route::get('/penjual/reviews/api', [App\Http\Controllers\Seller\ReviewController::class, 'getReviewsJson'])->name('seller.reviews.api');
+
 Route::get('/penjual/pesanan', [App\Http\Controllers\Seller\SellerOrderController::class, 'index'])->name('penjual.pesanan');
 
 Route::get('/penjual/saldo', function () {
     return view('penjual.saldo_penarikan');
 })->name('penjual.saldo');
 
-Route::get('/penjual/ulasan', function () {
-    return view('penjual.manajemen_ulasan');
-})->name('penjual.ulasan');
+
 
 
 

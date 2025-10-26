@@ -14,6 +14,8 @@ class Review extends Model
         'review_text',
         'status',
         'media',
+        'reply',
+        'replied_at',
     ];
 
     // Relasi ke user

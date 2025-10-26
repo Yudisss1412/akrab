@@ -372,62 +372,28 @@
         <section class="stats-grid">
           <div class="stat-card">
             <p class="stat-title">Rating Rata-rata</p>
-            <p class="stat-value">4.8 ⭐</p>
+            <p class="stat-value">{{ number_format($averageRating, 1) }} ⭐</p>
           </div>
           
           <div class="stat-card">
             <p class="stat-title">Total Ulasan</p>
-            <p class="stat-value">142</p>
+            <p class="stat-value">{{ $totalReviews }}</p>
           </div>
           
           <div class="stat-card">
             <p class="stat-title">Rincian Ulasan</p>
             <div class="star-breakdown">
+              @foreach($ratingStats as $rating => $count)
               <div class="star-row">
                 <span class="star-label">
-                  <span class="star">⭐</span> 5
+                  <span class="star">⭐</span> {{ $rating }}
                 </span>
                 <div class="star-progress">
-                  <div class="star-progress-bar" style="width: 70%"></div>
+                  <div class="star-progress-bar" style="width: {{ $totalReviews > 0 ? ($count / $totalReviews) * 100 : 0 }}%"></div>
                 </div>
-                <span>85</span>
+                <span>{{ $count }}</span>
               </div>
-              <div class="star-row">
-                <span class="star-label">
-                  <span class="star">⭐</span> 4
-                </span>
-                <div class="star-progress">
-                  <div class="star-progress-bar" style="width: 15%"></div>
-                </div>
-                <span>25</span>
-              </div>
-              <div class="star-row">
-                <span class="star-label">
-                  <span class="star">⭐</span> 3
-                </span>
-                <div class="star-progress">
-                  <div class="star-progress-bar" style="width: 5%"></div>
-                </div>
-                <span>12</span>
-              </div>
-              <div class="star-row">
-                <span class="star-label">
-                  <span class="star">⭐</span> 2
-                </span>
-                <div class="star-progress">
-                  <div class="star-progress-bar" style="width: 3%"></div>
-                </div>
-                <span>5</span>
-              </div>
-              <div class="star-row">
-                <span class="star-label">
-                  <span class="star">⭐</span> 1
-                </span>
-                <div class="star-progress">
-                  <div class="star-progress-bar" style="width: 2%"></div>
-                </div>
-                <span>3</span>
-              </div>
+              @endforeach
             </div>
           </div>
         </section>
@@ -436,7 +402,7 @@
         <div class="filter-row">
           <div class="filter-group">
             <label for="filter-star">Filter berdasarkan Bintang</label>
-            <select id="filter-star" class="filter-control">
+            <select id="filter-star" class="filter-control" @change="fetchReviews()">
               <option value="">Semua Bintang</option>
               <option value="5">5 Bintang</option>
               <option value="4">4 Bintang</option>
@@ -448,7 +414,7 @@
           
           <div class="filter-group">
             <label for="filter-reply">Filter berdasarkan Status Balasan</label>
-            <select id="filter-reply" class="filter-control">
+            <select id="filter-reply" class="filter-control" @change="fetchReviews()">
               <option value="">Semua Status</option>
               <option value="replied">Telah Dibalas</option>
               <option value="pending">Belum Dibalas</option>
@@ -457,7 +423,7 @@
           
           <div class="filter-group">
             <label for="sort-by">Urutkan berdasarkan</label>
-            <select id="sort-by" class="filter-control">
+            <select id="sort-by" class="filter-control" @change="fetchReviews()">
               <option value="newest">Terbaru</option>
               <option value="oldest">Terlama</option>
               <option value="highest">Rating Tertinggi</option>
@@ -467,73 +433,82 @@
         </div>
 
         <!-- Reviews List with Alpine.js -->
-        <div x-data="{ reviews: [
-          {
-            id: 1,
-            name: 'Budi Santoso',
-            rating: 5,
-            comment: 'Produk sangat bagus, kualitas oke banget. Pengiriman cepat dan kemasan rapi. Recommended seller ini!',
-            date: '10 Okt 2025',
-            product: {
-              name: 'Kaos Polos Premium',
-              image: 'https://placehold.co/60x60'
-            },
-            replied: true,
-            reply: 'Terima kasih atas ulasannya, Bapak Budi!'
+        <div x-data="{
+          reviews: [],
+          currentPage: 1,
+          lastPage: 1,
+          total: 0,
+          perPage: 10,
+          loading: true,
+          
+          init() {
+            this.fetchReviews();
           },
-          {
-            id: 2,
-            name: 'Siti Aminah',
-            rating: 4,
-            comment: 'Kualitas bagus, tapi sedikit kebesaran dari ukuran yang saya pesan.',
-            date: '8 Okt 2025',
-            product: {
-              name: 'Celana Panjang Casual',
-              image: 'https://placehold.co/60x60'
-            },
-            replied: false,
-            reply: null
+          
+          fetchReviews() {
+            this.loading = true;
+            
+            const params = new URLSearchParams();
+            params.append('page', this.currentPage);
+            params.append('filter_star', document.getElementById('filter-star').value);
+            params.append('filter_reply', document.getElementById('filter-reply').value);
+            params.append('sort_by', document.getElementById('sort-by').value);
+            
+            fetch(`{{ route('seller.reviews.api') }}?${params}`)
+              .then(response => response.json())
+              .then(data => {
+                this.reviews = data.reviews;
+                this.currentPage = data.pagination.current_page;
+                this.lastPage = data.pagination.last_page;
+                this.total = data.pagination.total;
+                this.perPage = data.pagination.per_page;
+                this.loading = false;
+              })
+              .catch(error => {
+                console.error('Error fetching reviews:', error);
+                this.loading = false;
+              });
           },
-          {
-            id: 3,
-            name: 'Ahmad Fauzi',
-            rating: 5,
-            comment: 'Barang sesuai deskripsi, pengiriman cepat, dan harga terjangkau. Akan pesan lagi lain waktu.',
-            date: '5 Okt 2025',
-            product: {
-              name: 'Jaket Hoodie Hangat',
-              image: 'https://placehold.co/60x60'
-            },
-            replied: true,
-            reply: 'Terima kasih, Pak Ahmad! Kami tunggu kedatangan berikutnya.'
+          
+          changePage(page) {
+            if (page >= 1 && page <= this.lastPage) {
+              this.currentPage = page;
+              this.fetchReviews();
+            }
           },
-          {
-            id: 4,
-            name: 'Dewi Anggraini',
-            rating: 3,
-            comment: 'Produknya bagus, tapi kemasannya agak rusak saat diterima.',
-            date: '3 Okt 2025',
-            product: {
-              name: 'Topi Snapback Trendy',
-              image: 'https://placehold.co/60x60'
-            },
-            replied: false,
-            reply: null
-          },
-          {
-            id: 5,
-            name: 'Rizki Pratama',
-            rating: 5,
-            comment: 'Sangat puas dengan produk dan pelayanannya. Seller responsif dan ramah.',
-            date: '1 Okt 2025',
-            product: {
-              name: 'Sendal Sandal Jepit',
-              image: 'https://placehold.co/60x60'
-            },
-            replied: false,
-            reply: null
+          
+          submitReply(reviewId, replyText, updateReviewState) {
+            fetch(`/seller/reviews/${reviewId}/reply`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                'Accept': 'application/json'
+              },
+              body: JSON.stringify({
+                reply_text: replyText
+              })
+            })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                updateReviewState(data.reply);
+                // Show success message
+                alert('Balasan berhasil dikirim');
+              } else {
+                alert('Gagal mengirim balasan: ' + data.message);
+              }
+            })
+            .catch(error => {
+              console.error('Error submitting reply:', error);
+              alert('Terjadi kesalahan saat mengirim balasan');
+            });
           }
-        ] }">
+        }">
+          <div x-show="loading" class="text-center" style="padding: 2rem; text-align: center;">
+            <p>Memuat ulasan...</p>
+          </div>
+          
           <template x-for="review in reviews" :key="review.id">
             <div class="review-card" x-data="{ isReplying: false, replyText: '' }">
               <div class="review-header">
@@ -555,7 +530,7 @@
                 <img :src="review.product.image" alt="Gambar Produk" class="product-image">
                 <div class="product-info">
                   <h4 class="product-name">
-                    <a href="#" x-text="review.product.name"></a>
+                    <a :href="`/produk/${review.product.id}`" x-text="review.product.name"></a>
                   </h4>
                 </div>
               </div>
@@ -571,13 +546,14 @@
                   x-model="replyText"
                   x-ref="replyTextarea"
                   x-effect="if (isReplying) $refs.replyTextarea.focus()"
+                  maxlength="500"
                 ></textarea>
                 
-                <div class="char-count" x-text="`${replyText.length}/250 karakter`"></div>
+                <div class="char-count" x-text="`${replyText.length}/500 karakter`"></div>
                 
                 <div class="reply-actions">
                   <button class="btn-secondary" @click="isReplying = false; replyText = ''">Batal</button>
-                  <button class="reply-btn" @click="isReplying = false; replyText = ''">
+                  <button class="reply-btn" @click="submitReply(review.id, replyText, (reply) => { review.reply = reply; review.replied = true; isReplying = false; replyText = ''; })">
                     Kirim Balasan
                   </button>
                 </div>
@@ -589,17 +565,28 @@
               </div>
             </div>
           </template>
-        </div>
-
-        <!-- Pagination -->
-        <div class="pagination">
-          <a href="#" class="prev">‹ Sebelumnya</a>
-          <a href="#">1</a>
-          <a href="#">2</a>
-          <a href="#">3</a>
-          <span class="active">4</span>
-          <a href="#">5</a>
-          <a href="#" class="next">Berikutnya ›</a>
+          
+          <!-- Pagination with Alpine.js -->
+          <div class="pagination" x-show="!loading && lastPage > 1">
+            <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1" class="prev">‹ Sebelumnya</button>
+            
+            <template x-for="page in Array.from({length: Math.min(5, lastPage)}, (_, i) => {
+              let start = Math.max(1, currentPage - 2);
+              let end = Math.min(lastPage, start + 4);
+              if (end - start < 4) start = Math.max(1, end - 4);
+              return start + i;
+            }).filter(page => page >= 1 && page <= lastPage)">
+              <button 
+                :key="page" 
+                @click="changePage(page)" 
+                :class="{'active': page === currentPage}" 
+                x-show="page >= Math.max(1, currentPage - 2) && page <= Math.min(lastPage, currentPage + 2)"
+                x-text="page"
+              ></button>
+            </template>
+            
+            <button @click="changePage(currentPage + 1)" :disabled="currentPage === lastPage" class="next">Berikutnya ›</button>
+          </div>
         </div>
       </main>
     </div>
@@ -608,7 +595,15 @@
   @include('components.admin_penjual.footer')
   
   <script>
-    // No script conversion needed since we removed double square brackets from template
+    // CSRF token meta tag
+    const csrfToken = document.head.querySelector('meta[name=csrf-token]');
+    if (!csrfToken) {
+      // Create CSRF token meta tag if not exists
+      const meta = document.createElement('meta');
+      meta.name = 'csrf-token';
+      meta.content = '{{ csrf_token() }}';
+      document.head.appendChild(meta);
+    }
   </script>
 </body>
 </html>

@@ -66,7 +66,7 @@
     </section>
 
     <!-- Riwayat Penjualan -->
-    <section class="card reviews-section" aria-labelledby="ordersTitle">
+    <section class="card orders-section" aria-labelledby="ordersTitle">
       <div class="orders-head">
         <h2 id="ordersTitle" class="card-title">Riwayat Penjualan</h2>
         <div class="orders-head-hint">Penjualan terbaru dari toko ini</div>
@@ -74,42 +74,7 @@
 
       <!-- viewport: item dipasang DI DALAM elemen ini -->
       <div id="ordersViewport" class="orders-viewport" aria-live="polite">
-        <!-- contoh item -->
-        <article class="order-card" data-order-id="INV-001">
-          <div class="order-head">
-            <div class="shop-name">Shoppy.gg</div>
-            <div class="order-meta">
-              <span>Tanggal:
-                <time datetime="2025-09-02">02 Sep 2025</time>
-              </span>
-              • <span>Status: <strong>Selesai</strong></span>
-            </div>
-          </div>
-
-          <div class="order-items">
-            <div class="order-item">
-              <img class="item-img" src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=400&auto=format&fit=crop" alt="Mini Projector">
-              <div class="item-body">
-                <div class="item-row">
-                  <div class="item-name">Mini Projector</div>
-                  <div class="item-qty">Qty 1</div>
-                </div>
-                <div class="item-desc scrollable">
-                  Proyektor mini untuk kebutuhan presentasi & hiburan.
-                </div>
-                <div class="item-subtotal">Rp 1.250.000</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="order-actions">
-            <div class="total-price" aria-label="Total">Total: Rp 1.250.000</div>
-            <div class="row-actions">
-              <a href="#" class="btn btn-ghost btn-detail">Detail</a>
-              <a href="{{ route('invoice') }}?no=INV-001" class="btn btn-primary">Cetak</a>
-            </div>
-          </div>
-        </article>
+        <!-- Data pesanan akan dimuat secara dinamis oleh JavaScript -->
       </div>
     </section>
 

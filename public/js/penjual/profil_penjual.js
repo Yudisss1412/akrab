@@ -490,3 +490,94 @@
   // Muat ulasan saat halaman dimuat
   document.addEventListener('DOMContentLoaded', loadRecentReviews);
 })();
+
+// ===============================
+// Riwayat Penjualan Dinamis
+// ===============================
+(function(){
+  const ordersSection = document.querySelector('.orders-section');
+  if (!ordersSection) return;
+  
+  const ordersViewport = document.getElementById('ordersViewport');
+  if (!ordersViewport) return;
+  
+  // Fungsi untuk memuat pesanan dari API
+  async function loadRecentOrders() {
+    try {
+      const response = await fetch('/penjual/pesanan/recent');
+      const data = await response.json();
+      
+      if (data.success && data.orders.length > 0) {
+        // Bersihkan konten sebelumnya
+        ordersViewport.innerHTML = '';
+        
+        // Tambahkan pesanan
+        data.orders.forEach(order => {
+          const orderElement = createOrderElement(order);
+          ordersViewport.appendChild(orderElement);
+        });
+      }
+    } catch (error) {
+      console.error('Error loading recent orders:', error);
+    }
+  }
+  
+  // Fungsi untuk membuat elemen pesanan
+  function createOrderElement(order) {
+    const article = document.createElement('article');
+    article.className = 'order-card';
+    article.setAttribute('data-order-id', order.order_number);
+    
+    // Status mapping untuk tampilan
+    const statusLabels = {
+      'pending_payment': 'Menunggu Pembayaran',
+      'processing': 'Diproses',
+      'shipping': 'Dikirim',
+      'completed': 'Selesai',
+      'cancelled': 'Dibatalkan'
+    };
+    
+    const statusLabel = statusLabels[order.status] || order.status;
+    
+    article.innerHTML = `
+      <div class="order-head">
+        <div class="shop-name">${order.customer_name}</div>
+        <div class="order-meta">
+          <span>Tanggal:
+            <time datetime="${order.created_at}">${order.created_at}</time>
+          </span>
+          • <span>Status: <strong>${statusLabel}</strong></span>
+        </div>
+      </div>
+
+      <div class="order-items">
+        <div class="order-item">
+          <img class="item-img" src="${order.product_image}" alt="${order.product_name}">
+          <div class="item-body">
+            <div class="item-row">
+              <div class="item-name">${order.product_name}</div>
+              <div class="item-qty">Qty ${order.quantity}</div>
+            </div>
+            <div class="item-desc scrollable">
+              Pesanan #${order.order_number}
+            </div>
+            <div class="item-subtotal">Rp ${parseInt(order.subtotal).toLocaleString('id-ID')}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="order-actions">
+        <div class="total-price" aria-label="Total">Total: Rp ${parseInt(order.total_amount).toLocaleString('id-ID')}</div>
+        <div class="row-actions">
+          <a href="/penjual/pesanan/${order.id}" class="btn btn-ghost btn-detail">Detail</a>
+          <a href="/invoice/${order.id}" class="btn btn-primary">Cetak</a>
+        </div>
+      </div>
+    `;
+    
+    return article;
+  }
+  
+  // Muat pesanan saat halaman dimuat
+  document.addEventListener('DOMContentLoaded', loadRecentOrders);
+})();

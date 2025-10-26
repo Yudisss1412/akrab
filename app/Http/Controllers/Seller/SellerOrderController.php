@@ -170,4 +170,57 @@ class SellerOrderController extends Controller
             'order' => $order
         ]);
     }
+    
+    /**
+     * API endpoint untuk mendapatkan pesanan terbaru untuk ditampilkan di profil penjual
+     */
+    public function getRecentOrders()
+    {
+        // Hanya penjual yang bisa mengakses
+        $user = Auth::user();
+        if (!$user || !$user->role || $user->role->name !== 'seller') {
+            return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
+        }
+
+        // Ambil ID penjual dari tabel sellers berdasarkan user_id
+        $seller = Seller::where('user_id', $user->id)->first();
+        if (!$seller) {
+            return response()->json(['success' => false, 'message' => 'Seller record tidak ditemukan'], 403);
+        }
+
+        // Ambil 3 pesanan terbaru dengan produk milik penjual ini
+        $recentOrders = Order::with(['user', 'items.product'])
+            ->whereHas('items.product', function ($q) use ($seller) {
+                $q->where('seller_id', $seller->id);
+            })
+            ->orderBy('created_at', 'desc')
+            ->limit(3)
+            ->get();
+
+        // Format data untuk frontend
+        $formattedOrders = $recentOrders->map(function($order) {
+            // Ambil item pertama untuk ditampilkan (bisa disesuaikan)
+            $firstItem = $order->items->first();
+            
+            return [
+                'id' => $order->id,
+                'order_number' => $order->order_number,
+                'created_at' => $order->created_at->format('d M Y'),
+                'status' => $order->status,
+                'total_amount' => $order->total_amount,
+                'customer_name' => $order->user->name ?? 'Pelanggan',
+                'product_name' => $firstItem && $firstItem->product ? $firstItem->product->name : 'Produk tidak ditemukan',
+                'product_image' => $firstItem && $firstItem->product && $firstItem->product->image ? 
+                    asset('storage/' . $firstItem->product->image) : 
+                    asset('src/placeholder_produk.png'),
+                'quantity' => $firstItem ? $firstItem->quantity : 1,
+                'subtotal' => $firstItem ? $firstItem->subtotal : 0
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'orders' => $formattedOrders
+        ]);
+    }
 }

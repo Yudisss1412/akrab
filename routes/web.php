@@ -654,6 +654,7 @@ Route::get('/penjual/reviews/api', [App\Http\Controllers\Seller\ReviewController
 Route::get('/penjual/reviews/recent', [App\Http\Controllers\Seller\ReviewController::class, 'getRecentReviews'])->name('seller.reviews.recent');
 
 Route::get('/penjual/pesanan', [App\Http\Controllers\Seller\SellerOrderController::class, 'index'])->name('penjual.pesanan');
+Route::get('/penjual/pesanan/recent', [App\Http\Controllers\Seller\SellerOrderController::class, 'getRecentOrders'])->name('penjual.pesanan.recent');
 
 Route::get('/penjual/saldo', function () {
     return view('penjual.saldo_penarikan');

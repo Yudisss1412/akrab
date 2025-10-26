@@ -651,6 +651,7 @@ Route::delete('/penjual/product-image/{id}', [App\Http\Controllers\Seller\Produc
 Route::get('/penjual/ulasan', [App\Http\Controllers\Seller\ReviewController::class, 'index'])->name('seller.reviews.index');
 Route::post('/penjual/reviews/{reviewId}/reply', [App\Http\Controllers\Seller\ReviewController::class, 'reply'])->name('seller.reviews.reply');
 Route::get('/penjual/reviews/api', [App\Http\Controllers\Seller\ReviewController::class, 'getReviewsJson'])->name('seller.reviews.api');
+Route::get('/penjual/reviews/recent', [App\Http\Controllers\Seller\ReviewController::class, 'getRecentReviews'])->name('seller.reviews.recent');
 
 Route::get('/penjual/pesanan', [App\Http\Controllers\Seller\SellerOrderController::class, 'index'])->name('penjual.pesanan');
 

@@ -416,3 +416,77 @@
     ta.focus({ preventScroll:false });
   });
 })();
+
+// ===============================
+// Riwayat Ulasan Dinamis
+// ===============================
+(function(){
+  const reviewsSection = document.querySelector('.reviews-section');
+  if (!reviewsSection) return;
+  
+  const reviewsViewport = reviewsSection.querySelector('.reviews-viewport');
+  if (!reviewsViewport) return;
+  
+  // Fungsi untuk memuat ulasan dari API
+  async function loadRecentReviews() {
+    try {
+      const response = await fetch('/penjual/reviews/recent');
+      const data = await response.json();
+      
+      if (data.success && data.reviews.length > 0) {
+        // Bersihkan konten sebelumnya kecuali tombol "Lihat Semua"
+        const viewAllBtn = reviewsViewport.querySelector('.view-all-btn');
+        reviewsViewport.innerHTML = '';
+        
+        // Tambahkan ulasan
+        data.reviews.forEach(review => {
+          const reviewElement = createReviewElement(review);
+          reviewsViewport.appendChild(reviewElement);
+        });
+        
+        // Tambahkan kembali tombol "Lihat Semua"
+        if (viewAllBtn) {
+          reviewsViewport.appendChild(viewAllBtn);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading recent reviews:', error);
+    }
+  }
+  
+  // Fungsi untuk membuat elemen ulasan
+  function createReviewElement(review) {
+    const article = document.createElement('article');
+    article.className = 'review-card';
+    
+    // Rating stars
+    let starsHtml = '';
+    for (let i = 1; i <= 5; i++) {
+      const starClass = i <= review.rating ? 'star filled' : 'star';
+      starsHtml += `<svg class="${starClass}" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1l2.6 5.3L18 7l-4 3.9L15 18l-5-2.6L5 18l1-7.1L2 7l5.4-.7L10 1z"/></svg>`;
+    }
+    
+    article.innerHTML = `
+      <div class="rev-top" style="padding:.8rem 1rem;">
+        <div><strong>${review.user_name}</strong> • <time datetime="${review.created_at}">${review.created_at}</time></div>
+        <div class="rev-stars" aria-label="${review.rating} dari 5 bintang">
+          ${starsHtml}
+        </div>
+      </div>
+      <div class="rev-body" style="padding:0 1rem 1rem;">
+        <div class="rev-text">${review.review_text || 'Tidak ada komentar'}</div>
+        ${review.reply ? `
+          <div class="rev-reply" style="margin-top: 0.75rem; padding: 0.75rem; background: #f0fdfa; border-left: 3px solid var(--ak-primary); border-radius: 0 var(--ak-radius) var(--ak-radius) 0;">
+            <strong>Balasan:</strong>
+            <p style="margin: 0.25rem 0 0;">${review.reply}</p>
+          </div>
+        ` : ''}
+      </div>
+    `;
+    
+    return article;
+  }
+  
+  // Muat ulasan saat halaman dimuat
+  document.addEventListener('DOMContentLoaded', loadRecentReviews);
+})();

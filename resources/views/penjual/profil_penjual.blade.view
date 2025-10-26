@@ -119,66 +119,7 @@
         <h2 id="reviewsTitle" class="card-title">Riwayat Ulasan</h2>
       </div>
       <div class="reviews-viewport">
-        <!-- Contoh maksimal 3 ulasan terbaru -->
-        <article class="review-card">
-          <div class="rev-top" style="padding:.8rem 1rem;">
-            <div><strong>Budi</strong> • <time datetime="2025-10-10">10 Okt 2025</time></div>
-            <div class="rev-stars" aria-label="5 dari 5 bintang">
-              <svg class="star filled" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1l2.6 5.3L18 7l-4 3.9L15 18l-5-2.6L5 18l1-7.1L2 7l5.4-.7L10 1z"/></svg>
-              <svg class="star filled" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1l2.6 5.3L18 7l-4 3.9L15 18l-5-2.6L5 18l1-7.1L2 7l5.4-.7L10 1z"/></svg>
-              <svg class="star filled" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1l2.6 5.3L18 7l-4 3.9L15 18l-5-2.6L5 18l1-7.1L2 7l5.4-.7L10 1z"/></svg>
-              <svg class="star filled" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1l2.6 5.3L18 7l-4 3.9L15 18l-5-2.6L5 18l1-7.1L2 7l5.4-.7L10 1z"/></svg>
-              <svg class="star filled" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1l2.6 5.3L18 7l-4 3.9L15 18l-5-2.6L5 18l1-7.1L2 7l5.4-.7L10 1z"/></svg>
-            </div>
-          </div>
-          <div class="rev-body" style="padding:0 1rem 1rem;">
-            <div class="rev-text">Produk sangat bagus, kualitas oke banget. Pengiriman cepat dan kemasan rapi. Recommended seller ini!</div>
-            <!-- Balasan dari penjual -->
-            <div class="rev-reply" style="margin-top: 0.75rem; padding: 0.75rem; background: #f0fdfa; border-left: 3px solid var(--ak-primary); border-radius: 0 var(--ak-radius) var(--ak-radius) 0;">
-              <strong>Balasan:</strong>
-              <p style="margin: 0.25rem 0 0;">Terima kasih atas ulasannya, Bapak Budi!</p>
-            </div>
-          </div>
-        </article>
-        
-        <article class="review-card">
-          <div class="rev-top" style="padding:.8rem 1rem;">
-            <div><strong>Siti</strong> • <time datetime="2025-10-08">08 Okt 2025</time></div>
-            <div class="rev-stars" aria-label="4 dari 5 bintang">
-              <svg class="star filled" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1l2.6 5.3L18 7l-4 3.9L15 18l-5-2.6L5 18l1-7.1L2 7l5.4-.7L10 1z"/></svg>
-              <svg class="star filled" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1l2.6 5.3L18 7l-4 3.9L15 18l-5-2.6L5 18l1-7.1L2 7l5.4-.7L10 1z"/></svg>
-              <svg class="star filled" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1l2.6 5.3L18 7l-4 3.9L15 18l-5-2.6L5 18l1-7.1L2 7l5.4-.7L10 1z"/></svg>
-              <svg class="star filled" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1l2.6 5.3L18 7l-4 3.9L15 18l-5-2.6L5 18l1-7.1L2 7l5.4-.7L10 1z"/></svg>
-              <svg class="star" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1l2.6 5.3L18 7l-4 3.9L15 18l-5-2.6L5 18l1-7.1L2 7l5.4-.7L10 1z"/></svg>
-            </div>
-          </div>
-          <div class="rev-body" style="padding:0 1rem 1rem;">
-            <div class="rev-text">Kualitas bagus, tapi sedikit kebesaran dari ukuran yang saya pesan.</div>
-            <!-- Balasan dari penjual -->
-            <div class="rev-reply" style="margin-top: 0.75rem; padding: 0.75rem; background: #f0fdfa; border-left: 3px solid var(--ak-primary); border-radius: 0 var(--ak-radius) var(--ak-radius) 0;">
-              <strong>Balasan:</strong>
-              <p style="margin: 0.25rem 0 0;">Mohon maaf atas ketidaknyamanannya, Ibu Siti. Kami akan perhatikan keterangan ukuran lebih lanjut.</p>
-            </div>
-          </div>
-        </article>
-        
-        <article class="review-card">
-          <div class="rev-top" style="padding:.8rem 1rem;">
-            <div><strong>Ahmad</strong> • <time datetime="2025-10-05">05 Okt 2025</time></div>
-            <div class="rev-stars" aria-label="5 dari 5 bintang">
-              <svg class="star filled" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1l2.6 5.3L18 7l-4 3.9L15 18l-5-2.6L5 18l1-7.1L2 7l5.4-.7L10 1z"/></svg>
-              <svg class="star filled" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1l2.6 5.3L18 7l-4 3.9L15 18l-5-2.6L5 18l1-7.1L2 7l5.4-.7L10 1z"/></svg>
-              <svg class="star filled" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1l2.6 5.3L18 7l-4 3.9L15 18l-5-2.6L5 18l1-7.1L2 7l5.4-.7L10 1z"/></svg>
-              <svg class="star filled" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1l2.6 5.3L18 7l-4 3.9L15 18l-5-2.6L5 18l1-7.1L2 7l5.4-.7L10 1z"/></svg>
-              <svg class="star filled" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1l2.6 5.3L18 7l-4 3.9L15 18l-5-2.6L5 18l1-7.1L2 7l5.4-.7L10 1z"/></svg>
-            </div>
-          </div>
-          <div class="rev-body" style="padding:0 1rem 1rem;">
-            <div class="rev-text">Barang sesuai deskripsi, pengiriman cepat, dan harga terjangkau. Akan pesan lagi lain waktu.</div>
-            <!-- Ulasan belum dibalas, tidak menampilkan balasan -->
-          </div>
-        </article>
-        
+        <!-- Tempat untuk ulasan dinamis akan dimuat oleh JavaScript -->
         <!-- Tombol untuk melihat semua ulasan -->
         <div class="view-all-btn" style="padding: 1rem; text-align: center; border-top: 1px solid var(--ak-border);">
           <a href="{{ route('seller.reviews.index') }}" class="btn btn-primary" aria-label="Lihat dan kelola semua ulasan">

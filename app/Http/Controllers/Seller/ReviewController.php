@@ -190,4 +190,35 @@ class ReviewController extends Controller
             ]
         ]);
     }
+    
+    /**
+     * API endpoint untuk mendapatkan ulasan terbaru untuk ditampilkan di profil penjual
+     */
+    public function getRecentReviews()
+    {
+        $seller = Auth::user()->seller;
+        $products = $seller->products()->pluck('id')->toArray();
+        
+        $recentReviews = Review::with(['user', 'product'])
+            ->whereIn('product_id', $products)
+            ->orderBy('created_at', 'desc')
+            ->limit(3) // Ambil 3 ulasan terbaru
+            ->get();
+            
+        $formattedReviews = $recentReviews->map(function($review) {
+            return [
+                'id' => $review->id,
+                'user_name' => $review->user->name,
+                'created_at' => $review->created_at->format('d M Y'),
+                'rating' => $review->rating,
+                'review_text' => $review->review_text,
+                'reply' => $review->reply
+            ];
+        });
+        
+        return response()->json([
+            'success' => true,
+            'reviews' => $formattedReviews
+        ]);
+    }
 }

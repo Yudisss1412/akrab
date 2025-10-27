@@ -657,6 +657,10 @@ Route::get('/penjual/pesanan', [App\Http\Controllers\Seller\SellerOrderControlle
 Route::get('/penjual/pesanan/recent', [App\Http\Controllers\Seller\SellerOrderController::class, 'getRecentOrders'])->name('penjual.pesanan.recent');
 Route::get('/penjual/riwayat-penjualan', [App\Http\Controllers\Seller\SellerOrderController::class, 'salesHistory'])->name('penjual.riwayat.penjualan');
 Route::get('/penjual/urgent-tasks', [App\Http\Controllers\Seller\SellerOrderController::class, 'getUrgentTasks'])->name('penjual.urgent.tasks');
+Route::get('/penjual/komplain-retur', [App\Http\Controllers\Seller\SellerOrderController::class, 'complaintsAndReturns'])->name('penjual.komplain.retur');
+Route::post('/api/returns/{id}/approve', [App\Http\Controllers\Seller\SellerOrderController::class, 'approveReturn'])->name('api.returns.approve');
+Route::post('/api/returns/{id}/reject', [App\Http\Controllers\Seller\SellerOrderController::class, 'rejectReturn'])->name('api.returns.reject');
+Route::post('/api/returns/{id}/complete', [App\Http\Controllers\Seller\SellerOrderController::class, 'completeReturn'])->name('api.returns.complete');
 
 Route::get('/penjual/saldo', function () {
     return view('penjual.saldo_penarikan');

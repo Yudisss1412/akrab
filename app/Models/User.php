@@ -141,4 +141,22 @@ class User extends Authenticatable
     {
         return $this->role ? $this->role->name : 'No Role';
     }
+
+    // Relasi ke tiket yang dibuat oleh user
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class, 'user_id');
+    }
+
+    // Relasi ke tiket terbuka milik user
+    public function openTickets()
+    {
+        return $this->hasMany(Ticket::class, 'user_id')->where('status', 'open');
+    }
+
+    // Fungsi untuk mendapatkan tiket terbaru
+    public function recentTickets($limit = 5)
+    {
+        return $this->hasMany(Ticket::class, 'user_id')->latest()->limit($limit);
+    }
 }

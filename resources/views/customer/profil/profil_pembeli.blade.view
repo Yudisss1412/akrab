@@ -69,6 +69,10 @@
           <i class="bi bi-chat-left-text"></i>
           <span>Ulasan Saya</span>
         </a>
+        <a href="{{ route('customer.tickets') }}" class="nav-item">
+          <i class="bi bi-ticket-detailed"></i>
+          <span>Tiket Bantuan</span>
+        </a>
         <a href="#" class="nav-item" data-target="account-settings">
           <i class="bi bi-gear"></i>
           <span>Pengaturan Akun</span>

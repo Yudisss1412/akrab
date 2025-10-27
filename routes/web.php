@@ -209,6 +209,22 @@ Route::view('/halaman-ulasan', 'customer.koleksi.halaman_ulasan')->name('halaman
 // API endpoint for fetching user's reviews
 Route::get('/api/user-reviews', [App\Http\Controllers\ReviewController::class, 'getUserReviews'])->name('api.user_reviews');
 
+// API endpoints for tickets
+Route::get('/api/tickets', [App\Http\Controllers\TicketController::class, 'apiGetTickets'])->name('api.tickets');
+Route::post('/api/tickets/{id}/replies', function ($id) {
+    // In a real implementation, this would store ticket replies
+    // For now, we return a success response
+    return response()->json(['success' => true, 'message' => 'Balasan berhasil ditambahkan']);
+})->name('api.tickets.replies');
+Route::get('/api/staff', function () {
+    // Return staff/admin users for ticket assignment
+    $staff = \App\Models\User::whereHas('role', function($query) {
+        $query->whereIn('name', ['admin', 'staff', 'support']);
+    })->get(['id', 'name']);
+    
+    return response()->json(['staff' => $staff]);
+})->name('api.staff');
+
 // API endpoint for updating user's review
 Route::put('/api/reviews/{reviewId}', [App\Http\Controllers\ReviewController::class, 'updateReview'])->name('api.update_review');
 
@@ -582,18 +598,17 @@ Route::put('/admin/profil/update', function () {
 })->name('profil.admin.update');
 
 // Admin dashboard related routes
-Route::get('/reports/violations', function () {
-    return '<h1>Daftar Laporan Pelanggaran Penjual</h1><p>Halaman ini menampilkan daftar laporan pelanggaran dari penjual.</p>';
-})->name('reports.violations');
+Route::middleware(['auth', 'admin.role'])->group(function () {
+    Route::get('/support/tickets', [App\Http\Controllers\TicketController::class, 'index'])->name('support.tickets');
+    Route::get('/support/tickets/{id}', [App\Http\Controllers\TicketController::class, 'show'])->name('support.tickets.detail');
+    Route::post('/support/tickets/{id}/update-status', [App\Http\Controllers\TicketController::class, 'updateStatus'])->name('support.tickets.update-status');
+});
 
-Route::get('/support/tickets', function () {
-    return '<h1>Daftar Tiket Bantahan</h1><p>Halaman ini menampilkan daftar tiket bantuan dari pengguna.</p>';
-})->name('support.tickets');
-
-Route::get('/withdrawal/requests', function () {
-    return '<h1>Daftar Permintaan Penarikan Dana</h1><p>Halaman ini menampilkan daftar permintaan penarikan dana dari 
-penjual.</p>';
-})->name('withdrawal.requests');
+Route::middleware(['auth', 'admin.role'])->group(function () {
+    Route::get('/withdrawal/requests', function () {
+        return view('admin.withdrawal_requests');
+    })->name('withdrawal.requests');
+});
 
 
 
@@ -609,18 +624,6 @@ Route::get('/reports/violations', [App\Http\Controllers\Admin\ReportsController:
 Route::get('/reports/violations/{id}', [App\Http\Controllers\Admin\ReportsController::class, 'show'])->name('reports.violations.detail');
 Route::put('/reports/violations/{id}/status', [App\Http\Controllers\Admin\ReportsController::class, 'updateStatus'])->name('reports.violations.update_status');
 Route::get('/reports/violations/filter', [App\Http\Controllers\Admin\ReportsController::class, 'filter'])->name('reports.violations.filter');
-
-Route::get('/support/tickets', function () {
-    return view('admin.support_tickets');
-})->name('support.tickets');
-
-Route::get('/support/tickets/{id}', function ($id) {
-    return view('admin.ticket_detail', ['ticketId' => $id]);
-})->name('support.tickets.detail');
-
-Route::get('/withdrawal/requests', function () {
-    return view('admin.withdrawal_requests');
-})->name('withdrawal.requests');
 
 // Product Management Routes
 Route::get('/admin/produk', function () {
@@ -773,6 +776,11 @@ Route::middleware(['auth', 'customer.role'])->group(function () {
     Route::get('/customer/dashboard', [App\Http\Controllers\RoleDashboardController::class, 
 'showCustomerDashboard'])->name('customer.dashboard');
     Route::get('/customer/riwayat-pesanan', [App\Http\Controllers\OrderHistoryController::class, 'index'])->name('customer.order.history');
+    
+    // Customer ticket routes
+    Route::get('/customer/tickets', [App\Http\Controllers\TicketController::class, 'getTicketsByUser'])->name('customer.tickets');
+    Route::get('/tickets/create', [App\Http\Controllers\TicketController::class, 'create'])->name('tickets.create');
+    Route::post('/tickets', [App\Http\Controllers\TicketController::class, 'store'])->name('tickets.store');
 });
 
 // Authentication Routes

@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Detail Tiket Bantuan - Tidak Bisa Melakukan Penarikan Dana - #12345 - AKRAB')
+@section('title', 'Detail Tiket Bantuan - ' . $ticket->subject . ' - #' . str_pad($ticket->id, 6, '0', STR_PAD_LEFT) . ' - AKRAB')
 
 @push('styles')
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -329,39 +329,54 @@
           <!-- Main Content -->
           <div class="main-content">
             <div class="ticket-header">
-              <h2 style="margin: 0; font-size: 1.5rem;">Tidak Bisa Melakukan Penarikan Dana - #12345</h2>
+              <h2 style="margin: 0; font-size: 1.5rem;">{{ $ticket->subject }} - #{{ str_pad($ticket->id, 6, '0', STR_PAD_LEFT) }}</h2>
               <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
-                <div class="status-badge status-new">Baru</div>
-                <div class="priority-badge priority-high">Tinggi</div>
+                <div class="status-badge 
+                  @if($ticket->status === 'open') status-new
+                  @elseif($ticket->status === 'in_progress') status-processing
+                  @elseif($ticket->status === 'resolved') status-completed
+                  @elseif($ticket->status === 'closed') status-completed
+                  @else status-new @endif">
+                  {{ ucfirst(str_replace('_', ' ', $ticket->status)) }}
+                </div>
+                <div class="priority-badge 
+                  @if($ticket->priority === 'low') priority-low
+                  @elseif($ticket->priority === 'medium') priority-medium
+                  @elseif($ticket->priority === 'high') priority-high
+                  @else priority-high @endif">
+                  {{ ucfirst($ticket->priority) }}
+                </div>
               </div>
             </div>
             
             <div class="ticket-info">
               <div class="info-row">
                 <div class="info-label">Tanggal Dibuat:</div>
-                <div class="info-value">28 September 2023, 14:30 WIB</div>
+                <div class="info-value">{{ $ticket->created_at->format('d M Y, H:i') }} WIB</div>
               </div>
               <div class="info-row">
                 <div class="info-label">Terakhir Diperbarui:</div>
-                <div class="info-value">28 September 2023, 14:30 WIB</div>
+                <div class="info-value">{{ $ticket->updated_at->format('d M Y, H:i') }} WIB</div>
               </div>
               <div class="info-row">
                 <div class="info-label">Status:</div>
                 <div class="info-value">
-                  <select class="status-select">
-                    <option value="new" selected>Baru</option>
-                    <option value="processing">Sedang Diproses</option>
-                    <option value="completed">Selesai</option>
+                  <select class="status-select" onchange="updateTicketStatus({{ $ticket->id }}, this.value)">
+                    <option value="open" {{ $ticket->status === 'open' ? 'selected' : '' }}>Dibuka</option>
+                    <option value="in_progress" {{ $ticket->status === 'in_progress' ? 'selected' : '' }}>Sedang Diproses</option>
+                    <option value="resolved" {{ $ticket->status === 'resolved' ? 'selected' : '' }}>Diselesaikan</option>
+                    <option value="closed" {{ $ticket->status === 'closed' ? 'selected' : '' }}>Ditutup</option>
                   </select>
                 </div>
               </div>
               <div class="info-row">
                 <div class="info-label">Prioritas:</div>
                 <div class="info-value">
-                  <select class="priority-select">
-                    <option value="low">Rendah</option>
-                    <option value="medium">Sedang</option>
-                    <option value="high" selected>Tinggi</option>
+                  <select class="priority-select" onchange="updateTicketPriority({{ $ticket->id }}, this.value)">
+                    <option value="low" {{ $ticket->priority === 'low' ? 'selected' : '' }}>Rendah</option>
+                    <option value="medium" {{ $ticket->priority === 'medium' ? 'selected' : '' }}>Menengah</option>
+                    <option value="high" {{ $ticket->priority === 'high' ? 'selected' : '' }}>Tinggi</option>
+                    <option value="urgent" {{ $ticket->priority === 'urgent' ? 'selected' : '' }}>Darurat</option>
                   </select>
                 </div>
               </div>
@@ -369,15 +384,19 @@
             
             <div class="chat-container" id="chatContainer">
               <div class="message user">
-                <div class="message-sender">Warung Online (Penjual)</div>
-                <div class="message-text">Saya tidak bisa melakukan penarikan dana dari akun saya. Setiap kali saya mencoba menarik dana, muncul pesan error bahwa saldo tidak mencukupi, padahal saya melihat saldo saya cukup.</div>
-                <div class="message-time">28 Sep 2023, 14:32 WIB</div>
+                <div class="message-sender">{{ $ticket->user->name ?? 'User Tidak Dikenal' }} (Pengirim Tiket)</div>
+                <div class="message-text">{{ $ticket->message }}</div>
+                <div class="message-time">{{ $ticket->created_at->format('d M Y, H:i') }} WIB</div>
               </div>
+              @if($ticket->resolution_notes)
               <div class="message admin">
-                <div class="message-sender">Tim Bantuan AKRAB</div>
-                <div class="message-text">Terima kasih telah menghubungi kami. Kami akan mengecek akun Anda dan segera memberikan solusi.</div>
-                <div class="message-time">28 Sep 2023, 14:35 WIB</div>
+                <div class="message-sender">Catatan Penyelesaian</div>
+                <div class="message-text">{{ $ticket->resolution_notes }}</div>
+                <div class="message-time">{{ $ticket->resolved_at ? $ticket->resolved_at->format('d M Y, H:i') : $ticket->updated_at->format('d M Y, H:i') }} WIB</div>
               </div>
+              @endif
+              
+              <!-- Pesan dinamis akan dimuat melalui JavaScript -->
             </div>
             
             <div class="reply-form">
@@ -421,31 +440,28 @@
               <h3 class="sidebar-title">Informasi Pengguna</h3>
               <div class="info-row">
                 <div class="info-label">Nama:</div>
-                <div class="info-value">Warung Online</div>
+                <div class="info-value">{{ $ticket->user->name ?? 'N/A' }}</div>
               </div>
               <div class="info-row">
                 <div class="info-label">Email:</div>
-                <div class="info-value">warungonline@example.com</div>
+                <div class="info-value">{{ $ticket->user->email ?? 'N/A' }}</div>
               </div>
               <div class="info-row">
-                <div class="info-label">ID Penjual:</div>
-                <div class="info-value">SLR-001234</div>
+                <div class="info-label">ID User:</div>
+                <div class="info-value">USR-{{ str_pad($ticket->user->id ?? 0, 6, '0', STR_PAD_LEFT) }}</div>
               </div>
               <div class="info-row" style="margin-top: 1rem;">
-                <a href="#" class="user-link">Lihat Profil Penjual</a>
-              </div>
-              <div class="info-row">
-                <a href="#" class="user-link">Lihat Riwayat Transaksi</a>
+                <a href="#" class="user-link">Lihat Profil Pengguna</a>
               </div>
             </div>
             
             <div class="sidebar-section">
               <h3 class="sidebar-title">Aksi Tiket</h3>
               <div class="action-buttons">
-                <button class="btn-action btn-primary">Kirim Balasan</button>
-                <button class="btn-action">Tambahkan Catatan Internal</button>
-                <button class="btn-action">Tandai Sebagai Penipuan</button>
-                <button class="btn-action">Tutup Tiket</button>
+                <button class="btn-action btn-primary" onclick="sendReply()">Kirim Balasan</button>
+                <button class="btn-action" onclick="updateTicketStatus({{ $ticket->id }}, 'in_progress')">Tandai Sedang Diproses</button>
+                <button class="btn-action" onclick="updateTicketStatus({{ $ticket->id }}, 'resolved')">Tandai Selesai</button>
+                <button class="btn-action" onclick="updateTicketStatus({{ $ticket->id }}, 'closed')">Tutup Tiket</button>
               </div>
             </div>
             
@@ -453,17 +469,21 @@
               <h3 class="sidebar-title">Riwayat Tiket</h3>
               <ul class="ticket-log">
                 <li class="log-item">
-                  <div class="log-time">28 Sep 14:30 WIB</div>
-                  <div class="log-message">Tiket dibuat oleh Warung Online</div>
+                  <div class="log-time">{{ $ticket->created_at->format('d M H:i') }} WIB</div>
+                  <div class="log-message">Tiket dibuat oleh {{ $ticket->user->name ?? 'User' }}</div>
                 </li>
+                @if($ticket->assignee)
                 <li class="log-item">
-                  <div class="log-time">28 Sep 14:32 WIB</div>
-                  <div class="log-message">Status diubah dari Baru menjadi Sedang Diproses oleh Admin</div>
+                  <div class="log-time">{{ $ticket->updated_at->format('d M H:i') }} WIB</div>
+                  <div class="log-message">Ditugaskan ke {{ $ticket->assignee->name ?? 'Staff' }}</div>
                 </li>
+                @endif
+                @if($ticket->resolution_notes)
                 <li class="log-item">
-                  <div class="log-time">28 Sep 14:35 WIB</div>
-                  <div class="log-message">Balasan dikirim oleh Tim Bantuan</div>
+                  <div class="log-time">{{ $ticket->resolved_at ? $ticket->resolved_at->format('d M H:i') : $ticket->updated_at->format('d M H:i') }} WIB</div>
+                  <div class="log-message">Catatan penyelesaian ditambahkan</div>
                 </li>
+                @endif
               </ul>
             </div>
           </div>
@@ -475,6 +495,18 @@
   @include('components.admin_penjual.footer')
 
   <script>
+    // Load ticket messages from API when page loads
+    $(document).ready(function() {
+      loadTicketMessages({{ $ticket->id }});
+    });
+    
+    // Function to load ticket messages
+    function loadTicketMessages(ticketId) {
+      // In a real implementation, this would load messages from the API
+      // For now, we'll just keep the original ticket message
+      console.log('Loading messages for ticket ID:', ticketId);
+    }
+    
     // Function to send reply
     function sendReply() {
       const replyText = document.getElementById('replyMessage').value;
@@ -483,7 +515,8 @@
         return;
       }
       
-      // Add the reply to the conversation
+      // In a real implementation, this would make an AJAX call to store the reply
+      // For now, we'll just add it to the conversation view
       const chatContainer = document.getElementById('chatContainer');
       const now = new Date();
       const timeString = now.toLocaleDateString('id-ID', { 
@@ -499,17 +532,61 @@
       replyDiv.className = 'message admin';
       replyDiv.innerHTML = `
         <div class="message-sender">Tim Bantuan AKRAB</div>
-        <div class="message-text">${replyText}</div>
-        <div class="message-time">${timeString}</div>
+        <div class="message-text">\${replyText}</div>
+        <div class="message-time">\${timeString}</div>
       `;
       
-      chatContainer.appendChild(replyDiv);
+      // Insert before the "Pesan dinamis akan dimuat" comment
+      const lastChild = chatContainer.lastChild;
+      chatContainer.insertBefore(replyDiv, lastChild.previousSibling);
       
       // Clear the reply textbox
       document.getElementById('replyMessage').value = '';
       
       // Scroll to the bottom
       chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+    
+    // Function to update ticket status
+    function updateTicketStatus(ticketId, newStatus) {
+      // In a real implementation, this would make an AJAX call to update the status
+      // For demo purposes, we'll just log the action
+      console.log(`Status tiket \${ticketId} diubah menjadi \${newStatus}`);
+      
+      // Update the status visually
+      const statusBadge = document.querySelector('.status-badge');
+      statusBadge.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+      
+      // Change badge class based on status
+      statusBadge.className = 'status-badge';
+      if(newStatus === 'open' || newStatus === 'new') {
+        statusBadge.classList.add('status-new');
+      } else if(newStatus === 'in_progress' || newStatus === 'processing') {
+        statusBadge.classList.add('status-processing');
+      } else if(newStatus === 'resolved' || newStatus === 'closed' || newStatus === 'completed') {
+        statusBadge.classList.add('status-completed');
+      }
+    }
+    
+    // Function to update ticket priority
+    function updateTicketPriority(ticketId, newPriority) {
+      // In a real implementation, this would make an AJAX call to update the priority
+      // For demo purposes, we'll just log the action
+      console.log(`Prioritas tiket \${ticketId} diubah menjadi \${newPriority}`);
+      
+      // Update the priority visually
+      const priorityBadge = document.querySelector('.priority-badge');
+      priorityBadge.textContent = newPriority.charAt(0).toUpperCase() + newPriority.slice(1);
+      
+      // Change badge class based on priority
+      priorityBadge.className = 'priority-badge';
+      if(newPriority === 'low') {
+        priorityBadge.classList.add('priority-low');
+      } else if(newPriority === 'medium') {
+        priorityBadge.classList.add('priority-medium');
+      } else if(newPriority === 'high' || newPriority === 'urgent') {
+        priorityBadge.classList.add('priority-high');
+      }
     }
     
     // Function for canned responses

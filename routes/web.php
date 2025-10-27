@@ -602,6 +602,7 @@ Route::middleware(['auth', 'admin.role'])->group(function () {
     Route::get('/support/tickets', [App\Http\Controllers\TicketController::class, 'index'])->name('support.tickets');
     Route::get('/support/tickets/{id}', [App\Http\Controllers\TicketController::class, 'show'])->name('support.tickets.detail');
     Route::post('/support/tickets/{id}/update-status', [App\Http\Controllers\TicketController::class, 'updateStatus'])->name('support.tickets.update-status');
+    Route::get('/api/tickets/{id}/messages', [App\Http\Controllers\TicketController::class, 'getTicketMessages'])->name('api.tickets.messages');
 });
 
 Route::middleware(['auth', 'admin.role'])->group(function () {

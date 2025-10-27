@@ -103,4 +103,36 @@ class TicketController extends Controller
 
         return response()->json(['tickets' => $tickets]);
     }
+    
+    public function getTicketMessages($id)
+    {
+        // Untuk sekarang, karena belum ada model pesan tiket, kita hanya kembalikan tiket asli
+        // di masa depan bisa ditambah dengan model pesan terpisah untuk komunikasi tiket
+        $ticket = Ticket::with('user')->findOrFail($id);
+        
+        // Format data sebagai message untuk konsistensi
+        $messages = [
+            [
+                'id' => $ticket->id,
+                'message' => $ticket->message,
+                'sender_id' => $ticket->user_id,
+                'sender_name' => $ticket->user->name ?? 'N/A',
+                'created_at' => $ticket->created_at->format('d M Y, H:i'),
+                'is_ticket_message' => true
+            ]
+        ];
+        
+        if($ticket->resolution_notes) {
+            $messages[] = [
+                'id' => 'resolution-'.$ticket->id,
+                'message' => $ticket->resolution_notes,
+                'sender_id' => $ticket->assignee_id ?? null,
+                'sender_name' => $ticket->assignee->name ?? 'System',
+                'created_at' => $ticket->resolved_at ? $ticket->resolved_at->format('d M Y, H:i') : $ticket->updated_at->format('d M Y, H:i'),
+                'is_resolution_note' => true
+            ];
+        }
+        
+        return response()->json(['messages' => $messages]);
+    }
 }

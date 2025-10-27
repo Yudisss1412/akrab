@@ -292,10 +292,17 @@
             <div class="detail-header">
               <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
-                  <h2 style="margin: 0; font-size: 1.5rem;">Laporan Pelanggaran #{{ $reportId ?? 'VR-XXXX-XX-XX-XXX' }}</h2>
-                  <p style="margin: 0.25rem 0 0; opacity: 0.9;">Dilaporkan pada 15 Juni 2023</p>
+                  <h2 style="margin: 0; font-size: 1.5rem;">Laporan Pelanggaran #{{ $report->report_number }}</h2>
+                  <p style="margin: 0.25rem 0 0; opacity: 0.9;">Dilaporkan pada {{ $report->created_at->format('d M Y') }}</p>
                 </div>
-                <span class="status-badge status-pending">Pending</span>
+                <span class="status-badge 
+                  @if($report->status === 'pending') status-pending
+                  @elseif($report->status === 'investigating') status-investigating
+                  @elseif($report->status === 'resolved') status-resolved
+                  @elseif($report->status === 'dismissed') status-dismissed
+                  @else status-pending @endif">
+                  {{ ucfirst(str_replace('_', ' ', $report->status)) }}
+                </span>
               </div>
             </div>
             
@@ -305,17 +312,17 @@
               <div class="info-grid">
                 <div class="info-card">
                   <div class="info-label">ID Laporan</div>
-                  <div class="info-value">{{ $reportId ?? 'VR-XXXX-XX-XX-XXX' }}</div>
+                  <div class="info-value">{{ $report->report_number }}</div>
                 </div>
                 
                 <div class="info-card">
                   <div class="info-label">Status</div>
-                  <div class="info-value">Baru</div>
+                  <div class="info-value">{{ ucfirst(str_replace('_', ' ', $report->status)) }}</div>
                 </div>
                 
                 <div class="info-card">
                   <div class="info-label">Tanggal Laporan</div>
-                  <div class="info-value">15 Juni 2023</div>
+                  <div class="info-value">{{ $report->created_at->format('d M Y H:i') }}</div>
                 </div>
               </div>
               
@@ -324,77 +331,101 @@
               <div class="info-grid">
                 <div class="info-card">
                   <div class="info-label">Pelapor</div>
-                  <div class="info-value">Budi Santoso</div>
+                  <div class="info-value">{{ $report->reporter->name ?? 'Tidak Ditemukan' }}</div>
                   <div class="info-label" style="margin-top: 0.5rem;">Email</div>
-                  <div class="info-value">budi.santoso@email.com</div>
+                  <div class="info-value">{{ $report->reporter->email ?? 'Tidak Tersedia' }}</div>
                   <div class="info-label" style="margin-top: 0.5rem;">ID Pengguna</div>
-                  <div class="info-value">USR-001234</div>
+                  <div class="info-value">USR-{{ $report->reporter->id ?? '000000' }}</div>
                 </div>
                 
                 <div class="info-card">
                   <div class="info-label">Penjual Terlapor</div>
-                  <div class="info-value">Toko Sejahtera</div>
+                  <div class="info-value">{{ $report->violator->name ?? 'Tidak Ditemukan' }}</div>
                   <div class="info-label" style="margin-top: 0.5rem;">Email</div>
-                  <div class="info-value">tokosejahtera@umkm.com</div>
+                  <div class="info-value">{{ $report->violator->email ?? 'Tidak Tersedia' }}</div>
                   <div class="info-label" style="margin-top: 0.5rem;">ID Penjual</div>
-                  <div class="info-value">SLR-005678</div>
+                  <div class="info-value">SLR-{{ $report->violator->id ?? '000000' }}</div>
                 </div>
                 
                 <div class="info-card">
                   <div class="info-label">Produk Terkait</div>
-                  <div class="info-value">Kaos Original Branded</div>
+                  <div class="info-value">{{ $report->product->name ?? 'Tidak Ada Produk Terkait' }}</div>
                   <div class="info-label" style="margin-top: 0.5rem;">ID Produk</div>
-                  <div class="info-value">PRD-009876</div>
+                  <div class="info-value">{{ $report->product ? 'PRD-'.$report->product->id : 'Tidak Tersedia' }}</div>
                   <div class="info-label" style="margin-top: 0.5rem;">Kategori</div>
-                  <div class="info-value">Fashion</div>
+                  <div class="info-value">{{ $report->product->category->name ?? 'Tidak Tersedia' }}</div>
+                </div>
+              </div>
+              
+              <!-- Detail Jenis dan Deskripsi Pelanggaran -->
+              <h3 class="section-title">Jenis dan Deskripsi Pelanggaran</h3>
+              <div class="info-grid">
+                <div class="info-card">
+                  <div class="info-label">Jenis Pelanggaran</div>
+                  <div class="info-value">{{ ucfirst(str_replace('_', ' ', $report->violation_type)) }}</div>
+                </div>
+                
+                <div class="info-card" style="grid-column: span 2;">
+                  <div class="info-label">Deskripsi Pelanggaran</div>
+                  <div class="info-value">{{ $report->description }}</div>
                 </div>
               </div>
               
               <!-- Riwayat Pelanggaran Penjual -->
               <h3 class="section-title">Riwayat Pelanggaran Penjual</h3>
+              @php
+                $violations = \App\Models\Models\ViolationReport::where('violator_user_id', $report->violator->id)
+                  ->where('id', '!=', $report->id) // Exclude current report
+                  ->orderBy('created_at', 'desc')
+                  ->limit(5)
+                  ->get();
+              @endphp
+              @if($violations->count() > 0)
               <div class="violation-history">
+                @foreach($violations as $violation)
                 <div class="history-item">
                   <div style="display: flex; justify-content: space-between;">
                     <div>
-                      <strong>Produk Palsu - Sepatu Branded</strong>
-                      <div style="font-size: 0.9rem; color: var(--muted);">Dilaporkan: 12 Juni 2023</div>
+                      <strong>{{ ucfirst(str_replace('_', ' ', $violation->violation_type)) }} - {{ $violation->product->name ?? 'Produk Tidak Ditemukan' }}</strong>
+                      <div style="font-size: 0.9rem; color: var(--muted);">Dilaporkan: {{ $violation->created_at->format('d M Y') }}</div>
                     </div>
-                    <span class="status-badge status-resolved">Diselesaikan</span>
+                    <span class="status-badge 
+                      @if($violation->status === 'pending') status-pending
+                      @elseif($violation->status === 'investigating') status-investigating
+                      @elseif($violation->status === 'resolved') status-resolved
+                      @elseif($violation->status === 'dismissed') status-dismissed
+                      @else status-pending @endif">
+                      {{ ucfirst(str_replace('_', ' ', $violation->status)) }}
+                    </span>
                   </div>
-                  <div style="margin-top: 0.5rem; font-size: 0.9rem;">Penjual diberi peringatan dan produk dinonaktifkan.</div>
+                  <div style="margin-top: 0.5rem; font-size: 0.9rem;">{{ Str::limit($violation->description, 100) }}</div>
                 </div>
-                <div class="history-item">
-                  <div style="display: flex; justify-content: space-between;">
-                    <div>
-                      <strong>Deskripsi Menyesatkan - Jam Tangan</strong>
-                      <div style="font-size: 0.9rem; color: var(--muted);">Dilaporkan: 5 Juni 2023</div>
-                    </div>
-                    <span class="status-badge status-resolved">Diselesaikan</span>
-                  </div>
-                  <div style="margin-top: 0.5rem; font-size: 0.9rem;">Penjual diberi peringatan dan deskripsi produk diperbaiki.</div>
-                </div>
+                @endforeach
               </div>
+              @else
+              <div class="info-card">
+                <div class="info-label">Tidak ada riwayat pelanggaran sebelumnya</div>
+                <div class="info-value">Penjual ini belum pernah dilaporkan sebelumnya</div>
+              </div>
+              @endif
               
               <!-- Bukti Laporan -->
               <h3 class="section-title">Bukti Laporan</h3>
+              @if($report->evidence && is_array($report->evidence) && count($report->evidence) > 0)
               <div class="evidence-grid">
+                @foreach($report->evidence as $evidence)
                 <div class="evidence-item">
-                  <img src="https://via.placeholder.com/200x150/cccccc/666666.png?text=Gambar+1" alt="Bukti Gambar" class="evidence-img">
-                  <div class="evidence-desc">Gambar produk palsu</div>
+                  <img src="{{ asset('storage/' . $evidence) }}" alt="Bukti Gambar" class="evidence-img" onerror="this.onerror=null; this.src='{{ asset('src/placeholder_produk.png') }}';">
+                  <div class="evidence-desc">Bukti pelanggaran</div>
                 </div>
-                <div class="evidence-item">
-                  <img src="https://via.placeholder.com/200x150/cccccc/666666.png?text=Gambar+2" alt="Bukti Gambar" class="evidence-img">
-                  <div class="evidence-desc">Perbandingan produk asli vs palsu</div>
-                </div>
-                <div class="evidence-item">
-                  <img src="https://via.placeholder.com/200x150/cccccc/666666.png?text=Gambar+3" alt="Bukti Gambar" class="evidence-img">
-                  <div class="evidence-desc">Screenshot deskripsi produk</div>
-                </div>
-                <div class="evidence-item">
-                  <img src="https://via.placeholder.com/200x150/cccccc/666666.png?text=Gambar+4" alt="Bukti Gambar" class="evidence-img">
-                  <div class="evidence-desc">Screenshot pembayaran</div>
-                </div>
+                @endforeach
               </div>
+              @else
+              <div class="info-card">
+                <div class="info-label">Tidak ada bukti dilampirkan</div>
+                <div class="info-value">Pelapor tidak menyertakan bukti pelanggaran</div>
+              </div>
+              @endif
             </div>
           </div>
           
@@ -464,7 +495,7 @@
     });
     
     // Handle form submission
-    document.getElementById('confirmAction').addEventListener('click', function() {
+    document.getElementById('confirmAction').addEventListener('click', async function() {
       const actionType = document.getElementById('actionType').value;
       const actionMessage = document.getElementById('actionMessage');
       
@@ -479,8 +510,57 @@
         return;
       }
       
-      // In a real application, this would submit the action to the server
-      alert(`Tindakan "${actionType}" berhasil dikirimkan. Laporan akan diperbarui sesuai dengan tindakan yang dipilih.`);
+      // Determine status based on action
+      let status = 'investigating';
+      let resolution = null;
+      
+      switch(actionType) {
+        case 'reject':
+          status = 'dismissed';
+          break;
+        case 'warning':
+        case 'deactivate':
+          status = 'resolved';
+          resolution = 'warning';
+          break;
+        case 'suspend_temp':
+          status = 'resolved';
+          resolution = 'suspension';
+          break;
+        case 'suspend_perm':
+          status = 'resolved';
+          resolution = 'permanent_ban';
+          break;
+      }
+      
+      try {
+        const response = await fetch(`/reports/violations/{{ $report->id }}/status`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          },
+          body: JSON.stringify({
+            status: status,
+            admin_notes: actionMessage.value.trim() || `Tindakan diambil: ${actionType}`,
+            resolution: resolution
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          alert(`Tindakan "${actionType}" berhasil dikirimkan. Laporan telah diperbarui.`);
+          // Reload the page to show updated status
+          location.reload();
+        } else {
+          alert('Gagal mengirim tindakan: ' + (data.message || 'Unknown error'));
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Terjadi kesalahan saat mengirim tindakan');
+      }
     });
   </script>
 @endsection

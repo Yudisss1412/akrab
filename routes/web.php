@@ -605,13 +605,10 @@ Route::get('/send/announcement', function () {
     return '<h1>Kirim Pengumuman</h1><p>Halaman untuk mengirim pengumuman ke pengguna.</p>';
 })->name('send.announcement');
 
-Route::get('/reports/violations', function () {
-    return view('admin.reports_violations');
-})->name('reports.violations');
-
-Route::get('/reports/violations/{id}', function ($id) {
-    return view('admin.report_detail', ['reportId' => $id]);
-})->name('reports.violations.detail');
+Route::get('/reports/violations', [App\Http\Controllers\Admin\ReportsController::class, 'index'])->name('reports.violations');
+Route::get('/reports/violations/{id}', [App\Http\Controllers\Admin\ReportsController::class, 'show'])->name('reports.violations.detail');
+Route::put('/reports/violations/{id}/status', [App\Http\Controllers\Admin\ReportsController::class, 'updateStatus'])->name('reports.violations.update_status');
+Route::get('/reports/violations/filter', [App\Http\Controllers\Admin\ReportsController::class, 'filter'])->name('reports.violations.filter');
 
 Route::get('/support/tickets', function () {
     return view('admin.support_tickets');

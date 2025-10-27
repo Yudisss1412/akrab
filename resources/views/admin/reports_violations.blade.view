@@ -48,6 +48,82 @@
       box-shadow: 0 8px 20px rgba(0,0,0,.05);
     }
     
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    
+    .status-pending {
+      background: rgba(245, 158, 11, 0.1);
+      color: #d97706;
+    }
+    
+    .status-investigating {
+      background: rgba(59, 130, 246, 0.1);
+      color: #2563eb;
+    }
+    
+    .status-resolved {
+      background: rgba(34, 197, 94, 0.1);
+      color: #16a34a;
+    }
+    
+    .status-dismissed {
+      background: rgba(239, 68, 68, 0.1);
+      color: #dc2626;
+    }
+    
+    .pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.5rem;
+    }
+    
+    .pagination-info {
+      color: var(--ak-muted);
+      font-size: 0.875rem;
+    }
+    
+    .pagination-nav {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .pagination-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--ak-border);
+      background: var(--ak-white);
+      border-radius: var(--ak-radius);
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .pagination-btn:hover:not(:disabled) {
+      background: var(--ak-primary);
+      color: white;
+      border-color: var(--ak-primary);
+    }
+    
+    .pagination-btn.active {
+      background: var(--ak-primary);
+      color: white;
+      border-color: var(--ak-primary);
+    }
+    
+    .pagination-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
     table {
       width: 100%;
       border-collapse: collapse;
@@ -294,32 +370,36 @@
               </tr>
             </thead>
             <tbody>
+              @forelse($reports as $report)
               <tr>
-                <td>2023-06-15</td>
-                <td>Produk Palsu</td>
-                <td>Toko Sejahtera</td>
-                <td>Kaos Original Branded</td>
-                <td>Budi Santoso</td>
-                <td><span class="status-badge status-pending">Pending</span></td>
+                <td>{{ $report->created_at->format('Y-m-d') }}</td>
+                <td>{{ ucfirst(str_replace('_', ' ', $report->violation_type)) }}</td>
+                <td>{{ $report->violator->name ?? 'Penjual Tidak Ditemukan' }}</td>
+                <td>{{ $report->product->name ?? 'Tidak Ada Produk Terkait' }}</td>
+                <td>{{ $report->reporter->name ?? 'Pelapor Tidak Ditemukan' }}</td>
+                <td>
+                  <span class="status-badge 
+                    @if($report->status === 'pending') status-pending
+                    @elseif($report->status === 'investigating') status-investigating
+                    @elseif($report->status === 'resolved') status-resolved
+                    @elseif($report->status === 'dismissed') status-dismissed
+                    @else status-pending @endif">
+                    {{ ucfirst(str_replace('_', ' ', $report->status)) }}
+                  </span>
+                </td>
                 <td class="action-buttons">
-                  <a href="{{ route('reports.violations.detail', ['id' => 'VR-2023-06-15-001']) }}" class="btn-action btn-view">Lihat</a>
-                  <button class="btn-action btn-resolve">Selesaikan</button>
+                  <a href="{{ route('reports.violations.detail', $report->id) }}" class="btn-action btn-view">Lihat</a>
+                  @if($report->status === 'pending' || $report->status === 'investigating')
+                  <button class="btn-action btn-resolve" onclick="updateReportStatus({{ $report->id }})">Selesaikan</button>
+                  @endif
                 </td>
               </tr>
+              @empty
               <tr>
-                <td>2023-06-14</td>
-                <td>Konten Tidak Pantas</td>
-                <td>Warung Online</td>
-                <td>Stiker Lucu</td>
-                <td>Siti Aminah</td>
-                <td><span class="status-badge status-verified">Terverifikasi</span></td>
-                <td class="action-buttons">
-                  <a href="{{ route('reports.violations.detail', ['id' => 'VR-2023-06-14-002']) }}" class="btn-action btn-view">Lihat</a>
-                  <button class="btn-action btn-resolve">Selesaikan</button>
-                </td>
+                <td colspan="7" style="text-align: center; padding: 2rem;">Tidak ada laporan pelanggaran ditemukan</td>
               </tr>
-              <tr>
-                <td>2023-06-13</td>
+              @endforelse
+            </tbody>
                 <td>Penipuan</td>
                 <td>Elektronik Murah</td>
                 <td>Handphone Second</td>
@@ -1015,6 +1095,43 @@
         showPage(currentPage);
       });
     });
+    
+    // Function to update report status
+    async function updateReportStatus(reportId) {
+      // In a real implementation, this would open a modal to update the status
+      // For now, we'll simulate with a simple prompt
+      const status = prompt('Masukkan status baru untuk laporan (pending, investigating, resolved, dismissed):', 'resolved');
+      
+      if (status) {
+        try {
+          const response = await fetch(`/reports/violations/${reportId}/status`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+              status: status,
+              admin_notes: 'Laporan diproses oleh admin'
+            })
+          });
+          
+          const data = await response.json();
+          
+          if (data.success) {
+            alert('Status laporan berhasil diperbarui');
+            // Reload the page to show updated status
+            location.reload();
+          } else {
+            alert('Gagal memperbarui status laporan: ' + (data.message || 'Unknown error'));
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Terjadi kesalahan saat memperbarui status laporan');
+        }
+      }
+    }
     
     // Action buttons
     document.querySelectorAll('.btn-action').forEach(button => {

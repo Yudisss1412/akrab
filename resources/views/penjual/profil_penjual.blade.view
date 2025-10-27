@@ -71,6 +71,13 @@
         <h2 id="ordersTitle" class="card-title">Riwayat Penjualan</h2>
         <div class="orders-head-hint">Penjualan terbaru dari toko ini</div>
       </div>
+      
+      <!-- Tombol untuk melihat semua riwayat penjualan -->
+      <div class="view-all-btn" style="padding: 1rem; text-align: center; border-top: 1px solid var(--ak-border);">
+        <a href="{{ route('penjual.riwayat.penjualan') }}" class="btn btn-primary" aria-label="Lihat dan kelola semua riwayat penjualan">
+          Lihat & Kelola Semua Riwayat Penjualan →
+        </a>
+      </div>
 
       <!-- viewport: item dipasang DI DALAM elemen ini -->
       <div id="ordersViewport" class="orders-viewport" aria-live="polite">

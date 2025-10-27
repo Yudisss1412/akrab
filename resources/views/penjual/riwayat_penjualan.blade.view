@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <title>Riwayat Penjualan — AKRAB</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ asset('css/admin_penjual/style.css') }}">
+  <style>
+    :root {
+      --ak-primary: #006E5C;
+      --ak-primary-light: #a8d5c9;
+      --ak-white: #FFFFFF;
+      --ak-background: #f0fdfa;
+      --ak-text: #1D232A;
+      --ak-muted: #6b7280;
+      --ak-border: #E5E7EB;
+      --ak-radius: 12px;
+      --ak-space: 16px;
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      color: var(--ak-text);
+      background: var(--ak-background);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .main-layout {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .content-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 0 1.5rem;
+    }
+    
+    /* Page Header */
+    .page-header {
+      background: var(--ak-white);
+      border-radius: var(--ak-radius);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--ak-border);
+    }
+    
+    .page-header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--ak-primary);
+    }
+    
+    .page-actions {
+      margin-top: 1rem;
+    }
+    
+    /* Sales Stats */
+    .sales-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .stat-card {
+      background: var(--ak-white);
+      border-radius: var(--ak-radius);
+      padding: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--ak-border);
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: var(--ak-primary);
+      margin: 0.5rem 0;
+    }
+    
+    .stat-label {
+      color: var(--ak-muted);
+      font-size: 0.875rem;
+    }
+    
+    /* Control Bar */
+    .control-bar {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      background: var(--ak-white);
+      padding: 1rem;
+      border-radius: var(--ak-radius);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--ak-border);
+      flex-wrap: wrap;
+    }
+    
+    .search-box {
+      flex: 1;
+      min-width: 250px;
+      position: relative;
+    }
+    
+    .search-box input {
+      width: 100%;
+      padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+      border: 1px solid var(--ak-border);
+      border-radius: var(--ak-radius);
+      font-size: 0.875rem;
+    }
+    
+    .search-box svg {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      color: var(--ak-muted);
+    }
+    
+    .date-filter {
+      width: 200px;
+    }
+    
+    .date-filter select {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--ak-border);
+      border-radius: var(--ak-radius);
+      font-size: 0.875rem;
+      background-color: var(--ak-white);
+    }
+    
+    /* Sales Cards */
+    .sales-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .sale-card {
+      background: var(--ak-white);
+      border-radius: var(--ak-radius);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--ak-border);
+      overflow: hidden;
+    }
+    
+    .sale-header {
+      padding: 1rem;
+      border-bottom: 1px solid var(--ak-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .sale-id {
+      font-weight: 600;
+      color: var(--ak-primary);
+    }
+    
+    .sale-date {
+      color: var(--ak-muted);
+      font-size: 0.875rem;
+    }
+    
+    .customer-name {
+      font-weight: 500;
+    }
+    
+    .sale-content {
+      padding: 1rem;
+      border-bottom: 1px solid var(--ak-border);
+    }
+    
+    .product-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 0;
+    }
+    
+    .product-thumb {
+      width: 50px;
+      height: 50px;
+      border-radius: 6px;
+      object-fit: cover;
+      background: #f3f4f6;
+    }
+    
+    .product-info {
+      flex: 1;
+    }
+    
+    .product-name {
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+    }
+    
+    .product-quantity {
+      color: var(--ak-muted);
+      font-size: 0.875rem;
+    }
+    
+    .sale-footer {
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .sale-total {
+      font-weight: 600;
+      color: var(--ak-primary);
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .btn {
+      border: 1px solid transparent;
+      border-radius: var(--ak-radius);
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+    
+    .btn-outline {
+      border: 1px solid var(--ak-primary);
+      color: var(--ak-primary);
+      background: transparent;
+    }
+    
+    .btn-outline:hover {
+      background: var(--ak-primary);
+      color: white;
+    }
+    
+    .btn-primary {
+      background: var(--ak-primary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #005a4a;
+    }
+    
+    /* Status Badge */
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    
+    .status-completed {
+      background: rgba(34, 197, 94, 0.1);
+      color: #16a34a;
+    }
+    
+    /* Pagination */
+    .pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.5rem;
+    }
+    
+    .pagination-info {
+      color: var(--ak-muted);
+      font-size: 0.875rem;
+    }
+    
+    .pagination-nav {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .pagination-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--ak-border);
+      background: var(--ak-white);
+      border-radius: var(--ak-radius);
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .pagination-btn:hover {
+      background: var(--ak-primary);
+      color: white;
+      border-color: var(--ak-primary);
+    }
+    
+    .pagination-btn.active {
+      background: var(--ak-primary);
+      color: white;
+      border-color: var(--ak-primary);
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .control-bar {
+        flex-direction: column;
+      }
+      
+      .date-filter {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  @include('components.admin_penjual.header')
+
+  <div class="main-layout">
+    <div class="content-wrapper">
+      <main class="content admin-page-content" role="main">
+        <!-- Page Header -->
+        <section class="page-header">
+          <h1>
+            <a href="{{ route('seller.dashboard') }}" class="btn btn-sm" style="margin-right: 1rem; vertical-align: middle; background: var(--ak-primary); color: white; border: none; width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;">
+              <i class="fas fa-arrow-left"></i>
+            </a>
+            Riwayat Penjualan untuk {{ auth()->user()->name }}
+          </h1>
+          <div class="page-actions">
+            <a href="{{ route('penjual.pesanan') }}" class="btn btn-outline">Kembali ke Manajemen Pesanan</a>
+          </div>
+        </section>
+
+        <!-- Sales Stats -->
+        <div class="sales-stats">
+          <div class="stat-card">
+            <div class="stat-label">Total Penjualan</div>
+            <div class="stat-value">{{ number_format($totalSales, 0, ',', '.') }}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total Transaksi</div>
+            <div class="stat-value">{{ $totalTransactions }}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Pendapatan Bulan Ini</div>
+            <div class="stat-value">Rp {{ number_format($monthlyRevenue, 0, ',', '.') }}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Rata-rata Per Transaksi</div>
+            <div class="stat-value">Rp {{ number_format($avgPerTransaction, 0, ',', '.') }}</div>
+          </div>
+        </div>
+
+        <!-- Control Bar -->
+        <div class="control-bar">
+          <form method="GET" action="{{ route('penjual.riwayat.penjualan') }}" id="filterForm">
+            <div class="search-box">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 10 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <input type="text" name="search" placeholder="Cari riwayat penjualan..." value="{{ request('search') }}">
+            </div>
+            <div class="date-filter">
+              <select name="date_filter" onchange="document.getElementById('filterForm').submit();">
+                <option value="">Filter Tanggal</option>
+                <option value="today" {{ request('date_filter') == 'today' ? 'selected' : '' }}>Hari Ini</option>
+                <option value="this_week" {{ request('date_filter') == 'this_week' ? 'selected' : '' }}>Minggu Ini</option>
+                <option value="this_month" {{ request('date_filter') == 'this_month' ? 'selected' : '' }}>Bulan Ini</option>
+                <option value="this_year" {{ request('date_filter') == 'this_year' ? 'selected' : '' }}>Tahun Ini</option>
+              </select>
+            </div>
+          </form>
+        </div>
+
+        <!-- Sales Container -->
+        <section class="sales-container" id="salesContainer">
+          @forelse($completedOrders as $order)
+          <div class="sale-card">
+            <div class="sale-header">
+              <div>
+                <div class="sale-id">#{{ $order->order_number }}</div>
+                <div class="sale-date">{{ \Carbon\Carbon::parse($order->created_at)->format('d M Y, H:i') }}</div>
+              </div>
+              <div class="customer-name">{{ $order->user->name ?? 'Customer' }}</div>
+            </div>
+            <div class="sale-content">
+              @foreach($order->items as $item)
+              <div class="product-item">
+                <img src="{{ $item->product->image ? asset('storage/' . $item->product->image) : asset('src/placeholder_produk.png') }}" alt="{{ $item->product->name }}" class="product-thumb">
+                <div class="product-info">
+                  <div class="product-name">{{ $item->product->name }}</div>
+                  <div class="product-quantity">Jumlah: {{ $item->quantity }}</div>
+                </div>
+              </div>
+              @endforeach
+            </div>
+            <div class="sale-footer">
+              <div>
+                <span class="status-badge status-completed">Selesai</span>
+              </div>
+              <div class="action-buttons">
+                <a href="{{ route('penjual.pesanan.show', $order->id) }}" class="btn btn-outline">Lihat Detail</a>
+              </div>
+            </div>
+          </div>
+          @empty
+          <div class="text-center p-4">
+            <p>Tidak ada riwayat penjualan ditemukan</p>
+          </div>
+          @endforelse
+        </section>
+
+        <!-- Pagination -->
+        <section class="pagination">
+          <div class="pagination-info">
+            Menampilkan {{ $completedOrders->firstItem() ?? 0 }}-{{ $completedOrders->lastItem() ?? 0 }} dari {{ $completedOrders->total() }} penjualan
+          </div>
+          <div class="pagination-nav">
+            @if ($completedOrders->onFirstPage())
+              <button class="pagination-btn" disabled>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M15 19L8 12L15 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            @else
+              <a href="{{ $completedOrders->previousPageUrl() }}" class="pagination-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M15 19L8 12L15 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+            @endif
+            
+            @for ($i = 1; $i <= $completedOrders->lastPage(); $i++)
+              <a href="{{ $completedOrders->url($i) }}" class="pagination-btn {{ $i == $completedOrders->currentPage() ? 'active' : '' }}">{{ $i }}</a>
+            @endfor
+            
+            @if ($completedOrders->hasMorePages())
+              <a href="{{ $completedOrders->nextPageUrl() }}" class="pagination-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+            @else
+              <button class="pagination-btn" disabled>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            @endif
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  @include('components.admin_penjual.footer')
+  
+  <script>
+    // Function to update order status
+    function updateOrderStatus(orderId, newStatus) {
+      if (confirm('Apakah Anda yakin ingin mengubah status pesanan ini?')) {
+        fetch(`/penjual/pesanan/${orderId}/status`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          },
+          body: JSON.stringify({
+            status: newStatus
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert(data.message);
+            // Refresh page to show updated status
+            location.reload();
+          } else {
+            alert('Gagal mengubah status: ' + (data.message || 'Unknown error'));
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Terjadi kesalahan saat mengubah status pesanan');
+        });
+      }
+    }
+  </script>
+</body>
+</html>

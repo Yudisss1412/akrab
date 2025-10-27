@@ -223,4 +223,101 @@ class SellerOrderController extends Controller
             'orders' => $formattedOrders
         ]);
     }
+    
+    /**
+     * Display the sales history page for sellers
+     */
+    public function salesHistory(Request $request)
+    {
+        // Hanya penjual yang bisa mengakses
+        $user = Auth::user();
+        if (!$user || !$user->role || $user->role->name !== 'seller') {
+            abort(403, 'Akses ditolak. Hanya penjual yang dapat mengakses halaman ini.');
+        }
+
+        // Ambil ID penjual dari tabel sellers berdasarkan user_id
+        $seller = Seller::where('user_id', $user->id)->first();
+        if (!$seller) {
+            abort(403, 'Akses ditolak. Seller record tidak ditemukan.');
+        }
+
+        // Query builder untuk pesanan selesai berdasarkan produk penjual
+        $query = Order::with(['user', 'items.product', 'items.variant', 'shipping_address', 'logs', 'payment'])
+            ->whereHas('items.product', function ($q) use ($seller) {
+                $q->where('seller_id', $seller->id);
+            })
+            ->where('status', 'completed') // Hanya tampilkan pesanan yang selesai
+            ->orderBy('created_at', 'desc');
+
+        // Filter berdasarkan pencarian jika ada
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('order_number', 'LIKE', "%{$search}%")
+                  ->orWhereHas('user', function ($userQuery) use ($search) {
+                      $userQuery->where('name', 'LIKE', "%{$search}%");
+                  });
+            });
+        }
+
+        // Filter berdasarkan tanggal jika ada
+        if ($request->has('date_filter') && $request->date_filter) {
+            switch ($request->date_filter) {
+                case 'today':
+                    $query->whereDate('created_at', today());
+                    break;
+                case 'this_week':
+                    $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
+                    break;
+                case 'this_month':
+                    $query->whereMonth('created_at', now()->month)
+                          ->whereYear('created_at', now()->year);
+                    break;
+                case 'this_year':
+                    $query->whereYear('created_at', now()->year);
+                    break;
+            }
+        }
+
+        // Pagination hasil
+        $completedOrders = $query->paginate(10)->appends($request->query());
+
+        // Hitung total penjualan (jumlah produk terjual)
+        $totalSales = DB::table('orders')
+            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->where('products.seller_id', $seller->id)
+            ->where('orders.status', 'completed')
+            ->sum('order_items.quantity');
+
+        // Hitung total transaksi selesai
+        $totalTransactions = DB::table('orders')
+            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->where('products.seller_id', $seller->id)
+            ->where('orders.status', 'completed')
+            ->distinct('orders.id')
+            ->count();
+
+        // Hitung pendapatan bulan ini
+        $monthlyRevenue = DB::table('orders')
+            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->where('products.seller_id', $seller->id)
+            ->where('orders.status', 'completed')
+            ->whereMonth('orders.created_at', now()->month)
+            ->whereYear('orders.created_at', now()->year)
+            ->sum('order_items.subtotal');
+
+        // Hitung rata-rata per transaksi
+        $avgPerTransaction = $totalTransactions > 0 ? $monthlyRevenue / $totalTransactions : 0;
+
+        return view('penjual.riwayat_penjualan', compact(
+            'completedOrders', 
+            'totalSales', 
+            'totalTransactions', 
+            'monthlyRevenue', 
+            'avgPerTransaction'
+        ));
+    }
 }

@@ -412,7 +412,7 @@
               </h2>
               <ul class="action-list">
                 <li class="action-item">
-                  <a href="#" class="action-link">
+                  <a href="{{ route('penjual.pesanan') }}" class="action-link">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M16 4H8C6.89543 4 6 4.89543 6 6V18C6 19.1046 6.89543 20 8 20H16C17.1046 20 18 19.1046 18 18V6C18 4.89543 17.1046 4 16 4Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                       <path d="M14 8H10" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -421,7 +421,7 @@
                     </svg>
                     Pesanan Perlu Diproses
                   </a>
-                  <span class="action-count">5</span>
+                  <span class="action-count" id="pending-orders-count">0</span>
                 </li>
                 <li class="action-item">
                   <a href="#" class="action-link">
@@ -430,7 +430,7 @@
                     </svg>
                     Chat Belum Dibalas
                   </a>
-                  <span class="action-count">3</span>
+                  <span class="action-count" id="unreplied-chats-count">0</span>
                 </li>
                 <li class="action-item">
                   <a href="#" class="action-link">
@@ -442,7 +442,7 @@
                     </svg>
                     Komplain & Retur Baru
                   </a>
-                  <span class="action-count">1</span>
+                  <span class="action-count" id="new-complaints-count">0</span>
                 </li>
               </ul>
             </section>
@@ -596,5 +596,38 @@
   </div>
 
   @include('components.admin_penjual.footer')
+  
+  <script>
+    // Ambil jumlah tugas mendesak secara dinamis
+    document.addEventListener('DOMContentLoaded', function() {
+      fetchUrgentTasks();
+      
+      // Refresh setiap 30 detik
+      setInterval(fetchUrgentTasks, 30000);
+    });
+    
+    function fetchUrgentTasks() {
+      fetch('{{ route('penjual.urgent.tasks') }}', {
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById('pending-orders-count').textContent = data.urgent_tasks.pending_orders;
+          document.getElementById('unreplied-chats-count').textContent = data.urgent_tasks.unreplied_chats;
+          document.getElementById('new-complaints-count').textContent = data.urgent_tasks.new_complaints;
+        } else {
+          console.error('Error fetching urgent tasks:', data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    }
+  </script>
 </body>
 </html>

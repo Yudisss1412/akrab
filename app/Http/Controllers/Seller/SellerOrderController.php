@@ -320,4 +320,49 @@ class SellerOrderController extends Controller
             'avgPerTransaction'
         ));
     }
+    
+    /**
+     * API endpoint to fetch urgent tasks counts for the seller dashboard
+     */
+    public function getUrgentTasks()
+    {
+        // Hanya penjual yang bisa mengakses
+        $user = Auth::user();
+        if (!$user || !$user->role || $user->role->name !== 'seller') {
+            return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
+        }
+
+        // Ambil ID penjual dari tabel sellers berdasarkan user_id
+        $seller = Seller::where('user_id', $user->id)->first();
+        if (!$seller) {
+            return response()->json(['success' => false, 'message' => 'Seller record tidak ditemukan'], 403);
+        }
+
+        // Hitung pesanan yang perlu diproses (status processing atau pending_payment)
+        $pendingPaymentCount = DB::table('orders')
+            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->where('products.seller_id', $seller->id)
+            ->whereIn('orders.status', ['pending_payment'])
+            ->count();
+
+        $processingCount = DB::table('orders')
+            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->where('products.seller_id', $seller->id)
+            ->where('orders.status', 'processing')
+            ->count();
+
+        $unrepliedChatsCount = 0; // Placeholder - bisa diintegrasikan dengan sistem chat
+        $newComplaintsCount = 0; // Placeholder - bisa diintegrasikan dengan sistem komplain
+
+        return response()->json([
+            'success' => true,
+            'urgent_tasks' => [
+                'pending_orders' => $pendingPaymentCount + $processingCount,
+                'unreplied_chats' => $unrepliedChatsCount,
+                'new_complaints' => $newComplaintsCount
+            ]
+        ]);
+    }
 }

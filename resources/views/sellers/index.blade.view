@@ -757,22 +757,53 @@
         <!-- Tab Navigation -->
         <ul class="nav nav-tabs" id="userTabs" role="tablist">
           <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="sellers-tab" data-bs-toggle="tab" data-bs-target="#sellers-tab-pane" type="button" role="tab">Penjual</button>
+            <button class="nav-link {{ (isset($tab) && $tab === 'buyers') ? '' : 'active' }}" id="sellers-tab" data-bs-toggle="tab" data-bs-target="#sellers-tab-pane" type="button" role="tab">Penjual</button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link" id="buyers-tab" data-bs-toggle="tab" data-bs-target="#buyers-tab-pane" type="button" role="tab">Pembeli</button>
+            <button class="nav-link {{ (isset($tab) && $tab === 'buyers') ? 'active' : '' }}" id="buyers-tab" data-bs-toggle="tab" data-bs-target="#buyers-tab-pane" type="button" role="tab">Pembeli</button>
           </li>
         </ul>
 
         <!-- Tab Content -->
         <div class="tab-content" id="userTabsContent">
           <!-- Sellers Tab -->
-          <div class="tab-pane fade show active" id="sellers-tab-pane" role="tabpanel">
+          <div class="tab-pane fade {{ (isset($tab) && $tab === 'buyers') ? '' : 'show active' }}" id="sellers-tab-pane" role="tabpanel">
             <div class="mt-3">
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <a href="{{ route('sellers.create') }}" class="btn btn-primary">
                   <i class="fas fa-plus"></i> Tambah Penjual Baru
                 </a>
+              </div>
+
+              <!-- Bulk Actions Toolbar -->
+              <div class="bulk-actions-toolbar mb-3">
+                <form id="bulkActionForm" method="POST" action="{{ route('sellers.bulk_action') }}">
+                  @csrf
+                  <div class="row align-items-center">
+                    <div class="col-md-2">
+                      <input type="checkbox" id="selectAll" class="form-check-input">
+                      <label for="selectAll" class="form-check-label ms-1">Pilih Semua</label>
+                    </div>
+                    <div class="col-md-3">
+                      <select name="action" class="form-select" required>
+                        <option value="">Pilih Aksi</option>
+                        <option value="suspend">Tangguhkan</option>
+                        <option value="activate">Aktifkan</option>
+                        <option value="delete">Hapus</option>
+                      </select>
+                    </div>
+                    <div class="col-md-2">
+                      <button type="submit" class="btn btn-primary" onclick="return confirm('Apakah Anda yakin ingin melakukan aksi ini pada penjual terpilih?')">Terapkan</button>
+                    </div>
+                    <div class="col-md-5 text-end">
+                      <a href="{{ route('sellers.export_sellers') }}" class="btn btn-success">
+                        <i class="fas fa-download"></i> Ekspor Data
+                      </a>
+                    </div>
+                  </div>
+                  </div>
+                  <input type="hidden" name="seller_ids" id="sellerIdsInput">
+                </form>
               </div>
 
               <!-- Filter Panel - Horizontal Layout -->
@@ -781,7 +812,7 @@
                   <h3 class="filter-title"><i class="fas fa-filter"></i> Filter dan Pencarian</h3>
                 </div>
                 <div class="filter-content">
-                  <form id="filterForm" method="GET" action="{{ route('sellers.index') }}">
+                  <form id="filterForm" method="GET" action="{{ route('sellers.index') }}?tab=sellers">
                     <div class="row g-2">
                       <div class="col-md-5 mb-2">
                         <label for="search" class="form-label">Cari Penjual</label>
@@ -826,6 +857,9 @@
                   <table class="table table-striped table-hover">
                     <thead>
                       <tr>
+                        <th scope="col">
+                          <input type="checkbox" id="selectAllHeader" class="form-check-input">
+                        </th>
                         <th scope="col">Nama Toko</th>
                         <th scope="col">Info Pemilik</th>
                         <th scope="col">Statistik</th>
@@ -834,8 +868,11 @@
                       </tr>
                     </thead>
                     <tbody>
-                      @forelse($sellers as $seller)
+                      @forelse($sellers ?? collect() as $seller)
                       <tr id="seller-row-{{ $seller->id }}">
+                        <td>
+                          <input type="checkbox" class="form-check-input seller-checkbox" value="{{ $seller->id }}" name="seller_ids[]">
+                        </td>
                         <td>
                           <a href="{{ route('sellers.show', $seller) }}" class="font-weight-bold text-primary d-block">
                             {{ $seller->store_name }}
@@ -919,7 +956,7 @@
                       </tr>
                       @empty
                       <tr>
-                        <td colspan="5" class="text-center py-4">Tidak ada data penjual ditemukan.</td>
+                        <td colspan="6" class="text-center py-4">Tidak ada data penjual ditemukan.</td>
                       </tr>
                       @endforelse
                     </tbody>
@@ -928,6 +965,7 @@
                 
                 <!-- Pagination -->
                 <div class="mt-3 d-flex justify-content-between align-items-center">
+                  @if($sellers)
                   <div>
                     Menampilkan {{ $sellers->firstItem() }} sampai {{ $sellers->lastItem() }} 
                     dari {{ $sellers->total() }} penjual
@@ -940,7 +978,7 @@
                         </li>
                       @else
                         <li class="page-item">
-                          <a class="page-link" href="{{ $sellers->previousPageUrl() }}" aria-label="Previous">
+                          <a class="page-link" href="{{ $sellers->previousPageUrl() }}&tab=sellers" aria-label="Previous">
                             <span aria-hidden="true">&laquo;&laquo; Sebelumnya</span>
                           </a>
                         </li>
@@ -950,13 +988,13 @@
                         @if ($i == $sellers->currentPage())
                           <li class="page-item active"><span class="page-link" style="color: white;">{{ $i }}</span></li>
                         @else
-                          <li class="page-item"><a class="page-link" href="{{ $sellers->url($i) }}">{{ $i }}</a></li>
+                          <li class="page-item"><a class="page-link" href="{{ $sellers->url($i) }}&tab=sellers">{{ $i }}</a></li>
                         @endif
                       @endfor
 
                       @if ($sellers->hasMorePages())
                         <li class="page-item">
-                          <a class="page-link" href="{{ $sellers->nextPageUrl() }}" aria-label="Next">
+                          <a class="page-link" href="{{ $sellers->nextPageUrl() }}&tab=sellers" aria-label="Next">
                             <span aria-hidden="true">Berikutnya &raquo;&raquo;</span>
                           </a>
                         </li>
@@ -967,207 +1005,223 @@
                       @endif
                     </ul>
                   </nav>
+                  @else
+                  <div>Tidak ada data penjual</div>
+                  @endif
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Buyers Tab -->
-        <div class="tab-pane fade" id="buyers-tab-pane" role="tabpanel">
-          <div class="mt-3">
-            <!-- Filter Panel for Buyers -->
-            <div class="filter-panel">
-              <div class="filter-header">
-                <h3 class="filter-title"><i class="fas fa-filter"></i> Filter dan Pencarian</h3>
-              </div>
-              <div class="filter-content">
-                <form id="filterFormBuyers" method="GET" action="{{ url()->current() }}?tab=buyers">
-                  <div class="row g-2">
-                    <div class="col-md-5 mb-2">
-                      <label for="buyer_search" class="form-label">Cari Pembeli</label>
-                      <input type="text" class="form-control" id="buyer_search" name="search" placeholder="Nama Pembeli, Email" onchange="submitBuyerForm()">
+          <!-- Buyers Tab -->
+          <div class="tab-pane fade {{ (isset($tab) && $tab === 'buyers') ? 'show active' : '' }}" id="buyers-tab-pane" role="tabpanel">
+            <div class="mt-3">
+              <!-- Bulk Actions Toolbar for Buyers -->
+              <div class="bulk-actions-toolbar mb-3">
+                <form id="bulkActionFormBuyer" method="POST" action="{{ route('sellers.bulk_action') }}">
+                  @csrf
+                  <input type="hidden" name="user_type" value="buyer">
+                  <div class="row align-items-center">
+                    <div class="col-md-2">
+                      <input type="checkbox" id="selectAllBuyers" class="form-check-input">
+                      <label for="selectAllBuyers" class="form-check-label ms-1">Pilih Semua</label>
                     </div>
-                    <div class="col-md-2 mb-2">
-                      <label for="buyer_status" class="form-label">Status</label>
-                      <select class="form-select" id="buyer_status" name="status" onchange="submitBuyerForm()">
-                        <option value="">Semua</option>
-                        <option value="aktif">Aktif</option>
-                        <option value="ditangguhkan">Ditangguhkan</option>
+                    <div class="col-md-3">
+                      <select name="action" class="form-select" required>
+                        <option value="">Pilih Aksi</option>
+                        <option value="suspend">Tangguhkan</option>
+                        <option value="activate">Aktifkan</option>
+                        <option value="delete">Hapus</option>
                       </select>
                     </div>
-                    <div class="col-md-2 mb-2">
-                      <label for="join_date_from_buyer" class="form-label">Bergabung Dari</label>
-                      <input type="date" class="form-control" id="join_date_from_buyer" name="join_date_from" onchange="submitBuyerForm()">
+                    <div class="col-md-2">
+                      <button type="submit" class="btn btn-primary" onclick="return confirm('Apakah Anda yakin ingin melakukan aksi ini pada pembeli terpilih?')">Terapkan</button>
                     </div>
-                    <div class="col-md-2 mb-2">
-                      <label for="join_date_to_buyer" class="form-label">Bergabung Sampai</label>
-                      <input type="date" class="form-control" id="join_date_to_buyer" name="join_date_to" onchange="submitBuyerForm()">
-                    </div>
-                    <div class="col-md-1 mb-2 d-flex align-items-end">
-                      <button type="button" class="btn btn-secondary w-100" onclick="clearBuyerFilters()">
-                        <i class="fas fa-times"></i>
-                      </button>
+                    <div class="col-md-5 text-end">
+                      <a href="{{ route('sellers.export_buyers') }}" class="btn btn-success">
+                        <i class="fas fa-download"></i> Ekspor Data
+                      </a>
                     </div>
                   </div>
+                  <input type="hidden" name="user_ids" id="userIdsInput">
                 </form>
               </div>
-            </div>
-            
-            <!-- Buyers Table -->
-            <div class="table-container mt-2">
-              <div class="table-header">
-                <h3 class="table-title">Daftar Pembeli</h3>
-              </div>
-              <div class="table-content">
-                <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                  <thead>
-                    <tr>
-                      <th scope="col">Info Pengguna</th>
-                      <th scope="col">Statistik</th>
-                      <th scope="col">Status</th>
-                      <th scope="col">Aksi</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <!-- Example buyer rows - would be populated by real data -->
-                    <tr>
-                      <td>
-                        <div><strong>Ronald Richards</strong></div>
-                        <small class="text-muted">ronald.richards@example.com</small><br>
-                        <small class="text-muted">Bergabung: 15 Agu 2024</small>
-                      </td>
-                      <td>
-                        <div>Transaksi: <strong>12</strong></div>
-                        <div>Spending: <strong>Rp 3.450.000</strong></div>
-                      </td>
-                      <td>
-                        <span class="badge rounded-pill bg-success d-block">Aktif</span>
-                      </td>
-                      <td>
-                        <div class="btn-group d-block" role="group">
-                          <a href="javascript:void(0)" class="btn btn-info d-block text-center square-btn" title="Lihat Riwayat Transaksi">
-                            <i class="fas fa-history"></i>
-                          </a>
-                          <a href="javascript:void(0)" class="btn btn-primary d-block text-center square-btn" title="Edit Profil">
-                            <i class="fas fa-edit"></i>
-                          </a>
-                          <form action="javascript:void(0)" method="POST" class="d-inline">
-                            @csrf
-                            <button type="submit" class="btn btn-warning text-dark d-block text-center square-btn" title="Tangguhkan Akun" onclick="return confirm('Apakah Anda yakin ingin menangguhkan pembeli ini?')">
-                              <i class="fas fa-pause"></i>
-                            </button>
-                          </form>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div><strong>Jenny Wilson</strong></div>
-                        <small class="text-muted">jenny.wilson@example.com</small><br>
-                        <small class="text-muted">Bergabung: 22 Agu 2024</small>
-                      </td>
-                      <td>
-                        <div>Transaksi: <strong>8</strong></div>
-                        <div>Spending: <strong>Rp 1.200.000</strong></div>
-                      </td>
-                      <td>
-                        <span class="badge rounded-pill bg-success d-block">Aktif</span>
-                      </td>
-                      <td>
-                        <div class="btn-group d-block" role="group">
-                          <a href="javascript:void(0)" class="btn btn-info d-block text-center square-btn" title="Lihat Riwayat Transaksi">
-                            <i class="fas fa-history"></i>
-                          </a>
-                          <a href="javascript:void(0)" class="btn btn-primary d-block text-center square-btn" title="Edit Profil">
-                            <i class="fas fa-edit"></i>
-                          </a>
-                          <form action="javascript:void(0)" method="POST" class="d-inline">
-                            @csrf
-                            <button type="submit" class="btn btn-warning text-dark d-block text-center square-btn" title="Tangguhkan Akun" onclick="return confirm('Apakah Anda yakin ingin menangguhkan pembeli ini?')">
-                              <i class="fas fa-pause"></i>
-                            </button>
-                          </form>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div><strong>Jerome Bell</strong></div>
-                        <small class="text-muted">jerome.bell@example.com</small><br>
-                        <small class="text-muted">Bergabung: 05 Sep 2024</small>
-                      </td>
-                      <td>
-                        <div>Transaksi: <strong>3</strong></div>
-                        <div>Spending: <strong>Rp 450.000</strong></div>
-                      </td>
-                      <td>
-                        <span class="badge rounded-pill bg-danger d-block">Ditangguhkan</span>
-                      </td>
-                      <td>
-                        <div class="btn-group d-block" role="group">
-                          <a href="javascript:void(0)" class="btn btn-info d-block text-center square-btn" title="Lihat Riwayat Transaksi">
-                            <i class="fas fa-history"></i>
-                          </a>
-                          <a href="javascript:void(0)" class="btn btn-primary d-block text-center square-btn" title="Edit Profil">
-                            <i class="fas fa-edit"></i>
-                          </a>
-                          <form action="javascript:void(0)" method="POST" class="d-inline">
-                            @csrf
-                            <button type="submit" class="btn btn-success d-block text-center square-btn" title="Aktifkan Kembali Akun" onclick="return confirm('Apakah Anda yakin ingin mengaktifkan kembali pembeli ini?')">
-                              <i class="fas fa-play"></i>
-                            </button>
-                          </form>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colspan="4" class="text-center py-4">Tidak ada data pembeli ditemukan.</td>
-                    </tr>
-                  </tbody>
-                </table>
+
+              <!-- Filter Panel for Buyers -->
+              <div class="filter-panel">
+                <div class="filter-header">
+                  <h3 class="filter-title"><i class="fas fa-filter"></i> Filter dan Pencarian</h3>
+                </div>
+                <div class="filter-content">
+                  <form id="filterFormBuyers" method="GET" action="{{ route('sellers.index') }}?tab=buyers">
+                    <div class="row g-2">
+                      <div class="col-md-5 mb-2">
+                        <label for="buyer_search" class="form-label">Cari Pembeli</label>
+                        <input type="text" class="form-control" id="buyer_search" name="search" value="{{ request('search') }}" placeholder="Nama Pembeli, Email" onchange="submitBuyerForm()">
+                      </div>
+                      <div class="col-md-2 mb-2">
+                        <label for="buyer_status" class="form-label">Status</label>
+                        <select class="form-select" id="buyer_status" name="status" onchange="submitBuyerForm()">
+                          <option value="">Semua</option>
+                          <option value="aktif" {{ request('status') === 'aktif' ? 'selected' : '' }}>Aktif</option>
+                          <option value="ditangguhkan" {{ request('status') === 'ditangguhkan' ? 'selected' : '' }}>Ditangguhkan</option>
+                        </select>
+                      </div>
+                      <div class="col-md-2 mb-2">
+                        <label for="join_date_from_buyer" class="form-label">Bergabung Dari</label>
+                        <input type="date" class="form-control" id="join_date_from_buyer" name="join_date_from" value="{{ request('join_date_from') }}" onchange="submitBuyerForm()">
+                      </div>
+                      <div class="col-md-2 mb-2">
+                        <label for="join_date_to_buyer" class="form-label">Bergabung Sampai</label>
+                        <input type="date" class="form-control" id="join_date_to_buyer" name="join_date_to" value="{{ request('join_date_to') }}" onchange="submitBuyerForm()">
+                      </div>
+                      <div class="col-md-1 mb-2 d-flex align-items-end">
+                        <button type="button" class="btn btn-secondary w-100" onclick="clearBuyerFilters()">
+                          <i class="fas fa-times"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
               </div>
               
-              <!-- Pagination for buyers -->
-              <div class="mt-3 d-flex justify-content-between align-items-center">
-                <div>
-                  Menampilkan 1 sampai 10 dari 25 pembeli
+              <!-- Buyers Table -->
+              <div class="table-container mt-2">
+                <div class="table-header">
+                  <h3 class="table-title">Daftar Pembeli</h3>
                 </div>
-                <nav aria-label="Halaman pembeli">
-                  <ul class="pagination mb-0">
-                    <li class="page-item">
-                      <a class="page-link" href="#" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;&laquo; Sebelumnya</span>
-                      </a>
-                    </li>
-                    <li class="page-item active"><span class="page-link" style="color: white;">1</span></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#">4</a></li>
-                    <li class="page-item"><a class="page-link" href="#">5</a></li>
-                    <li class="page-item">
-                      <a class="page-link" href="#" aria-label="Next">
-                        <span aria-hidden="true">Berikutnya &raquo;&raquo;</span>
-                      </a>
-                    </li>
-                  </ul>
-                </nav>
+                <div class="table-content">
+                  <div class="table-responsive">
+                  <table class="table table-striped table-hover">
+                    <thead>
+                      <tr>
+                        <th scope="col">
+                          <input type="checkbox" id="selectAllBuyersHeader" class="form-check-input">
+                        </th>
+                        <th scope="col">Info Pengguna</th>
+                        <th scope="col">Statistik</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @forelse($buyers ?? collect() as $buyer)
+                      <tr id="user-row-{{ $buyer->id }}">
+                        <td>
+                          <input type="checkbox" class="form-check-input buyer-checkbox" value="{{ $buyer->id }}" name="user_ids[]">
+                        </td>
+                        <td>
+                          <div><strong>{{ $buyer->name }}</strong></div>
+                          <small class="text-muted">{{ $buyer->email }}</small><br>
+                          <small class="text-muted">Bergabung: {{ $buyer->created_at ? $buyer->created_at->format('d M Y') : '-' }}</small>
+                        </td>
+                        <td>
+                          @php
+                            // Hitung total pembelian dari order pengguna
+                            $totalOrders = isset($buyer->orders) ? $buyer->orders->count() : $buyer->orders()->count();
+                            $totalSpending = isset($buyer->orders) ? $buyer->orders->sum('total_amount') : $buyer->orders()->sum('total_amount');
+                          @endphp
+                          <div>Transaksi: <strong>{{ $totalOrders }}</strong></div>
+                          <div>Spending: <strong>Rp {{ number_format($totalSpending, 0, ',', '.') }}</strong></div>
+                        </td>
+                        <td>
+                          @php
+                            $statusClass = $buyer->deleted_at ? 'bg-danger' : 'bg-success';
+                            $statusText = $buyer->deleted_at ? 'Ditangguhkan' : 'Aktif';
+                          @endphp
+                          <span class="badge rounded-pill {{ $statusClass }} d-block">{{ $statusText }}</span>
+                        </td>
+                        <td>
+                          <div class="btn-group d-block" role="group">
+                            <a href="{{ route('sellers.user_history', $buyer) }}" class="btn btn-info d-block text-center square-btn" title="Lihat Riwayat Transaksi">
+                              <i class="fas fa-history"></i>
+                            </a>
+                            <a href="{{ route('sellers.edit_user', $buyer) }}" class="btn btn-primary d-block text-center square-btn" title="Edit Profil">
+                              <i class="fas fa-edit"></i>
+                            </a>
+                            @if($buyer->deleted_at)
+                              <form action="{{ route('sellers.activate_user', $buyer) }}" method="POST" class="d-inline">
+                                @csrf
+                                <button type="submit" class="btn btn-success d-block text-center square-btn" title="Aktifkan Kembali Akun" onclick="return confirm('Apakah Anda yakin ingin mengaktifkan kembali pembeli ini?')">
+                                  <i class="fas fa-play"></i>
+                                </button>
+                              </form>
+                            @else
+                              <form action="{{ route('sellers.suspend_user', $buyer) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-warning text-dark d-block text-center square-btn" title="Tangguhkan Akun" onclick="return confirm('Apakah Anda yakin ingin menangguhkan pembeli ini?')">
+                                  <i class="fas fa-pause"></i>
+                                </button>
+                              </form>
+                            @endif
+                          </div>
+                        </td>
+                      </tr>
+                      @empty
+                      <tr>
+                        <td colspan="5" class="text-center py-4">Tidak ada data pembeli ditemukan.</td>
+                      </tr>
+                      @endforelse
+                    </tbody>
+                  </table>
+                  </div>
+                  
+                  <!-- Pagination for buyers -->
+                  <div class="mt-3 d-flex justify-content-between align-items-center">
+                    @if($buyers)
+                    <div>
+                      Menampilkan {{ $buyers->firstItem() }} sampai {{ $buyers->lastItem() }} 
+                      dari {{ $buyers->total() }} pembeli
+                    </div>
+                    <nav aria-label="Halaman pembeli">
+                      <ul class="pagination mb-0">
+                        @if ($buyers->onFirstPage())
+                          <li class="page-item disabled">
+                            <span class="page-link">&laquo;&laquo; Sebelumnya</span>
+                          </li>
+                        @else
+                          <li class="page-item">
+                            <a class="page-link" href="{{ $buyers->previousPageUrl() }}&tab=buyers" aria-label="Previous">
+                              <span aria-hidden="true">&laquo;&laquo; Sebelumnya</span>
+                            </a>
+                          </li>
+                        @endif
+
+                        @for ($i = max(1, $buyers->currentPage() - 2); $i <= min($buyers->lastPage(), $buyers->currentPage() + 2); $i++)
+                          @if ($i == $buyers->currentPage())
+                            <li class="page-item active"><span class="page-link" style="color: white;">{{ $i }}</span></li>
+                          @else
+                            <li class="page-item"><a class="page-link" href="{{ $buyers->url($i) }}&tab=buyers">{{ $i }}</a></li>
+                          @endif
+                        @endfor
+
+                        @if ($buyers->hasMorePages())
+                          <li class="page-item">
+                            <a class="page-link" href="{{ $buyers->nextPageUrl() }}&tab=buyers" aria-label="Next">
+                              <span aria-hidden="true">Berikutnya &raquo;&raquo;</span>
+                            </a>
+                          </li>
+                        @else
+                          <li class="page-item disabled">
+                            <span class="page-link">Berikutnya &raquo;&raquo;</span>
+                          </li>
+                        @endif
+                      </ul>
+                    </nav>
+                    @else
+                    <div>Tidak ada data pembeli</div>
+                    @endif
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
         </div>
       </div>
     </div>
   </div>
-</div>
-</div>  <!-- Close the col-md-12 div -->
-</div>  <!-- Close the row div -->
-</main>
-</div>
-</div>
 
   @include('components.admin_penjual.footer')
 
@@ -1186,6 +1240,9 @@
         url.searchParams.append(key, value);
       }
     }
+    
+    // Ensure tab parameter is preserved
+    url.searchParams.set('tab', 'sellers');
     
     // Navigate to the URL with parameters
     window.location.href = url.toString();
@@ -1216,6 +1273,9 @@
       }
     }
     
+    // Ensure tab parameter is preserved
+    url.searchParams.set('tab', 'buyers');
+    
     // Navigate to the URL with parameters
     window.location.href = url.toString();
   }
@@ -1232,8 +1292,83 @@
   }
 
   document.addEventListener('DOMContentLoaded', function() {
-    // No bulk actions functionality since it has been removed
+    // Select all functionality for sellers
+    const selectAll = document.getElementById('selectAll');
+    const selectAllHeader = document.getElementById('selectAllHeader');
+    const sellerCheckboxes = document.querySelectorAll('.seller-checkbox');
+    
+    // For tab switch, update active state
+    const urlParams = new URLSearchParams(window.location.search);
+    const tab = urlParams.get('tab');
+    if (tab === 'buyers') {
+      document.getElementById('buyers-tab').classList.add('active');
+      document.getElementById('sellers-tab').classList.remove('active');
+      document.getElementById('buyers-tab-pane').classList.add('show', 'active');
+      document.getElementById('sellers-tab-pane').classList.remove('show', 'active');
+    }
+    
+    // Select all functionality for sellers
+    selectAll && selectAll.addEventListener('change', function() {
+      sellerCheckboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+      });
+    });
+    
+    selectAllHeader && selectAllHeader.addEventListener('change', function() {
+      sellerCheckboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+      });
+      selectAll.checked = this.checked;
+    });
+    
+    // Select all functionality for buyers
+    const selectAllBuyers = document.getElementById('selectAllBuyers');
+    const selectAllBuyersHeader = document.getElementById('selectAllBuyersHeader');
+    const buyerCheckboxes = document.querySelectorAll('.buyer-checkbox');
+    
+    selectAllBuyers && selectAllBuyers.addEventListener('change', function() {
+      buyerCheckboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+      });
+    });
+    
+    selectAllBuyersHeader && selectAllBuyersHeader.addEventListener('change', function() {
+      buyerCheckboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+      });
+      selectAllBuyers.checked = this.checked;
+    });
+    
+    // Bulk actions for sellers
+    const bulkActionForm = document.getElementById('bulkActionForm');
+    if (bulkActionForm) {
+      bulkActionForm.addEventListener('submit', function(e) {
+        const selectedSellers = Array.from(sellerCheckboxes).filter(checkbox => checkbox.checked).map(checkbox => checkbox.value);
+        if (selectedSellers.length === 0) {
+          e.preventDefault();
+          alert('Silakan pilih setidaknya satu penjual terlebih dahulu.');
+          return;
+        }
+        document.getElementById('sellerIdsInput').value = JSON.stringify(selectedSellers);
+      });
+    }
+    
+    // Bulk actions for buyers
+    const bulkActionFormBuyer = document.getElementById('bulkActionFormBuyer');
+    if (bulkActionFormBuyer) {
+      bulkActionFormBuyer.addEventListener('submit', function(e) {
+        const selectedUsers = Array.from(buyerCheckboxes).filter(checkbox => checkbox.checked).map(checkbox => checkbox.value);
+        if (selectedUsers.length === 0) {
+          e.preventDefault();
+          alert('Silakan pilih setidaknya satu pembeli terlebih dahulu.');
+          return;
+        }
+        document.getElementById('userIdsInput').value = JSON.stringify(selectedUsers);
+      });
+    }
   });
+  
+
   </script>
   
 @endsection

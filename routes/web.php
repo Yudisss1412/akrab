@@ -62,6 +62,17 @@ Route::prefix('admin')->name('sellers.')->group(function () {
     Route::post('/sellers/{seller}/activate', [SellerManagementController::class, 'activate'])->name('activate');
     Route::post('/sellers/bulk-action', [SellerManagementController::class, 'bulkAction'])->name('bulk_action');
     Route::get('/sellers/dashboard-stats', [SellerManagementController::class, 'getDashboardStats'])->name('dashboard_stats');
+    
+    // User management routes for buyers
+    Route::post('/users/{user}/suspend', [SellerManagementController::class, 'suspendUser'])->name('suspend_user');
+    Route::post('/users/{user}/activate', [SellerManagementController::class, 'activateUser'])->name('activate_user');
+    Route::get('/users/{user}/history', [SellerManagementController::class, 'userHistory'])->name('user_history');
+    Route::get('/users/{user}/edit', [SellerManagementController::class, 'editUser'])->name('edit_user');
+    Route::put('/users/{user}', [SellerManagementController::class, 'updateUser'])->name('update_user');
+    
+    // Export routes
+    Route::get('/sellers/export', [SellerManagementController::class, 'exportSellers'])->name('export_sellers');
+    Route::get('/buyers/export', [SellerManagementController::class, 'exportBuyers'])->name('export_buyers');
 });
 
 Route::get('/welcome', function () {

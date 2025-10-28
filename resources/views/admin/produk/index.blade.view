@@ -425,20 +425,20 @@
           <!-- Tab Navigation -->
           <ul class="nav nav-tabs" id="productManagementTabs" role="tablist">
             <li class="nav-item" role="presentation">
-              <button class="nav-link active" id="products-tab" data-bs-toggle="tab" data-bs-target="#products-tab-pane" type="button" role="tab">Produk</button>
+              <button class="nav-link {{ (isset($tab) && $tab === 'reviews') || (isset($tab) && $tab === 'categories') ? '' : 'active' }}" id="products-tab" data-bs-toggle="tab" data-bs-target="#products-tab-pane" type="button" role="tab">Produk</button>
             </li>
             <li class="nav-item" role="presentation">
-              <button class="nav-link" id="categories-tab" data-bs-toggle="tab" data-bs-target="#categories-tab-pane" type="button" role="tab">Kategori & Atribut</button>
+              <button class="nav-link {{ (isset($tab) && $tab === 'categories') ? 'active' : '' }}" id="categories-tab" data-bs-toggle="tab" data-bs-target="#categories-tab-pane" type="button" role="tab">Kategori & Atribut</button>
             </li>
             <li class="nav-item" role="presentation">
-              <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews-tab-pane" type="button" role="tab">Ulasan Produk</button>
+              <button class="nav-link {{ (isset($tab) && $tab === 'reviews') ? 'active' : '' }}" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews-tab-pane" type="button" role="tab">Ulasan Produk</button>
             </li>
           </ul>
 
           <!-- Tab Content -->
           <div class="tab-content" id="productManagementTabsContent">
             <!-- Products Tab -->
-            <div class="tab-pane fade show active" id="products-tab-pane" role="tabpanel">
+            <div class="tab-pane fade {{ (isset($tab) && $tab === 'reviews') || (isset($tab) && $tab === 'categories') ? '' : 'show active' }}" id="products-tab-pane" role="tabpanel">
               <div class="mt-3">
                 <!-- Filter Panel - Horizontal Layout -->
                 <div class="filter-panel">
@@ -446,43 +446,46 @@
                     <h3 class="filter-title"><i class="fas fa-filter"></i> Filter dan Pencarian</h3>
                   </div>
                   <div class="filter-content">
-                    <form id="productFilterForm" method="GET" action="">
+                    <form id="productFilterForm" method="GET" action="{{ route('admin.produk.index') }}">
                       <div class="row g-2">
                         <div class="col-md-3 mb-2">
                           <label for="search" class="form-label">Cari Produk</label>
-                          <input type="text" class="form-control" id="search" name="search" placeholder="Nama Produk atau SKU">
+                          <input type="text" class="form-control" id="search" name="search" value="{{ request('search') }}" placeholder="Nama Produk atau SKU">
                         </div>
                         <div class="col-md-3 mb-2">
                           <label for="seller_filter" class="form-label">Filter berdasarkan Penjual</label>
                           <select class="form-select" id="seller_filter" name="seller_id">
                             <option value="">Semua Penjual</option>
-                            <option value="1">Toko Fajar Jaya</option>
-                            <option value="2">Warung Online</option>
-                            <option value="3">Grosir Murah</option>
-                            <option value="4">Toko Elektronik</option>
-                            <option value="5">Fashion Kita</option>
+                            @if(isset($sellers))
+                              @foreach($sellers as $seller)
+                                <option value="{{ $seller->id }}" {{ request('seller_id') == $seller->id ? 'selected' : '' }}>{{ $seller->store_name }}</option>
+                              @endforeach
+                            @endif
                           </select>
                         </div>
                         <div class="col-md-2 mb-2">
                           <label for="status_filter" class="form-label">Status Produk</label>
                           <select class="form-select" id="status_filter" name="status">
                             <option value="">Semua Status</option>
-                            <option value="pending">Menunggu Persetujuan</option>
-                            <option value="active">Aktif</option>
-                            <option value="suspended">Ditangguhkan</option>
-                            <option value="rejected">Ditolak</option>
+                            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Menunggu Persetujuan</option>
+                            <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Aktif</option>
+                            <option value="suspended" {{ request('status') == 'suspended' ? 'selected' : '' }}>Ditangguhkan</option>
+                            <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Ditolak</option>
                           </select>
                         </div>
                         <div class="col-md-2 mb-2">
                           <label for="category_filter" class="form-label">Kategori</label>
                           <select class="form-select" id="category_filter" name="category">
                             <option value="">Semua Kategori</option>
-                            <option value="electronics">Elektronik</option>
-                            <option value="fashion">Fashion</option>
-                            <option value="books">Buku</option>
-                            <option value="sports">Olahraga</option>
-                            <option value="food">Makanan</option>
+                            @if(isset($categories))
+                              @foreach($categories as $category)
+                                <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                              @endforeach
+                            @endif
                           </select>
+                        </div>
+                        <div class="col-md-2 mb-2 d-flex align-items-end">
+                          <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search"></i> Cari</button>
                         </div>
                       </div>
                     </form>
@@ -508,199 +511,142 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr>
+                          @forelse($products ?? collect() as $product)
+                          <tr id="product-row-{{ $product->id }}">
                             <td>
                               <div style="display: flex; align-items: center; gap: 1rem;">
-                                <img src="{{ asset('src/produk_sample.jpg') }}" alt="Sample Product" class="product-thumbnail">
+                                <img src="{{ $product->images->first() ? asset('storage/' . $product->images->first()->image_path) : asset('src/produk_sample.jpg') }}" alt="{{ $product->name }}" class="product-thumbnail" onerror="this.src='{{ asset('src/produk_sample.jpg') }}'">
                                 <div>
-                                  <div><strong>Smartphone ABC 128GB</strong></div>
-                                  <small class="text-muted">SKU: SM-ABC-128</small>
+                                  <div><strong>{{ $product->name }}</strong></div>
+                                  <small class="text-muted">SKU: {{ $product->sku ?? 'N/A' }}</small>
                                 </div>
                               </div>
                             </td>
                             <td>
-                              <a href="{{ route('sellers.show', 1) }}" class="text-primary">Toko Fajar Jaya</a>
+                              <a href="{{ route('sellers.show', $product->seller_id) }}" class="text-primary">{{ $product->seller_name ?? $product->seller->store_name ?? 'N/A' }}</a>
                             </td>
                             <td>
-                              <div>Elektronik</div>
-                              <small class="text-muted">Smartphone</small>
+                              <div>{{ $product->category->name ?? 'N/A' }}</div>
+                              <small class="text-muted">{{ $product->subcategory ?? 'N/A' }}</small>
                             </td>
                             <td>
-                              <div><strong>Rp 3,500,000</strong></div>
-                              <small class="text-muted">Stok: 25</small>
+                              <div><strong>Rp {{ number_format($product->price, 0, ',', '.') }}</strong></div>
+                              <small class="text-muted">Stok: {{ $product->stock }}</small>
                             </td>
                             <td>
-                              <span class="badge badge-pending d-block">Menunggu Persetujuan</span>
-                            </td>
-                            <td>
-                              <div class="btn-group" role="group">
-                                <a href="#" class="btn btn-sm btn-view" title="Lihat di Situs">
-                                  <i class="fas fa-external-link-alt"></i>
-                                </a>
-                                <a href="#" class="btn btn-sm btn-edit" title="Edit">
-                                  <i class="fas fa-edit"></i>
-                                </a>
-                                <button type="button" class="btn btn-sm btn-approve" title="Setujui">
-                                  <i class="fas fa-check"></i>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-reject" title="Tolak">
-                                  <i class="fas fa-times"></i>
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <div style="display: flex; align-items: center; gap: 1rem;">
-                                <img src="{{ asset('src/produk_sample.jpg') }}" alt="Sample Product" class="product-thumbnail">
-                                <div>
-                                  <div><strong>Kemeja Formal Pria</strong></div>
-                                  <small class="text-muted">SKU: FM-KM-001</small>
-                                </div>
-                              </div>
-                            </td>
-                            <td>
-                              <a href="{{ route('sellers.show', 2) }}" class="text-primary">Warung Online</a>
-                            </td>
-                            <td>
-                              <div>Fashion</div>
-                              <small class="text-muted">Pakaian Pria</small>
-                            </td>
-                            <td>
-                              <div><strong>Rp 185,000</strong></div>
-                              <small class="text-muted">Stok: 50</small>
-                            </td>
-                            <td>
-                              <span class="badge badge-active d-block">Aktif</span>
+                              @php
+                                $statusClass = '';
+                                $statusText = '';
+                                switch($product->status) {
+                                  case 'pending':
+                                    $statusClass = 'badge-pending';
+                                    $statusText = 'Menunggu Persetujuan';
+                                    break;
+                                  case 'active':
+                                    $statusClass = 'badge-active';
+                                    $statusText = 'Aktif';
+                                    break;
+                                  case 'suspended':
+                                    $statusClass = 'badge-suspended';
+                                    $statusText = 'Ditangguhkan';
+                                    break;
+                                  case 'rejected':
+                                    $statusClass = 'badge-rejected';
+                                    $statusText = 'Ditolak';
+                                    break;
+                                  default:
+                                    $statusClass = 'badge-secondary';
+                                    $statusText = 'Tidak Dikenal';
+                                }
+                              @endphp
+                              <span class="badge {{ $statusClass }} d-block">{{ $statusText }}</span>
                             </td>
                             <td>
                               <div class="btn-group" role="group">
-                                <a href="#" class="btn btn-sm btn-view" title="Lihat di Situs">
+                                <a href="{{ route('halaman.produk') }}?product={{ $product->id }}" class="btn btn-sm btn-view" title="Lihat di Situs">
                                   <i class="fas fa-external-link-alt"></i>
                                 </a>
-                                <a href="#" class="btn btn-sm btn-edit" title="Edit">
+                                <a href="{{ route('penjual.produk.edit', $product->id) }}" class="btn btn-sm btn-edit" title="Edit">
                                   <i class="fas fa-edit"></i>
                                 </a>
-                                <button type="button" class="btn btn-sm btn-suspend" title="Tangguhkan">
-                                  <i class="fas fa-pause"></i>
-                                </button>
+                                @if($product->status === 'pending')
+                                  <button type="button" class="btn btn-sm btn-approve" title="Setujui" onclick="approveProduct({{ $product->id }})">
+                                    <i class="fas fa-check"></i>
+                                  </button>
+                                  <button type="button" class="btn btn-sm btn-reject" title="Tolak" onclick="rejectProduct({{ $product->id }})">
+                                    <i class="fas fa-times"></i>
+                                  </button>
+                                @elseif($product->status === 'active')
+                                  <button type="button" class="btn btn-sm btn-suspend" title="Tangguhkan" onclick="suspendProduct({{ $product->id }})">
+                                    <i class="fas fa-pause"></i>
+                                  </button>
+                                @else
+                                  <button type="button" class="btn btn-sm btn-approve" title="Setujui" onclick="approveProduct({{ $product->id }})">
+                                    <i class="fas fa-check"></i>
+                                  </button>
+                                @endif
                               </div>
                             </td>
                           </tr>
-                          <tr>
-                            <td>
-                              <div style="display: flex; align-items: center; gap: 1rem;">
-                                <img src="{{ asset('src/produk_sample.jpg') }}" alt="Sample Product" class="product-thumbnail">
-                                <div>
-                                  <div><strong>Buku Pemrograman Laravel</strong></div>
-                                  <small class="text-muted">SKU: BK-LRV-001</small>
-                                </div>
-                              </div>
-                            </td>
-                            <td>
-                              <a href="{{ route('sellers.show', 3) }}" class="text-primary">Grosir Murah</a>
-                            </td>
-                            <td>
-                              <div>Buku</div>
-                              <small class="text-muted">Teknologi</small>
-                            </td>
-                            <td>
-                              <div><strong>Rp 125,000</strong></div>
-                              <small class="text-muted">Stok: 15</small>
-                            </td>
-                            <td>
-                              <span class="badge badge-suspended d-block">Ditangguhkan</span>
-                            </td>
-                            <td>
-                              <div class="btn-group" role="group">
-                                <a href="#" class="btn btn-sm btn-view" title="Lihat di Situs">
-                                  <i class="fas fa-external-link-alt"></i>
-                                </a>
-                                <a href="#" class="btn btn-sm btn-edit" title="Edit">
-                                  <i class="fas fa-edit"></i>
-                                </a>
-                                <button type="button" class="btn btn-sm btn-approve" title="Setujui">
-                                  <i class="fas fa-check"></i>
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <div style="display: flex; align-items: center; gap: 1rem;">
-                                <img src="{{ asset('src/produk_sample.jpg') }}" alt="Sample Product" class="product-thumbnail">
-                                <div>
-                                  <div><strong>Jersey Sepak Bola</strong></div>
-                                  <small class="text-muted">SKU: JR-SB-001</small>
-                                </div>
-                              </div>
-                            </td>
-                            <td>
-                              <a href="{{ route('sellers.show', 4) }}" class="text-primary">Toko Elektronik</a>
-                            </td>
-                            <td>
-                              <div>Olahraga</div>
-                              <small class="text-muted">Pakaian Olahraga</small>
-                            </td>
-                            <td>
-                              <div><strong>Rp 95,000</strong></div>
-                              <small class="text-muted">Stok: 30</small>
-                            </td>
-                            <td>
-                              <span class="badge badge-rejected d-block">Ditolak</span>
-                            </td>
-                            <td>
-                              <div class="btn-group" role="group">
-                                <a href="#" class="btn btn-sm btn-view" title="Lihat di Situs">
-                                  <i class="fas fa-external-link-alt"></i>
-                                </a>
-                                <a href="#" class="btn btn-sm btn-edit" title="Edit">
-                                  <i class="fas fa-edit"></i>
-                                </a>
-                                <button type="button" class="btn btn-sm btn-approve" title="Setujui">
-                                  <i class="fas fa-check"></i>
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
+                          @empty
                           <tr>
                             <td colspan="6" class="text-center py-4">Tidak ada data produk ditemukan.</td>
                           </tr>
+                          @endforelse
                         </tbody>
                       </table>
                     </div>
                     
                     <!-- Pagination -->
+                    @if(isset($products) && $products->count() > 0)
                     <div class="mt-3 d-flex justify-content-between align-items-center">
-                      Menampilkan 1 sampai 4 dari 25 produk
+                      Menampilkan {{ $products->firstItem() }} sampai {{ $products->lastItem() }} dari {{ $products->total() }} produk
                     </div>
                     <div>
                       <nav aria-label="Navigasi produk">
                         <ul class="pagination">
-                          <li class="page-item disabled">
-                            <a class="page-link" href="#" aria-label="Previous">
-                              <span aria-hidden="true">&laquo;&laquo; Sebelumnya</span>
-                            </a>
-                          </li>
-                          <li class="page-item active"><span class="page-link" style="color: white;">1</span></li>
-                          <li class="page-item"><a class="page-link" href="#">2</a></li>
-                          <li class="page-item"><a class="page-link" href="#">3</a></li>
-                          <li class="page-item"><a class="page-link" href="#">4</a></li>
-                          <li class="page-item">
-                            <a class="page-link" href="#" aria-label="Next">
-                              <span aria-hidden="true">Berikutnya &raquo;&raquo;</span>
-                            </a>
-                          </li>
+                          @if ($products->onFirstPage())
+                            <li class="page-item disabled">
+                              <span class="page-link">&laquo;&laquo; Sebelumnya</span>
+                            </li>
+                          @else
+                            <li class="page-item">
+                              <a class="page-link" href="{{ $products->previousPageUrl() }}{{ request('tab') ? '&tab=products' : '' }}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;&laquo; Sebelumnya</span>
+                              </a>
+                            </li>
+                          @endif
+
+                          @for ($i = max(1, $products->currentPage() - 2); $i <= min($products->lastPage(), $products->currentPage() + 2); $i++)
+                            @if ($i == $products->currentPage())
+                              <li class="page-item active"><span class="page-link" style="color: white;">{{ $i }}</span></li>
+                            @else
+                              <li class="page-item"><a class="page-link" href="{{ $products->url($i) }}{{ request('tab') ? '&tab=products' : '' }}">{{ $i }}</a></li>
+                            @endif
+                          @endfor
+
+                          @if ($products->hasMorePages())
+                            <li class="page-item">
+                              <a class="page-link" href="{{ $products->nextPageUrl() }}{{ request('tab') ? '&tab=products' : '' }}" aria-label="Next">
+                                <span aria-hidden="true">Berikutnya &raquo;&raquo;</span>
+                              </a>
+                            </li>
+                          @else
+                            <li class="page-item disabled">
+                              <span class="page-link">Berikutnya &raquo;&raquo;</span>
+                            </li>
+                          @endif
                         </ul>
                       </nav>
                     </div>
+                    @endif
                   </div>
                 </div>
               </div>
             </div>
 
             <!-- Categories & Attributes Tab -->
-            <div class="tab-pane fade" id="categories-tab-pane" role="tabpanel">
+            <div class="tab-pane fade {{ (isset($tab) && $tab === 'categories') ? 'show active' : '' }}" id="categories-tab-pane" role="tabpanel">
               <div class="mt-3">
                 <div class="category-layout">
                   <div class="category-panel">
@@ -709,14 +655,20 @@
                       <button class="btn btn-primary">Tambah Kategori</button>
                     </div>
                     <ul class="category-list">
-                      <li class="active">Elektronik</li>
-                      <li>Fashion</li>
-                      <li>Buku</li>
-                      <li>Olahraga</li>
-                      <li>Makanan</li>
-                      <li>Kerajinan</li>
-                      <li>Kesehatan</li>
-                      <li>Rumah Tangga</li>
+                      @if(isset($mainCategories))
+                        @foreach($mainCategories as $category)
+                          <li class="{{ request('selected_category') == $category->id ? 'active' : '' }}" onclick="selectCategory({{ $category->id }})">{{ $category->name }}</li>
+                        @endforeach
+                      @else
+                        <li class="active">Elektronik</li>
+                        <li>Fashion</li>
+                        <li>Buku</li>
+                        <li>Olahraga</li>
+                        <li>Makanan</li>
+                        <li>Kerajinan</li>
+                        <li>Kesehatan</li>
+                        <li>Rumah Tangga</li>
+                      @endif
                     </ul>
                   </div>
                   
@@ -751,7 +703,7 @@
             </div>
 
             <!-- Reviews Tab -->
-            <div class="tab-pane fade" id="reviews-tab-pane" role="tabpanel">
+            <div class="tab-pane fade {{ (isset($tab) && $tab === 'reviews') ? 'show active' : '' }}" id="reviews-tab-pane" role="tabpanel">
               <div class="mt-3">
                 <!-- Filter Panel for Reviews -->
                 <div class="filter-panel">
@@ -759,31 +711,34 @@
                     <h3 class="filter-title"><i class="fas fa-filter"></i> Filter Ulasan</h3>
                   </div>
                   <div class="filter-content">
-                    <form id="reviewFilterForm" method="GET" action="">
+                    <form id="reviewFilterForm" method="GET" action="{{ route('admin.produk.index') }}?tab=reviews">
                       <div class="row g-2">
                         <div class="col-md-3 mb-2">
                           <label for="review_status_filter" class="form-label">Status Ulasan</label>
                           <select class="form-select" id="review_status_filter" name="review_status">
                             <option value="">Semua Status</option>
-                            <option value="pending">Menunggu Persetujuan</option>
-                            <option value="approved">Disetujui</option>
-                            <option value="rejected">Ditolak</option>
+                            <option value="pending" {{ request('review_status') == 'pending' ? 'selected' : '' }}>Menunggu Persetujuan</option>
+                            <option value="approved" {{ request('review_status') == 'approved' ? 'selected' : '' }}>Disetujui</option>
+                            <option value="rejected" {{ request('review_status') == 'rejected' ? 'selected' : '' }}>Ditolak</option>
                           </select>
                         </div>
                         <div class="col-md-3 mb-2">
                           <label for="rating_filter" class="form-label">Filter berdasarkan Rating</label>
                           <select class="form-select" id="rating_filter" name="rating">
                             <option value="">Semua Rating</option>
-                            <option value="1">1 Bintang</option>
-                            <option value="2">2 Bintang</option>
-                            <option value="3">3 Bintang</option>
-                            <option value="4">4 Bintang</option>
-                            <option value="5">5 Bintang</option>
+                            <option value="1" {{ request('rating') == '1' ? 'selected' : '' }}>1 Bintang</option>
+                            <option value="2" {{ request('rating') == '2' ? 'selected' : '' }}>2 Bintang</option>
+                            <option value="3" {{ request('rating') == '3' ? 'selected' : '' }}>3 Bintang</option>
+                            <option value="4" {{ request('rating') == '4' ? 'selected' : '' }}>4 Bintang</option>
+                            <option value="5" {{ request('rating') == '5' ? 'selected' : '' }}>5 Bintang</option>
                           </select>
                         </div>
                         <div class="col-md-4 mb-2">
                           <label for="review_search" class="form-label">Cari berdasarkan</label>
-                          <input type="text" class="form-control" id="review_search" name="review_search" placeholder="Isi ulasan, nama produk, atau nama pengguna">
+                          <input type="text" class="form-control" id="review_search" name="review_search" value="{{ request('review_search') }}" placeholder="Isi ulasan, nama produk, atau nama pengguna">
+                        </div>
+                        <div class="col-md-2 mb-2 d-flex align-items-end">
+                          <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search"></i> Cari</button>
                         </div>
                       </div>
                     </form>
@@ -809,138 +764,104 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr>
+                          @forelse($reviews ?? collect() as $review)
+                          <tr id="review-row-{{ $review->id }}">
                             <td>
-                              <div>Produk sangat bagus, kualitas sesuai harga. Pengiriman cepat dan aman.</div>
+                              <div>{{ $review->review_text }}</div>
                               <div>
                                 <span class="badge bg-warning text-dark">
-                                  <i class="fas fa-star"></i> 4
+                                  <i class="fas fa-star"></i> {{ $review->rating }}
                                 </span>
                               </div>
                             </td>
                             <td>
-                              <a href="#" class="text-primary">Smartphone ABC 128GB</a>
+                              <span class="text-primary">{{ $review->product->name ?? 'Produk Tidak Ditemukan' }}</span>
                             </td>
                             <td>
-                              <div><strong>Andi Prasetyo</strong></div>
-                              <small class="text-muted">andi@example.com</small>
+                              <div><strong>{{ $review->user->name ?? 'User Tidak Ditemukan' }}</strong></div>
+                              <small class="text-muted">{{ $review->user->email ?? 'N/A' }}</small>
                             </td>
-                            <td>15 Agu 2024</td>
+                            <td>{{ $review->created_at->format('d M Y') }}</td>
                             <td>
-                              <span class="badge badge-active d-block">Disetujui</span>
+                              @if($review->approved_at)
+                                <span class="badge badge-active d-block">Disetujui</span>
+                              @elseif($review->rejected_at)
+                                <span class="badge badge-rejected d-block">Ditolak</span>
+                              @else
+                                <span class="badge badge-pending d-block">Menunggu Persetujuan</span>
+                              @endif
                             </td>
                             <td>
                               <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-sm btn-approve" title="Setujui">
-                                  <i class="fas fa-check"></i>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-danger" title="Hapus">
+                                @if(!$review->approved_at && !$review->rejected_at)
+                                  <button type="button" class="btn btn-sm btn-approve" title="Setujui" onclick="approveReview({{ $review->id }})">
+                                    <i class="fas fa-check"></i>
+                                  </button>
+                                  <button type="button" class="btn btn-sm btn-danger" title="Tolak" onclick="rejectReview({{ $review->id }})">
+                                    <i class="fas fa-times"></i>
+                                  </button>
+                                @endif
+                                <button type="button" class="btn btn-sm btn-danger" title="Hapus" onclick="deleteReview({{ $review->id }})">
                                   <i class="fas fa-trash"></i>
                                 </button>
-                                <button type="button" class="btn btn-sm btn-warning" title="Tandai sebagai Spam">
+                                <button type="button" class="btn btn-sm btn-warning" title="Tandai sebagai Spam" onclick="markAsSpam({{ $review->id }})">
                                   <i class="fas fa-ban"></i>
                                 </button>
                               </div>
                             </td>
                           </tr>
-                          <tr>
-                            <td>
-                              <div>Barang tidak sesuai deskripsi. Warna berbeda dari yang ditampilkan di foto.</div>
-                              <div>
-                                <span class="badge bg-warning text-dark">
-                                  <i class="fas fa-star"></i> 1
-                                </span>
-                              </div>
-                            </td>
-                            <td>
-                              <a href="#" class="text-primary">Kemeja Formal Pria</a>
-                            </td>
-                            <td>
-                              <div><strong>Siti Nurhaliza</strong></div>
-                              <small class="text-muted">siti@example.com</small>
-                            </td>
-                            <td>18 Agu 2024</td>
-                            <td>
-                              <span class="badge badge-pending d-block">Menunggu Persetujuan</span>
-                            </td>
-                            <td>
-                              <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-sm btn-approve" title="Setujui">
-                                  <i class="fas fa-check"></i>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-danger" title="Hapus">
-                                  <i class="fas fa-trash"></i>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-warning" title="Tandai sebagai Spam">
-                                  <i class="fas fa-ban"></i>
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <div>Produk sangat bagus dan tahan lama. Cocok untuk penggunaan sehari-hari.</div>
-                              <div>
-                                <span class="badge bg-warning text-dark">
-                                  <i class="fas fa-star"></i> 5
-                                </span>
-                              </div>
-                            </td>
-                            <td>
-                              <a href="#" class="text-primary">Buku Pemrograman Laravel</a>
-                            </td>
-                            <td>
-                              <div><strong>Ahmad Fauzi</strong></div>
-                              <small class="text-muted">ahmad@example.com</small>
-                            </td>
-                            <td>20 Agu 2024</td>
-                            <td>
-                              <span class="badge badge-active d-block">Disetujui</span>
-                            </td>
-                            <td>
-                              <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-sm btn-approve" title="Setujui">
-                                  <i class="fas fa-check"></i>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-danger" title="Hapus">
-                                  <i class="fas fa-trash"></i>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-warning" title="Tandai sebagai Spam">
-                                  <i class="fas fa-ban"></i>
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
+                          @empty
                           <tr>
                             <td colspan="6" class="text-center py-4">Tidak ada data ulasan produk ditemukan.</td>
                           </tr>
+                          @endforelse
                         </tbody>
                       </table>
                     </div>
                     
                     <!-- Pagination -->
+                    @if(isset($reviews) && $reviews->count() > 0)
                     <div class="mt-3 d-flex justify-content-between align-items-center">
-                      Menampilkan 1 sampai 3 dari 15 ulasan
+                      Menampilkan {{ $reviews->firstItem() }} sampai {{ $reviews->lastItem() }} dari {{ $reviews->total() }} ulasan
                     </div>
                     <div>
                       <nav aria-label="Navigasi ulasan">
                         <ul class="pagination">
-                          <li class="page-item disabled">
-                            <a class="page-link" href="#" aria-label="Previous">
-                              <span aria-hidden="true">«« Sebelumnya</span>
-                            </a>
-                          </li>
-                          <li class="page-item active"><span class="page-link" style="color: white;">1</span></li>
-                          <li class="page-item"><a class="page-link" href="#">2</a></li>
-                          <li class="page-item"><a class="page-link" href="#">3</a></li>
-                          <li class="page-item">
-                            <a class="page-link" href="#" aria-label="Next">
-                              <span aria-hidden="true">Berikutnya »»</span>
-                            </a>
-                          </li>
+                          @if ($reviews->onFirstPage())
+                            <li class="page-item disabled">
+                              <span class="page-link">«« Sebelumnya</span>
+                            </li>
+                          @else
+                            <li class="page-item">
+                              <a class="page-link" href="{{ $reviews->previousPageUrl() }}&tab=reviews" aria-label="Previous">
+                                <span aria-hidden="true">«« Sebelumnya</span>
+                              </a>
+                            </li>
+                          @endif
+
+                          @for ($i = max(1, $reviews->currentPage() - 2); $i <= min($reviews->lastPage(), $reviews->currentPage() + 2); $i++)
+                            @if ($i == $reviews->currentPage())
+                              <li class="page-item active"><span class="page-link" style="color: white;">{{ $i }}</span></li>
+                            @else
+                              <li class="page-item"><a class="page-link" href="{{ $reviews->url($i) }}&tab=reviews">{{ $i }}</a></li>
+                            @endif
+                          @endfor
+
+                          @if ($reviews->hasMorePages())
+                            <li class="page-item">
+                              <a class="page-link" href="{{ $reviews->nextPageUrl() }}&tab=reviews" aria-label="Next">
+                                <span aria-hidden="true">Berikutnya »»</span>
+                              </a>
+                            </li>
+                          @else
+                            <li class="page-item disabled">
+                              <span class="page-link">Berikutnya »»</span>
+                            </li>
+                          @endif
                         </ul>
                       </nav>
                     </div>
+                    @endif
                   </div>
                 </div>
               </div>
@@ -1074,8 +995,7 @@
           }
           
           // Preserve the current active tab in the URL
-          const currentActiveTab = document.querySelector('#productManagementTabs .nav-link.active').id.replace('-tab', '');
-          params.set('tab', currentActiveTab);
+          params.set('tab', 'reviews');
           
           // Get the current URL without query parameters
           let newUrl = window.location.pathname;
@@ -1113,6 +1033,178 @@
         });
       }
     });
+    
+    // Functions for product actions
+    function approveProduct(productId) {
+      if (confirm('Apakah Anda yakin ingin menyetujui produk ini?')) {
+        fetch(`/admin/produk/${productId}/approve`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert(data.message);
+            location.reload();
+          } else {
+            alert('Gagal menyetujui produk: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Terjadi kesalahan saat menyetujui produk');
+        });
+      }
+    }
+    
+    function rejectProduct(productId) {
+      if (confirm('Apakah Anda yakin ingin menolak produk ini?')) {
+        fetch(`/admin/produk/${productId}/reject`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert(data.message);
+            location.reload();
+          } else {
+            alert('Gagal menolak produk: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Terjadi kesalahan saat menolak produk');
+        });
+      }
+    }
+    
+    function suspendProduct(productId) {
+      if (confirm('Apakah Anda yakin ingin menangguhkan produk ini?')) {
+        fetch(`/admin/produk/${productId}/suspend`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert(data.message);
+            location.reload();
+          } else {
+            alert('Gagal menangguhkan produk: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Terjadi kesalahan saat menangguhkan produk');
+        });
+      }
+    }
+    
+    // Functions for review actions
+    function approveReview(reviewId) {
+      if (confirm('Apakah Anda yakin ingin menyetujui ulasan ini?')) {
+        fetch(`/admin/reviews/${reviewId}/approve`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert(data.message);
+            location.reload();
+          } else {
+            alert('Gagal menyetujui ulasan: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Terjadi kesalahan saat menyetujui ulasan');
+        });
+      }
+    }
+    
+    function rejectReview(reviewId) {
+      if (confirm('Apakah Anda yakin ingin menolak ulasan ini?')) {
+        fetch(`/admin/reviews/${reviewId}/reject`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert(data.message);
+            location.reload();
+          } else {
+            alert('Gagal menolak ulasan: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Terjadi kesalahan saat menolak ulasan');
+        });
+      }
+    }
+    
+    function deleteReview(reviewId) {
+      if (confirm('Apakah Anda yakin ingin menghapus ulasan ini?')) {
+        fetch(`/admin/reviews/${reviewId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert(data.message);
+            location.reload();
+          } else {
+            alert('Gagal menghapus ulasan: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Terjadi kesalahan saat menghapus ulasan');
+        });
+      }
+    }
+    
+    function markAsSpam(reviewId) {
+      alert('Fitur ini akan segera hadir: Tandai ulasan sebagai spam');
+    }
+    
+    function selectCategory(categoryId) {
+      // Update URL dengan selected_category
+      const urlParams = new URLSearchParams(window.location.search);
+      urlParams.set('selected_category', categoryId);
+      const newUrl = window.location.pathname + '?' + urlParams.toString() + '&tab=categories';
+      
+      // Update the URL without reloading the page
+      history.pushState({}, '', newUrl);
+      
+      // Update active class
+      document.querySelectorAll('.category-list li').forEach(li => {
+        li.classList.remove('active');
+      });
+      event.target.classList.add('active');
+    }
   </script>
   
 @endsection

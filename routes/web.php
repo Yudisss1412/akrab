@@ -644,9 +644,20 @@ Route::put('/reports/violations/{id}/status', [App\Http\Controllers\Admin\Report
 Route::get('/reports/violations/filter', [App\Http\Controllers\Admin\ReportsController::class, 'filter'])->name('reports.violations.filter');
 
 // Product Management Routes
-Route::get('/admin/produk', function () {
-    return view('admin.produk.index');
-})->name('produk.index');
+// Product Management Routes for Admin
+Route::middleware(['auth', 'admin.role'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/produk', [App\Http\Controllers\Admin\ProductController::class, 'index'])->name('produk.index');
+    Route::put('/produk/{id}/approve', [App\Http\Controllers\Admin\ProductController::class, 'approveProduct'])->name('produk.approve');
+    Route::put('/produk/{id}/reject', [App\Http\Controllers\Admin\ProductController::class, 'rejectProduct'])->name('produk.reject');
+    Route::put('/produk/{id}/suspend', [App\Http\Controllers\Admin\ProductController::class, 'suspendProduct'])->name('produk.suspend');
+    Route::put('/produk/{id}/status', [App\Http\Controllers\Admin\ProductController::class, 'update'])->name('produk.update_status');
+    Route::delete('/produk/{id}', [App\Http\Controllers\Admin\ProductController::class, 'destroy'])->name('produk.delete');
+    
+    // Review Management Routes
+    Route::put('/reviews/{id}/approve', [App\Http\Controllers\Admin\ProductController::class, 'approveReview'])->name('reviews.approve');
+    Route::put('/reviews/{id}/reject', [App\Http\Controllers\Admin\ProductController::class, 'rejectReview'])->name('reviews.reject');
+    Route::delete('/reviews/{id}', [App\Http\Controllers\Admin\ProductController::class, 'deleteReview'])->name('reviews.delete');
+});
 
 
 Route::get('/penjual/produk', [App\Http\Controllers\Seller\ProductController::class, 'index'])->name('penjual.produk');

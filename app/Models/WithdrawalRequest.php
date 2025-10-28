@@ -10,6 +10,12 @@ class WithdrawalRequest extends Model
         'seller_id',
         'amount',
         'status',
+        'payment_method',
+        'bank_name',
+        'account_number',
+        'account_name',
+        'ewallet_number',
+        'rejection_reason',
         'request_date',
         'processed_date',
         'bank_account',
@@ -17,6 +23,7 @@ class WithdrawalRequest extends Model
     ];
 
     protected $casts = [
+        'amount' => 'decimal:2',
         'request_date' => 'datetime',
         'processed_date' => 'datetime',
     ];
@@ -25,5 +32,11 @@ class WithdrawalRequest extends Model
     public function seller()
     {
         return $this->belongsTo(Seller::class, 'seller_id');
+    }
+
+    // Relasi ke user melalui seller
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'seller_id', 'seller_id');
     }
 }

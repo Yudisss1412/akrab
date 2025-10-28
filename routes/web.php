@@ -603,13 +603,19 @@ Route::middleware(['auth', 'admin.role'])->group(function () {
     Route::get('/support/tickets/{id}', [App\Http\Controllers\TicketController::class, 'show'])->name('support.tickets.detail');
     Route::post('/support/tickets/{id}/update-status', [App\Http\Controllers\TicketController::class, 'updateStatus'])->name('support.tickets.update-status');
     Route::get('/api/tickets/{id}/messages', [App\Http\Controllers\TicketController::class, 'getTicketMessages'])->name('api.tickets.messages');
+    
+    // Withdrawal Request routes
+    Route::get('/withdrawal-requests', [App\Http\Controllers\WithdrawalRequestController::class, 'index'])->name('withdrawal.requests');
+    Route::get('/api/withdrawals/{id}', [App\Http\Controllers\WithdrawalRequestController::class, 'show'])->name('api.withdrawals.show');
+    Route::post('/api/withdrawals/{id}/approve', [App\Http\Controllers\WithdrawalRequestController::class, 'approve'])->name('api.withdrawals.approve');
+    Route::post('/api/withdrawals/{id}/reject', [App\Http\Controllers\WithdrawalRequestController::class, 'reject'])->name('api.withdrawals.reject');
+    Route::post('/api/withdrawals/{id}/process', [App\Http\Controllers\WithdrawalRequestController::class, 'process'])->name('api.withdrawals.process');
+    Route::post('/admin/withdrawals/approve-bulk', [App\Http\Controllers\WithdrawalRequestController::class, 'approveBulk'])->name('admin.withdrawals.approve-bulk');
+    Route::post('/admin/withdrawals/reject-bulk', [App\Http\Controllers\WithdrawalRequestController::class, 'rejectBulk'])->name('admin.withdrawals.reject-bulk');
+    Route::get('/admin/withdrawals/export', [App\Http\Controllers\WithdrawalRequestController::class, 'export'])->name('admin.withdrawals.export');
 });
 
-Route::middleware(['auth', 'admin.role'])->group(function () {
-    Route::get('/withdrawal/requests', function () {
-        return view('admin.withdrawal_requests');
-    })->name('withdrawal.requests');
-});
+
 
 
 

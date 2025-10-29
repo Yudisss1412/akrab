@@ -19,19 +19,19 @@ class AuthHelper
         
         $user = Auth::user();
         
-        // Cek apakah user adalah admin
-        if (self::isAdmin($user)) {
-            return 'admin';
-        }
+        // Gunakan sistem role yang konsisten dengan middleware
+        $roleName = $user->getRoleName();
         
-        // Cek apakah user adalah penjual
-        $seller = Seller::where('user_id', $user->id)->first();
-        if ($seller) {
-            return 'seller';
+        switch($roleName) {
+            case 'admin':
+                return 'admin';
+            case 'seller':
+                return 'seller';
+            case 'buyer': // dalam sistem ini role customer disebut buyer
+                return 'customer';
+            default:
+                return 'guest';
         }
-        
-        // Default sebagai customer
-        return 'customer';
     }
     
     /**
@@ -47,10 +47,8 @@ class AuthHelper
             return false;
         }
         
-        // Logika untuk menentukan apakah user adalah admin
-        return $user->email === 'admin@akrab.test' || 
-               str_contains($user->email, 'admin') || 
-               $user->id === 1;
+        // Gunakan sistem role yang konsisten
+        return $user->role && $user->role->name === 'admin';
     }
     
     /**
@@ -66,7 +64,8 @@ class AuthHelper
             return false;
         }
         
-        return Seller::where('user_id', $user->id)->exists();
+        // Gunakan sistem role yang konsisten
+        return $user->role && $user->role->name === 'seller';
     }
     
     /**
@@ -82,7 +81,7 @@ class AuthHelper
             return false;
         }
         
-        // Customer adalah user yang terautentikasi tetapi bukan penjual dan bukan admin
-        return !self::isSeller($user) && !self::isAdmin($user);
+        // Customer adalah user dengan role buyer
+        return $user->role && $user->role->name === 'buyer';
     }
 }

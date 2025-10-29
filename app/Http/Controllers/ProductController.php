@@ -14,18 +14,25 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        // Ambil semua produk dengan relasi variants dan seller
-        $products = Product::with(['variants', 'seller', 'category'])->get();
+        // Ambil semua produk dengan relasi variants, seller, category, dan approvedReviews untuk rating
+        $products = Product::with(['variants', 'seller', 'category', 'approvedReviews'])->get();
         
         // Tambahkan filter berdasarkan kategori jika ada
         $kategori = $request->query('kategori');
         if ($kategori && $kategori !== 'all') {
-            $products = Product::with(['variants', 'seller', 'category'])
+            $products = Product::with(['variants', 'seller', 'category', 'approvedReviews'])
                             ->whereHas('category', function($query) use ($kategori) {
                                 $query->where('name', $kategori);
                             })
                             ->get();
         }
+        
+        // Tambahkan average rating dan review count ke setiap produk
+        $products = $products->map(function($product) {
+            $product->setAttribute('average_rating', $product->averageRating);
+            $product->setAttribute('review_count', $product->reviews_count);
+            return $product;
+        });
         
         return view('customer.produk.halaman_produk', compact('products'));
     }
@@ -36,7 +43,7 @@ class ProductController extends Controller
     public function show($id)
     {
         // Ambil produk berdasarkan ID dengan relasi yang diperlukan
-        $product = Product::with(['variants', 'seller', 'category', 'reviews.user'])->find($id);
+        $product = Product::with(['variants', 'seller', 'category', 'approvedReviews.user'])->find($id);
         
         if (!$product) {
             abort(404, 'Produk tidak ditemukan');
@@ -53,7 +60,7 @@ class ProductController extends Controller
             'gambar' => [$product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png')], // Tambahkan lebih banyak gambar jika ada
             'rating' => $product->averageRating, // Gunakan averageRating dari accessor
             'jumlah_ulasan' => $product->reviews_count, // Gunakan reviews_count dari accessor
-            'ulasan' => $product->reviews->where('status', 'approved')->map(function($review) {
+            'ulasan' => $product->approvedReviews->map(function($review) {
                 return [
                     'id' => $review->id,
                     'user' => $review->user->name,
@@ -84,9 +91,16 @@ class ProductController extends Controller
     {
         $query = $request->input('q');
         
-        $products = Product::with(['variants', 'seller', 'category'])
+        $products = Product::with(['variants', 'seller', 'category', 'approvedReviews'])
                         ->where('name', 'LIKE', "%{$query}%")
                         ->get();
+        
+        // Tambahkan average rating dan review count ke setiap produk
+        $products = $products->map(function($product) {
+            $product->setAttribute('average_rating', $product->averageRating);
+            $product->setAttribute('review_count', $product->reviews_count);
+            return $product;
+        });
         
         return view('customer.produk.halaman_produk', compact('products'));
     }
@@ -96,11 +110,18 @@ class ProductController extends Controller
      */
     public function byCategory($category)
     {
-        $products = Product::with(['variants', 'seller', 'category'])
+        $products = Product::with(['variants', 'seller', 'category', 'approvedReviews'])
                         ->whereHas('category', function($query) use ($category) {
                             $query->where('name', $category);
                         })
                         ->get();
+        
+        // Tambahkan average rating dan review count ke setiap produk
+        $products = $products->map(function($product) {
+            $product->setAttribute('average_rating', $product->averageRating);
+            $product->setAttribute('review_count', $product->reviews_count);
+            return $product;
+        });
         
         return view('customer.produk.halaman_produk', compact('products'));
     }
@@ -131,10 +152,17 @@ class ProductController extends Controller
         }
         
         // Ambil produk berdasarkan kategori dengan informasi lengkap
-        $products = Product::with(['variants', 'seller', 'category'])
+        $products = Product::with(['variants', 'seller', 'category', 'approvedReviews'])
                          ->where('category_id', $category->id)
                          ->where('status', 'active')
                          ->get();
+        
+        // Tambahkan average rating dan review count ke setiap produk
+        $products = $products->map(function($product) {
+            $product->setAttribute('average_rating', $product->averageRating);
+            $product->setAttribute('review_count', $product->reviews_count);
+            return $product;
+        });
         
         // Format data produk untuk ditampilkan di halaman kategori
         $formattedProducts = $products->map(function($product) {
@@ -144,6 +172,8 @@ class ProductController extends Controller
                 'description' => $product->description,
                 'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
                 'image' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
+                'average_rating' => round($product->averageRating, 1),
+                'review_count' => $product->reviews_count,
             ];
         });
         
@@ -174,10 +204,17 @@ class ProductController extends Controller
     public function popular()
     {
         // Ambil produk terbaru atau produk dengan penjualan terbanyak sebagai produk populer
-        $products = Product::with(['variants', 'seller', 'category'])
+        $products = Product::with(['variants', 'seller', 'category', 'approvedReviews'])
                         ->orderBy('created_at', 'desc') // Urutkan berdasarkan tanggal terbaru
                         ->limit(10)
                         ->get();
+        
+        // Tambahkan average rating dan review count ke setiap produk
+        $products = $products->map(function($product) {
+            $product->setAttribute('average_rating', $product->averageRating);
+            $product->setAttribute('review_count', $product->reviews_count);
+            return $product;
+        });
         
         $formattedProducts = $products->map(function($product) {
             return [
@@ -186,6 +223,8 @@ class ProductController extends Controller
                 'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
                 'image' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
                 'description' => $product->description,
+                'average_rating' => round($product->averageRating, 1),
+                'review_count' => $product->reviews_count,
                 'specifications' => [
                     'Kategori: ' . ($product->category->name ?? 'Umum'),
                     'Stok: ' . $product->stock,
@@ -202,7 +241,7 @@ class ProductController extends Controller
      */
     public function apiShow($id)
     {
-        $product = Product::with(['variants', 'seller', 'category'])->find($id);
+        $product = Product::with(['variants', 'seller', 'category', 'approvedReviews'])->find($id);
         
         if (!$product) {
             return response()->json(['error' => 'Produk tidak ditemukan'], 404);
@@ -263,6 +302,8 @@ class ProductController extends Controller
             'discount_price' => $product->discount_price ? 'Rp ' . number_format($product->discount_price, 0, ',', '.') : null,
             'discount_start_date' => $product->discount_start_date,
             'discount_end_date' => $product->discount_end_date,
+            'average_rating' => round($product->averageRating, 1),
+            'review_count' => $product->reviews_count,
         ];
         
         return response()->json($formattedProduct);

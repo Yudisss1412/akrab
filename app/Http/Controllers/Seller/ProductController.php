@@ -35,7 +35,7 @@ class ProductController extends Controller
         
         // Query builder untuk produk milik penjual saat ini
         $query = Product::where('seller_id', $seller->id)
-            ->with(['variants', 'category', 'images']);
+            ->with(['variants', 'category', 'images', 'approvedReviews']);
 
         // Filter berdasarkan pencarian jika ada
         if ($request->has('search') && $request->search) {

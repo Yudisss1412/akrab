@@ -98,7 +98,7 @@ class ReviewController extends Controller
             'rating' => $request->rating,
             'review_text' => $request->review_text,
             'media' => !empty($mediaPaths) ? $mediaPaths : null,
-            'status' => 'approved' // Otomatis disetujui untuk user
+            'status' => 'pending' // Status awal adalah pending, menunggu approval
         ]);
 
         return response()->json([

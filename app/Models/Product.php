@@ -86,6 +86,12 @@ class Product extends Model
     {
         return $this->hasMany(Review::class);
     }
+    
+    // Relasi ke ulasan yang disetujui
+    public function approvedReviews()
+    {
+        return $this->hasMany(Review::class)->where('status', 'approved');
+    }
 
     // Relasi ke wishlist
     public function wishlists()
@@ -108,7 +114,7 @@ class Product extends Model
     // Method untuk mendapatkan jumlah ulasan
     public function getReviewsCountAttribute()
     {
-        return $this->reviews()->where('status', 'approved')->count();
+        return $this->approvedReviews()->count();
     }
 
     // Relasi ke promosi produk

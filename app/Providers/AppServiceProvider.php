@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Facade;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,5 +21,14 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         //
+    }
+    
+    /**
+     * Register any application services after loading.
+     */
+    public function registerFacades(): void
+    {
+        // Register Intervention Image Facade if needed
+        Facade::clearResolvedInstances();
     }
 }

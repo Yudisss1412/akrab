@@ -77,7 +77,7 @@ Route::prefix('admin')->name('sellers.')->group(function () {
 
 Route::get('/welcome', function () {
     return view('customer.cust_welcome');
-})->name('cust.welcome');
+})->name('welcome');
 
 Route::get('/login', function () {
     return view('auth.login');
@@ -732,7 +732,7 @@ Route::middleware(['auth'])->group(function () {
 
 // Payment Routes
 Route::middleware(['auth'])->group(function () {
-    Route::post('/payment/process', [App\Http\Controllers\PaymentController::class, 'process'])->name('payment.process');
+    Route::post('/payment/process', [App\Http\Controllers\PaymentController::class, 'process'])->name('payment.process.api');
     Route::post('/payment/callback', [App\Http\Controllers\PaymentController::class, 'callback'])->name('payment.callback');
     Route::get('/payment/{order}', [App\Http\Controllers\PaymentController::class, 'show'])->name('payment.show');
 });

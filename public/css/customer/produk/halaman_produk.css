@@ -26,9 +26,6 @@ body {
   --shadow-sm:0 2px 10px rgba(0,0,0,.06);
   --shadow-md:0 6px 20px rgba(0,110,92,.12);
 }
-  --shadow-sm:0 2px 10px rgba(0,0,0,.06);
-  --shadow-md:0 6px 20px rgba(0,110,92,.12);
-}
 
 /* ====== HEADER mandiri ====== */
 .header{
@@ -115,19 +112,19 @@ body {
 @media (max-width:520px){  .produk-page .produk-grid{ grid-template-columns:1fr } }
 
 /* Kartu Produk */
-.produk-page .produk-card{
+.produk-page .produk-item{
   position:relative;
   background:var(--secondary-color); border:1px solid var(--primary-color); border-radius:16px;
   box-shadow: var(--shadow-sm);
   overflow:hidden; display:flex; flex-direction:column; padding:12px;
   transition: box-shadow .15s, border-color .15s, transform .15s;
 }
-.produk-page .produk-card:hover{
+.produk-page .produk-item:hover{
   box-shadow: var(--shadow-md); border-color: var(--primary-color-dark);
   transform: translateY(-1px);
 }
-.produk-page .produk-card img{
-  width:100%; height:150px; object-fit:cover; border-radius:10px; background:var(--background-color);
+.produk-page .produk-item img{
+  width:40px; height:40px; object-fit:cover; border-radius:10px; background:var(--background-color);
 }
 .produk-page .produk-card-info{ padding:8px 4px 6px }
 .produk-page .produk-card-name{
@@ -212,22 +209,24 @@ body {
   transition:box-shadow .15s, border-color .15s;
 }
 .produk-page .rek-card:hover{ box-shadow:0 8px 22px rgba(0,110,92,.10); border-color: var(--primary-color-dark) }
-.produk-page .rek-img{ width:100%; height:140px; object-fit:cover; display:block; background:var(--background-color) }
-.produk-page .rek-body{ padding:.85rem .9rem 1rem; display:flex; flex-direction:column; gap:.35rem }
-.produk-page .rek-name{ font-weight:700; color: var(--primary-color-dark); line-height:1.3 }
-.produk-page .rek-cat{ font-size:.9rem; color:var(--grey-text-color) }
-.produk-page .rek-price{ font-weight:700; color:var(--dark-text-color) }
-.produk-page .rek-actions{ margin-top:.5rem; display:flex; gap:.55rem }
-.produk-page .rek-btn{
+.produk-page .produk-img{ width:40px; height:40px; display:block; object-fit:cover; background:var(--background-color); flex-shrink: 0; }
+.produk-page .produk-info{ flex:1; }
+.produk-page .produk-name{ font-weight:700; color: var(--primary-color-dark); line-height:1.3 }
+.produk-page .produk-toko{ font-size:.9rem; color:var(--grey-text-color); margin:0 }
+.produk-page .produk-harga{ font-weight:700; color:var(--dark-text-color) }
+.produk-page .produk-rating{ display:flex; align-items:center; gap:5px; margin:5px 0; }
+.produk-page .produk-aksi{ margin-top:.5rem; display:flex; gap:.55rem }
+.produk-page .btn-produk{
   flex:1; border:none; border-radius:8px; padding:.55rem .75rem; font-weight:600; cursor:pointer; transition:background .15s,color .15s;
   display: flex;
   align-items: center;
   justify-content: center;
+  text-decoration: none;
 }
-.produk-page .rek-btn.primary{ background: var(--primary-color-dark); color:#fff }
-.produk-page .rek-btn.primary:hover{ background: var(--primary-color); color: var(--primary-color-dark) }
-.produk-page .rek-btn.ghost{ background:#f5fbf8; color: var(--primary-color-dark); border:1px solid var(--primary-color-dark) }
-.produk-page .rek-btn.ghost:hover{ background: var(--primary-color-dark); color:#fff }
+.produk-page .btn-produk.btn-primary{ background: var(--primary-color-dark); color:#fff }
+.produk-page .btn-produk.btn-primary:hover{ background: var(--primary-color); color: var(--primary-color-dark) }
+.produk-page .btn-produk.btn-outline{ background:#f5fbf8; color: var(--primary-color-dark); border:1px solid var(--primary-color-dark) }
+.produk-page .btn-produk.btn-outline:hover{ background: var(--primary-color-dark); color:#fff }
 
 /* ====== Footer (copied from cust_welcome.css) ====== */
 .footer{

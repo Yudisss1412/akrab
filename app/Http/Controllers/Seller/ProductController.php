@@ -142,14 +142,27 @@ class ProductController extends Controller
                 'status' => $status
             ]);
 
-            // Upload gambar
+            // Upload dan proses gambar
             if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $image) {
-                    $path = $image->store('products/' . $product->id, 'public');
-                    $product->images()->create([
+                $files = $request->file('images');
+                
+                foreach ($files as $index => $image) {
+                    // Simpan gambar
+                    $path = $this->processImageTo16By9($image, 'products/' . $product->id);
+                    
+                    // Simpan semua gambar ke tabel product_images
+                    $productImage = $product->images()->create([
                         'image_path' => $path,
                         'alt_text' => $request->name
                     ]);
+                    
+                    // Gunakan gambar pertama sebagai gambar utama
+                    if ($index === 0) {
+                        // Update produk dengan gambar utama
+                        $product->update([
+                            'image' => $path
+                        ]);
+                    }
                 }
             }
 
@@ -277,14 +290,28 @@ class ProductController extends Controller
                 'status' => $status,
             ]);
 
-            // Upload gambar baru jika ada
+            // Upload dan proses gambar baru jika ada
             if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $image) {
-                    $path = $image->store('products/' . $product->id, 'public');
-                    $product->images()->create([
+                $files = $request->file('images');
+                
+                foreach ($files as $index => $image) {
+                    // Simpan gambar
+                    $path = $this->processImageTo16By9($image, 'products/' . $product->id);
+                    
+                    // Simpan semua gambar ke tabel product_images
+                    $productImage = $product->images()->create([
                         'image_path' => $path,
                         'alt_text' => $request->name
                     ]);
+                    
+                    // Gunakan gambar pertama sebagai gambar utama hanya jika produk belum memiliki gambar utama
+                    // atau menambahkan secara berurutan
+                    if ($index === 0 && !$product->image) {
+                        // Jika produk belum memiliki gambar utama, gunakan yang pertama sebagai gambar utama
+                        $product->update([
+                            'image' => $path
+                        ]);
+                    }
                 }
             }
 
@@ -420,5 +447,54 @@ class ProductController extends Controller
             \Log::error('Error deleting product image: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat menghapus gambar'], 500);
         }
+    }
+    
+    /**
+     * Store image without processing - just save as is
+     */
+    private function processImageTo16By9($image, $directory)
+    {
+        // Simply store the image as is to ensure it appears
+        return $image->store($directory, 'public');
+    }
+    
+    /**
+     * Fix missing product images in product_images table
+     */
+    public function fixMissingImages()
+    {
+        $user = Auth::user();
+        if (!$user || !$user->role || $user->role->name !== 'seller') {
+            abort(403, 'Akses ditolak. Hanya penjual yang dapat mengakses halaman ini.');
+        }
+
+        // Ambil ID penjual dari tabel sellers berdasarkan user_id
+        $seller = \App\Models\Seller::where('user_id', $user->id)->first();
+        if (!$seller) {
+            return response()->json(['success' => false, 'message' => 'Akses ditolak. Seller record tidak ditemukan.'], 403);
+        }
+
+        // Ambil semua produk milik penjual ini yang memiliki gambar di kolom image 
+        // tetapi tidak memiliki gambar di tabel product_images
+        $products = \App\Models\Product::where('seller_id', $seller->id)
+            ->whereNotNull('image')  // Produk memiliki gambar di kolom image
+            ->whereDoesntHave('images')  // Tetapi tidak memiliki entri di tabel product_images
+            ->get();
+
+        $fixedCount = 0;
+        foreach ($products as $product) {
+            // Buat entri di tabel product_images untuk gambar dari kolom image
+            $product->images()->create([
+                'image_path' => $product->image,
+                'alt_text' => $product->name
+            ]);
+            $fixedCount++;
+        }
+
+        return response()->json([
+            'success' => true, 
+            'message' => "Berhasil memperbaiki {$fixedCount} produk dengan gambar yang hilang",
+            'fixed_count' => $fixedCount
+        ]);
     }
 }

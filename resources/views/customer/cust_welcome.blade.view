@@ -270,13 +270,34 @@
 
     .modal-content-new {
       max-width: 420px;
-      width: 100%;
+      width: 90%;
+      max-height: 90vh;
       background: #fff;
       border-radius: 25px;
       box-shadow: 0 8px 38px rgba(0, 0, 0, 0.22);
       display: flex;
       flex-direction: column;
       position: relative;
+      overflow: hidden;
+    }
+    
+    .modal-img-section {
+      display: flex;
+      flex-direction: column;
+      background: #fafbfc;
+      padding: 0 0 1.2rem 0;
+      flex-shrink: 0; /* Prevents the image section from shrinking */
+    }
+    
+    @media (max-width: 480px) {
+      .modal-content-new {
+        width: 95%;
+        max-height: 95vh;
+      }
+      
+      .modal-body-scrollable {
+        max-height: calc(95vh - 280px);
+      }
     }
 
     .modal-title-row {
@@ -321,13 +342,11 @@
     }
 
     .modal-img-main {
-      width: 90%;
-      max-width: 220px;
-      height: auto;
+      width: 274.14px;
+      height: 145px;
       object-fit: cover;
       border-radius: 16px;
       background: #e5e5e5;
-      margin: 0.5rem 0 0.7rem 0;
     }
 
     .modal-thumbs-new {
@@ -382,6 +401,34 @@
       font-size: 1rem;
     }
 
+    .modal-body-scrollable {
+      max-height: calc(90vh - 320px); /* Adjusted for larger image section height */
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 0 2rem 1.1rem 2rem;
+    }
+    
+    /* Scrollbar styling for better UX */
+    .modal-body-scrollable::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .modal-body-scrollable::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    
+    .modal-body-scrollable::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 10px;
+    }
+    
+    .modal-body-scrollable::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+    
     .modal-actions {
       display: flex;
       justify-content: space-between;
@@ -593,11 +640,14 @@
             <img class="modal-img-main" id="modal-img" src="" alt="Foto Produk">
             <div class="modal-thumbs-new" id="modal-thumbs"></div>
         </div>
-        <div class="modal-price-new" id="modal-price"></div>
-        <div class="modal-desc-box-new">
-            <div class="modal-desc" id="modal-desc"></div>
-            <ul class="modal-detail-list" id="modal-specs"></ul>
+        <div class="modal-body-scrollable">
+            <div class="modal-price-new" id="modal-price"></div>
+            <div class="modal-desc-box-new">
+                <div class="modal-desc" id="modal-desc"></div>
+                <ul class="modal-detail-list" id="modal-specs"></ul>
+            </div>
         </div>
+
         <div class="modal-actions">
             <button class="modal-btn modal-btn-primary" id="modal-addcart-btn">Tambah ke Keranjang</button>
             <button class="modal-btn modal-btn-secondary" id="modal-lihatdetail-btn">Lihat Detail</button>

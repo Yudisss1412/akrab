@@ -28,10 +28,79 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ---------- Galeri ---------- */
-  const mainImg = document.getElementById('mainImg');
-  document.querySelectorAll('.thumbs .thumb').forEach(img => {
+  const mainImg = document.getElementById('mainImage');
+  const thumbs = document.querySelectorAll('.thumbs .thumb');
+  
+  // Function to validate and fix main image if needed
+  function validateMainImage() {
+    if (!mainImg) return;
+    
+    // Check if main image is valid (not broken)
+    if (!mainImg.complete || mainImg.naturalWidth === 0) {
+      // Main image failed to load, try to set from first thumbnail
+      if (thumbs.length > 0) {
+        const firstThumb = thumbs[0];
+        mainImg.src = firstThumb.src;
+      } else {
+        // If no thumbnails, set to placeholder
+        mainImg.src = 'https://via.placeholder.com/600x600';
+      }
+    }
+  }
+  
+  // Handle gallery initialization based on number of thumbnails
+  if (thumbs.length > 0) {
+    // If there are thumbnails, handle active state and sync with main image
+    const activeThumb = document.querySelector('.thumb.is-active');
+    
+    if (thumbs.length === 1) {
+      // If only one thumbnail, make it active and set as main image
+      thumbs[0].classList.add('is-active');
+      const thumbSrc = thumbs[0].src;
+      if (mainImg && mainImg.src !== thumbSrc) {
+        mainImg.src = thumbSrc;
+      }
+    } else {
+      // If multiple thumbnails, ensure first one is active by default when no active exists
+      if (!activeThumb) {
+        // No active thumbnail, set first as active and sync with main image
+        thumbs[0].classList.add('is-active');
+        const firstThumbSrc = thumbs[0].src;
+        if (mainImg && mainImg.src !== firstThumbSrc) {
+          mainImg.src = firstThumbSrc;
+        }
+      } else {
+        // Sync main image with active thumbnail
+        const activeThumbSrc = activeThumb.src;
+        if (mainImg && mainImg.src !== activeThumbSrc) {
+          mainImg.src = activeThumbSrc;
+        }
+      }
+    }
+  } else {
+    // If no thumbnails exist, main image should be from server
+    // But if it's broken, we need to handle it
+  }
+  
+  // Validate main image after all setup is complete
+  // Use a slightly delayed approach to ensure all images are loaded
+  setTimeout(() => {
+    if (mainImg) {
+      // Force reload of main image to ensure it's loaded
+      const currentSrc = mainImg.src;
+      mainImg.src = currentSrc; // This triggers reload if needed
+      
+      // Additional validation after a brief delay
+      setTimeout(validateMainImage, 50);
+    }
+  }, 0);
+  
+  // Also validate on window load as additional safety
+  window.addEventListener('load', validateMainImage);
+  
+  thumbs.forEach(img => {
     img.addEventListener('click', () => {
-      document.querySelectorAll('.thumbs .thumb').forEach(t => t.classList.remove('is-active'));
+      thumbs.forEach(t => t.classList.remove('is-active'));
       img.classList.add('is-active');
       if (mainImg) mainImg.src = img.src;
     });

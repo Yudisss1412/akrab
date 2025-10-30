@@ -31,28 +31,32 @@
       @forelse($products as $index => $product)
       {{-- PRODUK {{ $index + 1 }} --}}
       <div class=\"produk-item\" role=\"article\" aria-labelledby=\"produk-{{ $index + 1 }}-title\">
-        <div class=\"produk-img\">
-          <img alt=\"{{ $product->name }}\" src=\"{{ $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png') }}\" />
-        </div>
         <div class=\"produk-info\">
-          <h2 id=\"produk-{{ $index + 1 }}-title\" class=\"produk-name\">{{ $product->name }}</h2>
-          <p class=\"produk-toko\">{{ $product->seller->name ?? 'Toko Umum' }}</p>
-          <div class=\"produk-harga\">Rp {{ number_format($product->price, 0, ',', '.') }}</div>
-          <div class=\"produk-rating\">
-            <span aria-label=\"{{ $product->rating ?? 4.5 }} dari 5 bintang\" class=\"rating-stars\">
-              @for($i = 1; $i <= 5; $i++)
-                @if($i <= floor($product->rating ?? 4.5))
-                  ★
-                @else
-                  ☆
-                @endif
-              @endfor
-            </span>
-            <span class=\"rating-angka\">{{ $product->rating ?? 4.5 }}</span>
-          </div>
-          <div class=\"produk-aksi\">
-            <a href=\"{{ route('produk.detail', ['id' => $product->id]) }}\" class=\"btn-produk btn-primary\">Lihat Detail</a>
-            <button class=\"btn-produk btn-outline btn-add\" data-product-id=\"{{ $product->id }}\" data-name=\"{{ $product->name }}\">+ Keranjang</button>
+          <div class=\"d-flex align-items-start gap-2\">
+            <div class=\"produk-img\">
+              <img alt=\"{{ $product->name }}\" src=\"{{ $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png') }}\" />
+            </div>
+            <div class=\"flex-grow-1\">
+              <h2 id=\"produk-{{ $index + 1 }}-title\" class=\"produk-name\">{{ $product->name }}</h2>
+              <p class=\"produk-toko\">{{ $product->seller->name ?? 'Toko Umum' }}</p>
+              <div class=\"produk-harga\">Rp {{ number_format($product->price, 0, ',', '.') }}</div>
+              <div class=\"produk-rating\">
+                <span aria-label=\"{{ $product->rating ?? 4.5 }} dari 5 bintang\" class=\"rating-stars\">
+                  @for($i = 1; $i <= 5; $i++)
+                    @if($i <= floor($product->rating ?? 4.5))
+                      ★
+                    @else
+                      ☆
+                    @endif
+                  @endfor
+                </span>
+                <span class=\"rating-angka\">{{ $product->rating ?? 4.5 }}</span>
+              </div>
+              <div class=\"produk-aksi\">
+                <a href=\"{{ route('produk.detail', ['id' => $product->id]) }}\" class=\"btn-produk btn-primary\">Lihat Detail</a>
+                <button class=\"btn-produk btn-outline btn-add\" data-product-id=\"{{ $product->id }}\" data-name=\"{{ $product->name }}\">+ Keranjang</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -72,40 +76,48 @@
       <div class=\"produk-grid\" role=\"feed\">
         {{-- PRODUK REKOMENDASI 1 --}}
         <div class=\"produk-item\" role=\"article\" aria-labelledby=\"rekomendasi-1-title\">
-          <div class=\"produk-img\">
-            <img alt=\"Gula Jawa Kemasan\" src=\"{{ asset('src/gula_jawa.png') }}\" />
-          </div>
           <div class=\"produk-info\">
-            <h2 id=\"rekomendasi-1-title\" class=\"produk-name\">Gula Jawa Kemasan</h2>
-            <p class=\"produk-toko\">Toko Surya</p>
-            <div class=\"produk-harga\">Rp 16.000</div>
-            <div class=\"produk-rating\">
-              <span aria-label=\"4 dari 5 bintang\" class=\"rating-stars\">★★★★☆</span>
-              <span class=\"rating-angka\">4.0</span>
-            </div>
-            <div class=\"produk-aksi\">
-              <button class=\"btn-produk btn-primary\">Beli</button>
-              <button class=\"btn-produk btn-outline\">+ Keranjang</button>
+            <div class=\"d-flex align-items-start gap-2\">
+              <div class=\"produk-img\">
+                <img alt=\"Gula Jawa Kemasan\" src=\"{{ asset('src/gula_jawa.png') }}\" />
+              </div>
+              <div class=\"flex-grow-1\">
+                <h2 id=\"rekomendasi-1-title\" class=\"produk-name\">Gula Jawa Kemasan</h2>
+                <p class=\"produk-toko\">Toko Surya</p>
+                <div class=\"produk-harga\">Rp 16.000</div>
+                <div class=\"produk-rating\">
+                  <span aria-label=\"4 dari 5 bintang\" class=\"rating-stars\">★★★★☆</span>
+                  <span class=\"rating-angka\">4.0</span>
+                </div>
+                <div class=\"produk-aksi\">
+                  <button class=\"btn-produk btn-primary\">Beli</button>
+                  <button class=\"btn-produk btn-outline\">+ Keranjang</button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
         {{-- PRODUK REKOMENDASI 2 --}}
         <div class=\"produk-item\" role=\"article\" aria-labelledby=\"rekomendasi-2-title\">
-          <div class=\"produk-img\">
-            <img alt=\"Minyak Goreng Bimoli\" src=\"{{ asset('src/minyak_goreng.png') }}\" />
-          </div>
           <div class=\"produk-info\">
-            <h2 id=\"rekomendasi-2-title\" class=\"produk-name\">Minyak Goreng Bimoli</h2>
-            <p class=\"produk-toko\">Toko Surya</p>
-            <div class=\"produk-harga\">Rp 25.000</div>
-            <div class=\"produk-rating\">
-              <span aria-label=\"4.5 dari 5 bintang\" class=\"rating-stars\">★★★★★</span>
-              <span class=\"rating-angka\">4.5</span>
-            </div>
-            <div class=\"produk-aksi\">
-              <button class=\"btn-produk btn-primary\">Beli</button>
-              <button class=\"btn-produk btn-outline\">+ Keranjang</button>
+            <div class=\"d-flex align-items-start gap-2\">
+              <div class=\"produk-img\">
+                <img alt=\"Minyak Goreng Bimoli\" src=\"{{ asset('src/minyak_goreng.png') }}\" />
+              </div>
+              <div class=\"flex-grow-1\">
+                <h2 id=\"rekomendasi-2-title\" class=\"produk-name\">Minyak Goreng Bimoli</h2>
+                <p class=\"produk-toko\">Toko Surya</p>
+                <div class=\"produk-harga\">Rp 25.000</div>
+                <div class=\"produk-rating\">
+                  <span aria-label=\"4.5 dari 5 bintang\" class=\"rating-stars\">★★★★★</span>
+                  <span class=\"rating-angka\">4.5</span>
+                </div>
+                <div class=\"produk-aksi\">
+                  <button class=\"btn-produk btn-primary\">Beli</button>
+                  <button class=\"btn-produk btn-outline\">+ Keranjang</button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -121,40 +133,48 @@
       <div class=\"produk-grid\" role=\"feed\">
         {{-- PRODUK POPULER 1 --}}
         <div class=\"produk-item\" role=\"article\" aria-labelledby=\"populer-1-title\">
-          <div class=\"produk-img\">
-            <img alt=\"Kecap Manis ABC\" src=\"{{ asset('src/kecap_manis.png') }}\" />
-          </div>
           <div class=\"produk-info\">
-            <h2 id=\"populer-1-title\" class=\"produk-name\">Kecap Manis ABC</h2>
-            <p class=\"produk-toko\">Toko Surya</p>
-            <div class=\"produk-harga\">Rp 14.000</div>
-            <div class=\"produk-rating\">
-              <span aria-label=\"4.5 dari 5 bintang\" class=\"rating-stars\">★★★★★</span>
-              <span class=\"rating-angka\">4.5</span>
-            </div>
-            <div class=\"produk-aksi\">
-              <button class=\"btn-produk btn-primary\">Beli</button>
-              <button class=\"btn-produk btn-outline\">+ Keranjang</button>
+            <div class=\"d-flex align-items-start gap-2\">
+              <div class=\"produk-img\">
+                <img alt=\"Kecap Manis ABC\" src=\"{{ asset('src/kecap_manis.png') }}\" />
+              </div>
+              <div class=\"flex-grow-1\">
+                <h2 id=\"populer-1-title\" class=\"produk-name\">Kecap Manis ABC</h2>
+                <p class=\"produk-toko\">Toko Surya</p>
+                <div class=\"produk-harga\">Rp 14.000</div>
+                <div class=\"produk-rating\">
+                  <span aria-label=\"4.5 dari 5 bintang\" class=\"rating-stars\">★★★★★</span>
+                  <span class=\"rating-angka\">4.5</span>
+                </div>
+                <div class=\"produk-aksi\">
+                  <button class=\"btn-produk btn-primary\">Beli</button>
+                  <button class=\"btn-produk btn-outline\">+ Keranjang</button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
         {{-- PRODUK POPULER 2 --}}
         <div class=\"produk-item\" role=\"article\" aria-labelledby=\"populer-2-title\">
-          <div class=\"produk-img\">
-            <img alt=\"Saus Tomat ABC\" src=\"{{ asset('src/saus_tomat.png') }}\" />
-          </div>
           <div class=\"produk-info\">
-            <h2 id=\"populer-2-title\" class=\"produk-name\">Saus Tomat ABC</h2>
-            <p class=\"produk-toko\">Toko Surya</p>
-            <div class=\"produk-harga\">Rp 12.000</div>
-            <div class=\"produk-rating\">
-              <span aria-label=\"4 dari 5 bintang\" class=\"rating-stars\">★★★★☆</span>
-              <span class=\"rating-angka\">4.0</span>
-            </div>
-            <div class=\"produk-aksi\">
-              <button class=\"btn-produk btn-primary\">Beli</button>
-              <button class=\"btn-produk btn-outline\">+ Keranjang</button>
+            <div class=\"d-flex align-items-start gap-2\">
+              <div class=\"produk-img\">
+                <img alt=\"Saus Tomat ABC\" src=\"{{ asset('src/saus_tomat.png') }}\" />
+              </div>
+              <div class=\"flex-grow-1\">
+                <h2 id=\"populer-2-title\" class=\"produk-name\">Saus Tomat ABC</h2>
+                <p class=\"produk-toko\">Toko Surya</p>
+                <div class=\"produk-harga\">Rp 12.000</div>
+                <div class=\"produk-rating\">
+                  <span aria-label=\"4 dari 5 bintang\" class=\"rating-stars\">★★★★☆</span>
+                  <span class=\"rating-angka\">4.0</span>
+                </div>
+                <div class=\"produk-aksi\">
+                  <button class=\"btn-produk btn-primary\">Beli</button>
+                  <button class=\"btn-produk btn-outline\">+ Keranjang</button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

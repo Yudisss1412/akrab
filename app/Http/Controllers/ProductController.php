@@ -248,6 +248,67 @@ class ProductController extends Controller
     }
 
     /**
+     * Tampilkan daftar produk dalam format JSON untuk keperluan JavaScript
+     */
+    public function getAllProducts(Request $request)
+    {
+        // Ambil semua produk dengan relasi yang diperlukan
+        $query = Product::with(['variants', 'seller', 'category', 'approvedReviews', 'images']);
+        
+        // Tambahkan filter berdasarkan kategori jika ada
+        $kategori = $request->query('kategori');
+        if ($kategori && $kategori !== 'all') {
+            $query = $query->whereHas('category', function($q) use ($kategori) {
+                $q->where('name', $kategori);
+            });
+        }
+        
+        // Tambahkan pencarian jika ada
+        $search = $request->query('search');
+        if ($search) {
+            $query = $query->where('name', 'LIKE', "%{$search}%");
+        }
+        
+        $products = $query->get();
+        
+        // Format untuk keperluan JavaScript - menggunakan format yang konsisten dengan sistem lain
+        $formattedProducts = $products->map(function($product) {
+            // Format gambar menggunakan metode yang sama seperti di controller lain
+            $gambar = null;
+            if ($product->image) {
+                // Jika produk memiliki gambar utama
+                $gambar = asset('storage/' . $product->image);
+            } else {
+                // Cek apakah ada gambar tambahan
+                $firstImage = $product->images->first();
+                if ($firstImage) {
+                    $gambar = asset('storage/' . $firstImage->image_path);
+                }
+            }
+            
+            // Jika tetap tidak ada gambar, gunakan placeholder
+            if (!$gambar) {
+                $gambar = asset('src/placeholder.png');
+            }
+            
+            return [
+                'id' => $product->id,
+                'nama' => $product->name,
+                'kategori' => $product->category->name ?? 'Umum',
+                'harga' => $product->price, // Kirim harga dalam bentuk angka, nanti format di JS
+                'gambar' => $gambar,
+                'rating' => $product->averageRating,
+                'toko' => $product->seller->name ?? 'Toko Umum',
+                'deskripsi' => $product->description,
+                'average_rating' => $product->averageRating,
+                'review_count' => $product->reviews_count,
+            ];
+        });
+        
+        return response()->json($formattedProducts);
+    }
+    
+    /**
      * API endpoint untuk mendapatkan detail produk
      */
     public function apiShow($id)

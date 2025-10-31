@@ -92,6 +92,7 @@ Route::get('/cust_welcome', function () {
 })->name('cust.welcome');
 
 Route::get('/halaman_produk', [App\Http\Controllers\ProductController::class, 'index'])->name('halaman.produk');
+Route::get('/produk', [App\Http\Controllers\ProductController::class, 'getAllProducts'])->name('produk.api');
 Route::get('/produk_detail/{id}', [App\Http\Controllers\ProductController::class, 'show'])->name('produk.detail');
 Route::get('/produk/search', [App\Http\Controllers\ProductController::class, 'search'])->name('produk.search');
 Route::get('/produk/kategori/{category}', [App\Http\Controllers\ProductController::class, 'byCategory'])->name('produk.kategori');

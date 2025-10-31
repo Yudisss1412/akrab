@@ -24,6 +24,7 @@ const rekomGrid = document.getElementById('rekom-grid');
 const rekomPagin = document.getElementById('rekom-pagination');
 
 /* ---------- ROUTE & API ENDPOINTS ---------- */
+const API_PRODUCTS = '/produk';  // API endpoint baru untuk mengambil semua produk
 const API_SEARCH = '/produk/search';
 const API_CATEGORY = '/produk/kategori';
 const DETAIL_BASE = '/produk_detail/';
@@ -54,11 +55,20 @@ function formatPrice(price) {
 /* ---------- API CALLS FOR DYNAMIC SEARCH/FILTER ---------- */
 async function searchProducts(search = '', category = 'all') {
   try {
-    let url = API_SEARCH;
+    let url = search ? API_SEARCH : API_PRODUCTS;
     const params = new URLSearchParams();
     
-    if (search) params.append('q', search);
-    if (category && category !== 'all') params.append('kategori', category);
+    if (search) {
+      params.append('q', search);
+    } else {
+      // For main products API, allow category filtering
+      if (category && category !== 'all') params.append('kategori', category);
+    }
+    
+    if (!search && category && category !== 'all') {
+      url = API_PRODUCTS;  // Use main products API with category filter
+      params.set('kategori', category);
+    }
     
     url += '?' + params.toString();
     
@@ -69,13 +79,13 @@ async function searchProducts(search = '', category = 'all') {
     const formattedProducts = Array.isArray(result) ? 
       result.map(product => ({
         id: product.id,
-        nama: product.name,
-        kategori: product.category?.name || product.kategori || 'Umum',
-        harga: formatPrice(product.price),
-        gambar: product.image ? product.image : (product.gambar || 'src/placeholder.png'),
-        rating: product.average_rating || product.rating || 0,
-        toko: product.seller?.name || product.toko || 'Toko Umum',
-        deskripsi: product.description || ''
+        nama: product.nama || product.name || 'Produk Tanpa Nama',
+        kategori: product.kategori || product.category?.name || 'Umum',
+        harga: product.harga ? formatPrice(product.harga) : formatPrice(product.price || 0),
+        gambar: product.gambar || product.image || product.main_image || 'src/placeholder.png',
+        rating: product.rating || product.average_rating || product.averageRating || 0,
+        toko: product.toko || product.seller?.name || 'Toko Umum',
+        deskripsi: product.deskripsi || product.description || ''
       })) : 
       [];
     
@@ -86,6 +96,43 @@ async function searchProducts(search = '', category = 'all') {
     return [];
   }
 }
+
+/* ---------- LOAD ALL PRODUCTS FROM API ---------- */
+async function loadAllProducts(category = 'all') {
+  try {
+    let url = API_PRODUCTS;
+    if (category && category !== 'all') {
+      const params = new URLSearchParams();
+      params.append('kategori', category);
+      url += '?' + params.toString();
+    }
+    
+    const response = await fetch(url);
+    const result = await response.json();
+    
+    // Format the data to match what the render function expects
+    const formattedProducts = Array.isArray(result) ? 
+      result.map(product => ({
+        id: product.id,
+        nama: product.nama || product.name || 'Produk Tanpa Nama',
+        kategori: product.kategori || product.category?.name || 'Umum',
+        harga: product.harga ? formatPrice(product.harga) : formatPrice(product.price || 0),
+        gambar: product.gambar || product.image || product.main_image || 'src/placeholder.png',
+        rating: product.rating || product.average_rating || product.averageRating || 0,
+        toko: product.toko || product.seller?.name || 'Toko Umum',
+        deskripsi: product.deskripsi || product.description || ''
+      })) : 
+      [];
+    
+    return formattedProducts;
+  } catch (error) {
+    console.error('Error loading products:', error);
+    showNotification('Gagal memuat produk', 'error');
+    return [];
+  }
+}
+
+
 
 /* ---------- RENDER FUNCTIONS ---------- */
 function renderList(products = []) {
@@ -101,12 +148,14 @@ function renderList(products = []) {
 
   grid.innerHTML = view.map(p => {
     const href = `${DETAIL_BASE}${encodeURIComponent(p.id)}`;
+    const imageSrc = p.gambar || 'src/placeholder.png';
     return `
       <div class="produk-card" data-product-id="${p.id}">
-        <img src="${p.gambar}" alt="${p.nama}"
+        <img src="${imageSrc}" alt="${p.nama}"
              onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,' + encodeURIComponent(
-               '<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"600\" height=\"400\"><rect width=\"100%\" height=\"100%\" fill=\"#eef6f4\"/><text x=\"50%\" y=\"50%\" dominant-baseline=\"middle\" text-anchor=\"middle\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"22\" fill=\"#7aa29b\">Gambar tidak tersedia</text></svg>'
-             )">
+               '<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"600\" height=\"400\"><rect width=\"100%\" height=\"100%\" fill=\"#eef6f4\"/><text x=\"50%\" y=\"50%\" dominant-baseline=\"middle\" text-anchor=\"middle\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"22\" fill=\"#7aa29b\">Gambar tidak tersedia: ${encodeURIComponent(p.nama)}</text></svg>'
+             )" 
+             loading="lazy">
         <div class="produk-card-info">
           <h3 class="produk-card-name">${p.nama}</h3>
           <div class="produk-card-sub">${p.kategori}</div>
@@ -133,12 +182,14 @@ function renderRekomendasi(products = [], maxItems = 8) {
 
   rekomGrid.innerHTML = view.map(p => {
     const href = `${DETAIL_BASE}${encodeURIComponent(p.id)}`;
+    const imageSrc = p.gambar || 'src/placeholder.png';
     return `
       <div class="rek-card" data-product-id="${p.id}">
-        <img class="rek-img" src="${p.gambar}" alt="${p.nama}"
+        <img class="rek-img" src="${imageSrc}" alt="${p.nama}"
              onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,' + encodeURIComponent(
-               '<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"600\" height=\"400\"><rect width=\"100%\" height=\"100%\" fill=\"#eef6f4\"/><text x=\"50%\" y=\"50%\" dominant-baseline=\"middle\" text-anchor=\"middle\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"22\" fill=\"#7aa29b\">Gambar tidak tersedia</text></svg>'
-             )">
+               '<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"600\" height=\"400\"><rect width=\"100%\" height=\"100%\" fill=\"#eef6f4\"/><text x=\"50%\" y=\"50%\" dominant-baseline=\"middle\" text-anchor=\"middle\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"22\" fill=\"#7aa29b\">Gambar tidak tersedia: ${encodeURIComponent(p.nama)}</text></svg>'
+             )" 
+             loading="lazy">
         <div class="rek-body">
           <div class="rek-name">${p.nama}</div>
           <div class="rek-cat">${p.kategori}</div>
@@ -182,22 +233,24 @@ function renderPagination(totalPage) {
 /* ---------- MAIN FUNCTION WITH DYNAMIC CONTENT ---------- */
 let currentSearch = '';
 let currentCategory = 'all';
-let allProducts = window.initialProducts || []; // Data dari server bisa ditempatkan di window
 
 async function updateContent() {
-  let products = allProducts;
+  let products = [];
   
-  // Filter based on search and category if they exist
+  // If search or filter is applied, use search API
   if (currentSearch || currentCategory !== 'all') {
     products = await searchProducts(currentSearch, currentCategory);
+  } else {
+    // Otherwise, load all products from API to ensure we have the latest
+    products = await loadAllProducts(currentCategory);
   }
   
   renderList(products);
   
-  // For recommendations, show a subset of products or popular products
+  // For recommendations, use a subset of products
   const recommendations = products.length > 0 ? 
     products.slice(0, 8).sort(() => Math.random() - 0.5) : 
-    window.popularProducts || [];
+    [];
   renderRekomendasi(recommendations);
 }
 
@@ -321,9 +374,14 @@ function showNotification(message, type = 'info') {
   }, 3000);
 }
 
-/* ---------- INIT WITH SERVER DATA ---------- */
+/* tombol refresh produk */
+document.getElementById('refresh-products')?.addEventListener('click', () => {
+  showNotification('Memuat ulang produk...', 'info');
+  updateContent();
+});
+
+/* ---------- INIT WITH LIVE DATA ---------- */
 document.addEventListener('DOMContentLoaded', () => {
-  // Ambil data produk dari server (akan diisi oleh blade template nanti)
-  // Jika tidak ada data dari server, kita bisa membuat fungsi untuk mengambil data pertama kali
+  // Muat produk terbaru dari API saat halaman dimuat
   updateContent();
 });

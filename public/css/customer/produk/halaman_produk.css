@@ -943,4 +943,31 @@ main[role="main"] {
   background-color: #007bff !important;
 }
 
+/* Style untuk tombol refresh */
+.btn-refresh {
+  background: var(--primary-color);
+  color: var(--primary-color-dark);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  margin-left: 10px;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.btn-refresh:hover {
+  background: var(--primary-color-dark);
+  color: white;
+  transform: rotate(90deg);
+}
+
+.btn-refresh:active {
+  transform: scale(0.95);
+}
+
 

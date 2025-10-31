@@ -903,4 +903,44 @@ main[role="main"] {
   cursor: not-allowed !important;
 }
 
+/* Additional styling for new elements */
+.produk-card-toko, .rek-toko {
+  font-size: 13px !important;
+  color: var(--grey-text-color) !important;
+  margin-bottom: 6px !important;
+}
+
+.produk-rating-angka, .rek-rating-angka {
+  font-size: 14px !important;
+  color: var(--grey-text-color) !important;
+  margin-top: 4px !important;
+}
+
+/* Notification styling */
+.notification {
+  position: fixed !important;
+  top: 20px !important;
+  right: 20px !important;
+  padding: 12px 20px !important;
+  border-radius: 6px !important;
+  color: #fff !important;
+  z-index: 9999 !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+  font-size: 14px !important;
+  max-width: 400px !important;
+  word-wrap: break-word !important;
+}
+
+.notification-error {
+  background-color: #dc3545 !important;
+}
+
+.notification-success {
+  background-color: #28a745 !important;
+}
+
+.notification-info {
+  background-color: #007bff !important;
+}
+
 

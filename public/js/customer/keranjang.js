@@ -300,10 +300,14 @@ class CartManager {
   }
 
   formatRupiah(angka) {
-    const reverse = angka.toString().split('').reverse().join('');
-    let ribuan = reverse.match(/\d{1,3}/g);
-    ribuan = ribuan.join('.').split('').reverse().join('');
-    return 'Rp ' + ribuan;
+    // Format as Rupiah using Indonesian locale for currency
+    // This will format as Rp X.XXX,XX with 2 decimal places
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 2,  // Tampilkan selalu 2 angka desimal
+      maximumFractionDigits: 2   // Batasi hanya 2 angka desimal
+    }).format(angka);
   }
 
   showNotification(message, type = 'info') {

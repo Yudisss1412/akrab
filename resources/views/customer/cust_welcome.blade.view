@@ -655,7 +655,7 @@
     </div>
 </div>
 
-<script src="{{ asset('js/customer/cust_welcome.js') }}"></script>
+<script src="{{ asset('js/customer/cust_welcome.js') }}?v=22"></script>
 @endsection
 
 @section('footer')

@@ -12,7 +12,7 @@ const getVal = (sel, fallback = "") => {
   return el.value ?? fallback;
 };
 const fmtIDR = (n) =>
-  (Number(n) || 0).toLocaleString("id-ID", { style: "currency", currency: "IDR" });
+  (Number(n) || 0).toLocaleString("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 /* ============== DOM ============== */
 const printCard = $("#printCard");

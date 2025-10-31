@@ -1,9 +1,42 @@
+// Format price function similar to halaman_produk.js
+function formatPrice(price) {
+  // If price is already formatted with 'Rp', return as is
+  if (typeof price === 'string' && price.startsWith('Rp')) {
+    // Extract numeric value and return properly formatted
+    const numericValue = parseFloat(price.replace(/[^\d]/g, ''));
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(numericValue);
+  }
+  
+  // Convert to number if it's a string
+  const numericPrice = typeof price === 'string' ? parseFloat(price) : price;
+  
+  // Format as Rupiah using Indonesian locale for currency
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 2,  // Tampilkan selalu 2 angka desimal
+    maximumFractionDigits: 2   // Batasi hanya 2 angka desimal
+  }).format(numericPrice);
+}
+
 // Function to load real product data
 async function loadProdukPopuler() {
   try {
     const response = await fetch('/api/products/popular'); // API endpoint to get popular products
     const data = await response.json();
-    return data;
+    
+    // Format the price for each product using global formatPrice function
+    const formattedData = data.map(product => ({
+      ...product,
+      price: window.formatPrice ? window.formatPrice(product.price || product.harga) : product.price
+    }));
+    
+    return formattedData;
   } catch (error) {
     console.error('Error loading popular products:', error);
     // Fallback to dummy data if API fails
@@ -11,7 +44,7 @@ async function loadProdukPopuler() {
       {
         id: 1,
         name: "Kopi Liberika 250gr",
-        price: "Rp 45.000",
+        price: window.formatPrice ? window.formatPrice(45000) : "Rp 45.000,00",
         image: "src/product_1.png",
         description: "Kopi Liberika asli dengan aroma khas dan rasa unik. Cocok untuk seduhan manual dan penikmat kopi sejati.",
         specifications: ["Ukuran: 250gr", "Asal: Indonesia", "Bahan: Kopi Liberika Murni"]
@@ -19,7 +52,7 @@ async function loadProdukPopuler() {
       {
         id: 2,
         name: "Sabun Herbal Zaitun",
-        price: "Rp 25.000",
+        price: window.formatPrice ? window.formatPrice(25000) : "Rp 25.000,00",
         image: "src/product_1.png",
         description: "Sabun herbal alami dari minyak zaitun, lembut untuk kulit sensitif, cocok untuk seluruh anggota keluarga.",
         specifications: ["Berat: 100gr", "Asal: Bandung", "Bahan: Zaitun, Minyak Nabati"]
@@ -27,7 +60,7 @@ async function loadProdukPopuler() {
       {
         id: 3,
         name: "Keranjang Rotan Handmade",
-        price: "Rp 120.000",
+        price: window.formatPrice ? window.formatPrice(120000) : "Rp 120.000,00",
         image: "src/product_1.png",
         description: "Keranjang rotan asli buatan tangan, cocok untuk dekorasi rumah, hamper, atau tempat penyimpanan serbaguna.",
         specifications: ["Ukuran: 32x22cm", "Asal: Yogyakarta", "Bahan: Rotan Alami"]
@@ -35,7 +68,7 @@ async function loadProdukPopuler() {
       {
         id: 4,
         name: "Brownies Panggang",
-        price: "Rp 38.000",
+        price: window.formatPrice ? window.formatPrice(38000) : "Rp 38.000,00",
         image: "src/product_1.png",
         description: "Brownies panggang homemade, tekstur fudgy dengan topping choco chips melimpah. Fresh baked setiap hari!",
         specifications: ["Berat: 200gr", "Asal: Surabaya", "Bahan: Cokelat, Telur, Terigu"]
@@ -123,7 +156,8 @@ function openProdukModal(idx, productId) {
       modalProduct.textContent = produk.name;
       modalImg.src = produk.image;
       modalImg.alt = produk.name;
-      modalPrice.textContent = produk.price;
+      // Format the price using our global function
+      modalPrice.textContent = window.formatPrice ? window.formatPrice(typeof produk.price === 'number' ? produk.price : produk.price) : produk.price;
       modalDesc.textContent = produk.description;
 
       // Spesifikasi
@@ -161,7 +195,7 @@ function openProdukModal(idx, productId) {
       const produk = {
         name: "Produk Tidak Ditemukan",
         image: "src/product_1.png",
-        price: "Rp 0",
+        price: window.formatPrice ? window.formatPrice(0) : "Rp 0,00",
         description: "Produk tidak ditemukan di sistem.",
         specifications: []
       };

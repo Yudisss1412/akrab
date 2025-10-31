@@ -55,7 +55,7 @@
           </div>
 
           <div class="price-wish-row">
-            <div class="price">Rp<span class="price-number">{{ number_format($produk['harga'] ?? 100000, 0, ',', '.') }}</span></div>
+            <div class="price">Rp<span class="price-number">{{ number_format($produk['harga'] ?? 100000, 2, ',', '.') }}</span></div>
             <button class="wish-small {{ $produk['di_wishlist'] ?? false ? 'active' : '' }}" type="button" aria-label="Wishlist">
               <svg class="heart-icon {{ $produk['di_wishlist'] ?? false ? 'heart-fill' : 'heart-outline' }}" viewBox="0 0 24 24" width="24" height="24" fill="{{ $produk['di_wishlist'] ?? false ? '#FF4757' : 'none' }}" stroke="{{ $produk['di_wishlist'] ?? false ? '#FF4757' : 'currentColor' }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>

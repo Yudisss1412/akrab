@@ -49,7 +49,18 @@ function formatPrice(price) {
   if (typeof price === 'string' && price.startsWith('Rp')) {
     return price;
   }
-  return 'Rp ' + price.toLocaleString('id-ID');
+  
+  // Convert to number if it's a string
+  const numericPrice = typeof price === 'string' ? parseFloat(price) : price;
+  
+  // Format as Rupiah using Indonesian locale for currency
+  // This will format as Rp X.XXX,XX with 2 decimal places
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 2,  // Tampilkan selalu 2 angka desimal
+    maximumFractionDigits: 2   // Batasi hanya 2 angka desimal
+  }).format(numericPrice);
 }
 
 /* ---------- IMAGE ERROR HANDLER ---------- */

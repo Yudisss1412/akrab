@@ -101,6 +101,8 @@ class ProductController extends Controller
             $product->setAttribute('average_rating', $product->averageRating);
             $product->setAttribute('review_count', $product->reviews_count);
             $product->setAttribute('formatted_images', $this->formatProductImages($product));
+            // Agar kompatibel dengan view halaman_produk, tambahkan property rating
+            $product->setAttribute('rating', $product->averageRating);
             return $product;
         });
         

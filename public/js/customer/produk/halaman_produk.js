@@ -283,7 +283,7 @@ inputSearch?.addEventListener('input', debounce(() => {
 selectKategori?.addEventListener('change', () => {
   currentCategory = selectKategori.value;
   currentPage = 1;
-  updateContent();
+  renderList();
 });
 
 pagin?.addEventListener('click', e => {
@@ -394,10 +394,7 @@ function showNotification(message, type = 'info') {
 }
 
 /* tombol refresh produk */
-document.getElementById('refresh-products')?.addEventListener('click', () => {
-  showNotification('Memuat ulang produk...', 'info');
-  updateContent();
-});
+// Tidak ada tombol refresh karena sudah dihapus dari UI
 
 /* ---------- INIT WITH LIVE DATA ---------- */
 document.addEventListener('DOMContentLoaded', () => {

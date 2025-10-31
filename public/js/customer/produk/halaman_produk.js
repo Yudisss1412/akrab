@@ -52,6 +52,16 @@ function formatPrice(price) {
   return 'Rp ' + price.toLocaleString('id-ID');
 }
 
+/* ---------- IMAGE ERROR HANDLER ---------- */
+function handleImageError(img) {
+  img.onerror = null; // Prevent infinite loop if placeholder also fails
+  
+  // Create simple SVG as fallback
+  const svgString = '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="100%" height="100%" fill="#eef6f4"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#7aa29b">Gambar tidak tersedia</text></svg>';
+  
+  img.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(svgString);
+}
+
 /* ---------- API CALLS FOR DYNAMIC SEARCH/FILTER ---------- */
 async function searchProducts(search = '', category = 'all') {
   try {
@@ -149,12 +159,11 @@ function renderList(products = []) {
   grid.innerHTML = view.map(p => {
     const href = `${DETAIL_BASE}${encodeURIComponent(p.id)}`;
     const imageSrc = p.gambar || 'src/placeholder.png';
+    const altText = p.nama.replace(/"/g, '&quot;').replace(/'/g, '&apos;');
     return `
       <div class="produk-card" data-product-id="${p.id}">
-        <img src="${imageSrc}" alt="${p.nama}"
-             onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,' + encodeURIComponent(
-               '<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"600\" height=\"400\"><rect width=\"100%\" height=\"100%\" fill=\"#eef6f4\"/><text x=\"50%\" y=\"50%\" dominant-baseline=\"middle\" text-anchor=\"middle\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"22\" fill=\"#7aa29b\">Gambar tidak tersedia: ${encodeURIComponent(p.nama)}</text></svg>'
-             )" 
+        <img src="${imageSrc}" alt="${altText}"
+             onerror="handleImageError(this)"
              loading="lazy">
         <div class="produk-card-info">
           <h3 class="produk-card-name">${p.nama}</h3>
@@ -183,12 +192,11 @@ function renderRekomendasi(products = [], maxItems = 8) {
   rekomGrid.innerHTML = view.map(p => {
     const href = `${DETAIL_BASE}${encodeURIComponent(p.id)}`;
     const imageSrc = p.gambar || 'src/placeholder.png';
+    const altText = p.nama.replace(/"/g, '&quot;').replace(/'/g, '&apos;');
     return `
       <div class="rek-card" data-product-id="${p.id}">
-        <img class="rek-img" src="${imageSrc}" alt="${p.nama}"
-             onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,' + encodeURIComponent(
-               '<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"600\" height=\"400\"><rect width=\"100%\" height=\"100%\" fill=\"#eef6f4\"/><text x=\"50%\" y=\"50%\" dominant-baseline=\"middle\" text-anchor=\"middle\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"22\" fill=\"#7aa29b\">Gambar tidak tersedia: ${encodeURIComponent(p.nama)}</text></svg>'
-             )" 
+        <img class="rek-img" src="${imageSrc}" alt="${altText}"
+             onerror="handleImageError(this)"
              loading="lazy">
         <div class="rek-body">
           <div class="rek-name">${p.nama}</div>

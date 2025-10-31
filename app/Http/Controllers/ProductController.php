@@ -252,7 +252,7 @@ class ProductController extends Controller
      */
     public function getAllProducts(Request $request)
     {
-        // Ambil semua produk dengan relasi yang diperlukan
+        // Ambil semua produk tanpa filter status untuk memastikan produk baru muncul
         $query = Product::with(['variants', 'seller', 'category', 'approvedReviews', 'images']);
         
         // Tambahkan filter berdasarkan kategori jika ada
@@ -271,37 +271,44 @@ class ProductController extends Controller
         
         $products = $query->get();
         
-        // Format untuk keperluan JavaScript - menggunakan format yang konsisten dengan sistem lain
+        // Format untuk keperluan JavaScript - menggunakan accessor dan logika yang konsisten
         $formattedProducts = $products->map(function($product) {
-            // Format gambar menggunakan metode yang sama seperti di controller lain
-            $gambar = null;
-            if ($product->image) {
-                // Jika produk memiliki gambar utama
-                $gambar = asset('storage/' . $product->image);
+            // Tambahkan average rating dan review count ke setiap produk
+            $product->setAttribute('average_rating', $product->averageRating);
+            $product->setAttribute('review_count', $product->reviews_count);
+            
+            // Gunakan accessor main_image dari model untuk mendapatkan gambar utama
+            $mainImage = $product->main_image;  // Ini menggunakan accessor dari model
+            $gambarUrl = null;
+            
+            if ($mainImage) {
+                // Jika gambar utama ada, gunakan asset() untuk menghasilkan URL yang benar
+                $gambarUrl = asset('storage/' . $mainImage);
             } else {
-                // Cek apakah ada gambar tambahan
-                $firstImage = $product->images->first();
-                if ($firstImage) {
-                    $gambar = asset('storage/' . $firstImage->image_path);
+                // Jika tidak ada gambar utama dari accessor, coba gunakan gambar dari formatProductImages
+                $formattedImages = $this->formatProductImages($product);
+                if (!empty($formattedImages)) {
+                    $gambarUrl = $formattedImages[0];
                 }
             }
             
             // Jika tetap tidak ada gambar, gunakan placeholder
-            if (!$gambar) {
-                $gambar = asset('src/placeholder.png');
+            if (!$gambarUrl) {
+                $gambarUrl = asset('src/placeholder.png');
             }
             
             return [
                 'id' => $product->id,
                 'nama' => $product->name,
                 'kategori' => $product->category->name ?? 'Umum',
-                'harga' => $product->price, // Kirim harga dalam bentuk angka, nanti format di JS
-                'gambar' => $gambar,
+                'harga' => $product->price,
+                'gambar' => $gambarUrl,
                 'rating' => $product->averageRating,
                 'toko' => $product->seller->name ?? 'Toko Umum',
                 'deskripsi' => $product->description,
                 'average_rating' => $product->averageRating,
                 'review_count' => $product->reviews_count,
+                'all_images' => $product->all_images,  // Ini juga dari accessor di model
             ];
         });
         

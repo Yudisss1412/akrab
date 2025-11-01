@@ -87,8 +87,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const responseData = await response.json();
 
             if (response.ok) {
-                // Login successful - redirect to intended page or dashboard
-                console.log('Login successful, redirecting...');
+                // Login successful - show notification and redirect
+                console.log('Login successful, showing notification and redirecting...');
+                console.log('Response data:', responseData);
                 
                 if (loginFormBox) {
                     loginFormBox.style.transition = 'all 0.5s ease';
@@ -96,10 +97,57 @@ document.addEventListener('DOMContentLoaded', () => {
                     loginFormBox.style.transform = 'scale(0.9)';
                 }
 
-                // Redirect to dashboard or intended page
+                // Check if redirect URL exists in response
+                const redirectUrl = responseData.redirect || '/dashboard';
+                console.log('Redirect URL:', redirectUrl);
+
+                // Show success toast notification in the center of screen
+                const toast = document.createElement('div');
+                toast.style.position = 'fixed';
+                toast.style.top = '50%';
+                toast.style.left = '50%';
+                toast.style.transform = 'translate(-50%, -50%)';
+                toast.style.backgroundColor = '#10b981';
+                toast.style.color = 'white';
+                toast.style.padding = '16px 24px';
+                toast.style.borderRadius = '8px';
+                toast.style.zIndex = '9999';
+                toast.style.fontWeight = '600';
+                toast.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+                toast.textContent = 'Login berhasil! Selamat datang kembali.';
+                
+                // Initially hidden
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s ease-in-out';
+                
+                try {
+                    document.body.appendChild(toast);
+                } catch (e) {
+                    console.error('Error appending toast to document body:', e);
+                }
+                
+                // Show with fade-in effect
                 setTimeout(() => {
-                    window.location.href = responseData.redirect || '/dashboard';
-                }, 500);
+                    toast.style.opacity = '1';
+                }, 10);
+
+                // Redirect to dashboard or intended page after showing notification
+                setTimeout(() => {
+                    // Fade out before redirect
+                    toast.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        if (document.body.contains(toast)) {
+                            try {
+                                document.body.removeChild(toast);
+                            } catch (e) {
+                                console.error('Error removing toast from document body:', e);
+                            }
+                        }
+                    }, 300);
+                    
+                    window.location.href = redirectUrl;
+                }, 2500); // Wait for 2.5 seconds to allow toast to show and fade out
             } else {
                 // Login failed - show error message
                 if (responseData.message) {

@@ -24,6 +24,32 @@ function formatPrice(price) {
   }).format(numericPrice);
 }
 
+// SVG rating stars
+const STAR_FULL = `<svg width="27" height="27" viewBox="0 0 47 47" xmlns="http://www.w3.org/2000/svg"><path d="M11.4076 41.1253L14.5899 27.368L3.91699 18.1149L18.017 16.891L23.5003 3.91699L28.9837 16.891L43.0837 18.1149L32.4107 27.368L35.593 41.1253L23.5003 33.8305L11.4076 41.1253Z" fill="#FFF600"/></svg>`;
+const STAR_HALF = `<svg width="27" height="27" viewBox="0 0 47 47" xmlns="http://www.w3.org/2000/svg"><path d="M29.6691 32.9982L28.0534 25.9482L33.4878 21.2482L26.3399 20.6118L23.5003 13.9535V29.2285L29.6691 32.9982ZM11.4076 41.1253L14.5899 27.368L3.91699 18.1149L18.017 16.891L23.5003 3.91699L28.9837 16.891L43.0837 18.1149L32.4107 27.368L35.593 41.1253L23.5003 33.8305L11.4076 41.1253Z" fill="#FFF700"/></svg>`;
+const STAR_EMPTY = `<svg width="27" height="27" viewBox="0 0 47 47" xmlns="http://www.w3.org/2000/svg"><path d="M17.3316 32.9493L23.5003 29.2285L29.6691 32.9982L28.0535 25.9482L33.4878 21.1993L26.3399 20.6118L23.5003 13.9535L20.6607 20.5628L13.5128 21.1993L18.9472 25.9482L17.3316 32.9493ZM11.4076 41.1253L14.5899 27.368L3.91699 18.1149L18.017 16.891L23.5003 3.91699L28.9837 16.891L43.0837 18.1149L32.4107 27.368L35.593 41.1253L23.5003 33.8305L11.4076 41.1253Z" fill="#FFF600"/></svg>`;
+
+// Create stars HTML function
+function createStarsHTML(num) {
+  const r = Math.max(0, Math.min(5, parseFloat(num) || 0));
+  let full = Math.floor(r), half = 0;
+  const frac = r - full;
+  if (frac >= 0.75) full += 1; else if (frac >= 0.25) half = 1;
+  const empty = Math.max(0, 5 - full - half);
+  return `${STAR_FULL.repeat(full)}${half ? STAR_HALF : ''}${STAR_EMPTY.repeat(empty)}`;
+}
+
+// Image error handler function
+function handleImageError(img) {
+  if (!img) return;
+  img.onerror = null; // Prevent infinite loop if placeholder also fails
+  
+  // Create simple SVG as fallback
+  const svgString = '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="100%" height="100%" fill="#eef6f4"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#7aa29b">Gambar tidak tersedia</text></svg>';
+  
+  img.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(svgString);
+}
+
 // Function to load real product data
 async function loadProdukPopuler() {
   try {
@@ -88,13 +114,23 @@ async function renderProdukPopuler() {
   
   produkPopuler.forEach((produk, idx) => {
     const card = document.createElement('div');
-    card.className = 'pop-modern-card';
+    card.className = 'produk-card'; // Gunakan class yang sama dengan produk utama
+    card.setAttribute('data-product-id', produk.id);
     card.innerHTML = `
-      <img class="pop-modern-img" src="${produk.image}" alt="${produk.name}">
-      <div class="pop-modern-body">
-        <div class="pop-modern-title">${produk.name}</div>
-        <div class="pop-modern-price">${produk.price}</div>
-        <button class="pop-modern-btn lihat-detail-btn" data-product-id="${produk.id}" data-idx="${idx}">Pratinjau</button>
+      <img src="${produk.image}" alt="${produk.name.replace(/"/g, '&quot;').replace(/'/g, '&apos;')}"
+           onerror="handleImageError(this)"
+           loading="lazy">
+      <div class="produk-card-info">
+        <h3 class="produk-card-name">${produk.name}</h3>
+        <div class="produk-card-sub">${produk.kategori || produk.category?.name || 'Umum'}</div>
+        <div class="produk-card-price">${produk.price}</div>
+        <div class="produk-card-toko">${produk.toko || produk.seller?.name || 'Toko Umum'}</div>
+        <div class="produk-card-stars" aria-label="Rating ${produk.rating || 0} dari 5">${createStarsHTML(produk.rating || 0)}</div>
+        <div class="produk-rating-angka">${produk.rating || 0}</div>
+      </div>
+      <div class="produk-card-actions">
+        <button class="btn-lihat lihat-detail-btn" data-product-id="${produk.id}" data-idx="${idx}">Lihat Detail</button>
+        <button class="btn-add" data-product-id="${produk.id}" data-name="${produk.name}" type="button">+ Keranjang</button>
       </div>
     `;
     grid.appendChild(card);

@@ -153,6 +153,35 @@ async function loadAllProducts(category = 'all') {
   }
 }
 
+/* ---------- LOAD POPULAR PRODUCTS FROM API ---------- */
+async function loadPopularProducts() {
+  try {
+    // Use the popular API endpoint
+    const response = await fetch('/api/products/popular');
+    const result = await response.json();
+    
+    // Format the data to match what the render function expects
+    const formattedProducts = Array.isArray(result) ? 
+      result.map(product => ({
+        id: product.id,
+        nama: product.name || product.nama || 'Produk Tanpa Nama',
+        kategori: product.kategori || product.category?.name || 'Umum',
+        harga: product.price || product.harga ? formatPrice(product.price || product.harga) : formatPrice(0),
+        gambar: product.image || product.gambar || product.main_image || 'src/placeholder.png',
+        rating: product.average_rating || product.rating || product.averageRating || 0,
+        toko: product.toko || product.seller?.name || 'Toko Umum',
+        deskripsi: product.description || product.deskripsi || ''
+      })) : 
+      [];
+    
+    return formattedProducts;
+  } catch (error) {
+    console.error('Error loading popular products:', error);
+    // showNotification('Gagal memuat produk populer', 'error');
+    return [];
+  }
+}
+
 
 
 /* ---------- RENDER FUNCTIONS ---------- */
@@ -205,21 +234,53 @@ function renderRekomendasi(products = [], maxItems = 8) {
     const imageSrc = p.gambar || 'src/placeholder.png';
     const altText = p.nama.replace(/"/g, '&quot;').replace(/'/g, '&apos;');
     return `
-      <div class="rek-card" data-product-id="${p.id}">
-        <img class="rek-img" src="${imageSrc}" alt="${altText}"
+      <div class="produk-card" data-product-id="${p.id}">
+        <img src="${imageSrc}" alt="${altText}"
              onerror="handleImageError(this)"
              loading="lazy">
-        <div class="rek-body">
-          <div class="rek-name">${p.nama}</div>
-          <div class="rek-cat">${p.kategori}</div>
-          <div class="rek-price">${p.harga}</div>
-          <div class="rek-toko">${p.toko}</div>
+        <div class="produk-card-info">
+          <h3 class="produk-card-name">${p.nama}</h3>
+          <div class="produk-card-sub">${p.kategori}</div>
+          <div class="produk-card-price">${p.harga}</div>
+          <div class="produk-card-toko">${p.toko}</div>
           <div class="produk-card-stars" aria-label="Rating ${p.rating} dari 5">${starsHTML(p.rating)}</div>
-          <div class="rek-rating-angka">${p.rating}</div>
-          <div class="rek-actions">
-            <a class="rek-btn primary" data-product-id="${p.id}" href="${href}">Lihat Detail</a>
-            <button class="rek-btn ghost" data-product-id="${p.id}" data-name="${p.nama}" type="button">+ Keranjang</button>
-          </div>
+          <div class="produk-rating-angka">${p.rating}</div>
+        </div>
+        <div class="produk-card-actions">
+          <a class="btn-lihat" data-product-id="${p.id}" href="${href}">Lihat Detail</a>
+          <button class="btn-add" data-product-id="${p.id}" data-name="${p.nama}" type="button">+ Keranjang</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderProdukPopuler(products = [], maxItems = 8) {
+  const populerGrid = document.getElementById('populer-grid');
+  if (!populerGrid) return;
+
+  // Limit to maxItems for populer section
+  const view = products.slice(0, maxItems);
+
+  populerGrid.innerHTML = view.map(p => {
+    const href = `${DETAIL_BASE}${encodeURIComponent(p.id)}`;
+    const imageSrc = p.gambar || 'src/placeholder.png';
+    const altText = p.nama.replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+    return `
+      <div class="produk-card" data-product-id="${p.id}">
+        <img src="${imageSrc}" alt="${altText}"
+             onerror="handleImageError(this)"
+             loading="lazy">
+        <div class="produk-card-info">
+          <h3 class="produk-card-name">${p.nama}</h3>
+          <div class="produk-card-sub">${p.kategori}</div>
+          <div class="produk-card-price">${p.harga}</div>
+          <div class="produk-card-toko">${p.toko}</div>
+          <div class="produk-card-stars" aria-label="Rating ${p.rating} dari 5">${starsHTML(p.rating)}</div>
+          <div class="produk-rating-angka">${p.rating}</div>
+        </div>
+        <div class="produk-card-actions">
+          <a class="btn-lihat" data-product-id="${p.id}" href="${href}">Lihat Detail</a>
+          <button class="btn-add" data-product-id="${p.id}" data-name="${p.nama}" type="button">+ Keranjang</button>
         </div>
       </div>`;
   }).join('');
@@ -294,6 +355,11 @@ async function updateContent() {
     products.slice(0, 8).sort(() => Math.random() - 0.5) : 
     [];
   renderRekomendasi(recommendations);
+  
+  // Load and render popular products
+  loadPopularProducts().then(popularProducts => {
+    renderProdukPopuler(popularProducts);
+  });
 }
 
 /* ---------- EVENTS ---------- */
@@ -342,8 +408,22 @@ grid?.addEventListener('click', e => {
 
 /* tombol di grid rekomendasi */
 rekomGrid?.addEventListener('click', e => {
-  const add = e.target.closest('.rek-btn.ghost');
-  const detail = e.target.closest('.rek-btn.primary');
+  const add = e.target.closest('.btn-add');
+  const detail = e.target.closest('.btn-lihat');
+  if (add) {
+    const productId = add.dataset.productId;
+    const productName = add.dataset.name;
+    addToCart(productId, productName);
+    return;
+  }
+  if (detail) { /* biarkan <a> navigate */ return; }
+});
+
+/* tombol di grid populer */
+const populerGrid = document.getElementById('populer-grid');
+populerGrid?.addEventListener('click', e => {
+  const add = e.target.closest('.btn-add');
+  const detail = e.target.closest('.btn-lihat');
   if (add) {
     const productId = add.dataset.productId;
     const productName = add.dataset.name;

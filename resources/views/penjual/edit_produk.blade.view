@@ -144,6 +144,18 @@
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="subcategory" class="form-label">Sub-Kategori</label>
+                                        <select class="form-select @error('subcategory') is-invalid @enderror" 
+                                                id="subcategory" name="subcategory">
+                                            <option value="">Pilih Sub-Kategori (Opsional)</option>
+                                            <!-- Sub-kategori akan diisi berdasarkan kategori yang dipilih -->
+                                        </select>
+                                        @error('subcategory')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
                                 </div>
                                 
                                 <!-- Status -->
@@ -207,6 +219,74 @@
 
 @push('scripts')
 <script>
+// Definisikan sub-kategori berdasarkan kategori utama
+const subcategories = {
+    'Kuliner': [
+        { value: 'makanan-berat', label: 'Makanan Berat' },
+        { value: 'camilan', label: 'Camilan' },
+        { value: 'minuman', label: 'Minuman' },
+        { value: 'bumbu-bahan-masak', label: 'Bumbu & Bahan Masak' },
+        { value: 'kue-kering', label: 'Kue & Kering' },
+        { value: 'makanan-ringan', label: 'Makanan Ringan' },
+        { value: 'produk-olahan-susu', label: 'Produk Olahan Susu' }
+    ],
+    'Fashion': [
+        { value: 'pakaian-pria', label: 'Pakaian Pria' },
+        { value: 'pakaian-wanita', label: 'Pakaian Wanita' },
+        { value: 'pakaian-anak', label: 'Pakaian Anak' },
+        { value: 'aksesoris', label: 'Aksesoris' },
+        { value: 'tas', label: 'Tas' },
+        { value: 'sepatu', label: 'Sepatu' },
+        { value: 'perhiasan', label: 'Perhiasan' }
+    ],
+    'Kerajinan Tangan': [
+        { value: 'kerajinan-logam', label: 'Kerajinan Logam' },
+        { value: 'kerajinan-kayu', label: 'Kerajinan Kayu' },
+        { value: 'kerajinan-kertas', label: 'Kerajinan Kertas' },
+        { value: 'kerajinan-kain', label: 'Kerajinan Kain' },
+        { value: 'kerajinan-tanah-liat', label: 'Kerajinan Tanah Liat' },
+        { value: 'souvenir-hadiah', label: 'Souvenir & Hadiah' },
+        { value: 'alat-tulis-kerajinan', label: 'Alat Tulis Kerajinan' }
+    ],
+    'Produk Berkebun': [
+        { value: 'tanaman-hias', label: 'Tanaman Hias' },
+        { value: 'tanaman-buah', label: 'Tanaman Buah' },
+        { value: 'tanaman-sayur', label: 'Tanaman Sayur' },
+        { value: 'tanaman-obat', label: 'Tanaman Obat' },
+        { value: 'pupuk-nutrisi', label: 'Pupuk & Nutrisi Tanaman' },
+        { value: 'peralatan-berkebun', label: 'Peralatan Berkebun' },
+        { value: 'pot-media-tanam', label: 'Pot & Media Tanam' }
+    ],
+    'Produk Kesehatan': [
+        { value: 'vitamin-suplemen', label: 'Vitamin & Suplemen' },
+        { value: 'obat-herbal', label: 'Obat Herbal' },
+        { value: 'alat-kesehatan', label: 'Alat Kesehatan' },
+        { value: 'produk-perawatan-diri', label: 'Produk Perawatan Diri' },
+        { value: 'produk-terapi', label: 'Produk Terapi' },
+        { value: 'diet-nutrisi', label: 'Produk Diet & Nutrisi' },
+        { value: 'alat-bantu-kesehatan', label: 'Alat Bantu Kesehatan' }
+    ],
+    'Mainan': [
+        { value: 'mainan-edukatif', label: 'Mainan Edukatif' },
+        { value: 'mainan-bayi', label: 'Mainan Bayi' },
+        { value: 'mainan-anak', label: 'Mainan Anak' },
+        { value: 'mainan-outdoor', label: 'Mainan Outdoor' },
+        { value: 'boneka-figure', label: 'Boneka & Action Figure' },
+        { value: 'permainan-tradisional', label: 'Permainan Tradisional' },
+        { value: 'puzzle-permainan-meja', label: 'Puzzle & Permainan Meja' }
+    ],
+    'Hampers': [
+        { value: 'hampers-makanan', label: 'Hampers Makanan' },
+        { value: 'hampers-minuman', label: 'Hampers Minuman' },
+        { value: 'hampers-kecantikan', label: 'Hampers Kecantikan' },
+        { value: 'hampers-fashion', label: 'Hampers Fashion' },
+        { value: 'hampers-bayi', label: 'Hampers Bayi' },
+        { value: 'hampers-kesehatan', label: 'Hampers Kesehatan' },
+        { value: 'hampers-buah-sayur', label: 'Hampers Buah & Sayur' },
+        { value: 'hampers-hari-raya', label: 'Hampers Hari Raya' }
+    ]
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     // Image preview functionality
     const imagesInput = document.getElementById('images');
@@ -239,6 +319,53 @@ document.addEventListener('DOMContentLoaded', function() {
                 reader.readAsDataURL(file);
             }
         }
+    });
+    
+    // Event listener untuk perubahan kategori di edit form
+    const categorySelect = document.getElementById('category_id');
+    const subcategorySelect = document.getElementById('subcategory');
+    
+    // Fungsi untuk mengisi sub-kategori
+    function updateSubcategories(categoryName) {
+        // Kosongkan sub-kategori sebelumnya
+        subcategorySelect.innerHTML = '<option value="">Pilih Sub-Kategori (Opsional)</option>';
+        
+        // Tambahkan sub-kategori berdasarkan kategori yang dipilih
+        if (subcategories[categoryName]) {
+            subcategories[categoryName].forEach(subcat => {
+                const option = document.createElement('option');
+                option.value = subcat.value;
+                option.textContent = subcat.label;
+                
+                // Jika produk memiliki sub-kategori saat ini, pilih opsi yang sesuai
+                if ("{{ old('subcategory', $product->subcategory) }}" === subcat.value) {
+                    option.selected = true;
+                }
+                
+                subcategorySelect.appendChild(option);
+            });
+        }
+        
+        // Jika tidak ada sub-kategori untuk kategori ini, tambahkan pesan
+        if (!subcategories[categoryName] || subcategories[categoryName].length === 0) {
+            const option = document.createElement('option');
+            option.value = '';
+            option.textContent = 'Tidak ada sub-kategori untuk kategori ini';
+            option.disabled = true;
+            subcategorySelect.appendChild(option);
+        }
+    }
+    
+    // Event listener untuk perubahan kategori
+    categorySelect.addEventListener('change', function() {
+        const selectedCategoryName = this.options[this.selectedIndex].text;
+        updateSubcategories(selectedCategoryName);
+    });
+    
+    // Saat halaman dimuat, isi sub-kategori berdasarkan kategori produk saat ini
+    window.addEventListener('load', function() {
+        const selectedCategory = categorySelect.options[categorySelect.selectedIndex].text;
+        updateSubcategories(selectedCategory);
     });
     
     // Remove image functionality

@@ -414,14 +414,103 @@
           locations: selectedLocations
         });
         
-        // Here you would normally fetch filtered products
-        // For demo purposes, we'll show an alert
-        alert('Filter berhasil diterapkan!');
+        // Build query parameters for API call
+        const params = new URLSearchParams();
+        
+        if (minPrice) params.append('min_price', minPrice);
+        if (maxPrice) params.append('max_price', maxPrice);
+        if (sortBy) params.append('sort', sortBy);
+        if (selectedSubkategori.length > 0) {
+          selectedSubkategori.forEach(sub => params.append('subkategori[]', sub));
+        }
+        if (selectedRatings.length > 0) {
+          selectedRatings.forEach(rating => params.append('rating[]', rating));
+        }
+        if (selectedLocations.length > 0) {
+          selectedLocations.forEach(location => params.append('lokasi[]', location));
+        }
+        
+        // Get the current category from the URL
+        const currentPath = window.location.pathname;
+        let apiUrl = '/api/products/filter'; // Default API endpoint
+        
+        // If we're on a specific category page, include it in the API call
+        if (currentPath.includes('/kategori/')) {
+          const categoryMatch = currentPath.split('/kategori/')[1];
+          if (categoryMatch) {
+            params.append('kategori', categoryMatch);
+            apiUrl = `/api/products/filter`;
+          }
+        }
+        
+        // Add other filters that might be relevant
+        // Apply the filter by making an API call and updating the product list
+        applyProductFilters(apiUrl, params);
       });
+      
+      // Function to apply product filters via API
+      function applyProductFilters(apiUrl, params) {
+        fetch(`${apiUrl}?${params.toString()}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Update the product grid with filtered results
+            const productsContainer = document.getElementById('products-container');
+            if (productsContainer) {
+              productsContainer.innerHTML = '';
+              
+              if (data.products && data.products.length > 0) {
+                // Display filtered products
+                data.products.forEach(product => {
+                  const productCard = document.createElement('div');
+                  productCard.className = 'product-card';
+                  productCard.setAttribute('data-product-id', product.id);
+                  productCard.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}" class="product-image">
+                    <div class="product-info">
+                      <h3 class="product-name">${product.name}</h3>
+                      <p class="product-description">${product.description}</p>
+                      <div class="product-price">${product.price}</div>
+                      <button class="btn btn-primary view-product" data-product-id="${product.id}">Pratinjau</button>
+                    </div>
+                  `;
+                  productsContainer.appendChild(productCard);
+                });
+                
+                // Update product count
+                const productCount = document.getElementById('product-count');
+                if (productCount) {
+                  productCount.textContent = `Menampilkan ${data.products.length} dari ${data.total} produk`;
+                }
+              } else {
+                // Show no results message
+                productsContainer.innerHTML = `
+                  <div class="no-products-message">
+                    <p>Maaf, tidak ada produk yang sesuai dengan filter Anda.</p>
+                  </div>
+                `;
+              }
+            }
+          } else {
+            console.error('Error applying filters:', data.message);
+            showNotification(data.message || 'Terjadi kesalahan saat menerapkan filter', 'error');
+          }
+        })
+        .catch(error => {
+          console.error('Error applying filters:', error);
+          showNotification('Terjadi kesalahan saat menerapkan filter', 'error');
+        });
+      }
       
       // Reset filter button functionality
       document.getElementById('reset-filter').addEventListener('click', function() {
-        // Reset all filters
+        // Reset all filter inputs
         document.getElementById('min-price').value = '';
         document.getElementById('max-price').value = '';
         document.getElementById('sort-by').value = 'popular';
@@ -436,8 +525,31 @@
         document.getElementById('sort-by-mobile').value = 'popular';
         
         console.log('Filters reset');
-        alert('Filter berhasil direset!');
+        
+        // Reload original products (without any filters)
+        resetProductFilters();
       });
+      
+      // Function to reset and reload original products
+      function resetProductFilters() {
+        // Get the current category from the URL to reload original products
+        const currentPath = window.location.pathname;
+        let apiUrl = '/api/products/filter'; // Default API endpoint
+        const params = new URLSearchParams();
+        
+        // If we're on a specific category page, include it to get original category products
+        if (currentPath.includes('/kategori/')) {
+          const categoryMatch = currentPath.split('/kategori/')[1];
+          if (categoryMatch) {
+            params.append('kategori', categoryMatch);
+            apiUrl = `/api/products/filter`;
+          }
+        }
+        
+        // Call API to get original products without filters
+        applyProductFilters(apiUrl, params);
+        showNotification('Filter berhasil direset', 'success');
+      }
       
       // Mobile sort functionality
       document.getElementById('sort-by-mobile').addEventListener('change', function() {

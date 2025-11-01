@@ -823,3 +823,6 @@ Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout'])->
 // General dashboard route that shows different content based on role
 Route::middleware(['auth'])->get('/dashboard', [App\Http\Controllers\RoleDashboardController::class, 
 'showRoleBasedDashboard'])->name('dashboard');
+
+// API route for filtering products
+Route::get('/api/products/filter', [App\Http\Controllers\ProductController::class, 'filter'])->name('api.products.filter');

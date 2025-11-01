@@ -431,6 +431,186 @@ class ProductController extends Controller
     }
     
     /**
+     * API endpoint untuk filtering produk berdasarkan berbagai parameter
+     */
+    public function filter(Request $request)
+    {
+        $query = Product::with(['variants', 'seller', 'category', 'approvedReviews', 'images'])
+                      ->where('status', 'active'); // Hanya produk aktif
+        
+        // Filter berdasarkan kategori
+        $kategori = $request->query('kategori');
+        if ($kategori && $kategori !== 'all') {
+            // Mapping kategori jika diperlukan
+            $categoryNameMap = [
+                'kuliner' => 'Kuliner',
+                'fashion' => 'Fashion',
+                'kerajinan' => 'Kerajinan Tangan',
+                'berkebun' => 'Berkebun',
+                'kesehatan' => 'Kesehatan',
+                'mainan' => 'Mainan',
+                'hampers' => 'Hampers',
+            ];
+            
+            $actualCategory = $categoryNameMap[$kategori] ?? $kategori;
+            
+            $query = $query->whereHas('category', function($q) use ($actualCategory) {
+                $q->where('name', $actualCategory);
+            });
+        }
+        
+        // Filter berdasarkan subkategori
+        $subkategori = $request->query('subkategori');
+        if ($subkategori && is_array($subkategori) && count($subkategori) > 0) {
+            $query = $query->whereIn('subcategory', $subkategori);
+        } elseif ($request->has('subkategori') && !empty($request->query('subkategori'))) {
+            // Kondisi jika subkategori bukan array
+            $singleSubkategori = $request->query('subkategori');
+            if (!is_array($singleSubkategori)) {
+                $query = $query->where('subcategory', $singleSubkategori);
+            }
+        }
+        
+        // Filter berdasarkan rentang harga
+        $minPrice = $request->query('min_price');
+        $maxPrice = $request->query('max_price');
+        
+        if ($minPrice !== null && $minPrice !== '') {
+            $query = $query->where('price', '>=', (int)$minPrice);
+        }
+        
+        if ($maxPrice !== null && $maxPrice !== '') {
+            $query = $query->where('price', '<=', (int)$maxPrice);
+        }
+        
+        // Filter berdasarkan rating
+        $ratings = $request->query('rating');
+        if ($ratings && is_array($ratings) && count($ratings) > 0) {
+            $ratingConditions = [];
+            foreach ($ratings as $rating) {
+                $rating = (int)$rating;
+                switch ($rating) {
+                    case 4:
+                        $query = $query->whereHas('approvedReviews', function($q) {
+                            $q->selectRaw('products.id, AVG(rating) as avg_rating')
+                              ->from('reviews')
+                              ->where('status', 'approved')
+                              ->groupBy('product_id')
+                              ->havingRaw('AVG(rating) >= 4');
+                        });
+                        break;
+                    case 3:
+                        $query = $query->whereHas('approvedReviews', function($q) {
+                            $q->selectRaw('products.id, AVG(rating) as avg_rating')
+                              ->from('reviews')
+                              ->where('status', 'approved')
+                              ->groupBy('product_id')
+                              ->havingRaw('AVG(rating) >= 3');
+                        });
+                        break;
+                    case 2:
+                        $query = $query->whereHas('approvedReviews', function($q) {
+                            $q->selectRaw('products.id, AVG(rating) as avg_rating')
+                              ->from('reviews')
+                              ->where('status', 'approved')
+                              ->groupBy('product_id')
+                              ->havingRaw('AVG(rating) >= 2');
+                        });
+                        break;
+                    case 1:
+                        $query = $query->whereHas('approvedReviews', function($q) {
+                            $q->selectRaw('products.id, AVG(rating) as avg_rating')
+                              ->from('reviews')
+                              ->where('status', 'approved')
+                              ->groupBy('product_id')
+                              ->havingRaw('AVG(rating) >= 1');
+                        });
+                        break;
+                }
+            }
+        }
+        
+        // Filter berdasarkan lokasi penjual (opsional)
+        $lokasi = $request->query('lokasi');
+        if ($lokasi && is_array($lokasi) && count($lokasi) > 0) {
+            $query = $query->whereHas('seller', function($q) use ($lokasi) {
+                $q->whereIn('city', $lokasi); // Asumsi field kota di tabel sellers adalah 'city'
+            });
+        } elseif ($request->has('lokasi') && !empty($request->query('lokasi'))) {
+            // Kondisi jika lokasi bukan array
+            $singleLokasi = $request->query('lokasi');
+            if (!is_array($singleLokasi)) {
+                $query = $query->whereHas('seller', function($q) use ($singleLokasi) {
+                    $q->where('city', $singleLokasi);
+                });
+            }
+        }
+        
+        // Urutkan produk
+        $sortBy = $request->query('sort', 'popular'); // default sort by popular
+        switch ($sortBy) {
+            case 'newest':
+                $query = $query->orderBy('created_at', 'desc');
+                break;
+            case 'price-low':
+                $query = $query->orderBy('price', 'asc');
+                break;
+            case 'price-high':
+                $query = $query->orderBy('price', 'desc');
+                break;
+            case 'popular': // Ini bisa berdasarkan jumlah penjualan, rating, dll
+            default:
+                // Sort berdasarkan rating rata-rata dan jumlah review
+                $query = $query->leftJoin('reviews', 'products.id', '=', 'reviews.product_id')
+                              ->select('products.*')
+                              ->groupBy('products.id')
+                              ->orderByRaw('AVG(reviews.rating) DESC NULLS LAST, COUNT(reviews.id) DESC');
+                break;
+        }
+        
+        // Ambil hasil query
+        $products = $query->get();
+        
+        // Hitung total produk untuk keperluan tampilan
+        $total = $products->count();
+        
+        // Format produk untuk ditampilkan
+        $formattedProducts = $products->map(function($product) {
+            $product->setAttribute('average_rating', $product->averageRating);
+            $product->setAttribute('review_count', $product->reviews_count);
+            
+            $mainImage = $product->main_image;
+            $imageUrl = $mainImage ? asset('storage/' . $mainImage) : asset('src/placeholder.png');
+            
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'description' => $product->description,
+                'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
+                'image' => $imageUrl,
+                'average_rating' => round($product->averageRating, 1),
+                'review_count' => $product->reviews_count,
+                'category' => $product->category->name ?? 'Umum',
+            ];
+        });
+        
+        return response()->json([
+            'success' => true,
+            'products' => $formattedProducts,
+            'total' => $total,
+            'filters_applied' => [
+                'kategori' => $kategori,
+                'min_price' => $minPrice,
+                'max_price' => $maxPrice,
+                'sort' => $sortBy,
+                'subkategori' => $subkategori,
+                'rating' => $ratings,
+                'lokasi' => $lokasi,
+            ]
+        ]);
+    }
+    
+    /**
      * Format product images for display
      */
     private function formatProductImages($product)

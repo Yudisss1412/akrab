@@ -16,6 +16,7 @@ class Product extends Model
         'stock',
         'weight',
         'category_id',
+        'subcategory',
         'seller_id',
         'status',
         'specifications',

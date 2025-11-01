@@ -108,9 +108,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 registerFormBox.style.opacity = '0';
                 registerFormBox.style.transform = 'scale(0.9)';
 
-                // Redirect to customer dashboard (not the old welcome page)
+                // Redirect to login page after successful registration
                 setTimeout(() => {
-                    window.location.href = '/customer/dashboard'; 
+                    window.location.href = '/login'; 
                 }, 500);
             } else {
                 // Handle validation errors

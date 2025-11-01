@@ -21,8 +21,8 @@ class RoleDashboardController extends Controller
 
     public function showCustomerDashboard()
     {
-        // Middleware customer.role akan memastikan hanya customer yang bisa mengakses
-        return view('customer.dashboard');
+        // Redirect to login if customer dashboard view is not available
+        return redirect('/login');
     }
 
     public function showRoleBasedDashboard()
@@ -36,7 +36,7 @@ class RoleDashboardController extends Controller
             case 'seller':
                 return view('penjual.dashboard');
             case 'customer':
-                return view('customer.dashboard');
+                return redirect('/login');
             default:
                 return redirect()->route('cust.welcome');
         }

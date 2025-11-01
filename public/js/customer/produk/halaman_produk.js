@@ -390,39 +390,47 @@ async function addToCart(productId, productName = 'Produk') {
 }
 
 function showNotification(message, type = 'info') {
-  // Hapus notifikasi yang sudah ada
-  const existingNotifications = document.querySelectorAll('.notification');
-  existingNotifications.forEach(notification => notification.remove());
-  
-  // Buat elemen notifikasi
+  // Buat elemen notifikasi di tengah layar
   const notification = document.createElement('div');
-  notification.className = `notification notification-${type}`;
-  notification.textContent = message;
   
-  // Gaya dasar untuk notifikasi
+  // Gaya untuk notifikasi di tengah layar
   Object.assign(notification.style, {
     position: 'fixed',
-    top: '20px',
-    right: '20px',
-    padding: '12px 20px',
-    borderRadius: '6px',
-    color: '#fff',
-    backgroundColor: type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : '#007bff',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    padding: '16px 24px',
+    borderRadius: '8px',
+    color: 'white',
+    backgroundColor: type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : '#3b82f6',
     zIndex: '9999',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+    fontWeight: '600',
+    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
     fontSize: '14px',
     maxWidth: '400px',
-    wordWrap: 'break-word'
+    wordWrap: 'break-word',
+    opacity: '0',
+    transition: 'opacity 0.3s ease-in-out'
   });
+  
+  notification.textContent = message;
   
   // Tambahkan ke body
   document.body.appendChild(notification);
   
+  // Tampilkan dengan efek fade-in
+  setTimeout(() => {
+    notification.style.opacity = '1';
+  }, 10);
+  
   // Hapus notifikasi setelah 3 detik
   setTimeout(() => {
-    if (notification.parentNode) {
-      notification.parentNode.removeChild(notification);
-    }
+    notification.style.opacity = '0';
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.parentNode.removeChild(notification);
+      }
+    }, 300);
   }, 3000);
 }
 

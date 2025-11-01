@@ -382,6 +382,7 @@
       filterContents.forEach(content => {
         content.style.display = 'none';
       });
+    });
       
       // View product modal functionality is handled by event delegation in the added script
       
@@ -925,6 +926,9 @@
       }, 3000);
     }
   </script>
+  
+  <!-- Subcategory filter script -->
+  <script src="{{ asset('js/customer/kategori/subcategory-filter.js') }}"></script>
 @endpush
 
 @section('footer')

@@ -102,16 +102,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok) {
                 // Registration successful
-                console.log('Registration successful, redirecting...');
+                console.log('Registration successful, showing notification and redirecting...');
                 
                 registerFormBox.style.transition = 'all 0.5s ease';
                 registerFormBox.style.opacity = '0';
                 registerFormBox.style.transform = 'scale(0.9)';
 
-                // Redirect to login page after successful registration
+                // Show success toast notification in the center of screen
+                const toast = document.createElement('div');
+                toast.style.position = 'fixed';
+                toast.style.top = '50%';
+                toast.style.left = '50%';
+                toast.style.transform = 'translate(-50%, -50%)';
+                toast.style.backgroundColor = '#10b981';
+                toast.style.color = 'white';
+                toast.style.padding = '16px 24px';
+                toast.style.borderRadius = '8px';
+                toast.style.zIndex = '9999';
+                toast.style.fontWeight = '600';
+                toast.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+                toast.textContent = 'Registrasi berhasil! Silakan login untuk melanjutkan.';
+                
+                // Initially hidden
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s ease-in-out';
+                
+                document.body.appendChild(toast);
+                
+                // Show with fade-in effect
                 setTimeout(() => {
+                    toast.style.opacity = '1';
+                }, 10);
+
+                // Redirect to login page after showing notification
+                setTimeout(() => {
+                    // Fade out before redirect
+                    toast.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        if (document.body.contains(toast)) {
+                            document.body.removeChild(toast);
+                        }
+                    }, 300);
+                    
                     window.location.href = '/login'; 
-                }, 500);
+                }, 2500);
             } else {
                 // Handle validation errors
                 const responseData = await response.json();

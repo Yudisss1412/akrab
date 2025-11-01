@@ -14,15 +14,24 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
+        // Mapping untuk variasi nama kategori
+        $categoryMapping = [
+            'Berkebun' => 'Produk Berkebun',
+            'Kesehatan' => 'Produk Kesehatan',
+        ];
+        
         // Ambil semua produk dengan relasi variants, seller, category, approvedReviews dan images untuk rating
         $products = Product::with(['variants', 'seller', 'category', 'approvedReviews', 'images'])->get();
         
         // Tambahkan filter berdasarkan kategori jika ada
         $kategori = $request->query('kategori');
         if ($kategori && $kategori !== 'all') {
+            // Jika kategori yang diminta adalah nama alternatif, gunakan nama sebenarnya
+            $actualCategory = $categoryMapping[$kategori] ?? $kategori;
+            
             $products = Product::with(['variants', 'seller', 'category', 'approvedReviews', 'images'])
-                            ->whereHas('category', function($query) use ($kategori) {
-                                $query->where('name', $kategori);
+                            ->whereHas('category', function($query) use ($actualCategory) {
+                                $query->where('name', $actualCategory);
                             })
                             ->get();
         }
@@ -35,7 +44,36 @@ class ProductController extends Controller
             return $product;
         });
         
-        return view('customer.produk.halaman_produk', compact('products'));
+        // Ambil kategori-kategori yang sesuai dengan dashboard customer
+        // Kita akan coba beberapa variasi nama kategori
+        $mainCategories = [
+            'Kuliner', 'Fashion', 'Kerajinan Tangan', 
+            'Produk Berkebun', 'Produk Kesehatan', 
+            'Mainan', 'Hampers'
+        ];
+        
+        // Cari kategori-kategori yang ada di database termasuk variasi nama
+        $categories = Category::where(function($query) use ($mainCategories) {
+            foreach ($mainCategories as $category) {
+                $query->orWhere('name', $category);
+            }
+            // Tambahkan kemungkinan variasi nama
+            $query->orWhere('name', 'Berkebun')  // Alternatif untuk 'Produk Berkebun'
+                  ->orWhere('name', 'Kesehatan'); // Alternatif untuk 'Produk Kesehatan'
+        })
+        ->orderByRaw("CASE 
+            WHEN name = 'Kuliner' THEN 1
+            WHEN name = 'Fashion' THEN 2
+            WHEN name = 'Kerajinan Tangan' THEN 3
+            WHEN name = 'Produk Berkebun' OR name = 'Berkebun' THEN 4
+            WHEN name = 'Produk Kesehatan' OR name = 'Kesehatan' THEN 5
+            WHEN name = 'Mainan' THEN 6
+            WHEN name = 'Hampers' THEN 7
+            ELSE 8
+        END")
+        ->get();
+        
+        return view('customer.produk.halaman_produk', compact('products', 'categories'));
     }
 
     /**

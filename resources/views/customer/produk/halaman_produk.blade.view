@@ -19,9 +19,9 @@
         <label for="filter-kategori">Kategori</label>
         <select aria-controls="produk-grid" id="filter-kategori" name="kategori">
           <option value="all">Semua</option>
-          <option value="Minuman">Minuman</option>
-          <option value="Camilan">Camilan</option>
-          <option value="Kerajinan">Kerajinan</option>
+          @foreach($categories as $category)
+          <option value="{{ $category->name }}">{{ $category->name }}</option>
+          @endforeach
         </select>
       </div>
     </div>

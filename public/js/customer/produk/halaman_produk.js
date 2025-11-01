@@ -253,6 +253,29 @@ function renderPagination(totalPage) {
 let currentSearch = '';
 let currentCategory = 'all';
 
+// Initialize filters from URL parameters
+function initFiltersFromUrl() {
+  const urlParams = new URLSearchParams(window.location.search);
+  
+  // Initialize category filter from URL
+  const categoryParam = urlParams.get('kategori');
+  if (categoryParam) {
+    const categorySelect = document.getElementById('filter-kategori');
+    if (categorySelect) {
+      // Check if the category exists in the dropdown options
+      const foundOption = Array.from(categorySelect.options).some(option => option.value === categoryParam);
+      if (foundOption) {
+        categorySelect.value = categoryParam;
+        currentCategory = categoryParam;
+      } else {
+        // If category doesn't exist in the dropdown, reset to 'all'
+        categorySelect.value = 'all';
+        currentCategory = 'all';
+      }
+    }
+  }
+}
+
 async function updateContent() {
   let products = [];
   
@@ -283,7 +306,17 @@ inputSearch?.addEventListener('input', debounce(() => {
 selectKategori?.addEventListener('change', () => {
   currentCategory = selectKategori.value;
   currentPage = 1;
-  renderList();
+  
+  // Update URL to reflect category selection
+  const url = new URL(window.location);
+  if (currentCategory && currentCategory !== 'all') {
+    url.searchParams.set('kategori', currentCategory);
+  } else {
+    url.searchParams.delete('kategori');
+  }
+  window.history.replaceState({}, '', url);
+  
+  updateContent();
 });
 
 pagin?.addEventListener('click', e => {
@@ -398,6 +431,9 @@ function showNotification(message, type = 'info') {
 
 /* ---------- INIT WITH LIVE DATA ---------- */
 document.addEventListener('DOMContentLoaded', () => {
+  // Initialize filters based on URL parameters
+  initFiltersFromUrl();
+  
   // Muat produk terbaru dari API saat halaman dimuat
   updateContent();
 });

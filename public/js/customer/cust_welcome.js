@@ -116,6 +116,7 @@ async function renderProdukPopuler() {
     const card = document.createElement('div');
     card.className = 'produk-card'; // Gunakan class yang sama dengan produk utama
     card.setAttribute('data-product-id', produk.id);
+    const tokoHref = `/toko/${produk.toko || produk.seller?.name || produk.seller_id || 'toko-tidak-ditemukan'}`;
     card.innerHTML = `
       <img src="${produk.image}" alt="${produk.name.replace(/"/g, '&quot;').replace(/'/g, '&apos;')}"
            onerror="handleImageError(this)"
@@ -124,7 +125,9 @@ async function renderProdukPopuler() {
         <h3 class="produk-card-name">${produk.name}</h3>
         <div class="produk-card-sub">${produk.kategori || produk.category?.name || 'Umum'}</div>
         <div class="produk-card-price">${produk.price}</div>
-        <div class="produk-card-toko">${produk.toko || produk.seller?.name || 'Toko Umum'}</div>
+        <div class="produk-card-toko">
+          <a href="${tokoHref}" class="toko-link" data-seller-name="${produk.toko || produk.seller?.name || 'Toko Umum'}">${produk.toko || produk.seller?.name || 'Toko Umum'}</a>
+        </div>
         <div class="produk-card-stars" aria-label="Rating ${produk.rating || 0} dari 5">${createStarsHTML(produk.rating || 0)}</div>
         <div class="produk-rating-angka">${produk.rating || 0}</div>
       </div>

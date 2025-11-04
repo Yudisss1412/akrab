@@ -198,6 +198,7 @@ function renderList(products = []) {
 
   grid.innerHTML = view.map(p => {
     const href = `${DETAIL_BASE}${encodeURIComponent(p.id)}`;
+    const tokoHref = `/toko/${p.toko || p.seller?.name || p.seller_id || 'toko-tidak-ditemukan'}`; // Assuming there's a toko page
     const imageSrc = p.gambar || 'src/placeholder.png';
     const altText = p.nama.replace(/"/g, '&quot;').replace(/'/g, '&apos;');
     return `
@@ -209,7 +210,9 @@ function renderList(products = []) {
           <h3 class="produk-card-name">${p.nama}</h3>
           <div class="produk-card-sub">${p.kategori}</div>
           <div class="produk-card-price">${p.harga}</div>
-          <div class="produk-card-toko">${p.toko}</div>
+          <div class="produk-card-toko">
+            <a href="${tokoHref}" class="toko-link" data-seller-name="${p.toko || p.seller?.name || 'Toko Umum'}">${p.toko || p.seller?.name || 'Toko Umum'}</a>
+          </div>
           <div class="produk-card-stars" aria-label="Rating ${p.rating} dari 5">${starsHTML(p.rating)}</div>
           <div class="produk-rating-angka">${p.rating}</div>
         </div>
@@ -231,6 +234,7 @@ function renderRekomendasi(products = [], maxItems = 8) {
 
   rekomGrid.innerHTML = view.map(p => {
     const href = `${DETAIL_BASE}${encodeURIComponent(p.id)}`;
+    const tokoHref = `/toko/${p.toko || p.seller?.name || p.seller_id || 'toko-tidak-ditemukan'}`;
     const imageSrc = p.gambar || 'src/placeholder.png';
     const altText = p.nama.replace(/"/g, '&quot;').replace(/'/g, '&apos;');
     return `
@@ -242,7 +246,9 @@ function renderRekomendasi(products = [], maxItems = 8) {
           <h3 class="produk-card-name">${p.nama}</h3>
           <div class="produk-card-sub">${p.kategori}</div>
           <div class="produk-card-price">${p.harga}</div>
-          <div class="produk-card-toko">${p.toko}</div>
+          <div class="produk-card-toko">
+            <a href="${tokoHref}" class="toko-link" data-seller-name="${p.toko || p.seller?.name || 'Toko Umum'}">${p.toko || p.seller?.name || 'Toko Umum'}</a>
+          </div>
           <div class="produk-card-stars" aria-label="Rating ${p.rating} dari 5">${starsHTML(p.rating)}</div>
           <div class="produk-rating-angka">${p.rating}</div>
         </div>
@@ -263,6 +269,7 @@ function renderProdukPopuler(products = [], maxItems = 8) {
 
   populerGrid.innerHTML = view.map(p => {
     const href = `${DETAIL_BASE}${encodeURIComponent(p.id)}`;
+    const tokoHref = `/toko/${p.toko || p.seller?.name || p.seller_id || 'toko-tidak-ditemukan'}`;
     const imageSrc = p.gambar || 'src/placeholder.png';
     const altText = p.nama.replace(/"/g, '&quot;').replace(/'/g, '&apos;');
     return `
@@ -274,7 +281,9 @@ function renderProdukPopuler(products = [], maxItems = 8) {
           <h3 class="produk-card-name">${p.nama}</h3>
           <div class="produk-card-sub">${p.kategori}</div>
           <div class="produk-card-price">${p.harga}</div>
-          <div class="produk-card-toko">${p.toko}</div>
+          <div class="produk-card-toko">
+            <a href="${tokoHref}" class="toko-link" data-seller-name="${p.toko || p.seller?.name || 'Toko Umum'}">${p.toko || p.seller?.name || 'Toko Umum'}</a>
+          </div>
           <div class="produk-card-stars" aria-label="Rating ${p.rating} dari 5">${starsHTML(p.rating)}</div>
           <div class="produk-rating-angka">${p.rating}</div>
         </div>

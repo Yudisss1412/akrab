@@ -253,20 +253,24 @@ body{
   font-size: 0.9rem;
 }
 
-/* Wishlist card styling for consistent appearance */
+/* Wishlist card styling for consistent appearance - Modified to match product card */
 .wl-card.card {
-  background: #fff;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: var(--gap-md);
-  box-shadow: 0 2px 10px rgba(0,0,0,.04);
-  transition: all 0.3s ease;
+  background: var(--secondary-color);
+  border: 1px solid var(--primary-color);
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.06);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  transition: box-shadow .15s, border-color .15s, transform .15s;
   margin-bottom: 0.5rem;
 }
 
 .wl-card.card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+  box-shadow: 0 6px 20px rgba(0,110,92,.12);
+  border-color: var(--primary-color-dark);
+  transform: translateY(-1px);
 }
 
 /* Wishlist grid styling */
@@ -274,17 +278,16 @@ body{
   margin-top: var(--gap-sm);
 }
 
-/* Horizontal product layout for wishlist */
+/* Horizontal product layout for wishlist - Modified to match product card */
 .product {
+  position: relative;
   display: flex;
-  align-items: center;
-  gap: 1rem;
+  flex-direction: column;
   text-decoration: none;
   color: inherit;
-  padding: 0.5rem;
-  border: 1px solid var(--border-color);
+  background: var(--secondary-color);
   border-radius: var(--radius-md);
-  background: #fff;
+  background: var(--background-color);
 }
 
 .product:hover {
@@ -293,63 +296,185 @@ body{
 }
 
 .product__thumb {
-  width: 80px;
-  height: 80px;
-  border-radius: var(--radius-sm);
+  width: 100%;
+  height: 145px;
   object-fit: cover;
+  border-radius: 10px;
+  background: var(--background-color);
   flex-shrink: 0;
 }
 
 .product__meta {
+  padding: 8px 4px 6px;
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 4px;
 }
 
 .product__title {
-  font-weight: 600;
-  font-size: 1rem;
-  color: var(--text-dark);
-  margin: 0;
+  margin: 8px 0 4px;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--primary-color-dark);
 }
 
 .product__shop {
-  font-size: 0.85rem;
+  font-size: 13px;
   color: var(--text-muted);
-  margin: 0;
+  margin-bottom: 6px;
 }
 
 .wl-price {
   font-weight: 700;
+  margin-bottom: 6px;
   color: var(--primary-color-dark);
-  margin-top: 0.25rem;
 }
 
-.product__actions {
+/* Actions - match product page styling */
+.product__actions,
+.produk-card-actions,
+.produk-aksi {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 0.5rem;
-  flex-shrink: 0;
+  gap: .55rem;
+  padding: 10px 4px 4px;
 }
 
-.wl-like {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.25rem;
+/* Styling untuk button di dalam action container - match produk page */
+.produk-aksi a,
+.produk-aksi button {
+  flex:1; 
+  border-radius: var(--btn-radius); 
+  font-weight:700; 
+  font-size:14px; 
+  padding:.70rem 0;
+  cursor:pointer; 
+  transition:background .15s,color .15s,border-color .15s; 
+  text-align:center;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-sm);
-  width: 36px;
-  height: 36px;
+}
+
+.wl-like {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  border: none;
+  background: #fff;
+  border-radius: 999px;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  cursor: pointer;
+  z-index: 2;
+  padding: 0;
 }
 
 .wl-like:hover {
   background-color: var(--background-color);
+}
+
+.wl-like.active {
+  outline: 2px solid #ffd2cc;
+}
+
+/* Styling untuk button sesuai produk page styling */
+.wl-card.card .product__actions .btn-lihat,
+.wl-card.card .product__actions .btn-add,
+.wl-card.card .product__actions a,
+.wl-card.card .product__actions button,
+.wl-card.card .produk-card-actions .btn-lihat,
+.wl-card.card .produk-card-actions .btn-add,
+.wl-card.card .produk-card-actions a,
+.wl-card.card .produk-card-actions button {
+  flex:1; 
+  border-radius: var(--btn-radius); 
+  font-weight:700; 
+  font-size:14px; 
+  padding:.70rem 0;
+  cursor:pointer; 
+  transition:background .15s,color .15s,border-color .15s; 
+  text-align:center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Lihat Detail = filled (like btn-primary on product page) */
+.wl-card.card .product__actions .btn-lihat,
+.wl-card.card .produk-card-actions .btn-lihat {
+  background: var(--primary-color-dark); 
+  color:#fff; 
+  border: var(--btn-brd) solid var(--primary-color-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.wl-card.card .product__actions .btn-lihat:hover,
+.wl-card.card .produk-card-actions .btn-lihat:hover {
+  background: var(--primary-color); 
+  color: var(--primary-color-dark);
+}
+
+/* + Keranjang = outline (like btn-add on product page) */
+.wl-card.card .product__actions .btn-add,
+.wl-card.card .produk-card-actions .btn-add {
+  background:#f5fbf8; 
+  color: var(--primary-color-dark); 
+  border: var(--btn-brd) solid var(--primary-color-dark);
+}
+.wl-card.card .product__actions .btn-add:hover,
+.wl-card.card .produk-card-actions .btn-add:hover {
+  background: var(--primary-color-dark); 
+  color:#fff;
+}
+
+/* Tambahan: Terapkan juga styling produk-aksi ke wishlist card untuk konsistensi */
+.produk-aksi a,
+.produk-aksi button,
+.wl-card.card .produk-aksi a,
+.wl-card.card .produk-aksi button {
+  flex:1; 
+  border-radius: var(--btn-radius); 
+  font-weight:700; 
+  font-size:14px; 
+  padding:.70rem 0;
+  cursor:pointer; 
+  transition:background .15s,color .15s,border-color .15s; 
+  text-align:center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.produk-aksi .btn-primary,
+.wl-card.card .produk-aksi .btn-primary {
+  background: var(--primary-color-dark); 
+  color:#fff; 
+  border: var(--btn-brd) solid var(--primary-color-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.produk-aksi .btn-primary:hover,
+.wl-card.card .produk-aksi .btn-primary:hover {
+  background: var(--primary-color); 
+  color: var(--primary-color-dark);
+}
+
+.produk-aksi .btn-add,
+.wl-card.card .produk-aksi .btn-add {
+  background:#f5fbf8; 
+  color: var(--primary-color-dark); 
+  border: var(--btn-brd) solid var(--primary-color-dark);
+}
+.produk-aksi .btn-add:hover,
+.wl-card.card .produk-aksi .btn-add:hover {
+  background: var(--primary-color-dark); 
+  color:#fff;
 }
 
 /* Review card styling */

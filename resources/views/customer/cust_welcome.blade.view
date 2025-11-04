@@ -204,6 +204,43 @@
       display: flex !important;
       gap: .55rem !important;
     }
+    
+    .produk-card-actions .btn-lihat,
+    .produk-card-actions .btn-add {
+      flex: 1 !important;
+      border: none !important;
+      border-radius: 8px !important;
+      padding: .55rem .75rem !important;
+      font-weight: 600 !important;
+      cursor: pointer !important;
+      transition: background .15s, color .15s !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-decoration: none !important;
+      text-align: center !important;
+    }
+    
+    .produk-card-actions .btn-lihat {
+      background: var(--primary-color-dark) !important;
+      color: #fff !important;
+    }
+    
+    .produk-card-actions .btn-lihat:hover {
+      background: var(--primary-color) !important;
+      color: var(--primary-color-dark) !important;
+    }
+    
+    .produk-card-actions .btn-add {
+      background: #f5fbf8 !important;
+      color: var(--primary-color-dark) !important;
+      border: 1px solid var(--primary-color-dark) !important;
+    }
+    
+    .produk-card-actions .btn-add:hover {
+      background: var(--primary-color-dark) !important;
+      color: #fff !important;
+    }
 
     /* ========== Kategori ========== */
     .content-section h3 {

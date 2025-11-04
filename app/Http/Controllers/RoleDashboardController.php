@@ -21,8 +21,7 @@ class RoleDashboardController extends Controller
 
     public function showCustomerDashboard()
     {
-        // Redirect to login if customer dashboard view is not available
-        return redirect('/login');
+        return view('customer.dashboard');
     }
 
     public function showRoleBasedDashboard()
@@ -36,7 +35,7 @@ class RoleDashboardController extends Controller
             case 'seller':
                 return view('penjual.dashboard');
             case 'customer':
-                return redirect('/login');
+                return view('customer.dashboard');
             default:
                 return redirect()->route('cust.welcome');
         }

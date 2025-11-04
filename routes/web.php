@@ -593,7 +593,7 @@ Route::get('/kategori/hampers', function () {
 })->name('kategori.hampers');
 
 Route::get('/dashboard_admin', function () {
-    return view('admin.dashboard_admin');
+    return view('admin.dashboard');
 })->name('dashboard.admin');
 
 Route::get('/profil_admin', function () {
@@ -798,7 +798,7 @@ Route::middleware(['auth', 'admin.role'])->group(function () {
 
 Route::middleware(['auth', 'seller.role'])->group(function () {
     Route::get('/penjual/dashboard', function () {
-        return view('penjual.dashboard_penjual');
+        return view('penjual.dashboard');
     })->name('seller.dashboard');
 });
 

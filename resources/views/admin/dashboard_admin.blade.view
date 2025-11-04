@@ -344,7 +344,7 @@
                   <div>Manajemen Akun</div>
                 </a>
                 
-                <a href="{{ route('produk.index') }}" class="shortcut-btn">
+                <a href="{{ route('admin.produk.index') }}" class="shortcut-btn">
                   <div class="shortcut-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M5 21C4.44772 21 4 20.5523 4 20V4C4 3.44772 4.44772 3 5 3H19C19.5523 3 20 3.44772 20 4V20C20 20.5523 19.5523 21 19 21H5Z" stroke="currentColor" stroke-width="2"/>

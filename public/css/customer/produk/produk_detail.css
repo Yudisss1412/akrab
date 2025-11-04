@@ -6,6 +6,38 @@
   --background-color:#f0fdfa; /* disamakan dengan style.css utama */
   --border-color:#e9ecef;
 }
+/* Ganti struktur agar lebih seragam dengan cust_welcome */
+.produk-detail-page {
+  max-width: 1450px;
+  margin: 0 auto;
+  padding: 2.2rem 2.7rem 70px 2.7rem; /* bottom padding supaya konten tidak nabrak footer */
+  color: var(--dark-text-color);
+  background: var(--background-color);
+  flex: 1;
+}
+
+/* Tambahkan styling untuk back-btn agar tampil konsisten */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  background: var(--secondary-color);
+  border: 1px solid var(--border-color);
+  text-decoration: none;
+  color: var(--primary-color-dark);
+  font-weight: 600;
+  transition: background 0.18s, color 0.18s;
+  margin-bottom: 20px; /* Jarak dari elemen sebelumnya */
+}
+
+.back-btn:hover {
+  background: var(--primary-color);
+  color: white;
+}
+
+/* Untuk menjaga backward compatibility */
 .main-layout{min-height:100vh;display:flex;flex-direction:column;background:var(--background-color)}
 .header{
   background:var(--secondary-color);
@@ -25,7 +57,27 @@
 .header-right{display:flex; gap:1.2rem; align-items:center}
 .header-right a.profile-ico{display:inline-flex; align-items:center; justify-content:center; text-decoration:none; color:inherit}
 .profile-ico,.cart-ico{width:27px; height:27px}
-main{padding:2.2rem 2.7rem 70px 2.7rem; width:100%; max-width:1200px; margin:0 auto}
+main{padding:2.2rem 2.7rem 70px 2.7rem; width:100%; max-width:1450px; margin:0 auto}
+
+/* Tambahkan margin-top untuk memberikan ruang antara header dan konten */
+.back-btn {
+  margin-top: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  background: var(--secondary-color);
+  border: 1px solid var(--border-color);
+  text-decoration: none;
+  color: var(--primary-color-dark);
+  font-weight: 600;
+  transition: background 0.18s, color 0.18s;
+}
+.back-btn:hover {
+  background: var(--primary-color);
+  color: white;
+}
 .footer{
   min-height:40px; background:var(--secondary-color); color:var(--primary-color-dark);
   display:flex; justify-content:space-between; align-items:center; padding:1rem 2rem;
@@ -52,7 +104,42 @@ main{padding:2.2rem 2.7rem 70px 2.7rem; width:100%; max-width:1200px; margin:0 a
 *{box-sizing:border-box}
 
 /* ===== Layout & card umum ===== */
-.pd-wrap{max-width:1200px;margin:10px auto;padding:0 16px}
+.pd-wrap{max-width:1450px;margin:20px auto 10px auto;padding:0 16px}
+.pd-header{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:16px;
+  margin:20px 0 20px 0; /* Tambahkan margin atas untuk memberikan ruang dari header */
+  padding:0 24px; /* Padding agar sejajar dengan konten card */
+}
+.pd-header .icon-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  background:var(--background-card);
+  border:1px solid var(--border);
+  cursor:pointer;
+  transition:background 0.18s, transform 0.12s;
+}
+.pd-header .icon-btn:hover{
+  background:var(--primary-color);
+  color:white;
+  transform:scale(1.05);
+}
+.pd-header .pd-title{
+  margin:0;
+  font-size:1.5rem;
+  font-weight:700;
+  color:var(--primary-color-dark);
+  flex:1;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
 .pd-top{display:grid;grid-template-columns:1.1fr .9fr;gap:20px}
 @media (max-width:980px){.pd-top{grid-template-columns:1fr}}
 

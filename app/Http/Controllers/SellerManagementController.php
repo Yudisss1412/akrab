@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Seller;
+use App\Models\User;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -120,20 +122,33 @@ class SellerManagementController extends Controller
         $request->validate([
             'store_name' => 'required|string|max:255',
             'owner_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:sellers,email',
+            'email' => 'required|email|max:255|unique:users,email|unique:sellers,email',
+            'password' => 'required|min:8',
         ]);
-        
+
+        // Buat user baru
+        $user = User::create([
+            'name' => $request->owner_name,
+            'email' => $request->email,
+            'password' => bcrypt($request->password),
+        ]);
+
+        // Assign role seller
+        $user->assignRole('seller');
+
+        // Buat data seller
         Seller::create([
+            'user_id' => $user->id,
             'store_name' => $request->store_name,
             'owner_name' => $request->owner_name,
             'email' => $request->email,
-            'status' => 'aktif', // Set default status as active
+            'status' => 'aktif',
             'join_date' => now(),
             'active_products_count' => 0,
             'total_sales' => 0,
             'rating' => 0
         ]);
-        
+
         return redirect()->route('sellers.index')->with('success', 'Penjual baru berhasil ditambahkan.');
     }
     

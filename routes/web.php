@@ -826,3 +826,7 @@ Route::middleware(['auth'])->get('/dashboard', [App\Http\Controllers\RoleDashboa
 
 // API route for filtering products
 Route::get('/api/products/filter', [App\Http\Controllers\ProductController::class, 'filter'])->name('api.products.filter');
+
+// API routes for subcategories
+Route::get('/api/categories/{id}/subcategories', [App\Http\Controllers\Api\SubcategoryController::class, 'getSubcategoriesByCategory']);
+Route::delete('/api/subcategories/{id}', [App\Http\Controllers\Api\SubcategoryController::class, 'destroy']);

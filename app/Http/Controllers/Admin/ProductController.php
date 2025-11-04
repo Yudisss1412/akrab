@@ -68,7 +68,7 @@ class ProductController extends Controller
         } elseif ($tab === 'categories') {
             // For categories tab, we'll return categories data
             $categories = Category::with('subcategories')->orderBy('name')->get();
-            $mainCategories = Category::whereNull('parent_id')->orderBy('name')->get();
+            $mainCategories = Category::orderBy('name')->get();
             
             return view('admin.produk.index', compact('categories', 'mainCategories', 'tab'));
         } else { // products tab

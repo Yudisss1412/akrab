@@ -484,6 +484,17 @@
                             @endif
                           </select>
                         </div>
+                        <div class="col-md-2 mb-2">
+                          <label for="subcategory_filter" class="form-label">Subkategori</label>
+                          <select class="form-select" id="subcategory_filter" name="subcategory">
+                            <option value="">Semua Subkategori</option>
+                            @if(isset($subcategories) && request('category'))
+                              @foreach($subcategories as $subcategory)
+                                <option value="{{ $subcategory->id }}" {{ request('subcategory') == $subcategory->id ? 'selected' : '' }}>{{ $subcategory->name }}</option>
+                              @endforeach
+                            @endif
+                          </select>
+                        </div>
                         <div class="col-md-2 mb-2 d-flex align-items-end">
                           <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search"></i> Cari</button>
                         </div>
@@ -527,7 +538,7 @@
                             </td>
                             <td>
                               <div>{{ $product->category->name ?? 'N/A' }}</div>
-                              <small class="text-muted">{{ $product->subcategory ?? 'N/A' }}</small>
+                              <small class="text-muted">{{ $product->subcategory->name ?? 'N/A' }}</small>
                             </td>
                             <td>
                               <div><strong>Rp {{ number_format($product->price, 0, ',', '.') }}</strong></div>
@@ -657,7 +668,7 @@
                     <ul class="category-list">
                       @if(isset($mainCategories))
                         @foreach($mainCategories as $category)
-                          <li class="{{ request('selected_category') == $category->id ? 'active' : '' }}" onclick="selectCategory({{ $category->id }})">{{ $category->name }}</li>
+                          <li class="{{ request('selected_category') == $category->id ? 'active' : '' }}" data-id="{{ $category->id }}" onclick="selectCategory({{ $category->id }})">{{ $category->name }}</li>
                         @endforeach
                       @else
                         <li class="active">Elektronik</li>
@@ -673,29 +684,12 @@
                   </div>
                   
                   <div class="category-panel">
-                    <h3>Subkategori: Elektronik</h3>
+                    <h3>Subkategori: <span id="selected-category-name">Pilih Kategori</span></h3>
                     <div class="d-flex justify-content-between mb-3">
-                      <button class="btn btn-primary">Tambah Subkategori</button>
+                      <button class="btn btn-primary" onclick="showAddSubcategoryModal()">Tambah Subkategori</button>
                     </div>
-                    <ul class="category-list subcategory-list">
-                      <li>Smartphone</li>
-                      <li>Laptop</li>
-                      <li>Tablet</li>
-                      <li>Aksesoris</li>
-                      <li>Kamera</li>
-                    </ul>
-                    
-                    <h3 class="mt-4">Atribut Produk</h3>
-                    <div class="d-flex justify-content-between mb-3">
-                      <button class="btn btn-primary">Tambah Atribut</button>
-                    </div>
-                    <ul class="category-list">
-                      <li>Ukuran</li>
-                      <li>Warna</li>
-                      <li>Merek</li>
-                      <li>Bahan</li>
-                      <li>Model</li>
-                      <li>Tahun Produksi</li>
+                    <ul class="category-list subcategory-list" id="subcategory-list">
+                      <!-- Subkategori akan dimuat secara dinamis -->
                     </ul>
                   </div>
                 </div>
@@ -1204,6 +1198,120 @@
         li.classList.remove('active');
       });
       event.target.classList.add('active');
+    }
+    
+    // Load subcategories when category is selected
+    function loadSubcategories(categoryId) {
+      if (!categoryId) {
+        document.getElementById('selected-category-name').textContent = 'Pilih Kategori';
+        document.getElementById('subcategory-list').innerHTML = '';
+        return;
+      }
+
+      // Update category name
+      const selectedCategory = document.querySelector(`#categories-tab-pane .category-list li[data-id="${categoryId}"]`);
+      document.getElementById('selected-category-name').textContent = selectedCategory ? selectedCategory.textContent : 'Kategori Terpilih';
+
+      // Load subcategories via AJAX
+      fetch(`/api/categories/${categoryId}/subcategories`)
+        .then(response => response.json())
+        .then(data => {
+          const subcategoryList = document.getElementById('subcategory-list');
+          subcategoryList.innerHTML = '';
+
+          if (data.subcategories.length > 0) {
+            data.subcategories.forEach(subcategory => {
+              const li = document.createElement('li');
+              li.innerHTML = `
+                <span>${subcategory.name}</span>
+                <div class="float-end">
+                  <button class="btn btn-sm btn-primary" onclick="editSubcategory(${subcategory.id})">Edit</button>
+                  <button class="btn btn-sm btn-danger" onclick="deleteSubcategory(${subcategory.id})">Hapus</button>
+                </div>
+              `;
+              subcategoryList.appendChild(li);
+            });
+          } else {
+            const li = document.createElement('li');
+            li.textContent = 'Tidak ada subkategori';
+            li.style.fontStyle = 'italic';
+            li.style.color = '#6c757d';
+            subcategoryList.appendChild(li);
+          }
+        })
+        .catch(error => {
+          console.error('Error loading subcategories:', error);
+          alert('Gagal memuat subkategori');
+        });
+    }
+
+    // Event listener for category selection in the category panel
+    document.querySelectorAll('#categories-tab-pane .category-list li').forEach(li => {
+      li.addEventListener('click', function() {
+        const categoryId = this.getAttribute('data-id');
+        loadSubcategories(categoryId);
+        
+        // Update active class
+        document.querySelectorAll('#categories-tab-pane .category-list li').forEach(li => {
+          li.classList.remove('active');
+        });
+        this.classList.add('active');
+      });
+    });
+
+    // Simulate category click when user clicks on category in the filter panel
+    document.getElementById('category_filter').addEventListener('change', function() {
+      const categoryId = this.value;
+      if (categoryId) {
+        // Simulate click on the corresponding category in the category panel
+        const categoryItem = document.querySelector(`#categories-tab-pane .category-list li[data-id="${categoryId}"]`);
+        if (categoryItem) {
+          categoryItem.click();
+        } else {
+          // If not found in panel, just load subcategories
+          loadSubcategories(categoryId);
+        }
+      } else {
+        loadSubcategories(null);
+      }
+    });
+
+    // Placeholder functions for subcategory management
+    function showAddSubcategoryModal() {
+      alert('Fungsi tambah subkategori akan segera hadir');
+    }
+
+    function editSubcategory(id) {
+      alert('Fungsi edit subkategori akan segera hadir');
+    }
+
+    function deleteSubcategory(id) {
+      if (confirm('Apakah Anda yakin ingin menghapus subkategori ini?')) {
+        fetch(`/api/subcategories/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert(data.message);
+            // Reload subcategories
+            const activeCategoryId = document.querySelector('#categories-tab-pane .category-list li.active')?.getAttribute('data-id');
+            if (activeCategoryId) {
+              loadSubcategories(activeCategoryId);
+            }
+          } else {
+            alert('Gagal menghapus subkategori: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error deleting subcategory:', error);
+          alert('Terjadi kesalahan saat menghapus subkategori');
+        });
+      }
     }
   </script>
   

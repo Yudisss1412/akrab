@@ -49,6 +49,12 @@ class Product extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    // Relasi ke subkategori
+    public function subcategory()
+    {
+        return $this->belongsTo(Subcategory::class, 'subcategory_id');
+    }
     
     // Relasi ke penjual
     public function seller()

@@ -35,7 +35,7 @@ class ProductController extends Controller
         
         // Query builder untuk produk milik penjual saat ini
         $query = Product::where('seller_id', $seller->id)
-            ->with(['variants', 'category', 'images', 'approvedReviews']);
+            ->with(['variants', 'category', 'subcategory', 'images', 'approvedReviews']);
 
         // Filter berdasarkan pencarian jika ada
         if ($request->has('search') && $request->search) {
@@ -199,7 +199,7 @@ class ProductController extends Controller
 
         $product = Product::where('id', $id)
             ->where('seller_id', $seller->id)
-            ->with(['variants', 'category', 'images', 'reviews.user'])
+            ->with(['variants', 'category', 'subcategory', 'images', 'reviews.user'])
             ->firstOrFail();
 
         // Hitung statistik produk
@@ -229,7 +229,7 @@ class ProductController extends Controller
 
         $product = Product::where('id', $id)
             ->where('seller_id', $seller->id)
-            ->with(['variants', 'category', 'images'])
+            ->with(['variants', 'category', 'subcategory', 'images'])
             ->firstOrFail();
         
         $categories = Category::all();

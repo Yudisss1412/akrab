@@ -91,9 +91,18 @@ async function searchProducts(search = '', category = 'all') {
       params.set('kategori', category);
     }
     
+    // Add cache busting parameter
+    params.append('_cb', Date.now());
+    
     url += '?' + params.toString();
     
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    });
     const result = await response.json();
     
     // Format the data to match what the render function expects
@@ -122,13 +131,23 @@ async function searchProducts(search = '', category = 'all') {
 async function loadAllProducts(category = 'all') {
   try {
     let url = API_PRODUCTS;
+    const params = new URLSearchParams();
     if (category && category !== 'all') {
-      const params = new URLSearchParams();
       params.append('kategori', category);
-      url += '?' + params.toString();
     }
     
-    const response = await fetch(url);
+    // Add cache busting parameter
+    params.append('_cb', Date.now());
+    
+    url += '?' + params.toString();
+    
+    const response = await fetch(url, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    });
     const result = await response.json();
     
     // Format the data to match what the render function expects
@@ -156,8 +175,17 @@ async function loadAllProducts(category = 'all') {
 /* ---------- LOAD POPULAR PRODUCTS FROM API ---------- */
 async function loadPopularProducts() {
   try {
-    // Use the popular API endpoint
-    const response = await fetch('/api/products/popular');
+    // Use the popular API endpoint with cache busting
+    const url = new URL('/api/products/popular', window.location.origin);
+    url.searchParams.append('_cb', Date.now());
+    
+    const response = await fetch(url, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    });
     const result = await response.json();
     
     // Format the data to match what the render function expects
@@ -208,7 +236,7 @@ function renderList(products = []) {
              loading="lazy">
         <div class="produk-card-info">
           <h3 class="produk-card-name">${p.nama}</h3>
-          <div class="produk-card-sub">${p.kategori}</div>
+          <div class="produk-card-sub">${p.subkategori || p.kategori}</div>
           <div class="produk-card-price">${p.harga}</div>
           <div class="produk-card-toko">
             <a href="${tokoHref}" class="toko-link" data-seller-name="${p.toko || p.seller?.name || 'Toko Umum'}">${p.toko || p.seller?.name || 'Toko Umum'}</a>
@@ -244,7 +272,7 @@ function renderRekomendasi(products = [], maxItems = 8) {
              loading="lazy">
         <div class="produk-card-info">
           <h3 class="produk-card-name">${p.nama}</h3>
-          <div class="produk-card-sub">${p.kategori}</div>
+          <div class="produk-card-sub">${p.subkategori || p.kategori}</div>
           <div class="produk-card-price">${p.harga}</div>
           <div class="produk-card-toko">
             <a href="${tokoHref}" class="toko-link" data-seller-name="${p.toko || p.seller?.name || 'Toko Umum'}">${p.toko || p.seller?.name || 'Toko Umum'}</a>
@@ -279,7 +307,7 @@ function renderProdukPopuler(products = [], maxItems = 8) {
              loading="lazy">
         <div class="produk-card-info">
           <h3 class="produk-card-name">${p.nama}</h3>
-          <div class="produk-card-sub">${p.kategori}</div>
+          <div class="produk-card-sub">${p.subkategori || p.kategori}</div>
           <div class="produk-card-price">${p.harga}</div>
           <div class="produk-card-toko">
             <a href="${tokoHref}" class="toko-link" data-seller-name="${p.toko || p.seller?.name || 'Toko Umum'}">${p.toko || p.seller?.name || 'Toko Umum'}</a>

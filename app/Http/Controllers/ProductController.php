@@ -14,27 +14,24 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        // Mapping untuk variasi nama kategori
-        $categoryMapping = [
-            'Berkebun' => 'Produk Berkebun',
-            'Kesehatan' => 'Produk Kesehatan',
-        ];
+
         
-        // Ambil semua produk dengan relasi variants, seller, category, approvedReviews dan images untuk rating
-        $products = Product::with(['variants', 'seller', 'category', 'approvedReviews', 'images'])->get();
+        // Bangun query produk awal
+        $query = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images']);
         
         // Tambahkan filter berdasarkan kategori jika ada
         $kategori = $request->query('kategori');
         if ($kategori && $kategori !== 'all') {
             // Jika kategori yang diminta adalah nama alternatif, gunakan nama sebenarnya
-            $actualCategory = $categoryMapping[$kategori] ?? $kategori;
+            $actualCategory = $kategori;
             
-            $products = Product::with(['variants', 'seller', 'category', 'approvedReviews', 'images'])
-                            ->whereHas('category', function($query) use ($actualCategory) {
-                                $query->where('name', $actualCategory);
-                            })
-                            ->get();
+            $query->whereHas('category', function($query) use ($actualCategory) {
+                $query->where('name', $actualCategory);
+            });
         }
+        
+        // Ambil produk berdasarkan query yang telah difilter
+        $products = $query->get();
         
         // Tambahkan average rating dan review count ke setiap produk
         $products = $products->map(function($product) {
@@ -57,16 +54,14 @@ class ProductController extends Controller
             foreach ($mainCategories as $category) {
                 $query->orWhere('name', $category);
             }
-            // Tambahkan kemungkinan variasi nama
-            $query->orWhere('name', 'Berkebun')  // Alternatif untuk 'Produk Berkebun'
-                  ->orWhere('name', 'Kesehatan'); // Alternatif untuk 'Produk Kesehatan'
+
         })
         ->orderByRaw("CASE 
             WHEN name = 'Kuliner' THEN 1
             WHEN name = 'Fashion' THEN 2
             WHEN name = 'Kerajinan Tangan' THEN 3
-            WHEN name = 'Produk Berkebun' OR name = 'Berkebun' THEN 4
-            WHEN name = 'Produk Kesehatan' OR name = 'Kesehatan' THEN 5
+            WHEN name = 'Produk Berkebun' THEN 4
+            WHEN name = 'Produk Kesehatan' THEN 5
             WHEN name = 'Mainan' THEN 6
             WHEN name = 'Hampers' THEN 7
             ELSE 8
@@ -82,7 +77,7 @@ class ProductController extends Controller
     public function show($id)
     {
         // Ambil produk berdasarkan ID dengan relasi yang diperlukan
-        $product = Product::with(['variants', 'seller', 'category', 'approvedReviews.user', 'images'])->find($id);
+        $product = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews.user', 'images'])->find($id);
         
         if (!$product) {
             abort(404, 'Produk tidak ditemukan');
@@ -93,6 +88,7 @@ class ProductController extends Controller
             'id' => $product->id,
             'nama' => $product->name,
             'kategori' => $product->category->name ?? 'Umum',
+            'subkategori' => $product->subcategory ? $product->subcategory->name : ($product->subcategory ?? 'Umum'),
             'harga' => $product->price,
             'deskripsi' => $product->description,
             'gambar_utama' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
@@ -130,7 +126,7 @@ class ProductController extends Controller
     {
         $query = $request->input('q');
         
-        $products = Product::with(['variants', 'seller', 'category', 'approvedReviews', 'images'])
+        $products = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images'])
                         ->where('name', 'LIKE', "%{$query}%")
                         ->get();
         
@@ -152,17 +148,19 @@ class ProductController extends Controller
      */
     public function byCategory($category)
     {
-        $products = Product::with(['variants', 'seller', 'category', 'approvedReviews', 'images'])
+        $query = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images'])
                         ->whereHas('category', function($query) use ($category) {
                             $query->where('name', $category);
-                        })
-                        ->get();
+                        });
+
+        $products = $query->get();
         
         // Tambahkan average rating dan review count ke setiap produk
         $products = $products->map(function($product) {
             $product->setAttribute('average_rating', $product->averageRating);
             $product->setAttribute('review_count', $product->reviews_count);
             $product->setAttribute('formatted_images', $this->formatProductImages($product));
+            $product->setAttribute('subcategory_name', $product->subcategory ? $product->subcategory->name : ($product->subcategory ?? 'Umum'));
             return $product;
         });
         
@@ -179,8 +177,8 @@ class ProductController extends Controller
             'kuliner' => 'Kuliner',
             'fashion' => 'Fashion',
             'kerajinan' => 'Kerajinan Tangan',
-            'berkebun' => 'Berkebun',
-            'kesehatan' => 'Kesehatan',
+            'berkebun' => 'Produk Berkebun',
+            'kesehatan' => 'Produk Kesehatan',
             'mainan' => 'Mainan',
             'hampers' => 'Hampers',
         ];
@@ -195,7 +193,7 @@ class ProductController extends Controller
         }
         
         // Ambil produk berdasarkan kategori dengan informasi lengkap
-        $products = Product::with(['variants', 'seller', 'category', 'approvedReviews', 'images'])
+        $products = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images'])
                          ->where('category_id', $category->id)
                          ->where('status', 'active')
                          ->get();
@@ -218,6 +216,8 @@ class ProductController extends Controller
                 'image' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
                 'average_rating' => round($product->averageRating, 1),
                 'review_count' => $product->reviews_count,
+                'category_name' => $product->category->name ?? 'Umum',
+                'subcategory_name' => $product->subcategory ? $product->subcategory->name : ($product->subcategory ?? 'Umum'),
             ];
         });
         
@@ -248,7 +248,7 @@ class ProductController extends Controller
     public function popular()
     {
         // Ambil produk terbaru atau produk dengan penjualan terbanyak sebagai produk populer
-        $products = Product::with(['variants', 'seller', 'category', 'approvedReviews', 'images'])
+        $products = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images'])
                         ->orderBy('created_at', 'desc') // Urutkan berdasarkan tanggal terbaru
                         ->limit(10)
                         ->get();
@@ -291,7 +291,7 @@ class ProductController extends Controller
     public function getAllProducts(Request $request)
     {
         // Ambil semua produk tanpa filter status untuk memastikan produk baru muncul
-        $query = Product::with(['variants', 'seller', 'category', 'approvedReviews', 'images']);
+        $query = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images']);
         
         // Tambahkan filter berdasarkan kategori jika ada
         $kategori = $request->query('kategori');
@@ -339,6 +339,7 @@ class ProductController extends Controller
                 'id' => $product->id,
                 'nama' => $product->name,
                 'kategori' => $product->category->name ?? 'Umum',
+                'subkategori' => $product->subcategory ? $product->subcategory->name : ($product->subcategory ?? 'Umum'), // Gunakan relasi subcategory atau field subcategory string
                 'harga' => $product->price,
                 'gambar' => $gambarUrl,
                 'rating' => $product->averageRating,
@@ -358,7 +359,7 @@ class ProductController extends Controller
      */
     public function apiShow($id)
     {
-        $product = Product::with(['variants', 'seller', 'category', 'approvedReviews', 'images'])->find($id);
+        $product = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images'])->find($id);
         
         if (!$product) {
             return response()->json(['error' => 'Produk tidak ditemukan'], 404);
@@ -400,6 +401,8 @@ class ProductController extends Controller
         $formattedProduct = [
             'id' => $product->id,
             'name' => $product->name,
+            'category_name' => $product->category->name ?? 'Umum',
+            'subcategory_name' => $product->subcategory ? $product->subcategory->name : ($product->subcategory ?? 'Umum'),
             'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
             'image' => $mainImage ? asset('storage/' . $mainImage) : asset('src/placeholder.png'),
             'formatted_images' => collect($product->all_images)->map(function($img) {
@@ -435,7 +438,7 @@ class ProductController extends Controller
      */
     public function filter(Request $request)
     {
-        $query = Product::with(['variants', 'seller', 'category', 'approvedReviews', 'images'])
+        $query = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images'])
                       ->where('status', 'active'); // Hanya produk aktif
         
         // Filter berdasarkan kategori
@@ -462,12 +465,16 @@ class ProductController extends Controller
         // Filter berdasarkan subkategori
         $subkategori = $request->query('subkategori');
         if ($subkategori && is_array($subkategori) && count($subkategori) > 0) {
-            $query = $query->whereIn('subcategory', $subkategori);
+            $query = $query->whereHas('subcategory', function($q) use ($subkategori) {
+                $q->whereIn('name', $subkategori);
+            });
         } elseif ($request->has('subkategori') && !empty($request->query('subkategori'))) {
             // Kondisi jika subkategori bukan array
             $singleSubkategori = $request->query('subkategori');
             if (!is_array($singleSubkategori)) {
-                $query = $query->where('subcategory', $singleSubkategori);
+                $query = $query->whereHas('subcategory', function($q) use ($singleSubkategori) {
+                    $q->where('name', $singleSubkategori);
+                });
             }
         }
         

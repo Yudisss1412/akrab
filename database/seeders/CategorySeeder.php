@@ -36,14 +36,14 @@ class CategorySeeder extends Seeder
                 'status' => 'active',
             ],
             [
-                'name' => 'Berkebun',
-                'slug' => 'berkebun',
+                'name' => 'Produk Berkebun',
+                'slug' => 'produk-berkebun',
                 'description' => 'Temukan berbagai produk berkebun alami dari UMKM lokal',
                 'status' => 'active',
             ],
             [
-                'name' => 'Kesehatan',
-                'slug' => 'kesehatan',
+                'name' => 'Produk Kesehatan',
+                'slug' => 'produk-kesehatan',
                 'description' => 'Temukan berbagai produk kesehatan alami dari UMKM lokal',
                 'status' => 'active',
             ],

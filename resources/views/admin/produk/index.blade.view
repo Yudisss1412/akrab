@@ -663,12 +663,15 @@
                   <div class="category-panel">
                     <h3>Kategori Utama</h3>
                     <div class="d-flex justify-content-between mb-3">
-                      <button class="btn btn-primary">Tambah Kategori</button>
+                      <button class="btn btn-primary" onclick="showAddCategoryModal()">Tambah Kategori</button>
                     </div>
                     <ul class="category-list">
                       @if(isset($mainCategories))
                         @foreach($mainCategories as $category)
-                          <li class="{{ request('selected_category') == $category->id ? 'active' : '' }}" data-id="{{ $category->id }}" onclick="selectCategory({{ $category->id }})">{{ $category->name }}</li>
+                          <li class="{{ request('selected_category') == $category->id ? 'active' : '' }}" data-id="{{ $category->id }}" onclick="selectCategory({{ $category->id }})" style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>{{ $category->name }}</span>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteCategory({{ $category->id }})">Hapus</button>
+                          </li>
                         @endforeach
                       @else
                         <li class="active">Elektronik</li>
@@ -1224,11 +1227,14 @@
               const li = document.createElement('li');
               li.innerHTML = `
                 <span>${subcategory.name}</span>
-                <div class="float-end">
-                  <button class="btn btn-sm btn-primary" onclick="editSubcategory(${subcategory.id})">Edit</button>
-                  <button class="btn btn-sm btn-danger" onclick="deleteSubcategory(${subcategory.id})">Hapus</button>
+                <div>
+                  <button class="btn btn-sm btn-primary me-1" onclick="editSubcategory(${subcategory.id})">Edit</button>
+                  <button class="btn btn-sm btn-outline-danger" onclick="deleteSubcategory(${subcategory.id})">Hapus</button>
                 </div>
               `;
+              li.style.display = 'flex';
+              li.style.justifyContent = 'space-between';
+              li.style.alignItems = 'center';
               subcategoryList.appendChild(li);
             });
           } else {
@@ -1286,13 +1292,25 @@
     }
 
     function deleteSubcategory(id) {
-      if (confirm('Apakah Anda yakin ingin menghapus subkategori ini?')) {
-        fetch(`/api/subcategories/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      // Ambil informasi jumlah produk terlebih dahulu sebelum menghapus
+      fetch(`/api/subcategories/${id}/product-count`)
+        .then(response => response.json())
+        .then(data => {
+          const productCount = data.product_count || 0;
+          let message = 'Apakah Anda yakin ingin menghapus subkategori ini?';
+          
+          if (productCount > 0) {
+            message += `\\n\\nPeringatan: Terdapat ${productCount} produk yang terkait dengan subkategori ini.`;
+            message += '\\nProduk-produk tersebut akan kehilangan referensi subkategori saat penghapusan.';
           }
+          
+          if (confirm(message)) {
+            fetch(`/api/subcategories/${id}`, {
+              method: 'DELETE',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+              }
         })
         .then(response => response.json())
         .then(data => {
@@ -1312,6 +1330,119 @@
           alert('Terjadi kesalahan saat menghapus subkategori');
         });
       }
+    }
+
+    function showAddCategoryModal() {
+      // Buat modal sederhana
+      const modalHtml = `
+        <div id="addCategoryModal" class="modal fade show" style="display: block; background: rgba(0,0,0,0.5);">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Tambah Kategori Baru</h5>
+                <button type="button" class="btn-close" onclick="closeModal('addCategoryModal')">&times;</button>
+              </div>
+              <div class="modal-body">
+                <form id="addCategoryForm">
+                  <div class="mb-3">
+                    <label for="categoryName" class="form-label">Nama Kategori</label>
+                    <input type="text" class="form-control" id="categoryName" name="name" required>
+                  </div>
+                  <div class="text-end">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addCategoryModal')">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Tambahkan ke body
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+      
+      // Tambahkan event listener ke form
+      document.getElementById('addCategoryForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const categoryName = document.getElementById('categoryName').value;
+        
+        // Kirim ke server
+        fetch('/api/categories', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          },
+          body: JSON.stringify({ name: categoryName })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert(data.message);
+            closeModal('addCategoryModal');
+            // Refresh kategori list
+            location.reload();
+          } else {
+            alert('Gagal menambah kategori: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Terjadi kesalahan saat menambah kategori');
+        });
+      });
+    }
+
+    function closeModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.remove();
+      }
+    }
+
+    function deleteCategory(id) {
+      // Cek dulu jumlah produk di kategori ini
+      fetch(`/api/categories/${id}/product-count`)
+        .then(response => response.json())
+        .then(data => {
+          const productCount = data.product_count;
+          let confirmMessage = 'Apakah Anda yakin ingin menghapus kategori ini?';
+          
+          if (productCount > 0) {
+            confirmMessage = `Kategori ini memiliki ${productCount} produk. Produk akan tetap ada tapi tidak memiliki kategori. Tetap hapus?`;
+          }
+          
+          if (confirm(confirmMessage)) {
+            // Kirim request hapus
+            fetch(`/api/categories/${id}`, {
+              method: 'DELETE',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+              }
+            })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                alert(data.message);
+                // Refresh halaman
+                location.reload();
+              } else {
+                alert('Gagal menghapus kategori: ' + data.message);
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              alert('Terjadi kesalahan saat menghapus kategori');
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Error checking product count:', error);
+          alert('Gagal memeriksa jumlah produk');
+        });
     }
   </script>
   

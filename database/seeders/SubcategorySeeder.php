@@ -26,11 +26,11 @@ class SubcategorySeeder extends Seeder
                 'Kerajinan Kain', 'Kerajinan Tanah Liat', 'Souvenir & Hadiah', 
                 'Alat Tulis Kerajinan'
             ]],
-            ['name' => 'Berkebun', 'subcategories' => [
+            ['name' => 'Produk Berkebun', 'subcategories' => [
                 'Tanaman Hias', 'Tanaman Buah', 'Tanaman Sayur', 'Tanaman Obat', 
                 'Pupuk & Nutrisi Tanaman', 'Peralatan Berkebun', 'Pot & Media Tanam'
             ]],
-            ['name' => 'Kesehatan', 'subcategories' => [
+            ['name' => 'Produk Kesehatan', 'subcategories' => [
                 'Vitamin & Suplemen', 'Obat Herbal', 'Alat Kesehatan', 
                 'Produk Perawatan Diri', 'Produk Terapi', 'Produk Diet & Nutrisi', 
                 'Alat Bantu Kesehatan'

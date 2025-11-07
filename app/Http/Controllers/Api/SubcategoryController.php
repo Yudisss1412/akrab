@@ -20,6 +20,16 @@ class SubcategoryController extends Controller
         ]);
     }
 
+    public function getProductCount($id)
+    {
+        $subcategory = Subcategory::findOrFail($id);
+        $productCount = $subcategory->products()->count();
+
+        return response()->json([
+            'product_count' => $productCount
+        ]);
+    }
+    
     public function destroy($id)
     {
         $subcategory = Subcategory::findOrFail($id);

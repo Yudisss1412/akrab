@@ -816,11 +816,11 @@
                     <div class="row g-2">
                       <div class="col-md-5 mb-2">
                         <label for="search" class="form-label">Cari Penjual</label>
-                        <input type="text" class="form-control" id="search" name="search" value="{{ request('search') }}" placeholder="Nama Toko, Nama Pemilik, atau Email" onchange="submitForm()">
+                        <input type="text" class="form-control" id="search" name="search" value="{{ request('search') }}" placeholder="Nama Toko, Nama Pemilik, atau Email">
                       </div>
                       <div class="col-md-2 mb-2">
                         <label for="status" class="form-label">Status</label>
-                        <select class="form-select" id="status" name="status" onchange="submitForm()">
+                        <select class="form-select" id="status" name="status">
                           <option value="">Semua</option>
                           @foreach($statusOptions as $value => $label)
                               <option value="{{ $value }}" {{ request('status') == $value ? 'selected' : '' }}>
@@ -831,16 +831,11 @@
                       </div>
                       <div class="col-md-2 mb-2">
                         <label for="join_date_from" class="form-label">Bergabung Dari</label>
-                        <input type="date" class="form-control" id="join_date_from" name="join_date_from" value="{{ request('join_date_from') }}" onchange="submitForm()">
+                        <input type="date" class="form-control" id="join_date_from" name="join_date_from" value="{{ request('join_date_from') }}">
                       </div>
                       <div class="col-md-2 mb-2">
                         <label for="join_date_to" class="form-label">Bergabung Sampai</label>
-                        <input type="date" class="form-control" id="join_date_to" name="join_date_to" value="{{ request('join_date_to') }}" onchange="submitForm()">
-                      </div>
-                      <div class="col-md-1 mb-2 d-flex align-items-end">
-                        <button type="button" class="btn btn-secondary w-100" onclick="clearFilters()">
-                          <i class="fas fa-times"></i>
-                        </button>
+                        <input type="date" class="form-control" id="join_date_to" name="join_date_to" value="{{ request('join_date_to') }}">
                       </div>
                     </div>
                   </form>
@@ -1057,11 +1052,11 @@
                     <div class="row g-2">
                       <div class="col-md-5 mb-2">
                         <label for="buyer_search" class="form-label">Cari Pembeli</label>
-                        <input type="text" class="form-control" id="buyer_search" name="search" value="{{ request('search') }}" placeholder="Nama Pembeli, Email" onchange="submitBuyerForm()">
+                        <input type="text" class="form-control" id="buyer_search" name="search" value="{{ request('search') }}" placeholder="Nama Pembeli, Email">
                       </div>
                       <div class="col-md-2 mb-2">
                         <label for="buyer_status" class="form-label">Status</label>
-                        <select class="form-select" id="buyer_status" name="status" onchange="submitBuyerForm()">
+                        <select class="form-select" id="buyer_status" name="status">
                           <option value="">Semua</option>
                           <option value="aktif" {{ request('status') === 'aktif' ? 'selected' : '' }}>Aktif</option>
                           <option value="ditangguhkan" {{ request('status') === 'ditangguhkan' ? 'selected' : '' }}>Ditangguhkan</option>
@@ -1069,16 +1064,11 @@
                       </div>
                       <div class="col-md-2 mb-2">
                         <label for="join_date_from_buyer" class="form-label">Bergabung Dari</label>
-                        <input type="date" class="form-control" id="join_date_from_buyer" name="join_date_from" value="{{ request('join_date_from') }}" onchange="submitBuyerForm()">
+                        <input type="date" class="form-control" id="join_date_from_buyer" name="join_date_from" value="{{ request('join_date_from') }}">
                       </div>
                       <div class="col-md-2 mb-2">
                         <label for="join_date_to_buyer" class="form-label">Bergabung Sampai</label>
-                        <input type="date" class="form-control" id="join_date_to_buyer" name="join_date_to" value="{{ request('join_date_to') }}" onchange="submitBuyerForm()">
-                      </div>
-                      <div class="col-md-1 mb-2 d-flex align-items-end">
-                        <button type="button" class="btn btn-secondary w-100" onclick="clearBuyerFilters()">
-                          <i class="fas fa-times"></i>
-                        </button>
+                        <input type="date" class="form-control" id="join_date_to_buyer" name="join_date_to" value="{{ request('join_date_to') }}">
                       </div>
                     </div>
                   </form>
@@ -1291,6 +1281,51 @@
     submitBuyerForm();
   }
 
+  // Auto-filter functionality for sellers
+  function updateSellerFilters() {
+    const form = document.getElementById('filterForm');
+    const formData = new FormData(form);
+
+    // Build URL with parameters
+    let url = new URL(window.location.href);
+    url.search = '';
+
+    for (const [key, value] of formData.entries()) {
+      if (value) {
+        url.searchParams.append(key, value);
+      }
+    }
+
+    // Ensure tab parameter is preserved
+    url.searchParams.set('tab', 'sellers');
+
+    // Navigate to the URL with parameters
+    window.location.href = url.toString();
+  }
+
+  // Auto-filter functionality for buyers
+  function updateBuyerFilters() {
+    const form = document.getElementById('filterFormBuyers');
+    const formData = new FormData(form);
+
+    // Build URL with parameters
+    let url = new URL(window.location.href);
+    url.search = '';
+
+    for (const [key, value] of formData.entries()) {
+      if (value) {
+        url.searchParams.append(key, value);
+      }
+    }
+
+    // Ensure tab parameter is preserved
+    url.searchParams.set('tab', 'buyers');
+
+    // Navigate to the URL with parameters
+    window.location.href = url.toString();
+  }
+
+  // Add event listeners to filter elements for automatic filtering
   document.addEventListener('DOMContentLoaded', function() {
     // Select all functionality for sellers
     const selectAll = document.getElementById('selectAll');
@@ -1306,7 +1341,63 @@
       document.getElementById('buyers-tab-pane').classList.add('show', 'active');
       document.getElementById('sellers-tab-pane').classList.remove('show', 'active');
     }
-    
+
+    // Add event listeners to seller filter elements for automatic filtering
+    const sellerSearch = document.getElementById('search');
+    const sellerStatus = document.getElementById('status');
+    const sellerJoinDateFrom = document.getElementById('join_date_from');
+    const sellerJoinDateTo = document.getElementById('join_date_to');
+
+    if (sellerSearch) {
+      sellerSearch.addEventListener('input', function() {
+        // Use a debounce to avoid too many requests while typing
+        clearTimeout(this.debounceTimeout);
+        this.debounceTimeout = setTimeout(() => {
+          updateSellerFilters();
+        }, 300);
+      });
+    }
+
+    if (sellerStatus) {
+      sellerStatus.addEventListener('change', updateSellerFilters);
+    }
+
+    if (sellerJoinDateFrom) {
+      sellerJoinDateFrom.addEventListener('change', updateSellerFilters);
+    }
+
+    if (sellerJoinDateTo) {
+      sellerJoinDateTo.addEventListener('change', updateSellerFilters);
+    }
+
+    // Add event listeners to buyer filter elements for automatic filtering
+    const buyerSearch = document.getElementById('buyer_search');
+    const buyerStatus = document.getElementById('buyer_status');
+    const buyerJoinDateFrom = document.getElementById('join_date_from_buyer');
+    const buyerJoinDateTo = document.getElementById('join_date_to_buyer');
+
+    if (buyerSearch) {
+      buyerSearch.addEventListener('input', function() {
+        // Use a debounce to avoid too many requests while typing
+        clearTimeout(this.debounceTimeout);
+        this.debounceTimeout = setTimeout(() => {
+          updateBuyerFilters();
+        }, 300);
+      });
+    }
+
+    if (buyerStatus) {
+      buyerStatus.addEventListener('change', updateBuyerFilters);
+    }
+
+    if (buyerJoinDateFrom) {
+      buyerJoinDateFrom.addEventListener('change', updateBuyerFilters);
+    }
+
+    if (buyerJoinDateTo) {
+      buyerJoinDateTo.addEventListener('change', updateBuyerFilters);
+    }
+
     // Select all functionality for sellers
     selectAll && selectAll.addEventListener('change', function() {
       sellerCheckboxes.forEach(checkbox => {

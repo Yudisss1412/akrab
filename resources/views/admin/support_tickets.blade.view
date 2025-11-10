@@ -415,10 +415,6 @@
                 <input type="text" id="searchFilter" name="search" placeholder="Cari di Akrab..." value="{{ request('search') }}">
               </div>
               
-              <div class="filter-buttons">
-                <button type="submit" class="btn btn-primary">Filter</button>
-                <a href="{{ route('support.tickets') }}" class="btn btn-secondary">Reset</a>
-              </div>
             </form>
           </div>
           
@@ -611,63 +607,59 @@
       conversationContent.scrollTop = conversationContent.scrollHeight;
     }
     
-    // Filter functionality
+    // Auto-filter functionality - automatically update URL and refresh page when filter changes
     const statusFilter = document.getElementById('statusFilter');
     const priorityFilter = document.getElementById('priorityFilter');
     const searchFilter = document.getElementById('searchFilter');
+
+    // Add event listeners to filter elements for automatic filtering
+    if (statusFilter) {
+      statusFilter.addEventListener('change', updateFilters);
+    }
     
-    statusFilter.addEventListener('change', filterTickets);
-    priorityFilter.addEventListener('change', filterTickets);
-    searchFilter.addEventListener('input', filterTickets);
+    if (priorityFilter) {
+      priorityFilter.addEventListener('change', updateFilters);
+    }
     
-    function filterTickets() {
+    if (searchFilter) {
+      searchFilter.addEventListener('input', function() {
+        // Use a debounce to avoid too many requests while typing
+        clearTimeout(this.debounceTimeout);
+        this.debounceTimeout = setTimeout(() => {
+          updateFilters();
+        }, 300);
+      });
+    }
+
+    // Set initial values based on URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('status')) {
+      statusFilter.value = urlParams.get('status');
+    }
+    if (urlParams.get('priority')) {
+      priorityFilter.value = urlParams.get('priority');
+    }
+    if (urlParams.get('search')) {
+      searchFilter.value = urlParams.get('search');
+    }
+    
+    function updateFilters() {
       const status = statusFilter.value;
       const priority = priorityFilter.value;
-      const search = searchFilter.value.toLowerCase();
-      
-      const rows = document.querySelectorAll('#ticketsTable tbody tr');
-      
-      rows.forEach(row => {
-        // Extract text content from cells, considering the badge content
-        const statusCell = row.cells[3].textContent.trim().toLowerCase();
-        const priorityCell = row.cells[4].textContent.trim().toLowerCase();
-        const ticketId = row.cells[0].textContent.trim().toLowerCase();
-        const subject = row.cells[1].textContent.trim().toLowerCase();
-        const sender = row.cells[2].textContent.trim().toLowerCase();
-        
-        let matches = true;
-        
-        // Status filter
-        if (status) {
-          let statusMatch = false;
-          if (status === 'new' && statusCell.includes('baru')) statusMatch = true;
-          if (status === 'processing' && statusCell.includes('sedang diproses')) statusMatch = true;
-          if (status === 'completed' && statusCell.includes('selesai')) statusMatch = true;
-          
-          if (!statusMatch) matches = false;
-        }
-        
-        // Priority filter
-        if (priority && matches) {
-          let priorityMatch = false;
-          if (priority === 'low' && priorityCell.includes('rendah')) priorityMatch = true;
-          if (priority === 'medium' && priorityCell.includes('sedang')) priorityMatch = true;
-          if (priority === 'high' && priorityCell.includes('tinggi')) priorityMatch = true;
-          
-          if (!priorityMatch) matches = false;
-        }
-        
-        // Search filter (applies to all columns)
-        if (search && matches) {
-          if (!ticketId.includes(search) && 
-              !subject.includes(search) && 
-              !sender.includes(search)) {
-            matches = false;
-          }
-        }
-        
-        row.style.display = matches ? '' : 'none';
-      });
+      const search = searchFilter.value;
+
+      // Build URL with filter parameters
+      let url = new URL(window.location);
+      url.searchParams.delete('status');    // Remove old status parameter
+      url.searchParams.delete('priority');  // Remove old priority parameter
+      url.searchParams.delete('search');    // Remove old search parameter
+
+      if (status) url.searchParams.set('status', status);
+      if (priority) url.searchParams.set('priority', priority);
+      if (search) url.searchParams.set('search', search);
+
+      // Reload page with updated parameters
+      window.location = url.toString();
     }
     
     // Pagination

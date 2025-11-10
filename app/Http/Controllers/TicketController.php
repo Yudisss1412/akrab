@@ -12,6 +12,11 @@ class TicketController extends Controller
     {
         $query = Ticket::with('user', 'assignee');
 
+        // Filter berdasarkan kategori jika ada
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+
         // Filter berdasarkan status jika ada
         if ($request->filled('status')) {
             $query->where('status', $request->status);

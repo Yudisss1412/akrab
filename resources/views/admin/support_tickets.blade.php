@@ -61,6 +61,7 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Filter system is now automatic - no need for filter button -->
 
                     <div class="table-responsive">
                         <table class="table table-centered table-nowrap table-hover mb-0">
@@ -240,21 +241,56 @@
         loadAssignees();
     });
 
-    function loadAssignees() {
-        $.ajax({
-            url: '/api/staff',
-            method: 'GET',
-            success: function(response) {
-                let options = '<option value="">Tidak Ditugaskan</option>';
-                response.staff.forEach(function(staff) {
-                    options += `<option value="${staff.id}">${staff.name}</option>`;
-                });
-                $('#assigneeSelect').html(options);
-            },
-            error: function(xhr) {
-                console.error('Error loading staff:', xhr);
-            }
-        });
-    }
+    // Auto-filter functionality - automatically reload page when filter changes
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterCategory = document.getElementById('filterCategory');
+        const filterStatus = document.getElementById('filterStatus');
+        const filterPriority = document.getElementById('filterPriority');
+
+        // Function to update URL with filter parameters and reload
+        function updateFilters() {
+            const category = filterCategory.value;
+            const status = filterStatus.value;
+            const priority = filterPriority.value;
+
+            // Build URL with filter parameters
+            let url = new URL(window.location);
+            url.searchParams.delete('category'); // Remove old category parameter
+            url.searchParams.delete('status'); // Remove old status parameter
+            url.searchParams.delete('priority'); // Remove old priority parameter
+
+            if (category) url.searchParams.set('category', category);
+            if (status) url.searchParams.set('status', status);
+            if (priority) url.searchParams.set('priority', priority);
+
+            // Reload page with updated parameters
+            window.location = url.toString();
+        }
+
+        // Add event listeners to filter dropdowns
+        if (filterCategory) {
+            filterCategory.addEventListener('change', updateFilters);
+        }
+        
+        if (filterStatus) {
+            filterStatus.addEventListener('change', updateFilters);
+        }
+        
+        if (filterPriority) {
+            filterPriority.addEventListener('change', updateFilters);
+        }
+
+        // Set initial values based on URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('category')) {
+            filterCategory.value = urlParams.get('category');
+        }
+        if (urlParams.get('status')) {
+            filterStatus.value = urlParams.get('status');
+        }
+        if (urlParams.get('priority')) {
+            filterPriority.value = urlParams.get('priority');
+        }
+    });
 </script>
 @endsection

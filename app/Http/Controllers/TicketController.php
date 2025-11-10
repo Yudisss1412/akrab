@@ -8,11 +8,33 @@ use Illuminate\Support\Facades\Auth;
 
 class TicketController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $tickets = Ticket::with('user', 'assignee')
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        $query = Ticket::with('user', 'assignee');
+
+        // Filter berdasarkan status jika ada
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filter berdasarkan priority jika ada
+        if ($request->filled('priority')) {
+            $query->where('priority', $request->priority);
+        }
+
+        // Filter berdasarkan pencarian jika ada
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('subject', 'LIKE', "%{$search}%")
+                  ->orWhere('message', 'LIKE', "%{$search}%")
+                  ->orWhereHas('user', function($userQuery) use ($search) {
+                      $userQuery->where('name', 'LIKE', "%{$search}%");
+                  });
+            });
+        }
+
+        $tickets = $query->orderBy('created_at', 'desc')->paginate(10);
 
         return view('admin.support_tickets', compact('tickets'));
     }
@@ -54,22 +76,38 @@ class TicketController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|in:open,in_progress,resolved,closed',
+            'status' => 'nullable|in:open,in_progress,resolved,closed',
+            'priority' => 'nullable|in:low,medium,high',
             'assignee_id' => 'nullable|exists:users,id',
             'resolution_notes' => 'nullable|string',
         ]);
 
         $ticket = Ticket::findOrFail($id);
-        
-        // Update status and additional fields
-        $ticket->update([
-            'status' => $request->status,
-            'assignee_id' => $request->assignee_id,
-            'resolution_notes' => $request->resolution_notes,
-            'resolved_at' => $request->status === 'resolved' ? now() : null,
-        ]);
 
-        return response()->json(['success' => true, 'message' => 'Status tiket berhasil diperbarui']);
+        // Prepare update data
+        $updateData = [];
+        
+        if ($request->has('status') && !empty($request->status)) {
+            $updateData['status'] = $request->status;
+            $updateData['resolved_at'] = $request->status === 'resolved' ? now() : null;
+        }
+        
+        if ($request->has('priority') && !empty($request->priority)) {
+            $updateData['priority'] = $request->priority;
+        }
+        
+        if ($request->has('assignee_id')) {
+            $updateData['assignee_id'] = $request->assignee_id;
+        }
+        
+        if ($request->has('resolution_notes')) {
+            $updateData['resolution_notes'] = $request->resolution_notes;
+        }
+
+        // Update ticket with validated data
+        $ticket->update($updateData);
+
+        return response()->json(['success' => true, 'message' => 'Tiket berhasil diperbarui']);
     }
 
     public function getTicketsByUser()

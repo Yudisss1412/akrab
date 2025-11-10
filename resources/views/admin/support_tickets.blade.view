@@ -27,6 +27,24 @@
       gap: 0.5rem;
     }
     
+    .filters form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: end;
+    }
+    
+    .filters .filter-group {
+      flex-direction: column;
+      min-width: 120px; /* Agar form tetap rapi saat menyamping */
+    }
+    
+    .filter-buttons {
+      display: flex;
+      gap: 0.5rem;
+      align-self: flex-end; /* Menjaga tombol tetap sejajar bawah */
+    }
+    
     .filter-group label {
       font-size: 0.9rem;
       color: var(--muted);
@@ -266,6 +284,24 @@
       background: #005a4a;
     }
     
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.9rem;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+    
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+    
     .ticket-details {
       margin-bottom: 1rem;
     }
@@ -352,30 +388,38 @@
           </div>
           
           <div class="filters">
-            <div class="filter-group">
-              <label for="statusFilter">Status</label>
-              <select id="statusFilter">
-                <option value="">Semua Status</option>
-                <option value="new">Baru</option>
-                <option value="processing">Sedang Diproses</option>
-                <option value="completed">Selesai</option>
-              </select>
-            </div>
-            
-            <div class="filter-group">
-              <label for="priorityFilter">Prioritas</label>
-              <select id="priorityFilter">
-                <option value="">Semua Prioritas</option>
-                <option value="low">Rendah</option>
-                <option value="medium">Sedang</option>
-                <option value="high">Tinggi</option>
-              </select>
-            </div>
-            
-            <div class="filter-group">
-              <label for="searchFilter">Cari</label>
-              <input type="text" id="searchFilter" placeholder="Cari di Akrab...">
-            </div>
+            <form method="GET" action="{{ route('support.tickets') }}">
+              <div class="filter-group">
+                <label for="statusFilter">Status</label>
+                <select id="statusFilter" name="status">
+                  <option value="">Semua Status</option>
+                  <option value="open" {{ request('status') == 'open' ? 'selected' : '' }}>Terbuka</option>
+                  <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>Dalam Proses</option>
+                  <option value="resolved" {{ request('status') == 'resolved' ? 'selected' : '' }}>Diselesaikan</option>
+                  <option value="closed" {{ request('status') == 'closed' ? 'selected' : '' }}>Ditutup</option>
+                </select>
+              </div>
+              
+              <div class="filter-group">
+                <label for="priorityFilter">Prioritas</label>
+                <select id="priorityFilter" name="priority">
+                  <option value="">Semua Prioritas</option>
+                  <option value="low" {{ request('priority') == 'low' ? 'selected' : '' }}>Rendah</option>
+                  <option value="medium" {{ request('priority') == 'medium' ? 'selected' : '' }}>Sedang</option>
+                  <option value="high" {{ request('priority') == 'high' ? 'selected' : '' }}>Tinggi</option>
+                </select>
+              </div>
+              
+              <div class="filter-group">
+                <label for="searchFilter">Cari</label>
+                <input type="text" id="searchFilter" name="search" placeholder="Cari di Akrab..." value="{{ request('search') }}">
+              </div>
+              
+              <div class="filter-buttons">
+                <button type="submit" class="btn btn-primary">Filter</button>
+                <a href="{{ route('support.tickets') }}" class="btn btn-secondary">Reset</a>
+              </div>
+            </form>
           </div>
           
           <div class="tickets-container">
@@ -392,190 +436,36 @@
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>#TKT-2023-06-15-001</td>
-                  <td>Kesulitan mengunggah produk</td>
-                  <td>Warung Online</td>
-                  <td>
-                    <select class="status-select" data-ticket="#TKT-2023-06-15-001" onchange="updateTicketStatus(this)">
-                      <option value="new" selected>Baru</option>
-                      <option value="processing">Sedang Diproses</option>
-                      <option value="completed">Selesai</option>
-                    </select>
-                  </td>
-                  <td>
-                    <select class="priority-select" data-ticket="#TKT-2023-06-15-001" onchange="updateTicketPriority(this)">
-                      <option value="low">Rendah</option>
-                      <option value="medium">Sedang</option>
-                      <option value="high" selected>Tinggi</option>
-                    </select>
-                  </td>
-                  <td>15 Jun 2023</td>
-                  <td>
-                    <a href="{{ route('support.tickets.detail', ['id' => 'TKT-2023-06-15-001']) }}" class="btn btn-outline">Lihat</a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>#TKT-2023-06-14-002</td>
-                  <td>Pembayaran tidak masuk</td>
-                  <td>Toko Elektronik</td>
-                  <td>
-                    <select class="status-select" data-ticket="#TKT-2023-06-14-002" onchange="updateTicketStatus(this)">
-                      <option value="new">Baru</option>
-                      <option value="processing" selected>Sedang Diproses</option>
-                      <option value="completed">Selesai</option>
-                    </select>
-                  </td>
-                  <td>
-                    <select class="priority-select" data-ticket="#TKT-2023-06-14-002" onchange="updateTicketPriority(this)">
-                      <option value="low">Rendah</option>
-                      <option value="medium" selected>Sedang</option>
-                      <option value="high">Tinggi</option>
-                    </select>
-                  </td>
-                  <td>14 Jun 2023</td>
-                  <td>
-                    <a href="{{ route('support.tickets.detail', ['id' => 'TKT-2023-06-14-002']) }}" class="btn btn-outline">Lihat</a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>#TKT-2023-06-13-003</td>
-                  <td>Kesulitan verifikasi akun</td>
-                  <td>Seni Kita</td>
-                  <td>
-                    <select class="status-select" data-ticket="#TKT-2023-06-13-003" onchange="updateTicketStatus(this)">
-                      <option value="new">Baru</option>
-                      <option value="processing">Sedang Diproses</option>
-                      <option value="completed" selected>Selesai</option>
-                    </select>
-                  </td>
-                  <td>
-                    <select class="priority-select" data-ticket="#TKT-2023-06-13-003" onchange="updateTicketPriority(this)">
-                      <option value="low" selected>Rendah</option>
-                      <option value="medium">Sedang</option>
-                      <option value="high">Tinggi</option>
-                    </select>
-                  </td>
-                  <td>13 Jun 2023</td>
-                  <td>
-                    <a href="{{ route('support.tickets.detail', ['id' => 'TKT-2023-06-13-003']) }}" class="btn btn-outline">Lihat</a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>#TKT-2023-06-12-004</td>
-                  <td>Produk tidak muncul di katalog</td>
-                  <td>Fashion Kita</td>
-                  <td>
-                    <select class="status-select" data-ticket="#TKT-2023-06-12-004" onchange="updateTicketStatus(this)">
-                      <option value="new" selected>Baru</option>
-                      <option value="processing">Sedang Diproses</option>
-                      <option value="completed">Selesai</option>
-                    </select>
-                  </td>
-                  <td>
-                    <select class="priority-select" data-ticket="#TKT-2023-06-12-004" onchange="updateTicketPriority(this)">
-                      <option value="low">Rendah</option>
-                      <option value="medium">Sedang</option>
-                      <option value="high" selected>Tinggi</option>
-                    </select>
-                  </td>
-                  <td>12 Jun 2023</td>
-                  <td>
-                    <a href="{{ route('support.tickets.detail', ['id' => 'TKT-2023-06-12-004']) }}" class="btn btn-outline">Lihat</a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>#TKT-2023-06-11-005</td>
-                  <td>Pengiriman tidak terupdate</td>
-                  <td>Buku Seru</td>
-                  <td>
-                    <select class="status-select" data-ticket="#TKT-2023-06-11-005" onchange="updateTicketStatus(this)">
-                      <option value="new">Baru</option>
-                      <option value="processing" selected>Sedang Diproses</option>
-                      <option value="completed">Selesai</option>
-                    </select>
-                  </td>
-                  <td>
-                    <select class="priority-select" data-ticket="#TKT-2023-06-11-005" onchange="updateTicketPriority(this)">
-                      <option value="low">Rendah</option>
-                      <option value="medium" selected>Sedang</option>
-                      <option value="high">Tinggi</option>
-                    </select>
-                  </td>
-                  <td>11 Jun 2023</td>
-                  <td>
-                    <a href="{{ route('support.tickets.detail', ['id' => 'TKT-2023-06-11-005']) }}" class="btn btn-outline">Lihat</a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>#TKT-2023-06-10-006</td>
-                  <td>Kesulitan menggunakan fitur diskon</td>
-                  <td>Hadiah Spesial</td>
-                  <td>
-                    <select class="status-select" data-ticket="#TKT-2023-06-10-006" onchange="updateTicketStatus(this)">
-                      <option value="new">Baru</option>
-                      <option value="processing">Sedang Diproses</option>
-                      <option value="completed" selected>Selesai</option>
-                    </select>
-                  </td>
-                  <td>
-                    <select class="priority-select" data-ticket="#TKT-2023-06-10-006" onchange="updateTicketPriority(this)">
-                      <option value="low" selected>Rendah</option>
-                      <option value="medium">Sedang</option>
-                      <option value="high">Tinggi</option>
-                    </select>
-                  </td>
-                  <td>10 Jun 2023</td>
-                  <td>
-                    <a href="{{ route('support.tickets.detail', ['id' => 'TKT-2023-06-10-006']) }}" class="btn btn-outline">Lihat</a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>#TKT-2023-06-09-007</td>
-                  <td>Laporan bug di dashboard</td>
-                  <td>Aksesoris Modis</td>
-                  <td>
-                    <select class="status-select" data-ticket="#TKT-2023-06-09-007" onchange="updateTicketStatus(this)">
-                      <option value="new" selected>Baru</option>
-                      <option value="processing">Sedang Diproses</option>
-                      <option value="completed">Selesai</option>
-                    </select>
-                  </td>
-                  <td>
-                    <select class="priority-select" data-ticket="#TKT-2023-06-09-007" onchange="updateTicketPriority(this)">
-                      <option value="low">Rendah</option>
-                      <option value="medium">Sedang</option>
-                      <option value="high" selected>Tinggi</option>
-                    </select>
-                  </td>
-                  <td>09 Jun 2023</td>
-                  <td>
-                    <a href="{{ route('support.tickets.detail', ['id' => 'TKT-2023-06-09-007']) }}" class="btn btn-outline">Lihat</a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>#TKT-2023-06-08-008</td>
-                  <td>Pengembalian dana tertunda</td>
-                  <td>Olahraga Store</td>
-                  <td>
-                    <select class="status-select" data-ticket="#TKT-2023-06-08-008" onchange="updateTicketStatus(this)">
-                      <option value="new">Baru</option>
-                      <option value="processing" selected>Sedang Diproses</option>
-                      <option value="completed">Selesai</option>
-                    </select>
-                  </td>
-                  <td>
-                    <select class="priority-select" data-ticket="#TKT-2023-06-08-008" onchange="updateTicketPriority(this)">
-                      <option value="low">Rendah</option>
-                      <option value="medium" selected>Sedang</option>
-                      <option value="high">Tinggi</option>
-                    </select>
-                  </td>
-                  <td>08 Jun 2023</td>
-                  <td>
-                    <a href="{{ route('support.tickets.detail', ['id' => 'TKT-2023-06-08-008']) }}" class="btn btn-outline">Lihat</a>
-                  </td>
-                </tr>
+                @forelse($tickets as $ticket)
+                  <tr>
+                    <td>{{ $ticket->id }}</td>
+                    <td>{{ Str::limit($ticket->subject, 30) }}</td>
+                    <td>{{ $ticket->user->name ?? 'N/A' }}</td>
+                    <td>
+                      <select class="status-select status-{{ strtolower($ticket->status) }}" data-ticket="{{ $ticket->id }}" onchange="updateTicketStatus(this)">
+                        <option value="open" {{ $ticket->status == 'open' ? 'selected' : '' }}>Terbuka</option>
+                        <option value="in_progress" {{ $ticket->status == 'in_progress' ? 'selected' : '' }}>Dalam Proses</option>
+                        <option value="resolved" {{ $ticket->status == 'resolved' ? 'selected' : '' }}>Diselesaikan</option>
+                        <option value="closed" {{ $ticket->status == 'closed' ? 'selected' : '' }}>Ditutup</option>
+                      </select>
+                    </td>
+                    <td>
+                      <select class="priority-select priority-{{ strtolower($ticket->priority) }}" data-ticket="{{ $ticket->id }}" onchange="updateTicketPriority(this)">
+                        <option value="low" {{ $ticket->priority == 'low' ? 'selected' : '' }}>Rendah</option>
+                        <option value="medium" {{ $ticket->priority == 'medium' ? 'selected' : '' }}>Sedang</option>
+                        <option value="high" {{ $ticket->priority == 'high' ? 'selected' : '' }}>Tinggi</option>
+                      </select>
+                    </td>
+                    <td>{{ $ticket->created_at->format('d M Y') }}</td>
+                    <td>
+                      <a href="{{ route('support.tickets.detail', ['id' => $ticket->id]) }}" class="btn btn-outline">Lihat</a>
+                    </td>
+                  </tr>
+                @empty
+                  <tr>
+                    <td colspan="7" style="text-align: center;">Tidak ada tiket ditemukan</td>
+                  </tr>
+                @endforelse
               </tbody>
             </table>
           </div>
@@ -797,12 +687,35 @@
       const ticketId = selectElement.getAttribute('data-ticket');
       const newStatus = selectElement.value;
       
-      // In a real application, this would make an AJAX call to update the status on the server
-      // For demonstration, we'll just show an alert
-      console.log(`Status updated for ticket ${ticketId} to ${newStatus}`);
-      
-      // Update the class on the select element to reflect the new status color
-      updateStatusSelectClass(selectElement, newStatus);
+      // Make AJAX call to update the status on the server
+      fetch(`/support/tickets/${ticketId}/update-status`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+          status: newStatus
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showNotification('Status tiket berhasil diperbarui', 'success');
+          // Update the class on the select element to reflect the new status color
+          updateStatusSelectClass(selectElement, newStatus);
+        } else {
+          showNotification('Gagal memperbarui status tiket', 'error');
+          // Restore original value if update failed
+          selectElement.value = selectElement.getAttribute('data-original-value');
+        }
+      })
+      .catch(error => {
+        console.error('Error updating ticket status:', error);
+        showNotification('Terjadi kesalahan saat memperbarui status tiket', 'error');
+        // Restore original value if update failed
+        selectElement.value = selectElement.getAttribute('data-original-value');
+      });
     }
     
     // Function to update ticket priority
@@ -810,26 +723,49 @@
       const ticketId = selectElement.getAttribute('data-ticket');
       const newPriority = selectElement.value;
       
-      // In a real application, this would make an AJAX call to update the priority on the server
-      // For demonstration, we'll just show an alert
-      console.log(`Priority updated for ticket ${ticketId} to ${newPriority}`);
-      
-      // Update the class on the select element to reflect the new priority color
-      updatePrioritySelectClass(selectElement, newPriority);
+      // Make AJAX call to update the priority on the server
+      fetch(`/support/tickets/${ticketId}/update-status`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+          priority: newPriority
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showNotification('Prioritas tiket berhasil diperbarui', 'success');
+          // Update the class on the select element to reflect the new priority color
+          updatePrioritySelectClass(selectElement, newPriority);
+        } else {
+          showNotification('Gagal memperbarui prioritas tiket', 'error');
+          // Restore original value if update failed
+          selectElement.value = selectElement.getAttribute('data-original-value');
+        }
+      })
+      .catch(error => {
+        console.error('Error updating ticket priority:', error);
+        showNotification('Terjadi kesalahan saat memperbarui prioritas tiket', 'error');
+        // Restore original value if update failed
+        selectElement.value = selectElement.getAttribute('data-original-value');
+      });
     }
     
     // Helper function to update status select styling
     function updateStatusSelectClass(selectElement, status) {
       // Remove all status classes
-      selectElement.classList.remove('status-new', 'status-processing', 'status-completed');
+      selectElement.classList.remove('status-new', 'status-processing', 'status-completed', 'status-open', 'status-in_progress', 'status-resolved', 'status-closed');
       
       // Add the appropriate class based on status
-      if (status === 'new') {
-        selectElement.classList.add('status-new');
-      } else if (status === 'processing') {
-        selectElement.classList.add('status-processing');
-      } else if (status === 'completed') {
-        selectElement.classList.add('status-completed');
+      if (status === 'new' || status === 'open') {
+        selectElement.classList.add('status-open');
+      } else if (status === 'processing' || status === 'in_progress') {
+        selectElement.classList.add('status-in_progress');
+      } else if (status === 'completed' || status === 'resolved' || status === 'closed') {
+        selectElement.classList.add('status-resolved');
       }
     }
     
@@ -853,12 +789,15 @@
       const statusSelects = document.querySelectorAll('.status-select');
       const prioritySelects = document.querySelectorAll('.priority-select');
       
+      // Store original values for rollback on error
       statusSelects.forEach(select => {
+        select.setAttribute('data-original-value', select.value);
         const selectedStatus = select.value;
         updateStatusSelectClass(select, selectedStatus);
       });
       
       prioritySelects.forEach(select => {
+        select.setAttribute('data-original-value', select.value);
         const selectedPriority = select.value;
         updatePrioritySelectClass(select, selectedPriority);
       });

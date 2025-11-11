@@ -28,8 +28,8 @@ class ProductController extends Controller
         $tab = $request->get('tab', 'products');
 
         if ($tab === 'reviews') {
-            // Fetch reviews with related product and user
-            $query = Review::with(['product', 'user']);
+            // Fetch reviews with related product and user - only load necessary fields
+            $query = Review::with(['product:id,name', 'user:id,name,email']);
             
             // Filter by review status
             if ($request->filled('review_status')) {
@@ -67,25 +67,13 @@ class ProductController extends Controller
             return view('admin.produk.index', compact('reviews', 'tab'));
         } elseif ($tab === 'categories') {
             // For categories tab, we'll return categories data
-            $categories = Category::with('subcategories')->orderBy('name')->get();
-            $mainCategories = Category::orderBy('name')->get();
+            $categories = Category::with(['subcategories:id,category_id,name'])->select('id', 'name')->orderBy('name')->get();
+            $mainCategories = Category::select('id', 'name')->orderBy('name')->get();
             
             return view('admin.produk.index', compact('categories', 'mainCategories', 'tab'));
         } else { // products tab
             // Query builder untuk semua produk
-            $query = Product::with(['seller', 'category'])
-                ->leftJoin('sellers', 'products.seller_id', '=', 'sellers.id')
-                ->leftJoinSub(
-                    \DB::table('product_images')
-                        ->select('product_id', \DB::raw('MIN(id) as first_image_id'))
-                        ->groupBy('product_id'),
-                    'first_images',
-                    'products.id',
-                    '=',
-                    'first_images.product_id'
-                )
-                ->leftJoin('product_images', 'first_images.first_image_id', '=', 'product_images.id')
-                ->select('products.*', 'sellers.store_name as seller_name', 'product_images.image_path as main_image')
+            $query = Product::with(['seller', 'category']) // Load minimal relationships
                 ->leftJoin('sellers', 'products.seller_id', '=', 'sellers.id')
                 ->select('products.*', 'sellers.store_name as seller_name');
 
@@ -120,11 +108,52 @@ class ProductController extends Controller
             // Paginate hasil
             $products = $query->paginate(10)->appends($request->query());
 
-            // Ambil semua penjual untuk filter dropdown
+            // Load only first image for each product efficiently to avoid N+1 queries
+            // Get all product IDs that are in the current page
+            $productIds = $products->pluck('id')->toArray();
+            
+            // Load first image for each product in the page
+            if (!empty($productIds)) {
+                $productImages = \DB::table('product_images')
+                    ->whereIn('product_id', $productIds)
+                    ->selectRaw('product_id, MIN(id) as first_image_id')
+                    ->groupBy('product_id')
+                    ->pluck('first_image_id', 'product_id');
+                
+                // Load the actual image records
+                $images = [];
+                if ($productImages->isNotEmpty()) {
+                    $imageRecords = \DB::table('product_images')
+                        ->whereIn('id', $productImages->values()->toArray())
+                        ->pluck('image_path', 'id');
+                    
+                    // Create a mapping of images ready to be set as relations
+                    foreach ($products as $product) {
+                        $firstImageId = $productImages->get($product->id);
+                        $imagePath = $firstImageId ? $imageRecords->get($firstImageId) : null;
+                        
+                        // Create a mock image object to maintain compatibility with view
+                        if ($imagePath) {
+                            $firstImage = new \stdClass();
+                            $firstImage->image_path = $imagePath;
+                            $product->setRelation('images', collect([$firstImage]));
+                        } else {
+                            $product->setRelation('images', collect([]));
+                        }
+                    }
+                } else {
+                    // If no images exist for these products, set empty collections
+                    foreach ($products as $product) {
+                        $product->setRelation('images', collect([]));
+                    }
+                }
+            }
+
+            // Ambil semua penjual untuk filter dropdown - hanya ambil field yang diperlukan
             $sellers = Seller::select('id', 'store_name')->get();
             
-            // Ambil semua kategori untuk filter dropdown
-            $categories = Category::all();
+            // Ambil semua kategori untuk filter dropdown - hanya ambil id dan name untuk efisiensi
+            $categories = Category::select('id', 'name')->get();
 
             return view('admin.produk.index', compact('products', 'sellers', 'categories', 'tab'));
         }

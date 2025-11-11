@@ -18,11 +18,46 @@ class ReportsController extends Controller
     /**
      * Display a listing of violation reports
      */
-    public function index()
+    public function index(Request $request)
     {
-        $reports = ViolationReport::with(['reporter', 'violator', 'product', 'order'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
+        $query = ViolationReport::with(['reporter', 'violator', 'product', 'order']);
+
+        // Search filter - search across multiple fields
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->whereHas('reporter', function($subQuery) use ($search) {
+                    $subQuery->where('name', 'LIKE', "%{$search}%");
+                })
+                ->orWhereHas('violator', function($subQuery) use ($search) {
+                    $subQuery->where('name', 'LIKE', "%{$search}%");
+                })
+                ->orWhere('violation_type', 'LIKE', "%{$search}%")
+                ->orWhereHas('product', function($subQuery) use ($search) {
+                    $subQuery->where('name', 'LIKE', "%{$search}%");
+                });
+            });
+        }
+
+        // Filter by violation type
+        if ($request->has('violation_type') && $request->violation_type) {
+            $query->where('violation_type', $request->violation_type);
+        }
+
+        // Filter by status
+        if ($request->has('status') && $request->status) {
+            $query->where('status', $request->status);
+        }
+
+        // Filter by date range
+        if ($request->has('start_date') && $request->has('end_date')) {
+            $query->whereBetween('created_at', [
+                $request->start_date,
+                $request->end_date . ' 23:59:59'
+            ]);
+        }
+
+        $reports = $query->orderBy('created_at', 'desc')->paginate(15);
 
         return view('admin.reports_violations', compact('reports'));
     }
@@ -78,6 +113,23 @@ class ReportsController extends Controller
     {
         $query = ViolationReport::with(['reporter', 'violator', 'product', 'order']);
 
+        // Search filter - search across multiple fields
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->whereHas('reporter', function($subQuery) use ($search) {
+                    $subQuery->where('name', 'LIKE', "%{$search}%");
+                })
+                ->orWhereHas('violator', function($subQuery) use ($search) {
+                    $subQuery->where('name', 'LIKE', "%{$search}%");
+                })
+                ->orWhere('violation_type', 'LIKE', "%{$search}%")
+                ->orWhereHas('product', function($subQuery) use ($search) {
+                    $subQuery->where('name', 'LIKE', "%{$search}%");
+                });
+            });
+        }
+
         // Filter by violation type
         if ($request->has('violation_type') && $request->violation_type) {
             $query->where('violation_type', $request->violation_type);
@@ -98,9 +150,6 @@ class ReportsController extends Controller
 
         $reports = $query->orderBy('created_at', 'desc')->paginate(15);
 
-        return response()->json([
-            'success' => true,
-            'reports' => $reports
-        ]);
+        return view('admin.reports_violations', compact('reports'));
     }
 }

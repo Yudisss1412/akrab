@@ -73,7 +73,9 @@ class ProductController extends Controller
             return view('admin.produk.index', compact('categories', 'mainCategories', 'tab'));
         } else { // products tab
             // Query builder untuk semua produk
-            $query = Product::with(['seller', 'category']) // Load minimal relationships
+            $query = Product::with(['seller', 'category', 'images' => function($query) {
+                    $query->orderBy('id')->limit(1);
+                }])
                 ->leftJoin('sellers', 'products.seller_id', '=', 'sellers.id')
                 ->select('products.*', 'sellers.store_name as seller_name');
 
@@ -132,10 +134,11 @@ class ProductController extends Controller
                         $firstImageId = $productImages->get($product->id);
                         $imagePath = $firstImageId ? $imageRecords->get($firstImageId) : null;
                         
-                        // Create a mock image object to maintain compatibility with view
+                        // Create a proper ProductImage model object to maintain compatibility with view
                         if ($imagePath) {
-                            $firstImage = new \stdClass();
+                            $firstImage = new \App\Models\ProductImage();
                             $firstImage->image_path = $imagePath;
+                            $firstImage->setAttribute('image_path', $imagePath);
                             $product->setRelation('images', collect([$firstImage]));
                         } else {
                             $product->setRelation('images', collect([]));

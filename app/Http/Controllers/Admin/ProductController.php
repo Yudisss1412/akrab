@@ -73,7 +73,19 @@ class ProductController extends Controller
             return view('admin.produk.index', compact('categories', 'mainCategories', 'tab'));
         } else { // products tab
             // Query builder untuk semua produk
-            $query = Product::with(['seller', 'category', 'images'])
+            $query = Product::with(['seller', 'category'])
+                ->leftJoin('sellers', 'products.seller_id', '=', 'sellers.id')
+                ->leftJoinSub(
+                    \DB::table('product_images')
+                        ->select('product_id', \DB::raw('MIN(id) as first_image_id'))
+                        ->groupBy('product_id'),
+                    'first_images',
+                    'products.id',
+                    '=',
+                    'first_images.product_id'
+                )
+                ->leftJoin('product_images', 'first_images.first_image_id', '=', 'product_images.id')
+                ->select('products.*', 'sellers.store_name as seller_name', 'product_images.image_path as main_image')
                 ->leftJoin('sellers', 'products.seller_id', '=', 'sellers.id')
                 ->select('products.*', 'sellers.store_name as seller_name');
 

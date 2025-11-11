@@ -526,7 +526,7 @@
                           <tr id="product-row-{{ $product->id }}">
                             <td>
                               <div style="display: flex; align-items: center; gap: 1rem;">
-                                <img src="{{ $product->images->first() ? asset('storage/' . $product->images->first()->image_path) : asset('src/produk_sample.jpg') }}" alt="{{ $product->name }}" class="product-thumbnail" onerror="this.src='{{ asset('src/produk_sample.jpg') }}'">
+                                <img src="{{ $product->main_image ? asset('storage/' . $product->main_image) : asset('src/produk_sample.jpg') }}" alt="{{ $product->name }}" class="product-thumbnail" onerror="this.src='{{ asset('src/produk_sample.jpg') }}'">
                                 <div>
                                   <div><strong>{{ $product->name }}</strong></div>
                                   <small class="text-muted">SKU: {{ $product->sku ?? 'N/A' }}</small>

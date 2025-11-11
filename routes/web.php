@@ -890,3 +890,5 @@ Route::delete('/api/categories/{id}', [App\Http\Controllers\Api\CategoryControll
 Route::get('/api/categories/{id}/subcategories', [App\Http\Controllers\Api\SubcategoryController::class, 'getSubcategoriesByCategory']);
 Route::get('/api/subcategories/{id}/product-count', [App\Http\Controllers\Api\SubcategoryController::class, 'getProductCount']);
 Route::delete('/api/subcategories/{id}', [App\Http\Controllers\Api\SubcategoryController::class, 'destroy']);
+
+

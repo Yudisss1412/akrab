@@ -13,9 +13,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Hanya jalankan seeder kategori dan subkategori karena sekarang mengelola semuanya
         $this->call([
             RoleSeeder::class,
-            CategorySeeder::class,
+            CategorySubcategorySeeder::class, // Ini sekarang mengatur kategori dan subkategori
             UserSeeder::class,
             ProductSeeder::class,
             ProductVariantSeeder::class,

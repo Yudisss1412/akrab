@@ -24,6 +24,10 @@ class ProductController extends Controller
             abort(403, 'Akses ditolak. Hanya admin yang dapat mengakses halaman ini.');
         }
 
+        // Load categories for all tabs since they are needed in the category panel
+        $categories = Category::with(['subcategories:id,category_id,name'])->select('id', 'name')->orderBy('name')->get();
+        $mainCategories = Category::select('id', 'name')->orderBy('name')->get();
+        
         // Check which tab is active
         $tab = $request->get('tab', 'products');
 
@@ -64,7 +68,7 @@ class ProductController extends Controller
             
             $reviews = $query->orderBy('created_at', 'desc')->paginate(10)->appends($request->query());
             
-            return view('admin.produk.index', compact('reviews', 'tab'));
+            return view('admin.produk.index', compact('reviews', 'tab', 'categories', 'mainCategories'));
         } elseif ($tab === 'categories') {
             // For categories tab, we'll return categories data
             $categories = Category::with(['subcategories:id,category_id,name'])->select('id', 'name')->orderBy('name')->get();
@@ -72,40 +76,37 @@ class ProductController extends Controller
             
             return view('admin.produk.index', compact('categories', 'mainCategories', 'tab'));
         } else { // products tab
-            // Query builder untuk semua produk
-            $query = Product::with(['seller', 'category', 'images' => function($query) {
-                    $query->orderBy('id')->limit(1);
-                }])
-                ->leftJoin('sellers', 'products.seller_id', '=', 'sellers.id')
-                ->select('products.*', 'sellers.store_name as seller_name');
+            // Optimized query using eager loading to reduce database queries
+            $query = Product::with(['seller:id,store_name', 'category:id,name']);
 
             // Filter berdasarkan pencarian jika ada
             if ($request->has('search') && $request->search) {
                 $search = $request->get('search');
                 $query->where(function($q) use ($search) {
-                    $q->where('products.name', 'LIKE', "%{$search}%")
-                      ->orWhere('products.sku', 'LIKE', "%{$search}%")
-                      ->orWhere('sellers.store_name', 'LIKE', "%{$search}%");
+                    $q->where('name', 'LIKE', "%{$search}%")
+                      ->orWhere('sku', 'LIKE', "%{$search}%");
+                })->orWhereHas('seller', function($subQuery) use ($search) {
+                    $subQuery->where('store_name', 'LIKE', "%{$search}%");
                 });
             }
 
             // Filter berdasarkan penjual jika ada
             if ($request->has('seller_id') && $request->seller_id) {
-                $query->where('products.seller_id', $request->seller_id);
+                $query->where('seller_id', $request->seller_id);
             }
 
             // Filter berdasarkan status produk jika ada
             if ($request->has('status') && $request->status) {
-                $query->where('products.status', $request->status);
+                $query->where('status', $request->status);
             }
 
             // Filter berdasarkan kategori jika ada
             if ($request->has('category') && $request->category) {
-                $query->where('products.category_id', $request->category);
+                $query->where('category_id', $request->category);
             }
 
             // Urutkan berdasarkan yang terbaru
-            $query->orderBy('products.created_at', 'desc');
+            $query->orderBy('created_at', 'desc');
 
             // Paginate hasil
             $products = $query->paginate(10)->appends($request->query());
@@ -158,7 +159,7 @@ class ProductController extends Controller
             // Ambil semua kategori untuk filter dropdown - hanya ambil id dan name untuk efisiensi
             $categories = Category::select('id', 'name')->get();
 
-            return view('admin.produk.index', compact('products', 'sellers', 'categories', 'tab'));
+            return view('admin.produk.index', compact('products', 'sellers', 'categories', 'mainCategories', 'tab'));
         }
     }
 

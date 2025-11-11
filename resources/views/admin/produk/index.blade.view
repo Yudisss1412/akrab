@@ -525,20 +525,17 @@
                           @forelse($products ?? collect() as $product)
                           <tr id="product-row-{{ $product->id }}">
                             <td>
-                              <div style="display: flex; align-items: center; gap: 1rem;">
-                                <img src="{{ $product->images->first() ? asset('storage/' . $product->images->first()->image_path) : asset('src/produk_sample.jpg') }}" alt="{{ $product->name }}" class="product-thumbnail" onerror="this.src='{{ asset('src/produk_sample.jpg') }}'">
-                                <div>
-                                  <div><strong>{{ $product->name }}</strong></div>
-                                  <small class="text-muted">SKU: {{ $product->sku ?? 'N/A' }}</small>
-                                </div>
+                              <div>
+                                <div><strong>{{ $product->name }}</strong></div>
+                                <small class="text-muted">SKU: {{ $product->sku ?? 'N/A' }}</small>
                               </div>
                             </td>
                             <td>
-                              <a href="{{ route('sellers.show', $product->seller_id) }}" class="text-primary">{{ $product->seller_name ?? $product->seller->store_name ?? 'N/A' }}</a>
+                              <a href="{{ route('sellers.show', $product->seller_id) }}" class="text-primary">{{ $product->seller_name ?? 'N/A' }}</a>
                             </td>
                             <td>
                               <div>{{ $product->category->name ?? 'N/A' }}</div>
-                              <small class="text-muted">{{ $product->subcategory->name ?? 'N/A' }}</small>
+                              <small class="text-muted">{{ $product->subcategory ?? 'N/A' }}</small>
                             </td>
                             <td>
                               <div><strong>Rp {{ number_format($product->price, 0, ',', '.') }}</strong></div>
@@ -666,22 +663,14 @@
                       <button class="btn btn-primary" onclick="showAddCategoryModal()">Tambah Kategori</button>
                     </div>
                     <ul class="category-list">
-                      @if(isset($mainCategories))
-                        @foreach($mainCategories as $category)
-                          <li class="{{ request('selected_category') == $category->id ? 'active' : '' }}" data-id="{{ $category->id }}" onclick="selectCategory({{ $category->id }})" style="display: flex; justify-content: space-between; align-items: center;">
+                      @if(isset($mainCategories) && $mainCategories->count() > 0)
+                        @foreach($mainCategories as $index => $category)
+                          <li class="{{ $index === 0 ? 'active' : '' }}" data-id="{{ $category->id }}" onclick="selectCategory({{ $category->id }})" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
                             <span>{{ $category->name }}</span>
-                            <button class="btn btn-sm btn-outline-danger" onclick="deleteCategory({{ $category->id }})">Hapus</button>
                           </li>
                         @endforeach
                       @else
-                        <li class="active">Elektronik</li>
-                        <li>Fashion</li>
-                        <li>Buku</li>
-                        <li>Olahraga</li>
-                        <li>Makanan</li>
-                        <li>Kerajinan</li>
-                        <li>Kesehatan</li>
-                        <li>Rumah Tangga</li>
+                        <li class="text-center text-muted">Tidak ada kategori ditemukan</li>
                       @endif
                     </ul>
                   </div>
@@ -1188,24 +1177,40 @@
     }
     
     function selectCategory(categoryId) {
+      console.log('selectCategory called with ID:', categoryId);
+      
       // Update URL dengan selected_category
       const urlParams = new URLSearchParams(window.location.search);
       urlParams.set('selected_category', categoryId);
-      const newUrl = window.location.pathname + '?' + urlParams.toString() + '&tab=categories';
+      urlParams.set('tab', 'categories');
+      const newUrl = window.location.pathname + '?' + urlParams.toString();
       
       // Update the URL without reloading the page
       history.pushState({}, '', newUrl);
       
-      // Update active class
-      document.querySelectorAll('.category-list li').forEach(li => {
-        li.classList.remove('active');
-      });
-      event.target.classList.add('active');
+      // Remove active class from all categories
+      const allCategories = document.querySelectorAll('#categories-tab-pane .category-list li');
+      allCategories.forEach(li => li.classList.remove('active'));
+      
+      // Add active class to clicked category
+      const clickedElement = document.querySelector(`#categories-tab-pane .category-list li[data-id="${categoryId}"]`);
+      if (clickedElement) {
+          clickedElement.classList.add('active');
+          console.log('Active class added to category ID:', categoryId);
+      }
+      
+      // Load subcategories for the selected category
+      console.log('About to load subcategories for category ID:', categoryId);
+      loadSubcategories(categoryId);
+}
     }
     
     // Load subcategories when category is selected
     function loadSubcategories(categoryId) {
+      console.log('loadSubcategories called with ID:', categoryId); // Debug log
+      
       if (!categoryId) {
+        console.log('No categoryId provided, clearing subcategory list');
         document.getElementById('selected-category-name').textContent = 'Pilih Kategori';
         document.getElementById('subcategory-list').innerHTML = '';
         return;
@@ -1214,15 +1219,21 @@
       // Update category name
       const selectedCategory = document.querySelector(`#categories-tab-pane .category-list li[data-id="${categoryId}"]`);
       document.getElementById('selected-category-name').textContent = selectedCategory ? selectedCategory.textContent : 'Kategori Terpilih';
+      console.log('Updated selected category name to:', selectedCategory ? selectedCategory.textContent : 'Kategori Terpilih');
 
       // Load subcategories via AJAX
+      console.log('Fetching subcategories from:', `/api/categories/${categoryId}/subcategories`);
       fetch(`/api/categories/${categoryId}/subcategories`)
-        .then(response => response.json())
+        .then(response => {
+          console.log('API response status:', response.status);
+          return response.json();
+        })
         .then(data => {
+          console.log('Received subcategory data:', data);
           const subcategoryList = document.getElementById('subcategory-list');
           subcategoryList.innerHTML = '';
 
-          if (data.subcategories.length > 0) {
+          if (data.subcategories && data.subcategories.length > 0) {
             data.subcategories.forEach(subcategory => {
               const li = document.createElement('li');
               li.innerHTML = `
@@ -1237,13 +1248,18 @@
               li.style.alignItems = 'center';
               subcategoryList.appendChild(li);
             });
+            console.log('Subcategories loaded successfully:', data.subcategories.length, 'subcategories found');
           } else {
             const li = document.createElement('li');
             li.textContent = 'Tidak ada subkategori';
             li.style.fontStyle = 'italic';
             li.style.color = '#6c757d';
             subcategoryList.appendChild(li);
+            console.log('No subcategories found for category ID:', categoryId);
           }
+        })
+        .catch(error => {
+          console.error('Error loading subcategories:', error);
         })
         .catch(error => {
           console.error('Error loading subcategories:', error);
@@ -1251,19 +1267,7 @@
         });
     }
 
-    // Event listener for category selection in the category panel
-    document.querySelectorAll('#categories-tab-pane .category-list li').forEach(li => {
-      li.addEventListener('click', function() {
-        const categoryId = this.getAttribute('data-id');
-        loadSubcategories(categoryId);
-        
-        // Update active class
-        document.querySelectorAll('#categories-tab-pane .category-list li').forEach(li => {
-          li.classList.remove('active');
-        });
-        this.classList.add('active');
-      });
-    });
+
 
     // Simulate category click when user clicks on category in the filter panel
     document.getElementById('category_filter').addEventListener('change', function() {

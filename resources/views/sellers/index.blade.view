@@ -1116,8 +1116,8 @@
                         </td>
                         <td>
                           @php
-                            $statusClass = $buyer->deleted_at ? 'bg-danger' : 'bg-success';
-                            $statusText = $buyer->deleted_at ? 'Ditangguhkan' : 'Aktif';
+                            $statusClass = $buyer->status === 'suspended' ? 'bg-danger' : 'bg-success';
+                            $statusText = $buyer->status === 'suspended' ? 'Ditangguhkan' : 'Aktif';
                           @endphp
                           <span class="badge rounded-pill {{ $statusClass }} d-block">{{ $statusText }}</span>
                         </td>
@@ -1129,7 +1129,7 @@
                             <a href="{{ route('sellers.edit_user', $buyer) }}" class="btn btn-primary d-block text-center square-btn" title="Edit Profil">
                               <i class="fas fa-edit"></i>
                             </a>
-                            @if($buyer->deleted_at)
+                            @if($buyer->status === 'suspended')
                               <form action="{{ route('sellers.activate_user', $buyer) }}" method="POST" class="d-inline">
                                 @csrf
                                 <button type="submit" class="btn btn-success d-block text-center square-btn" title="Aktifkan Kembali Akun" onclick="return confirm('Apakah Anda yakin ingin mengaktifkan kembali pembeli ini?')">

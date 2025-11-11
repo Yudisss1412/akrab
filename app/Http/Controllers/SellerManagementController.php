@@ -12,64 +12,81 @@ class SellerManagementController extends Controller
 {
     public function index(Request $request)
     {
-        // Check which tab is active
         $tab = $request->get('tab', 'sellers');
         
         // Initialize variables
         $sellers = null;
         $buyers = null;
         $statusOptions = [];
-        
+
         if ($tab === 'buyers') {
-            // Search and filter logic for buyers
-            $query = User::with(['role', 'orders'])->whereHas('role', function($q) {
-                $q->where('name', 'customer'); // Assuming customer role identifies buyers
-            });
-            
-            // Search by name or email
-            if ($request->filled('search')) {
-                $search = $request->get('search');
-                $query->where(function($q) use ($search) {
-                    $q->where('name', 'LIKE', "%{$search}%")
-                      ->orWhere('email', 'LIKE', "%{$search}%");
-                });
-            }
-            
-            // Filter by status (assuming active/inactive based on account status)
-            if ($request->filled('status')) {
-                $status = $request->get('status');
-                if ($status === 'aktif') {
-                    $query->whereNull('deleted_at'); // active users not deleted
-                } elseif ($status === 'ditangguhkan') {
-                    $query->whereNotNull('deleted_at'); // suspended users (soft deleted)
+            // Super simple query to ensure buyers are returned
+            try {
+                // First, get all users with buyer role ID
+                $buyerRoleId = Role::where('name', 'buyer')->value('id');
+                
+                if ($buyerRoleId) {
+                    // Build query step by step
+                    $query = User::query();
+                    
+                    // Filter by role_id
+                    $query->where('role_id', $buyerRoleId);
+                    
+                    // Apply filters
+                    if ($request->filled('search')) {
+                        $searchTerm = $request->get('search');
+                        $query->where(function($q) use ($searchTerm) {
+                            $q->where('name', 'LIKE', "%{$searchTerm}%")
+                              ->orWhere('email', 'LIKE', "%{$searchTerm}%");
+                        });
+                    }
+
+                    if ($request->filled('status')) {
+                        $status = $request->get('status');
+                        if ($status === 'aktif') {
+                            $query->where('status', 'active');
+                        } elseif ($status === 'ditangguhkan') {
+                            $query->where('status', 'suspended');
+                        }
+                    }
+
+                    if ($request->filled('join_date_from') || $request->filled('join_date_to')) {
+                        if ($request->filled('join_date_from')) {
+                            $query->whereDate('created_at', '>=', $request->get('join_date_from'));
+                        }
+                        if ($request->filled('join_date_to')) {
+                            $query->whereDate('created_at', '<=', $request->get('join_date_to'));
+                        }
+                    }
+
+                    $query->orderBy('created_at', 'desc');
+                    $buyers = $query->paginate(15)->appends($request->query());
+
+                    // Load relationships after pagination
+                    if($buyers && $buyers->count() > 0) {
+                        $buyers->getCollection()->load(['role']);
+                        // Load orders separately to avoid issues
+                        foreach($buyers as $buyer) {
+                            $buyer->setRelation('orders', $buyer->orders);
+                        }
+                    }
+                } else {
+                    // Role 'buyer' tidak ditemukan, kembalikan pagination kosong
+                    $buyers = collect()->paginate(15);
                 }
+            } catch (\Exception $e) {
+                \Log::error('Error loading buyers: ' . $e->getMessage());
+                $buyers = collect()->paginate(15);
             }
-            
-            // Filter by join date range
-            if ($request->filled('join_date_from') || $request->filled('join_date_to')) {
-                if ($request->filled('join_date_from')) {
-                    $query->whereDate('created_at', '>=', $request->get('join_date_from'));
-                }
-                if ($request->filled('join_date_to')) {
-                    $query->whereDate('created_at', '<=', $request->get('join_date_to'));
-                }
-            }
-            
-            // Sort by created_at descending by default
-            $query->orderBy('created_at', 'desc');
-            
-            $buyers = $query->paginate(15)->appends($request->query());
-            
-            // Get status filter options for buyers
+
             $statusOptions = [
                 'aktif' => 'Aktif',
                 'ditangguhkan' => 'Ditangguhkan'
             ];
         } else {
-            // Search and filter logic for sellers
+            // For sellers tab
             $query = Seller::query();
-            
-            // Search by store name, owner name, or email
+
             if ($request->filled('search')) {
                 $search = $request->get('search');
                 $query->where(function($q) use ($search) {
@@ -78,13 +95,11 @@ class SellerManagementController extends Controller
                       ->orWhere('email', 'LIKE', "%{$search}%");
                 });
             }
-            
-            // Filter by status
+
             if ($request->filled('status')) {
                 $query->where('status', $request->get('status'));
             }
-            
-            // Filter by join date range
+
             if ($request->filled('join_date_from') || $request->filled('join_date_to')) {
                 if ($request->filled('join_date_from')) {
                     $query->whereDate('join_date', '>=', $request->get('join_date_from'));
@@ -93,13 +108,10 @@ class SellerManagementController extends Controller
                     $query->whereDate('join_date', '<=', $request->get('join_date_to'));
                 }
             }
-            
-            // Sort by join date descending by default
+
             $query->orderBy('join_date', 'desc');
-            
             $sellers = $query->paginate(15)->appends($request->query());
-            
-            // Get status filter options for sellers
+
             $statusOptions = [
                 'aktif' => 'Aktif',
                 'ditangguhkan' => 'Ditangguhkan',
@@ -107,16 +119,20 @@ class SellerManagementController extends Controller
                 'baru' => 'Baru'
             ];
         }
-        
-        // Return view with all necessary variables
+
+        // Ensure that $buyers is never null when tab is buyers
+        if ($tab === 'buyers' && is_null($buyers)) {
+            $buyers = collect()->paginate(15);
+        }
+
         return view('sellers.index', compact('sellers', 'buyers', 'statusOptions', 'tab'));
     }
-    
+
     public function create()
     {
         return view('sellers.create');
     }
-    
+
     public function store(Request $request)
     {
         $request->validate([
@@ -126,17 +142,15 @@ class SellerManagementController extends Controller
             'password' => 'required|min:8',
         ]);
 
-        // Buat user baru
         $user = User::create([
             'name' => $request->owner_name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
+            'status' => 'active',
         ]);
 
-        // Assign role seller
         $user->assignRole('seller');
 
-        // Buat data seller
         Seller::create([
             'user_id' => $user->id,
             'store_name' => $request->store_name,
@@ -151,17 +165,17 @@ class SellerManagementController extends Controller
 
         return redirect()->route('sellers.index')->with('success', 'Penjual baru berhasil ditambahkan.');
     }
-    
+
     public function show(Seller $seller)
     {
         return view('sellers.show', compact('seller'));
     }
-    
+
     public function edit(Seller $seller)
     {
         return view('sellers.edit', compact('seller'));
     }
-    
+
     public function update(Request $request, Seller $seller)
     {
         $request->validate([
@@ -170,80 +184,78 @@ class SellerManagementController extends Controller
             'email' => 'required|email|max:255|unique:sellers,email,' . $seller->id,
             'status' => 'required|in:aktif,ditangguhkan,menunggu_verifikasi,baru'
         ]);
-        
+
         $seller->update([
             'store_name' => $request->store_name,
             'owner_name' => $request->owner_name,
             'email' => $request->email,
             'status' => $request->status
         ]);
-        
+
         return redirect()->route('sellers.index')->with('success', 'Data penjual berhasil diperbarui.');
     }
-    
+
     public function destroy(Seller $seller)
     {
         $seller->delete();
-        
+
         return redirect()->route('sellers.index')->with('success', 'Penjual berhasil dihapus.');
     }
-    
+
     public function suspend(Seller $seller)
     {
         $seller->update(['status' => 'ditangguhkan']);
-        
+
         return redirect()->back()->with('success', 'Penjual berhasil ditangguhkan.');
     }
-    
+
     public function activate(Seller $seller)
     {
         $seller->update(['status' => 'aktif']);
-        
+
         return redirect()->back()->with('success', 'Penjual berhasil diaktifkan kembali.');
     }
-    
+
     public function bulkAction(Request $request)
     {
         $userType = $request->input('user_type', 'seller');
-        
+
         if ($userType === 'buyer') {
-            // Handle bulk actions for buyers
             $request->validate([
                 'action' => 'required|in:suspend,activate,delete',
                 'user_ids' => 'required|array',
                 'user_ids.*' => 'exists:users,id'
             ]);
-            
+
             $userIds = json_decode($request->input('user_ids'), true) ?: [];
             $action = $request->input('action');
-            
+
             switch ($action) {
                 case 'suspend':
-                    User::whereIn('id', $userIds)->delete(); // Soft delete to suspend
+                    User::whereIn('id', $userIds)->update(['status' => 'suspended']);
                     $message = 'Pembeli berhasil ditangguhkan.';
                     break;
                 case 'activate':
-                    User::whereIn('id', $userIds)->restore(); // Restore to activate
+                    User::whereIn('id', $userIds)->update(['status' => 'active']);
                     $message = 'Pembeli berhasil diaktifkan kembali.';
                     break;
                 case 'delete':
-                    User::whereIn('id', $userIds)->forceDelete(); // Permanent delete
+                    User::whereIn('id', $userIds)->forceDelete();
                     $message = 'Pembeli berhasil dihapus.';
                     break;
                 default:
                     return redirect()->back()->with('error', 'Aksi tidak valid.');
             }
         } else {
-            // Handle bulk actions for sellers
             $request->validate([
                 'action' => 'required|in:suspend,activate,delete',
                 'seller_ids' => 'required|array',
                 'seller_ids.*' => 'exists:sellers,id'
             ]);
-            
+
             $sellerIds = json_decode($request->input('seller_ids'), true) ?: [];
             $action = $request->input('action');
-            
+
             switch ($action) {
                 case 'suspend':
                     Seller::whereIn('id', $sellerIds)->update(['status' => 'ditangguhkan']);
@@ -261,10 +273,10 @@ class SellerManagementController extends Controller
                     return redirect()->back()->with('error', 'Aksi tidak valid.');
             }
         }
-        
+
         return redirect()->back()->with('success', $message);
     }
-    
+
     public function getDashboardStats()
     {
         $stats = [
@@ -273,31 +285,28 @@ class SellerManagementController extends Controller
             'suspended_sellers' => Seller::where('status', 'ditangguhkan')->count(),
             'pending_verification' => Seller::where('status', 'menunggu_verifikasi')->count(),
         ];
-        
+
         return response()->json($stats);
     }
-    
+
     public function suspendUser(Request $request, User $user)
     {
-        // Soft delete the user to suspend
-        $user->delete();
-        
+        $user->update(['status' => 'suspended']);
+
         return redirect()->back()->with('success', 'Pembeli berhasil ditangguhkan.');
     }
 
     public function activateUser(Request $request, User $user)
     {
-        // Restore the user to activate
-        $user->restore();
-        
+        $user->update(['status' => 'active']);
+
         return redirect()->back()->with('success', 'Pembeli berhasil diaktifkan kembali.');
     }
 
     public function userHistory(User $user)
     {
-        // Get user's order history
         $orders = $user->orders()->with(['items', 'shipping_address'])->latest()->paginate(10);
-        
+
         return view('admin.user_history', compact('user', 'orders'));
     }
 
@@ -312,19 +321,19 @@ class SellerManagementController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
         ]);
-        
+
         $user->update([
             'name' => $request->name,
             'email' => $request->email,
         ]);
-        
+
         return redirect()->route('sellers.index', ['tab' => 'buyers'])->with('success', 'Data pembeli berhasil diperbarui.');
     }
 
     public function exportSellers()
     {
         $sellers = Seller::all();
-        
+
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="sellers.csv"',
@@ -367,7 +376,7 @@ class SellerManagementController extends Controller
     public function exportBuyers()
     {
         $buyers = User::whereHas('role', function($query) {
-            $query->where('name', 'customer');
+            $query->where('name', 'buyer');
         })->get();
 
         $headers = [
@@ -390,12 +399,12 @@ class SellerManagementController extends Controller
             foreach ($buyers as $buyer) {
                 $totalOrders = $buyer->orders()->count();
                 $totalSpending = $buyer->orders()->sum('total_amount');
-                
+
                 fputcsv($file, [
                     $buyer->id,
                     $buyer->name,
                     $buyer->email,
-                    $buyer->deleted_at ? 'Ditangguhkan' : 'Aktif',
+                    $buyer->status,
                     $buyer->created_at->format('Y-m-d'),
                     $totalOrders,
                     $totalSpending

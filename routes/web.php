@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SellerManagementController;
+use App\Models\User;
+use App\Models\Role;
 
 // Route debugging untuk verifikasi sistem
 Route::get('/debug-info', function() {
@@ -13,6 +15,55 @@ Route::get('/debug-info', function() {
         'file_exists' => file_exists(resource_path('views/penjual/manajemen_promosi.blade.view')),
         'route_works' => true
     ];
+});
+
+// Route debugging untuk mengecek data pembeli
+Route::get('/debug-buyers', function() {
+    $role = Role::where('name', 'buyer')->first();
+    $roleExists = $role !== null;
+    $buyerRoleId = $role ? $role->id : null;
+    
+    $allUsersCount = User::count();
+    $usersWithBuyerRoleId = $role ? User::where('role_id', $role->id)->count() : 0;
+    $usersWithBuyerRoleCheck = User::whereHas('role', function($q) {
+        $q->where('name', 'buyer');
+    })->count();
+    
+    $sampleBuyers = $role ? User::where('role_id', $role->id)->limit(5)->get(['id', 'name', 'email', 'role_id']) : collect([]);
+    
+    return [
+        'role_exists' => $roleExists,
+        'buyer_role_id' => $buyerRoleId,
+        'total_users' => $allUsersCount,
+        'users_with_buyer_role_id' => $usersWithBuyerRoleId,
+        'users_with_buyer_role_check' => $usersWithBuyerRoleCheck,
+        'sample_buyers' => $sampleBuyers
+    ];
+});
+
+// Route untuk debugging controller
+Route::get('/debug-controller', function() {
+    $tab = request('tab', 'sellers');
+    $buyerRole = \App\Models\Role::where('name', 'buyer')->first();
+    $buyerRoleId = $buyerRole ? $buyerRole->id : null;
+    
+    if ($tab === 'buyers' && $buyerRoleId) {
+        $buyersQuery = \App\Models\User::where('role_id', $buyerRoleId);
+        $buyers = $buyersQuery->orderBy('created_at', 'desc')->with(['role', 'orders'])->paginate(15);
+        return [
+            'tab' => $tab,
+            'buyer_role_id' => $buyerRoleId,
+            'buyers_count' => $buyers->count(),
+            'buyers_data' => $buyers->items()
+        ];
+    } else {
+        return [
+            'tab' => $tab,
+            'buyer_role_id' => $buyerRoleId,
+            'buyers_count' => 0,
+            'message' => $tab !== 'buyers' ? 'Tab is not buyers' : 'Buyer role not found'
+        ];
+    }
 });
 
 // Route untuk Manajemen Promosi - ditempatkan di awal untuk menghindari konflik
@@ -52,6 +103,9 @@ Route::get('/', function () {
 // Seller Management Routes
 Route::prefix('admin')->name('sellers.')->group(function () {
     Route::get('/sellers', [SellerManagementController::class, 'index'])->name('index');
+    Route::get('/sellers/buyers', function () {
+        return redirect()->route('sellers.index', ['tab' => 'buyers']);
+    })->name('buyers.index');  // Tautan langsung ke tab pembeli
     Route::get('/sellers/create', [SellerManagementController::class, 'create'])->name('create');
     Route::post('/sellers', [SellerManagementController::class, 'store'])->name('store');
     Route::get('/sellers/{seller}', [SellerManagementController::class, 'show'])->name('show');

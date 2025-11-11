@@ -20,63 +20,49 @@ class SellerManagementController extends Controller
         $statusOptions = [];
 
         if ($tab === 'buyers') {
-            // Super simple query to ensure buyers are returned
-            try {
-                // First, get all users with buyer role ID
-                $buyerRoleId = Role::where('name', 'buyer')->value('id');
-                
-                if ($buyerRoleId) {
-                    // Build query step by step
-                    $query = User::query();
-                    
-                    // Filter by role_id
-                    $query->where('role_id', $buyerRoleId);
-                    
-                    // Apply filters
-                    if ($request->filled('search')) {
-                        $searchTerm = $request->get('search');
-                        $query->where(function($q) use ($searchTerm) {
-                            $q->where('name', 'LIKE', "%{$searchTerm}%")
-                              ->orWhere('email', 'LIKE', "%{$searchTerm}%");
-                        });
-                    }
-
-                    if ($request->filled('status')) {
-                        $status = $request->get('status');
-                        if ($status === 'aktif') {
-                            $query->where('status', 'active');
-                        } elseif ($status === 'ditangguhkan') {
-                            $query->where('status', 'suspended');
-                        }
-                    }
-
-                    if ($request->filled('join_date_from') || $request->filled('join_date_to')) {
-                        if ($request->filled('join_date_from')) {
-                            $query->whereDate('created_at', '>=', $request->get('join_date_from'));
-                        }
-                        if ($request->filled('join_date_to')) {
-                            $query->whereDate('created_at', '<=', $request->get('join_date_to'));
-                        }
-                    }
-
-                    $query->orderBy('created_at', 'desc');
-                    $buyers = $query->paginate(15)->appends($request->query());
-
-                    // Load relationships after pagination
-                    if($buyers && $buyers->count() > 0) {
-                        $buyers->getCollection()->load(['role']);
-                        // Load orders separately to avoid issues
-                        foreach($buyers as $buyer) {
-                            $buyer->setRelation('orders', $buyer->orders);
-                        }
-                    }
-                } else {
-                    // Role 'buyer' tidak ditemukan, kembalikan pagination kosong
-                    $buyers = collect()->paginate(15);
-                }
-            } catch (\Exception $e) {
-                \Log::error('Error loading buyers: ' . $e->getMessage());
+            // Get buyers using direct role_id approach
+            $buyerRole = Role::where('name', 'buyer')->first();
+            $buyerRoleId = $buyerRole ? $buyerRole->id : null;
+            
+            if (!$buyerRoleId) {
+                // If buyer role doesn't exist, return empty collection
                 $buyers = collect()->paginate(15);
+                \Log::warning('Buyer role not found when accessing buyers tab');
+            } else {
+                $buyersQuery = User::where('role_id', $buyerRoleId);
+
+                // Apply filters
+                if ($request->filled('search')) {
+                    $searchTerm = $request->get('search');
+                    $buyersQuery = $buyersQuery->where(function($query) use ($searchTerm) {
+                        $query->where('name', 'LIKE', "%{$searchTerm}%")
+                              ->orWhere('email', 'LIKE', "%{$searchTerm}%");
+                    });
+                }
+
+                if ($request->filled('status')) {
+                    $status = $request->get('status');
+                    if ($status === 'aktif') {
+                        $buyersQuery = $buyersQuery->where('status', 'active');
+                    } elseif ($status === 'ditangguhkan') {
+                        $buyersQuery = $buyersQuery->where('status', 'suspended');
+                    }
+                }
+
+                if ($request->filled('join_date_from') || $request->filled('join_date_to')) {
+                    if ($request->filled('join_date_from')) {
+                        $buyersQuery = $buyersQuery->whereDate('created_at', '>=', $request->get('join_date_from'));
+                    }
+                    if ($request->filled('join_date_to')) {
+                        $buyersQuery = $buyersQuery->whereDate('created_at', '<=', $request->get('join_date_to'));
+                    }
+                }
+
+                // Execute the query and debug
+                $buyers = $buyersQuery->orderBy('created_at', 'desc')->with(['role', 'orders'])->paginate(15)->appends($request->query());
+                
+                // Debug: Log the count of buyers retrieved and role ID used
+                \Log::info('Buyers retrieved for tab: ' . $buyers->count() . ' using role_id: ' . $buyerRoleId);
             }
 
             $statusOptions = [
@@ -120,8 +106,23 @@ class SellerManagementController extends Controller
             ];
         }
 
-        // Ensure that $buyers is never null when tab is buyers
-        if ($tab === 'buyers' && is_null($buyers)) {
+        // Ensure buyers data is available for tab switching even when not currently on buyers tab
+        if ($tab !== 'buyers') {
+            $buyerRole = Role::where('name', 'buyer')->first();
+            $buyerRoleId = $buyerRole ? $buyerRole->id : null;
+
+            if ($buyerRoleId) {
+                $buyersQuery = User::where('role_id', $buyerRoleId);
+                // Don't apply filters when loading for potential tab switching
+                $buyers = $buyersQuery->orderBy('created_at', 'desc')->with(['role', 'orders'])->paginate(15);
+            } else {
+                $buyers = collect()->paginate(15);
+                \Log::warning('Buyer role not found when preparing buyers data for tab switching');
+            }
+        }
+
+        // Final check: ensure $buyers is never null
+        if (!$buyers) {
             $buyers = collect()->paginate(15);
         }
 

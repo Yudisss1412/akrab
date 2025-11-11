@@ -796,7 +796,7 @@
                       <button type="submit" class="btn btn-primary" onclick="return confirm('Apakah Anda yakin ingin melakukan aksi ini pada penjual terpilih?')">Terapkan</button>
                     </div>
                     <div class="col-md-5 text-end">
-                      <a href="{{ route('sellers.export_sellers') }}" class="btn btn-success">
+                      <a href="{{ route('sellers.export_sellers') }}" class="btn btn-primary">
                         <i class="fas fa-download"></i> Ekspor Data
                       </a>
                     </div>
@@ -1033,7 +1033,7 @@
                       <button type="submit" class="btn btn-primary" onclick="return confirm('Apakah Anda yakin ingin melakukan aksi ini pada pembeli terpilih?')">Terapkan</button>
                     </div>
                     <div class="col-md-5 text-end">
-                      <a href="{{ route('sellers.export_buyers') }}" class="btn btn-success">
+                      <a href="{{ route('sellers.export_buyers') }}" class="btn btn-primary">
                         <i class="fas fa-download"></i> Ekspor Data
                       </a>
                     </div>
@@ -1332,15 +1332,48 @@
     const selectAllHeader = document.getElementById('selectAllHeader');
     const sellerCheckboxes = document.querySelectorAll('.seller-checkbox');
     
-    // For tab switch, update active state
-    const urlParams = new URLSearchParams(window.location.search);
-    const tab = urlParams.get('tab');
-    if (tab === 'buyers') {
-      document.getElementById('buyers-tab').classList.add('active');
-      document.getElementById('sellers-tab').classList.remove('active');
-      document.getElementById('buyers-tab-pane').classList.add('show', 'active');
-      document.getElementById('sellers-tab-pane').classList.remove('show', 'active');
-    }
+  // Handle tab switching to update URL and ensure correct tab is active
+  document.addEventListener('DOMContentLoaded', function() {
+      // Add click event listeners to the tab buttons to update URL
+      const buyersTab = document.getElementById('buyers-tab');
+      const sellersTab = document.getElementById('sellers-tab');
+      
+      if (buyersTab) {
+          buyersTab.addEventListener('click', function(e) {
+              // Update URL to include tab=buyers parameter
+              const newUrl = new URL(window.location);
+              newUrl.searchParams.set('tab', 'buyers');
+              window.history.pushState({}, '', newUrl);
+          });
+      }
+      
+      if (sellersTab) {
+          sellersTab.addEventListener('click', function(e) {
+              // Update URL to include tab=sellers parameter (or remove tab param for default)
+              const newUrl = new URL(window.location);
+              newUrl.searchParams.set('tab', 'sellers');
+              window.history.pushState({}, '', newUrl);
+          });
+      }
+      
+      // Handle browser back/forward buttons
+      window.addEventListener('popstate', function(e) {
+          const urlParams = new URLSearchParams(window.location.search);
+          const tab = urlParams.get('tab');
+          
+          if (tab === 'buyers') {
+              const buyersTabEl = document.getElementById('buyers-tab');
+              if (buyersTabEl) {
+                  bootstrap.Tab.getInstance(buyersTabEl)?.show() || new bootstrap.Tab(buyersTabEl).show();
+              }
+          } else {
+              const sellersTabEl = document.getElementById('sellers-tab');
+              if (sellersTabEl) {
+                  bootstrap.Tab.getInstance(sellersTabEl)?.show() || new bootstrap.Tab(sellersTabEl).show();
+              }
+          }
+      });
+  });
 
     // Add event listeners to seller filter elements for automatic filtering
     const sellerSearch = document.getElementById('search');

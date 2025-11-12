@@ -386,7 +386,21 @@
               @forelse($reports as $report)
               <tr>
                 <td>{{ $report->created_at->format('Y-m-d') }}</td>
-                <td>{{ ucfirst(str_replace('_', ' ', $report->violation_type)) }}</td>
+                <td>
+                  @if($report->violation_type === 'product')
+                    Produk Palsu
+                  @elseif($report->violation_type === 'content')
+                    Konten Tidak Pantas
+                  @elseif($report->violation_type === 'scam')
+                    Penipuan
+                  @elseif($report->violation_type === 'copyright')
+                    Pelanggaran Hak Cipta
+                  @elseif($report->violation_type === 'other')
+                    Lainnya
+                  @else
+                    {{ ucfirst(str_replace('_', ' ', $report->violation_type)) }}
+                  @endif
+                </td>
                 <td>{{ $report->violator->name ?? 'Penjual Tidak Ditemukan' }}</td>
                 <td>{{ $report->product->name ?? 'Tidak Ada Produk Terkait' }}</td>
                 <td>{{ $report->reporter->name ?? 'Pelapor Tidak Ditemukan' }}</td>

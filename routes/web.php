@@ -694,9 +694,9 @@ Route::get('/send/announcement', function () {
 })->name('send.announcement');
 
 Route::get('/reports/violations', [App\Http\Controllers\Admin\ReportsController::class, 'index'])->name('reports.violations');
+Route::get('/reports/violations/filter', [App\Http\Controllers\Admin\ReportsController::class, 'filter'])->name('reports.violations.filter');
 Route::get('/reports/violations/{id}', [App\Http\Controllers\Admin\ReportsController::class, 'show'])->name('reports.violations.detail');
 Route::put('/reports/violations/{id}/status', [App\Http\Controllers\Admin\ReportsController::class, 'updateStatus'])->name('reports.violations.update_status');
-Route::get('/reports/violations/filter', [App\Http\Controllers\Admin\ReportsController::class, 'filter'])->name('reports.violations.filter');
 
 // Product Management Routes
 // Product Management Routes for Admin

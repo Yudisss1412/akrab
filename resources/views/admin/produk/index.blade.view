@@ -1197,8 +1197,8 @@
 
     function showAddCategoryModal() {
       // Buat modal sederhana
-      var modalHtml = '<div id="addCategoryModal" class="modal fade show" style="display: block; background: rgba(0,0,0,0.5);">';
-      modalHtml += '<div class="modal-dialog">';
+      var modalHtml = '<div id="addCategoryModal" class="modal fade show" style="display: block; background: rgba(0,0,0,0.5); z-index: 1050; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; overflow-y: auto; padding: 5% 0;">';
+      modalHtml += '<div class="modal-dialog" style="margin: 0 auto;">';
       modalHtml += '<div class="modal-content">';
       modalHtml += '<div class="modal-header">';
       modalHtml += '<h5 class="modal-title">Tambah Kategori Baru</h5>';
@@ -1208,7 +1208,7 @@
       modalHtml += '<form id="addCategoryForm">';
       modalHtml += '<div class="mb-3">';
       modalHtml += '<label for="categoryName" class="form-label">Nama Kategori</label>';
-      modalHtml += '<input type="text" class="form-control" id="categoryName" name="name" required>';
+      modalHtml += '<input type="text" class="form-control" id="categoryName" name="name" required maxlength="255">';
       modalHtml += '</div>';
       modalHtml += '<div class="text-end">';
       modalHtml += '<button type="button" class="btn btn-secondary" onclick="closeModal(\'addCategoryModal\')">Batal</button>';
@@ -1227,7 +1227,17 @@
       document.getElementById('addCategoryForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
-        var categoryName = document.getElementById('categoryName').value;
+        var categoryName = document.getElementById('categoryName').value.trim();
+        
+        if (categoryName === '') {
+          alert('Nama kategori tidak boleh kosong!');
+          return;
+        }
+        
+        // Disable tombol submit untuk mencegah double submission
+        var submitButton = document.querySelector('#addCategoryForm button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.innerHTML = 'Menyimpan...';
         
         // Kirim ke server
         fetch('/api/categories', {
@@ -1242,18 +1252,25 @@
           return response.json();
         })
         .then(function(data) {
+          // Kembalikan tombol ke kondisi awal
+          submitButton.disabled = false;
+          submitButton.innerHTML = 'Simpan';
+          
           if (data.success) {
             alert(data.message);
             closeModal('addCategoryModal');
-            // Refresh kategori list
+            // Refresh kategori list tanpa reload halaman
             location.reload();
           } else {
-            alert('Gagal menambah kategori: ' + data.message);
+            alert('Gagal menambah kategori: ' + (data.message || 'Data tidak valid'));
           }
         })
         .catch(function(error) {
           console.error('Error:', error);
-          alert('Terjadi kesalahan saat menambah kategori');
+          // Kembalikan tombol ke kondisi awal
+          submitButton.disabled = false;
+          submitButton.innerHTML = 'Simpan';
+          alert('Terjadi kesalahan saat menambah kategori: ' + error.message);
         });
       });
     }

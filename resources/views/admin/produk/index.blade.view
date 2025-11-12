@@ -1268,11 +1268,16 @@
         })
         .then(function(data) {
           var productCount = data.product_count;
-          var message = 'Apakah Anda yakin ingin menghapus kategori ini?';
+          var message = 'Apakah Anda yakin ingin menghapus kategori ini?\\n';
+          message += 'Kategori ini sedang digunakan oleh ' + productCount + ' produk.\\n\\n';
           
           if (productCount > 0) {
-            message += '\\n\\nPeringatan: Kategori ini memiliki ' + productCount + ' produk. Produk akan tetap ada tapi tidak memiliki kategori.';
-            message += '\\nProduk-produk tersebut akan kehilangan referensi kategori saat penghapusan.';
+            message += 'Peringatan: Produk yang terkait dengan kategori ini akan tetap ada,\\n';
+            message += 'namun tidak akan memiliki kategori setelah penghapusan.\\n';
+            message += 'Anda yakin ingin melanjutkan?';
+          } else {
+            message += 'Kategori ini tidak memiliki produk terkait.\\n';
+            message += 'Anda yakin ingin melanjutkan?';
           }
           
           if (confirm(message)) {

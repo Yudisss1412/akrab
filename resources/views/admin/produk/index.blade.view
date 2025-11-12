@@ -862,176 +862,22 @@
 
   <!-- JavaScript for Tabs and Interactions -->
   <script>
-    // Handle tab changes and filtering
-    document.addEventListener('DOMContentLoaded', function() {
-      // Get the active tab from URL or default to products tab
-      const urlParams = new URLSearchParams(window.location.search);
-      const activeTabFromUrl = urlParams.get('tab');
-      
-      // Set the active tab when page loads
-      if (activeTabFromUrl) {
-        const activeTabBtn = document.getElementById(activeTabFromUrl + '-tab');
-        const activeTabPane = document.getElementById(activeTabFromUrl + '-tab-pane');
-        
-        if (activeTabBtn && activeTabPane) {
-          // Remove active class from all tabs and panes
-          document.querySelectorAll('#productManagementTabs .nav-link').forEach(tab => {
-            tab.classList.remove('active');
-          });
-          document.querySelectorAll('.tab-pane').forEach(pane => {
-            pane.classList.remove('show');
-            pane.classList.remove('active');
-          });
-          
-          // Add active class to the desired tab and pane
-          activeTabBtn.classList.add('active');
-          activeTabPane.classList.add('show');
-          activeTabPane.classList.add('active');
-        }
-      }
-      
-      const tabTriggerList = [].slice.call(document.querySelectorAll('#productManagementTabs button[data-bs-toggle="tab"]'));
-      tabTriggerList.forEach(function(tabTrigger) {
-        tabTrigger.addEventListener('shown.bs.tab', function(event) {
-          // Update URL with current tab when tab changes
-          const currentTab = event.target.id.replace('-tab', '');
-          const urlParams = new URLSearchParams(window.location.search);
-          urlParams.set('tab', currentTab);
-          
-          // Update the URL without reloading the page
-          const newUrl = window.location.pathname + '?' + urlParams.toString();
-          history.pushState({}, '', newUrl);
-        });
-      });
-      
-      // Auto-submit product filter form when any filter changes
-      const productFilterForm = document.getElementById('productFilterForm');
-      
-      if (productFilterForm) {
-        // Prevent default form submission
-        productFilterForm.addEventListener('submit', function(e) {
-          e.preventDefault();
-          
-          // Build URL with query parameters
-          const formData = new FormData(productFilterForm);
-          const params = new URLSearchParams();
-          
-          for (const [key, value] of formData.entries()) {
-            if (value.trim() !== '') { // Only add non-empty values
-              params.append(key, value);
-            }
-          }
-          
-          // Preserve the current active tab in the URL
-          const currentActiveTab = document.querySelector('#productManagementTabs .nav-link.active').id.replace('-tab', '');
-          params.set('tab', currentActiveTab);
-          
-          // Get the current URL without query parameters
-          let newUrl = window.location.pathname;
-          
-          // Add parameters if there are any
-          if (params.toString()) {
-            newUrl += '?' + params.toString();
-          }
-          
-          // Navigate to the new URL with parameters
-          window.location.href = newUrl;
-        });
-        
-        // Add event listeners to product filter inputs for auto-submit
-        const productFilterInputs = productFilterForm.querySelectorAll('input, select');
-        
-        productFilterInputs.forEach(function(input) {
-          // Handle change events for select and other inputs
-          input.addEventListener('change', function() {
-            // Submit the form when any filter changes
-            productFilterForm.dispatchEvent(new Event('submit'));
-          });
-          
-          // Handle input events for text inputs (for real-time search)
-          if (input.type === 'text') {
-            let timeout;
-            input.addEventListener('input', function() {
-              clearTimeout(timeout);
-              timeout = setTimeout(() => {
-                // Submit the form after user stops typing
-                productFilterForm.dispatchEvent(new Event('submit'));
-              }, 500); // Delay for 500ms after user stops typing
-            });
-          }
-        });
-      }
-      
-      // Auto-submit review filter form when any filter changes
-      const reviewFilterForm = document.getElementById('reviewFilterForm');
-      
-      if (reviewFilterForm) {
-        // Prevent default form submission
-        reviewFilterForm.addEventListener('submit', function(e) {
-          e.preventDefault();
-          
-          // Build URL with query parameters
-          const formData = new FormData(reviewFilterForm);
-          const params = new URLSearchParams();
-          
-          for (const [key, value] of formData.entries()) {
-            if (value.trim() !== '') { // Only add non-empty values
-              params.append(key, value);
-            }
-          }
-          
-          // Preserve the current active tab in the URL
-          params.set('tab', 'reviews');
-          
-          // Get the current URL without query parameters
-          let newUrl = window.location.pathname;
-          
-          // Add parameters if there are any
-          if (params.toString()) {
-            newUrl += '?' + params.toString();
-          }
-          
-          // Navigate to the new URL with parameters
-          window.location.href = newUrl;
-        });
-        
-        // Add event listeners to review filter inputs for auto-submit
-        const reviewFilterInputs = reviewFilterForm.querySelectorAll('input, select');
-        
-        reviewFilterInputs.forEach(function(input) {
-          // Handle change events for select and other inputs
-          input.addEventListener('change', function() {
-            // Submit the form when any filter changes
-            reviewFilterForm.dispatchEvent(new Event('submit'));
-          });
-          
-          // Handle input events for text inputs (for real-time search)
-          if (input.type === 'text') {
-            let timeout;
-            input.addEventListener('input', function() {
-              clearTimeout(timeout);
-              timeout = setTimeout(() => {
-                // Submit the form after user stops typing
-                reviewFilterForm.dispatchEvent(new Event('submit'));
-              }, 500); // Delay for 500ms after user stops typing
-            });
-          }
-        });
-      }
-    });
+    // Functions for product actions - defined in global scope to be accessible from HTML onclick attributes
     
-    // Functions for product actions
     function approveProduct(productId) {
       if (confirm('Apakah Anda yakin ingin menyetujui produk ini?')) {
-        fetch(`/admin/produk/${productId}/approve`, {
+        var url = '/admin/produk/' + productId + '/approve';
+        fetch(url, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
           }
         })
-        .then(response => response.json())
-        .then(data => {
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(data) {
           if (data.success) {
             alert(data.message);
             location.reload();
@@ -1039,7 +885,7 @@
             alert('Gagal menyetujui produk: ' + data.message);
           }
         })
-        .catch(error => {
+        .catch(function(error) {
           console.error('Error:', error);
           alert('Terjadi kesalahan saat menyetujui produk');
         });
@@ -1048,15 +894,18 @@
     
     function rejectProduct(productId) {
       if (confirm('Apakah Anda yakin ingin menolak produk ini?')) {
-        fetch(`/admin/produk/${productId}/reject`, {
+        var url = '/admin/produk/' + productId + '/reject';
+        fetch(url, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
           }
         })
-        .then(response => response.json())
-        .then(data => {
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(data) {
           if (data.success) {
             alert(data.message);
             location.reload();
@@ -1064,7 +913,7 @@
             alert('Gagal menolak produk: ' + data.message);
           }
         })
-        .catch(error => {
+        .catch(function(error) {
           console.error('Error:', error);
           alert('Terjadi kesalahan saat menolak produk');
         });
@@ -1073,15 +922,18 @@
     
     function suspendProduct(productId) {
       if (confirm('Apakah Anda yakin ingin menangguhkan produk ini?')) {
-        fetch(`/admin/produk/${productId}/suspend`, {
+        var url = '/admin/produk/' + productId + '/suspend';
+        fetch(url, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
           }
         })
-        .then(response => response.json())
-        .then(data => {
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(data) {
           if (data.success) {
             alert(data.message);
             location.reload();
@@ -1089,7 +941,7 @@
             alert('Gagal menangguhkan produk: ' + data.message);
           }
         })
-        .catch(error => {
+        .catch(function(error) {
           console.error('Error:', error);
           alert('Terjadi kesalahan saat menangguhkan produk');
         });
@@ -1099,15 +951,18 @@
     // Functions for review actions
     function approveReview(reviewId) {
       if (confirm('Apakah Anda yakin ingin menyetujui ulasan ini?')) {
-        fetch(`/admin/reviews/${reviewId}/approve`, {
+        var url = '/admin/reviews/' + reviewId + '/approve';
+        fetch(url, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
           }
         })
-        .then(response => response.json())
-        .then(data => {
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(data) {
           if (data.success) {
             alert(data.message);
             location.reload();
@@ -1115,7 +970,7 @@
             alert('Gagal menyetujui ulasan: ' + data.message);
           }
         })
-        .catch(error => {
+        .catch(function(error) {
           console.error('Error:', error);
           alert('Terjadi kesalahan saat menyetujui ulasan');
         });
@@ -1124,15 +979,18 @@
     
     function rejectReview(reviewId) {
       if (confirm('Apakah Anda yakin ingin menolak ulasan ini?')) {
-        fetch(`/admin/reviews/${reviewId}/reject`, {
+        var url = '/admin/reviews/' + reviewId + '/reject';
+        fetch(url, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
           }
         })
-        .then(response => response.json())
-        .then(data => {
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(data) {
           if (data.success) {
             alert(data.message);
             location.reload();
@@ -1140,7 +998,7 @@
             alert('Gagal menolak ulasan: ' + data.message);
           }
         })
-        .catch(error => {
+        .catch(function(error) {
           console.error('Error:', error);
           alert('Terjadi kesalahan saat menolak ulasan');
         });
@@ -1149,15 +1007,18 @@
     
     function deleteReview(reviewId) {
       if (confirm('Apakah Anda yakin ingin menghapus ulasan ini?')) {
-        fetch(`/admin/reviews/${reviewId}`, {
+        var url = '/admin/reviews/' + reviewId;
+        fetch(url, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
           }
         })
-        .then(response => response.json())
-        .then(data => {
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(data) {
           if (data.success) {
             alert(data.message);
             location.reload();
@@ -1165,7 +1026,7 @@
             alert('Gagal menghapus ulasan: ' + data.message);
           }
         })
-        .catch(error => {
+        .catch(function(error) {
           console.error('Error:', error);
           alert('Terjadi kesalahan saat menghapus ulasan');
         });
@@ -1176,24 +1037,27 @@
       alert('Fitur ini akan segera hadir: Tandai ulasan sebagai spam');
     }
     
+    // Functions for category management
     function selectCategory(categoryId) {
       console.log('selectCategory called with ID:', categoryId);
       
       // Update URL dengan selected_category
-      const urlParams = new URLSearchParams(window.location.search);
+      var urlParams = new URLSearchParams(window.location.search);
       urlParams.set('selected_category', categoryId);
       urlParams.set('tab', 'categories');
-      const newUrl = window.location.pathname + '?' + urlParams.toString();
+      var newUrl = window.location.pathname + '?' + urlParams.toString();
       
       // Update the URL without reloading the page
       history.pushState({}, '', newUrl);
       
       // Remove active class from all categories
-      const allCategories = document.querySelectorAll('#categories-tab-pane .category-list li');
-      allCategories.forEach(li => li.classList.remove('active'));
+      var allCategories = document.querySelectorAll('#categories-tab-pane .category-list li');
+      allCategories.forEach(function(li) {
+        li.classList.remove('active');
+      });
       
       // Add active class to clicked category
-      const clickedElement = document.querySelector(`#categories-tab-pane .category-list li[data-id="${categoryId}"]`);
+      var clickedElement = document.querySelector('#categories-tab-pane .category-list li[data-id="' + categoryId + '"]');
       if (clickedElement) {
           clickedElement.classList.add('active');
           console.log('Active class added to category ID:', categoryId);
@@ -1202,7 +1066,6 @@
       // Load subcategories for the selected category
       console.log('About to load subcategories for category ID:', categoryId);
       loadSubcategories(categoryId);
-}
     }
     
     // Load subcategories when category is selected
@@ -1217,32 +1080,32 @@
       }
 
       // Update category name
-      const selectedCategory = document.querySelector(`#categories-tab-pane .category-list li[data-id="${categoryId}"]`);
+      var selectedCategory = document.querySelector('#categories-tab-pane .category-list li[data-id="' + categoryId + '"]');
       document.getElementById('selected-category-name').textContent = selectedCategory ? selectedCategory.textContent : 'Kategori Terpilih';
       console.log('Updated selected category name to:', selectedCategory ? selectedCategory.textContent : 'Kategori Terpilih');
 
       // Load subcategories via AJAX
-      console.log('Fetching subcategories from:', `/api/categories/${categoryId}/subcategories`);
-      fetch(`/api/categories/${categoryId}/subcategories`)
-        .then(response => {
+      console.log('Fetching subcategories from:', '/api/categories/' + categoryId + '/subcategories');
+      var fetchUrl = '/api/categories/' + categoryId + '/subcategories';
+      fetch(fetchUrl)
+        .then(function(response) {
           console.log('API response status:', response.status);
           return response.json();
         })
-        .then(data => {
+        .then(function(data) {
           console.log('Received subcategory data:', data);
-          const subcategoryList = document.getElementById('subcategory-list');
+          var subcategoryList = document.getElementById('subcategory-list');
           subcategoryList.innerHTML = '';
 
           if (data.subcategories && data.subcategories.length > 0) {
-            data.subcategories.forEach(subcategory => {
-              const li = document.createElement('li');
-              li.innerHTML = `
-                <span>${subcategory.name}</span>
-                <div>
-                  <button class="btn btn-sm btn-primary me-1" onclick="editSubcategory(${subcategory.id})">Edit</button>
-                  <button class="btn btn-sm btn-outline-danger" onclick="deleteSubcategory(${subcategory.id})">Hapus</button>
-                </div>
-              `;
+            data.subcategories.forEach(function(subcategory) {
+              var li = document.createElement('li');
+              var innerHTML = '<span>' + subcategory.name + '</span>';
+              innerHTML += '<div>';
+              innerHTML += '<button class="btn btn-sm btn-primary me-1" onclick="editSubcategory(' + subcategory.id + ')">Edit</button>';
+              innerHTML += '<button class="btn btn-sm btn-outline-danger" onclick="deleteSubcategory(' + subcategory.id + ')">Hapus</button>';
+              innerHTML += '</div>';
+              li.innerHTML = innerHTML;
               li.style.display = 'flex';
               li.style.justifyContent = 'space-between';
               li.style.alignItems = 'center';
@@ -1250,7 +1113,7 @@
             });
             console.log('Subcategories loaded successfully:', data.subcategories.length, 'subcategories found');
           } else {
-            const li = document.createElement('li');
+            var li = document.createElement('li');
             li.textContent = 'Tidak ada subkategori';
             li.style.fontStyle = 'italic';
             li.style.color = '#6c757d';
@@ -1258,33 +1121,10 @@
             console.log('No subcategories found for category ID:', categoryId);
           }
         })
-        .catch(error => {
+        .catch(function(error) {
           console.error('Error loading subcategories:', error);
-        })
-        .catch(error => {
-          console.error('Error loading subcategories:', error);
-          alert('Gagal memuat subkategori');
         });
     }
-
-
-
-    // Simulate category click when user clicks on category in the filter panel
-    document.getElementById('category_filter').addEventListener('change', function() {
-      const categoryId = this.value;
-      if (categoryId) {
-        // Simulate click on the corresponding category in the category panel
-        const categoryItem = document.querySelector(`#categories-tab-pane .category-list li[data-id="${categoryId}"]`);
-        if (categoryItem) {
-          categoryItem.click();
-        } else {
-          // If not found in panel, just load subcategories
-          loadSubcategories(categoryId);
-        }
-      } else {
-        loadSubcategories(null);
-      }
-    });
 
     // Placeholder functions for subcategory management
     function showAddSubcategoryModal() {
@@ -1297,71 +1137,80 @@
 
     function deleteSubcategory(id) {
       // Ambil informasi jumlah produk terlebih dahulu sebelum menghapus
-      fetch(`/api/subcategories/${id}/product-count`)
-        .then(response => response.json())
-        .then(data => {
-          const productCount = data.product_count || 0;
-          let message = 'Apakah Anda yakin ingin menghapus subkategori ini?';
+      var fetchUrl = '/api/subcategories/' + id + '/product-count';
+      fetch(fetchUrl)
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(data) {
+          var productCount = data.product_count || 0;
+          var message = 'Apakah Anda yakin ingin menghapus subkategori ini?';
           
           if (productCount > 0) {
-            message += `\\n\\nPeringatan: Terdapat ${productCount} produk yang terkait dengan subkategori ini.`;
+            message += '\\n\\nPeringatan: Terdapat ' + productCount + ' produk yang terkait dengan subkategori ini.';
             message += '\\nProduk-produk tersebut akan kehilangan referensi subkategori saat penghapusan.';
           }
           
           if (confirm(message)) {
-            fetch(`/api/subcategories/${id}`, {
+            var deleteUrl = '/api/subcategories/' + id;
+            fetch(deleteUrl, {
               method: 'DELETE',
               headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
               }
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            alert(data.message);
-            // Reload subcategories
-            const activeCategoryId = document.querySelector('#categories-tab-pane .category-list li.active')?.getAttribute('data-id');
-            if (activeCategoryId) {
-              loadSubcategories(activeCategoryId);
-            }
-          } else {
-            alert('Gagal menghapus subkategori: ' + data.message);
+            })
+            .then(function(response) {
+              return response.json();
+            })
+            .then(function(data) {
+              if (data.success) {
+                alert(data.message);
+                // Reload subcategories
+                var activeCategoryId = document.querySelector('#categories-tab-pane .category-list li.active')?.getAttribute('data-id');
+                if (activeCategoryId) {
+                  loadSubcategories(activeCategoryId);
+                }
+              } else {
+                alert('Gagal menghapus subkategori: ' + data.message);
+              }
+            })
+            .catch(function(error) {
+              console.error('Error deleting subcategory:', error);
+              alert('Terjadi kesalahan saat menghapus subkategori');
+            });
           }
         })
-        .catch(error => {
-          console.error('Error deleting subcategory:', error);
-          alert('Terjadi kesalahan saat menghapus subkategori');
+        .catch(function(error) {
+          console.error('Error checking product count:', error);
+          alert('Gagal memeriksa jumlah produk');
         });
-      }
     }
 
     function showAddCategoryModal() {
       // Buat modal sederhana
-      const modalHtml = `
-        <div id="addCategoryModal" class="modal fade show" style="display: block; background: rgba(0,0,0,0.5);">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title">Tambah Kategori Baru</h5>
-                <button type="button" class="btn-close" onclick="closeModal('addCategoryModal')">&times;</button>
-              </div>
-              <div class="modal-body">
-                <form id="addCategoryForm">
-                  <div class="mb-3">
-                    <label for="categoryName" class="form-label">Nama Kategori</label>
-                    <input type="text" class="form-control" id="categoryName" name="name" required>
-                  </div>
-                  <div class="text-end">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('addCategoryModal')">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
+      var modalHtml = '<div id="addCategoryModal" class="modal fade show" style="display: block; background: rgba(0,0,0,0.5);">';
+      modalHtml += '<div class="modal-dialog">';
+      modalHtml += '<div class="modal-content">';
+      modalHtml += '<div class="modal-header">';
+      modalHtml += '<h5 class="modal-title">Tambah Kategori Baru</h5>';
+      modalHtml += '<button type="button" class="btn-close" onclick="closeModal(\'addCategoryModal\')">&times;</button>';
+      modalHtml += '</div>';
+      modalHtml += '<div class="modal-body">';
+      modalHtml += '<form id="addCategoryForm">';
+      modalHtml += '<div class="mb-3">';
+      modalHtml += '<label for="categoryName" class="form-label">Nama Kategori</label>';
+      modalHtml += '<input type="text" class="form-control" id="categoryName" name="name" required>';
+      modalHtml += '</div>';
+      modalHtml += '<div class="text-end">';
+      modalHtml += '<button type="button" class="btn btn-secondary" onclick="closeModal(\'addCategoryModal\')">Batal</button>';
+      modalHtml += '<button type="submit" class="btn btn-primary">Simpan</button>';
+      modalHtml += '</div>';
+      modalHtml += '</form>';
+      modalHtml += '</div>';
+      modalHtml += '</div>';
+      modalHtml += '</div>';
+      modalHtml += '</div>';
       
       // Tambahkan ke body
       document.body.insertAdjacentHTML('beforeend', modalHtml);
@@ -1370,7 +1219,7 @@
       document.getElementById('addCategoryForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
-        const categoryName = document.getElementById('categoryName').value;
+        var categoryName = document.getElementById('categoryName').value;
         
         // Kirim ke server
         fetch('/api/categories', {
@@ -1381,8 +1230,10 @@
           },
           body: JSON.stringify({ name: categoryName })
         })
-        .then(response => response.json())
-        .then(data => {
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(data) {
           if (data.success) {
             alert(data.message);
             closeModal('addCategoryModal');
@@ -1392,7 +1243,7 @@
             alert('Gagal menambah kategori: ' + data.message);
           }
         })
-        .catch(error => {
+        .catch(function(error) {
           console.error('Error:', error);
           alert('Terjadi kesalahan saat menambah kategori');
         });
@@ -1400,7 +1251,7 @@
     }
 
     function closeModal(modalId) {
-      const modal = document.getElementById(modalId);
+      var modal = document.getElementById(modalId);
       if (modal) {
         modal.remove();
       }
@@ -1408,27 +1259,31 @@
 
     function deleteCategory(id) {
       // Cek dulu jumlah produk di kategori ini
-      fetch(`/api/categories/${id}/product-count`)
-        .then(response => response.json())
-        .then(data => {
-          const productCount = data.product_count;
-          let confirmMessage = 'Apakah Anda yakin ingin menghapus kategori ini?';
+      fetch('/api/categories/' + id + '/product-count')
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(data) {
+          var productCount = data.product_count;
+          var confirmMessage = 'Apakah Anda yakin ingin menghapus kategori ini?';
           
           if (productCount > 0) {
-            confirmMessage = `Kategori ini memiliki ${productCount} produk. Produk akan tetap ada tapi tidak memiliki kategori. Tetap hapus?`;
+            confirmMessage = 'Kategori ini memiliki ' + productCount + ' produk. Produk akan tetap ada tapi tidak memiliki kategori. Tetap hapus?';
           }
           
           if (confirm(confirmMessage)) {
             // Kirim request hapus
-            fetch(`/api/categories/${id}`, {
+            fetch('/api/categories/' + id, {
               method: 'DELETE',
               headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
               }
             })
-            .then(response => response.json())
-            .then(data => {
+            .then(function(response) {
+              return response.json();
+            })
+            .then(function(data) {
               if (data.success) {
                 alert(data.message);
                 // Refresh halaman
@@ -1437,17 +1292,196 @@
                 alert('Gagal menghapus kategori: ' + data.message);
               }
             })
-            .catch(error => {
+            .catch(function(error) {
               console.error('Error:', error);
               alert('Terjadi kesalahan saat menghapus kategori');
             });
           }
         })
-        .catch(error => {
+        .catch(function(error) {
           console.error('Error checking product count:', error);
           alert('Gagal memeriksa jumlah produk');
         });
     }
+
+    // Handle tab changes and filtering - inside DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get the active tab from URL or default to products tab
+      var urlParams = new URLSearchParams(window.location.search);
+      var activeTabFromUrl = urlParams.get('tab');
+      
+      // Set the active tab when page loads
+      if (activeTabFromUrl) {
+        var activeTabBtn = document.getElementById(activeTabFromUrl + '-tab');
+        var activeTabPane = document.getElementById(activeTabFromUrl + '-tab-pane');
+        
+        if (activeTabBtn && activeTabPane) {
+          // Remove active class from all tabs and panes
+          document.querySelectorAll('#productManagementTabs .nav-link').forEach(function(tab) {
+            tab.classList.remove('active');
+          });
+          document.querySelectorAll('.tab-pane').forEach(function(pane) {
+            pane.classList.remove('show');
+            pane.classList.remove('active');
+          });
+          
+          // Add active class to the desired tab and pane
+          activeTabBtn.classList.add('active');
+          activeTabPane.classList.add('show');
+          activeTabPane.classList.add('active');
+        }
+      }
+      
+      var tabTriggerList = [].slice.call(document.querySelectorAll('#productManagementTabs button[data-bs-toggle="tab"]'));
+      tabTriggerList.forEach(function(tabTrigger) {
+        tabTrigger.addEventListener('shown.bs.tab', function(event) {
+          // Update URL with current tab when tab changes
+          var currentTab = event.target.id.replace('-tab', '');
+          var urlParams = new URLSearchParams(window.location.search);
+          urlParams.set('tab', currentTab);
+          
+          // Update the URL without reloading the page
+          var newUrl = window.location.pathname + '?' + urlParams.toString();
+          history.pushState({}, '', newUrl);
+        });
+      });
+      
+      // Auto-submit product filter form when any filter changes
+      var productFilterForm = document.getElementById('productFilterForm');
+      
+      if (productFilterForm) {
+        // Prevent default form submission
+        productFilterForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          // Build URL with query parameters
+          var formData = new FormData(productFilterForm);
+          var params = new URLSearchParams();
+          
+          for (var pair of formData.entries()) {
+            var key = pair[0];
+            var value = pair[1];
+            if (value.trim() !== '') { // Only add non-empty values
+              params.append(key, value);
+            }
+          }
+          
+          // Preserve the current active tab in the URL
+          var currentActiveTab = document.querySelector('#productManagementTabs .nav-link.active').id.replace('-tab', '');
+          params.set('tab', currentActiveTab);
+          
+          // Get the current URL without query parameters
+          var newUrl = window.location.pathname;
+          
+          // Add parameters if there are any
+          if (params.toString()) {
+            newUrl += '?' + params.toString();
+          }
+          
+          // Navigate to the new URL with parameters
+          window.location.href = newUrl;
+        });
+        
+        // Add event listeners to product filter inputs for auto-submit
+        var productFilterInputs = productFilterForm.querySelectorAll('input, select');
+        
+        productFilterInputs.forEach(function(input) {
+          // Handle change events for select and other inputs
+          input.addEventListener('change', function() {
+            // Submit the form when any filter changes
+            productFilterForm.dispatchEvent(new Event('submit'));
+          });
+          
+          // Handle input events for text inputs (for real-time search)
+          if (input.type === 'text') {
+            var timeout;
+            input.addEventListener('input', function() {
+              clearTimeout(timeout);
+              timeout = setTimeout(function() {
+                // Submit the form after user stops typing
+                productFilterForm.dispatchEvent(new Event('submit'));
+              }, 500); // Delay for 500ms after user stops typing
+            });
+          }
+        });
+      }
+      
+      // Auto-submit review filter form when any filter changes
+      var reviewFilterForm = document.getElementById('reviewFilterForm');
+      
+      if (reviewFilterForm) {
+        // Prevent default form submission
+        reviewFilterForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          // Build URL with query parameters
+          var formData = new FormData(reviewFilterForm);
+          var params = new URLSearchParams();
+          
+          for (var pair of formData.entries()) {
+            var key = pair[0];
+            var value = pair[1];
+            if (value.trim() !== '') { // Only add non-empty values
+              params.append(key, value);
+            }
+          }
+          
+          // Preserve the current active tab in the URL
+          params.set('tab', 'reviews');
+          
+          // Get the current URL without query parameters
+          var newUrl = window.location.pathname;
+          
+          // Add parameters if there are any
+          if (params.toString()) {
+            newUrl += '?' + params.toString();
+          }
+          
+          // Navigate to the new URL with parameters
+          window.location.href = newUrl;
+        });
+        
+        // Add event listeners to review filter inputs for auto-submit
+        var reviewFilterInputs = reviewFilterForm.querySelectorAll('input, select');
+        
+        reviewFilterInputs.forEach(function(input) {
+          // Handle change events for select and other inputs
+          input.addEventListener('change', function() {
+            // Submit the form when any filter changes
+            reviewFilterForm.dispatchEvent(new Event('submit'));
+          });
+          
+          // Handle input events for text inputs (for real-time search)
+          if (input.type === 'text') {
+            var timeout;
+            input.addEventListener('input', function() {
+              clearTimeout(timeout);
+              timeout = setTimeout(function() {
+                // Submit the form after user stops typing
+                reviewFilterForm.dispatchEvent(new Event('submit'));
+              }, 500); // Delay for 500ms after user stops typing
+            });
+          }
+        });
+      }
+
+      // Simulate category click when user clicks on category in the filter panel
+      document.getElementById('category_filter').addEventListener('change', function() {
+        var categoryId = this.value;
+        if (categoryId) {
+          // Simulate click on the corresponding category in the category panel
+          var categoryItem = document.querySelector('#categories-tab-pane .category-list li[data-id="' + categoryId + '"]');
+          if (categoryItem) {
+            categoryItem.click();
+          } else {
+            // If not found in panel, just load subcategories
+            loadSubcategories(categoryId);
+          }
+        } else {
+          loadSubcategories(null);
+        }
+      });
+    });
   </script>
   
 @endsection

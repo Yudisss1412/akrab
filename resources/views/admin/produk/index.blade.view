@@ -667,6 +667,9 @@
                         @foreach($mainCategories as $index => $category)
                           <li class="{{ $index === 0 ? 'active' : '' }}" data-id="{{ $category->id }}" onclick="selectCategory({{ $category->id }})" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
                             <span>{{ $category->name }}</span>
+                            <div>
+                              <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation(); deleteCategory({{ $category->id }})">Hapus</button>
+                            </div>
                           </li>
                         @endforeach
                       @else
@@ -1265,13 +1268,14 @@
         })
         .then(function(data) {
           var productCount = data.product_count;
-          var confirmMessage = 'Apakah Anda yakin ingin menghapus kategori ini?';
+          var message = 'Apakah Anda yakin ingin menghapus kategori ini?';
           
           if (productCount > 0) {
-            confirmMessage = 'Kategori ini memiliki ' + productCount + ' produk. Produk akan tetap ada tapi tidak memiliki kategori. Tetap hapus?';
+            message += '\\n\\nPeringatan: Kategori ini memiliki ' + productCount + ' produk. Produk akan tetap ada tapi tidak memiliki kategori.';
+            message += '\\nProduk-produk tersebut akan kehilangan referensi kategori saat penghapusan.';
           }
           
-          if (confirm(confirmMessage)) {
+          if (confirm(message)) {
             // Kirim request hapus
             fetch('/api/categories/' + id, {
               method: 'DELETE',

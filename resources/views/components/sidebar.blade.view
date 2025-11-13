@@ -65,11 +65,6 @@
                     <i class="fas fa-user-cog me-2"></i>Profil Admin
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('logout') }}">
-                    <i class="fas fa-sign-out-alt me-2"></i>Keluar
-                </a>
-            </li>
         
         {{-- Menu untuk Penjual --}}
         @elseif($role === 'seller')
@@ -121,11 +116,6 @@
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('profil.penjual') ? 'active' : '' }}" href="{{ route('profil.penjual') }}">
                     <i class="fas fa-store me-2"></i>Profil Toko
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('logout') }}">
-                    <i class="fas fa-sign-out-alt me-2"></i>Keluar
                 </a>
             </li>
         
@@ -192,11 +182,6 @@
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('support.tickets') }}">
                     <i class="fas fa-headset me-2"></i>Bantuan
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('logout') }}">
-                    <i class="fas fa-sign-out-alt me-2"></i>Keluar
                 </a>
             </li>
         @endif

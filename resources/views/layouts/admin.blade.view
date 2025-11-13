@@ -11,26 +11,16 @@
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
-    <style>
-        body.dashboard-page .navbar {
-            display: none;
-        }
-    </style>
     @stack('styles')
 </head>
-<body class="{{ request()->routeIs('dashboard.admin') ? 'dashboard-page' : '' }}">
+<body class="{{ request()->routeIs('dashboard.admin') || request()->routeIs('admin.dashboard') ? 'dashboard-page' : '' }}">
     <div class="container-fluid">
+        @if(!(request()->routeIs('dashboard.admin') || request()->routeIs('admin.dashboard')))
         <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
             <div class="container-fluid">
-                @if(!request()->routeIs('dashboard.admin'))
                 <a class="navbar-brand" href="javascript:history.back()" title="Kembali ke halaman sebelumnya">
                     <i class="fas fa-arrow-left me-2"></i>UMKM AKRAB Admin
                 </a>
-                @else
-                <span class="navbar-brand">
-                    UMKM AKRAB Admin
-                </span>
-                @endif
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -40,6 +30,7 @@
                 </div>
             </div>
         </nav>
+        @endif
         
         <!-- Success and Error Messages -->
         @if(session('success'))

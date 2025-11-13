@@ -649,25 +649,23 @@
       }
     }
     
-    // Search functionality with debounce
-    const searchInput = document.getElementById('searchInput');
-    const categoryFilter = document.getElementById('categoryFilter');
-    const statusFilter = document.getElementById('statusFilter');
-    let searchTimeout;
-    
     // Function to update URL with filters
     function updateFilters() {
         const url = new URL(window.location);
-        const searchTerm = searchInput.value.trim();
-        const category = categoryFilter.value;
-        const status = statusFilter.value;
-        
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const statusFilter = document.getElementById('statusFilter');
+
+        const searchTerm = searchInput ? searchInput.value.trim() : '';
+        const category = categoryFilter ? categoryFilter.value : '';
+        const status = statusFilter ? statusFilter.value : '';
+
         // Clear existing params
         url.searchParams.delete('search');
         url.searchParams.delete('category');
         url.searchParams.delete('status');
         url.searchParams.delete('page');
-        
+
         // Set new params
         if (searchTerm) {
             url.searchParams.set('search', searchTerm);
@@ -678,27 +676,47 @@
         if (status) {
             url.searchParams.set('status', status);
         }
-        
+
         window.location = url.toString();
     }
-    
-    // Search input handler
-    searchInput.addEventListener('input', function() {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(updateFilters, 500); // Debounce for 500ms
-    });
-    
-    // Enter key to trigger search immediately
-    searchInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            clearTimeout(searchTimeout);
-            updateFilters();
+
+    // Wait for DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const statusFilter = document.getElementById('statusFilter');
+        let searchTimeout;
+
+        // Add event listeners only if elements exist
+        if (searchInput) {
+            // Search input handler
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(updateFilters, 500); // Debounce for 500ms
+            });
+
+            // Enter key to trigger search immediately
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    clearTimeout(searchTimeout);
+                    updateFilters();
+                }
+            });
+        }
+
+        // Filter change handlers - only add if elements exist
+        if (categoryFilter) {
+            categoryFilter.addEventListener('change', function() {
+                updateFilters();
+            });
+        }
+
+        if (statusFilter) {
+            statusFilter.addEventListener('change', function() {
+                updateFilters();
+            });
         }
     });
-    
-    // Filter change handlers
-    categoryFilter.addEventListener('change', updateFilters);
-    statusFilter.addEventListener('change', updateFilters);
   </script>
   <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
@@ -736,9 +754,11 @@
             <!-- Filter Status -->
             <select class="form-control" id="statusFilter" style="width: 150px; margin-left: 1rem;">
               <option value="">Semua Status</option>
-              <option value="aktif" {{ request('status') == 'aktif' ? 'selected' : '' }}>Aktif</option>
-              <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>Draft</option>
+              <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Aktif</option>
+              <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Menunggu Persetujuan</option>
+              <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Ditolak</option>
               <option value="suspended" {{ request('status') == 'suspended' ? 'selected' : '' }}>Ditangguhkan</option>
+              <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>Draft</option>
             </select>
           </div>
           

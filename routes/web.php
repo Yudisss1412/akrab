@@ -883,13 +883,20 @@ Route::middleware(['auth'])->get('/dashboard', [App\Http\Controllers\RoleDashboa
 Route::get('/api/products/filter', [App\Http\Controllers\ProductController::class, 'filter'])->name('api.products.filter');
 
 // API routes for categories
-Route::post('/api/categories', [App\Http\Controllers\Api\CategoryController::class, 'store']);
-Route::get('/api/categories/{id}/product-count', [App\Http\Controllers\Api\CategoryController::class, 'getProductCount']);
-Route::delete('/api/categories/{id}', [App\Http\Controllers\Api\CategoryController::class, 'destroy']);
+Route::middleware(['auth', 'admin.role'])->group(function () {
+    Route::post('/api/categories', [App\Http\Controllers\Api\CategoryController::class, 'store']);
+    Route::get('/api/categories/{id}/product-count', [App\Http\Controllers\Api\CategoryController::class, 'getProductCount']);
+    Route::delete('/api/categories/{id}', [App\Http\Controllers\Api\CategoryController::class, 'destroy']);
+});
 
 // API routes for subcategories
-Route::get('/api/categories/{id}/subcategories', [App\Http\Controllers\Api\SubcategoryController::class, 'getSubcategoriesByCategory']);
-Route::get('/api/subcategories/{id}/product-count', [App\Http\Controllers\Api\SubcategoryController::class, 'getProductCount']);
-Route::delete('/api/subcategories/{id}', [App\Http\Controllers\Api\SubcategoryController::class, 'destroy']);
+Route::middleware(['auth', 'admin.role'])->group(function () {
+    Route::get('/api/categories/{id}/subcategories', [App\Http\Controllers\Api\SubcategoryController::class, 'getSubcategoriesByCategory']);
+    Route::get('/api/subcategories/{id}/product-count', [App\Http\Controllers\Api\SubcategoryController::class, 'getProductCount']);
+    Route::delete('/api/subcategories/{id}', [App\Http\Controllers\Api\SubcategoryController::class, 'destroy']);
+    Route::post('/api/subcategories', [App\Http\Controllers\Api\SubcategoryController::class, 'store']);
+    Route::put('/api/subcategories/{id}', [App\Http\Controllers\Api\SubcategoryController::class, 'update']);
+    Route::get('/api/subcategories/{id}', [App\Http\Controllers\Api\SubcategoryController::class, 'show']);
+});
 
 

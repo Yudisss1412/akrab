@@ -865,8 +865,14 @@
 
   <!-- JavaScript for Tabs and Interactions -->
   <script>
+    // Helper function to safely get CSRF token
+    function getCSRFToken() {
+      var csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+      return csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
+    }
+
     // Functions for product actions - defined in global scope to be accessible from HTML onclick attributes
-    
+
     function approveProduct(productId) {
       if (confirm('Apakah Anda yakin ingin menyetujui produk ini?')) {
         var url = '/admin/produk/' + productId + '/approve';
@@ -874,7 +880,7 @@
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            'X-CSRF-TOKEN': getCSRFToken()
           }
         })
         .then(function(response) {
@@ -902,7 +908,7 @@
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            'X-CSRF-TOKEN': getCSRFToken()
           }
         })
         .then(function(response) {
@@ -930,7 +936,7 @@
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            'X-CSRF-TOKEN': getCSRFToken()
           }
         })
         .then(function(response) {
@@ -959,7 +965,7 @@
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            'X-CSRF-TOKEN': getCSRFToken()
           }
         })
         .then(function(response) {
@@ -987,7 +993,7 @@
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            'X-CSRF-TOKEN': getCSRFToken()
           }
         })
         .then(function(response) {
@@ -1015,7 +1021,7 @@
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            'X-CSRF-TOKEN': getCSRFToken()
           }
         })
         .then(function(response) {
@@ -1131,11 +1137,214 @@
 
     // Placeholder functions for subcategory management
     function showAddSubcategoryModal() {
-      alert('Fungsi tambah subkategori akan segera hadir');
+      // Get active category ID
+      var activeCategory = document.querySelector('#categories-tab-pane .category-list li.active');
+      if (!activeCategory) {
+        alert('Silakan pilih kategori terlebih dahulu');
+        return;
+      }
+
+      var categoryId = activeCategory.getAttribute('data-id');
+
+      // Buat modal sederhana untuk menambah subkategori
+      var modalHtml = '<div id="addSubcategoryModal" class="modal fade show" style="display: block; background: rgba(0,0,0,0.5); z-index: 1050; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; overflow-y: auto; padding: 5% 0;">';
+      modalHtml += '<div class="modal-dialog" style="margin: 0 auto; max-width: 500px;">';
+      modalHtml += '<div class="modal-content">';
+      modalHtml += '<div class="modal-header">';
+      modalHtml += '<h5 class="modal-title">Tambah Subkategori Baru</h5>';
+      modalHtml += '<button type="button" class="btn-close" onclick="closeModal(\'addSubcategoryModal\')">&times;</button>';
+      modalHtml += '</div>';
+      modalHtml += '<div class="modal-body">';
+      modalHtml += '<form id="addSubcategoryForm">';
+      modalHtml += '<div class="mb-3">';
+      modalHtml += '<label for="subcategoryName" class="form-label">Nama Subkategori</label>';
+      modalHtml += '<input type="text" class="form-control" id="subcategoryName" name="name" required maxlength="255">';
+      modalHtml += '</div>';
+      modalHtml += '<input type="hidden" id="categoryId" name="category_id" value="' + categoryId + '">';
+      modalHtml += '<div class="modal-footer">';
+      modalHtml += '<button type="button" class="btn btn-secondary" onclick="closeModal(\'addSubcategoryModal\')">Batal</button>';
+      modalHtml += '<button type="submit" class="btn btn-primary">Simpan</button>';
+      modalHtml += '</div>';
+      modalHtml += '</form>';
+      modalHtml += '</div>';
+      modalHtml += '</div>';
+      modalHtml += '</div>';
+
+      // Tambahkan ke body
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+      // Tambahkan event listener ke form (hanya jika element sudah dibuat)
+      var addSubcategoryForm = document.getElementById('addSubcategoryForm');
+      if (addSubcategoryForm) {
+        addSubcategoryForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+
+          var subcategoryName = document.getElementById('subcategoryName').value.trim();
+          var categoryId = document.getElementById('categoryId').value;
+
+          if (subcategoryName === '') {
+            alert('Nama subkategori tidak boleh kosong!');
+            return;
+          }
+
+          // Disable tombol submit untuk mencegah double submission
+          var submitButton = document.querySelector('#addSubcategoryForm button[type="submit"]');
+          if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.innerHTML = 'Menyimpan...';
+          }
+
+          // Kirim ke server
+          fetch('/api/subcategories', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-TOKEN': getCSRFToken()
+            },
+            body: JSON.stringify({
+              name: subcategoryName,
+              category_id: categoryId
+            })
+          })
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(data) {
+            // Kembalikan tombol ke kondisi awal
+            if (submitButton) {
+              submitButton.disabled = false;
+              submitButton.innerHTML = 'Simpan';
+            }
+
+            if (data.success) {
+              alert(data.message);
+              closeModal('addSubcategoryModal');
+              // Refresh subkategori list tanpa reload halaman
+              loadSubcategories(categoryId);
+            } else {
+              alert('Gagal menambah subkategori: ' + (data.message || 'Data tidak valid'));
+            }
+          })
+          .catch(function(error) {
+            console.error('Error:', error);
+            // Kembalikan tombol ke kondisi awal
+            if (submitButton) {
+              submitButton.disabled = false;
+              submitButton.innerHTML = 'Simpan';
+            }
+            alert('Terjadi kesalahan saat menambah subkategori: ' + error.message);
+          });
+        });
+      }
     }
 
     function editSubcategory(id) {
-      alert('Fungsi edit subkategori akan segera hadir');
+      // Fetch subcategory data
+      fetch('/api/subcategories/' + id)
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(data) {
+          if (data.success) {
+            var subcategory = data.subcategory;
+
+            // Buat modal sederhana untuk mengedit subkategori
+            var modalHtml = '<div id="editSubcategoryModal" class="modal fade show" style="display: block; background: rgba(0,0,0,0.5); z-index: 1050; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; overflow-y: auto; padding: 5% 0;">';
+            modalHtml += '<div class="modal-dialog" style="margin: 0 auto; max-width: 500px;">';
+            modalHtml += '<div class="modal-content">';
+            modalHtml += '<div class="modal-header">';
+            modalHtml += '<h5 class="modal-title">Edit Subkategori</h5>';
+            modalHtml += '<button type="button" class="btn-close" onclick="closeModal(\'editSubcategoryModal\')">&times;</button>';
+            modalHtml += '</div>';
+            modalHtml += '<div class="modal-body">';
+            modalHtml += '<form id="editSubcategoryForm">';
+            modalHtml += '<div class="mb-3">';
+            modalHtml += '<label for="editSubcategoryName" class="form-label">Nama Subkategori</label>';
+            modalHtml += '<input type="text" class="form-control" id="editSubcategoryName" name="name" value="' + (subcategory.name || '') + '" required maxlength="255">';
+            modalHtml += '</div>';
+            modalHtml += '<input type="hidden" id="editSubcategoryId" name="id" value="' + id + '">';
+            modalHtml += '<div class="modal-footer">';
+            modalHtml += '<button type="button" class="btn btn-secondary" onclick="closeModal(\'editSubcategoryModal\')">Batal</button>';
+            modalHtml += '<button type="submit" class="btn btn-primary">Simpan Perubahan</button>';
+            modalHtml += '</div>';
+            modalHtml += '</form>';
+            modalHtml += '</div>';
+            modalHtml += '</div>';
+            modalHtml += '</div>';
+
+            // Tambahkan ke body
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+            // Tambahkan event listener ke form (hanya jika element sudah dibuat)
+            var editSubcategoryForm = document.getElementById('editSubcategoryForm');
+            if (editSubcategoryForm) {
+              editSubcategoryForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                var subcategoryName = document.getElementById('editSubcategoryName').value.trim();
+                var categoryId = subcategory.category_id; // Use the original category ID
+
+                if (subcategoryName === '') {
+                  alert('Nama subkategori tidak boleh kosong!');
+                  return;
+                }
+
+                // Disable tombol submit untuk mencegah double submission
+                var submitButton = document.querySelector('#editSubcategoryForm button[type="submit"]');
+                if (submitButton) {
+                  submitButton.disabled = true;
+                  submitButton.innerHTML = 'Menyimpan...';
+                }
+
+                // Kirim ke server
+                fetch('/api/subcategories/' + id, {
+                  method: 'PUT',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': getCSRFToken()
+                  },
+                  body: JSON.stringify({
+                    name: subcategoryName
+                  })
+                })
+                .then(function(response) {
+                  return response.json();
+                })
+                .then(function(data) {
+                  // Kembalikan tombol ke kondisi awal
+                  if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = 'Simpan Perubahan';
+                  }
+
+                  if (data.success) {
+                    alert(data.message);
+                    closeModal('editSubcategoryModal');
+                    // Refresh subkategori list tanpa reload halaman
+                    loadSubcategories(categoryId);
+                  } else {
+                    alert('Gagal mengedit subkategori: ' + (data.message || 'Data tidak valid'));
+                  }
+                })
+                .catch(function(error) {
+                  console.error('Error:', error);
+                  // Kembalikan tombol ke kondisi awal
+                  if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = 'Simpan Perubahan';
+                  }
+                  alert('Terjadi kesalahan saat mengedit subkategori: ' + error.message);
+                });
+              });
+            }
+          } else {
+            alert('Gagal memuat data subkategori: ' + (data.message || 'Data tidak ditemukan'));
+          }
+        })
+        .catch(function(error) {
+          console.error('Error fetching subcategory:', error);
+          alert('Terjadi kesalahan saat memuat data subkategori');
+        });
     }
 
     function deleteSubcategory(id) {
@@ -1165,7 +1374,7 @@
               method: 'DELETE',
               headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                'X-CSRF-TOKEN': getCSRFToken()
               }
             })
             .then(function(response) {
@@ -1223,56 +1432,65 @@
       // Tambahkan ke body
       document.body.insertAdjacentHTML('beforeend', modalHtml);
       
-      // Tambahkan event listener ke form
-      document.getElementById('addCategoryForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        var categoryName = document.getElementById('categoryName').value.trim();
-        
-        if (categoryName === '') {
-          alert('Nama kategori tidak boleh kosong!');
-          return;
-        }
-        
-        // Disable tombol submit untuk mencegah double submission
-        var submitButton = document.querySelector('#addCategoryForm button[type="submit"]');
-        submitButton.disabled = true;
-        submitButton.innerHTML = 'Menyimpan...';
-        
-        // Kirim ke server
-        fetch('/api/categories', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-          },
-          body: JSON.stringify({ name: categoryName })
-        })
-        .then(function(response) {
-          return response.json();
-        })
-        .then(function(data) {
-          // Kembalikan tombol ke kondisi awal
-          submitButton.disabled = false;
-          submitButton.innerHTML = 'Simpan';
-          
-          if (data.success) {
-            alert(data.message);
-            closeModal('addCategoryModal');
-            // Refresh kategori list tanpa reload halaman
-            location.reload();
-          } else {
-            alert('Gagal menambah kategori: ' + (data.message || 'Data tidak valid'));
+      // Tambahkan event listener ke form (hanya jika element sudah dibuat)
+      var addCategoryForm = document.getElementById('addCategoryForm');
+      if (addCategoryForm) {
+        addCategoryForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+
+          var categoryName = document.getElementById('categoryName').value.trim();
+
+          if (categoryName === '') {
+            alert('Nama kategori tidak boleh kosong!');
+            return;
           }
-        })
-        .catch(function(error) {
-          console.error('Error:', error);
-          // Kembalikan tombol ke kondisi awal
-          submitButton.disabled = false;
-          submitButton.innerHTML = 'Simpan';
-          alert('Terjadi kesalahan saat menambah kategori: ' + error.message);
+
+          // Disable tombol submit untuk mencegah double submission
+          var submitButton = document.querySelector('#addCategoryForm button[type="submit"]');
+          if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.innerHTML = 'Menyimpan...';
+          }
+
+          // Kirim ke server
+          fetch('/api/categories', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-TOKEN': getCSRFToken()
+            },
+            body: JSON.stringify({ name: categoryName })
+          })
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(data) {
+            // Kembalikan tombol ke kondisi awal
+            if (submitButton) {
+              submitButton.disabled = false;
+              submitButton.innerHTML = 'Simpan';
+            }
+
+            if (data.success) {
+              alert(data.message);
+              closeModal('addCategoryModal');
+              // Refresh kategori list tanpa reload halaman
+              location.reload();
+            } else {
+              alert('Gagal menambah kategori: ' + (data.message || 'Data tidak valid'));
+            }
+          })
+          .catch(function(error) {
+            console.error('Error:', error);
+            // Kembalikan tombol ke kondisi awal
+            if (submitButton) {
+              submitButton.disabled = false;
+              submitButton.innerHTML = 'Simpan';
+            }
+            alert('Terjadi kesalahan saat menambah kategori: ' + error.message);
+          });
         });
-      });
+      }
     }
 
     function closeModal(modalId) {
@@ -1308,7 +1526,7 @@
               method: 'DELETE',
               headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                'X-CSRF-TOKEN': getCSRFToken()
               }
             })
             .then(function(response) {

@@ -852,7 +852,7 @@ Route::middleware(['auth', 'admin.role'])->group(function () {
 
 Route::middleware(['auth', 'seller.role'])->group(function () {
     Route::get('/penjual/dashboard', function () {
-        return view('penjual.dashboard');
+        return view('penjual.dashboard_penjual');
     })->name('seller.dashboard');
 });
 

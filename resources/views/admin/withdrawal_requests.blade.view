@@ -417,7 +417,7 @@
                   <td><input type="checkbox" class="request-check" data-id="{{ $withdrawal->id }}"></td>
                   <td>{{ $withdrawal->id }}</td>
                   <td>{{ \Carbon\Carbon::parse($withdrawal->created_at)->format('d M Y') }}</td>
-                  <td><a href="{{ route('sellers.show', $withdrawal->seller_id) }}" class="seller-link">{{ $withdrawal->seller->name ?? 'Penjual Tidak Ditemukan' }}</a></td>
+                  <td><a href="{{ route('sellers.show', $withdrawal->seller_id) }}" class="seller-link">{{ $withdrawal->seller->store_name ?? 'Penjual Tidak Ditemukan' }}</a></td>
                   <td class="amount">Rp {{ number_format($withdrawal->amount, 0, ',', '.') }}</td>
                   <td>{{ $withdrawal->bank_name ?? 'N/A' }} - {{ $withdrawal->account_number ?? 'xxxx' }}</td>
                   <td class="action-buttons">
@@ -501,7 +501,7 @@
                 <tr>
                   <td>{{ $withdrawal->id }}</td>
                   <td>{{ \Carbon\Carbon::parse($withdrawal->updated_at)->format('d M Y') }}</td>
-                  <td><a href="{{ route('sellers.show', $withdrawal->seller_id) }}" class="seller-link">{{ $withdrawal->seller->name ?? 'Penjual Tidak Ditemukan' }}</a></td>
+                  <td><a href="{{ route('sellers.show', $withdrawal->seller_id) }}" class="seller-link">{{ $withdrawal->seller->store_name ?? 'Penjual Tidak Ditemukan' }}</a></td>
                   <td class="amount">Rp {{ number_format($withdrawal->amount, 0, ',', '.') }}</td>
                   <td>{{ $withdrawal->bank_name ?? 'N/A' }} - {{ $withdrawal->account_number ?? 'xxxx' }}</td>
                   <td>

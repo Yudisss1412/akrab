@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('withdrawal_requests', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('seller_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('seller_id')->constrained('sellers')->onDelete('cascade');
             $table->decimal('amount', 15, 2);
             $table->enum('status', ['pending', 'processing', 'completed', 'rejected'])->default('pending');
             $table->timestamp('request_date')->nullable();

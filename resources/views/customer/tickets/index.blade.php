@@ -36,7 +36,7 @@
                                 @forelse($tickets as $ticket)
                                 <tr>
                                     <td>
-                                        <a href="{{ route('support.tickets.detail', $ticket->id) }}" class="text-body fw-bold">#{{ str_pad($ticket->id, 6, '0', STR_PAD_LEFT) }}</a>
+                                        <a href="{{ route('customer.tickets.detail', $ticket->id) }}" class="text-body fw-bold">#{{ str_pad($ticket->id, 6, '0', STR_PAD_LEFT) }}</a>
                                     </td>
                                     <td>
                                         <h5 class="m-0 fw-normal">{{ $ticket->subject }}</h5>
@@ -73,7 +73,7 @@
                                         {{ $ticket->created_at->format('d M Y H:i') }}
                                     </td>
                                     <td>
-                                        <a href="{{ route('support.tickets.detail', $ticket->id) }}" class="btn btn-sm btn-outline-primary">Lihat</a>
+                                        <a href="{{ route('customer.tickets.detail', $ticket->id) }}" class="btn btn-sm btn-outline-primary">Lihat</a>
                                     </td>
                                 </tr>
                                 @empty

@@ -863,6 +863,7 @@ Route::middleware(['auth', 'customer.role'])->group(function () {
     
     // Customer ticket routes
     Route::get('/customer/tickets', [App\Http\Controllers\TicketController::class, 'getTicketsByUser'])->name('customer.tickets');
+    Route::get('/customer/tickets/{id}', [App\Http\Controllers\TicketController::class, 'show'])->name('customer.tickets.detail');
     Route::get('/tickets/create', [App\Http\Controllers\TicketController::class, 'create'])->name('tickets.create');
     Route::post('/tickets', [App\Http\Controllers\TicketController::class, 'store'])->name('tickets.store');
 });

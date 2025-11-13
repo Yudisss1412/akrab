@@ -18,6 +18,10 @@ class Review extends Model
         'replied_at',
     ];
 
+    protected $casts = [
+        'media' => 'array',  // Cast media field as array since it's stored as JSON
+    ];
+
     // Relasi ke user
     public function user()
     {

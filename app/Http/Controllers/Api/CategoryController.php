@@ -14,12 +14,14 @@ class CategoryController extends Controller
     {
         try {
             $request->validate([
-                'name' => 'required|string|max:255|unique:categories,name'
+                'name' => 'required|string|max:255|unique:categories,name',
+                'description' => 'nullable|string|max:500'
             ]);
 
             $category = Category::create([
                 'name' => $request->name,
                 'slug' => \Str::slug($request->name),
+                'description' => $request->description,
                 'status' => 'active'
             ]);
 
@@ -85,6 +87,58 @@ class CategoryController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'An error occurred while deleting category'
+            ], 404);
+        }
+    }
+
+    public function update(Request $request, $id)
+    {
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255|unique:categories,name,' . $id,
+                'description' => 'nullable|string|max:500'
+            ]);
+
+            $category = Category::findOrFail($id);
+            $category->name = $request->name;
+            $category->slug = \Str::slug($request->name);
+            $category->description = $request->description;
+            $category->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Kategori berhasil diperbarui',
+                'category' => $category
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (Exception $e) {
+            \Log::error('Category update error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while updating category: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function show($id)
+    {
+        try {
+            $category = Category::findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'category' => $category
+            ]);
+        } catch (Exception $e) {
+            \Log::error('Category show error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while fetching category: ' . $e->getMessage()
             ], 404);
         }
     }

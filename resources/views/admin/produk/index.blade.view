@@ -668,6 +668,7 @@
                           <li class="{{ $index === 0 ? 'active' : '' }}" data-id="{{ $category->id }}" onclick="selectCategory({{ $category->id }})" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
                             <span>{{ $category->name }}</span>
                             <div>
+                              <button class="btn btn-sm btn-outline-primary me-1" onclick="event.stopPropagation(); editCategory({{ $category->id }})">Edit</button>
                               <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation(); deleteCategory({{ $category->id }})">Hapus</button>
                             </div>
                           </li>
@@ -1419,6 +1420,10 @@
       modalHtml += '<label for="categoryName" class="form-label">Nama Kategori</label>';
       modalHtml += '<input type="text" class="form-control" id="categoryName" name="name" required maxlength="255">';
       modalHtml += '</div>';
+      modalHtml += '<div class="mb-3">';
+      modalHtml += '<label for="categoryDescription" class="form-label">Deskripsi Kategori</label>';
+      modalHtml += '<textarea class="form-control" id="categoryDescription" name="description" rows="3" maxlength="500"></textarea>';
+      modalHtml += '</div>';
       modalHtml += '<div class="text-end">';
       modalHtml += '<button type="button" class="btn btn-secondary" onclick="closeModal(\'addCategoryModal\')">Batal</button>';
       modalHtml += '<button type="submit" class="btn btn-primary">Simpan</button>';
@@ -1439,6 +1444,7 @@
           e.preventDefault();
 
           var categoryName = document.getElementById('categoryName').value.trim();
+          var categoryDescription = document.getElementById('categoryDescription').value.trim();
 
           if (categoryName === '') {
             alert('Nama kategori tidak boleh kosong!');
@@ -1459,7 +1465,10 @@
               'Content-Type': 'application/json',
               'X-CSRF-TOKEN': getCSRFToken()
             },
-            body: JSON.stringify({ name: categoryName })
+            body: JSON.stringify({
+              name: categoryName,
+              description: categoryDescription
+            })
           })
           .then(function(response) {
             return response.json();
@@ -1550,6 +1559,120 @@
         .catch(function(error) {
           console.error('Error checking product count:', error);
           alert('Gagal memeriksa jumlah produk');
+        });
+    }
+
+    function editCategory(id) {
+      // Fetch category data
+      fetch('/api/categories/' + id)
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(data) {
+          if (data.success) {
+            var category = data.category;
+
+            // Buat modal sederhana untuk mengedit kategori
+            var modalHtml = '<div id="editCategoryModal" class="modal fade show" style="display: block; background: rgba(0,0,0,0.5); z-index: 1050; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; overflow-y: auto; padding: 5% 0;">';
+            modalHtml += '<div class="modal-dialog" style="margin: 0 auto; max-width: 500px;">';
+            modalHtml += '<div class="modal-content">';
+            modalHtml += '<div class="modal-header">';
+            modalHtml += '<h5 class="modal-title">Edit Kategori</h5>';
+            modalHtml += '<button type="button" class="btn-close" onclick="closeModal(\'editCategoryModal\')">&times;</button>';
+            modalHtml += '</div>';
+            modalHtml += '<div class="modal-body">';
+            modalHtml += '<form id="editCategoryForm">';
+            modalHtml += '<div class="mb-3">';
+            modalHtml += '<label for="editCategoryName" class="form-label">Nama Kategori</label>';
+            modalHtml += '<input type="text" class="form-control" id="editCategoryName" name="name" value="' + (category.name || '') + '" required maxlength="255">';
+            modalHtml += '</div>';
+            modalHtml += '<div class="mb-3">';
+            modalHtml += '<label for="editCategoryDescription" class="form-label">Deskripsi Kategori</label>';
+            modalHtml += '<textarea class="form-control" id="editCategoryDescription" name="description" rows="3" maxlength="500">' + (category.description || '') + '</textarea>';
+            modalHtml += '</div>';
+            modalHtml += '<input type="hidden" id="editCategoryId" name="id" value="' + id + '">';
+            modalHtml += '<div class="modal-footer">';
+            modalHtml += '<button type="button" class="btn btn-secondary" onclick="closeModal(\'editCategoryModal\')">Batal</button>';
+            modalHtml += '<button type="submit" class="btn btn-primary">Simpan Perubahan</button>';
+            modalHtml += '</div>';
+            modalHtml += '</form>';
+            modalHtml += '</div>';
+            modalHtml += '</div>';
+            modalHtml += '</div>';
+
+            // Tambahkan ke body
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+            // Tambahkan event listener ke form (hanya jika element sudah dibuat)
+            var editCategoryForm = document.getElementById('editCategoryForm');
+            if (editCategoryForm) {
+              editCategoryForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                var categoryName = document.getElementById('editCategoryName').value.trim();
+                var categoryDescription = document.getElementById('editCategoryDescription').value.trim();
+
+                if (categoryName === '') {
+                  alert('Nama kategori tidak boleh kosong!');
+                  return;
+                }
+
+                // Disable tombol submit untuk mencegah double submission
+                var submitButton = document.querySelector('#editCategoryForm button[type="submit"]');
+                if (submitButton) {
+                  submitButton.disabled = true;
+                  submitButton.innerHTML = 'Menyimpan...';
+                }
+
+                // Kirim ke server
+                fetch('/api/categories/' + id, {
+                  method: 'PUT', // Using PUT method for update
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': getCSRFToken()
+                  },
+                  body: JSON.stringify({
+                    name: categoryName,
+                    description: categoryDescription
+                  })
+                })
+                .then(function(response) {
+                  return response.json();
+                })
+                .then(function(data) {
+                  // Kembalikan tombol ke kondisi awal
+                  if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = 'Simpan Perubahan';
+                  }
+
+                  if (data.success) {
+                    alert(data.message);
+                    closeModal('editCategoryModal');
+                    // Refresh halaman untuk memperbarui daftar kategori
+                    location.reload();
+                  } else {
+                    alert('Gagal mengedit kategori: ' + (data.message || 'Data tidak valid'));
+                  }
+                })
+                .catch(function(error) {
+                  console.error('Error:', error);
+                  // Kembalikan tombol ke kondisi awal
+                  if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = 'Simpan Perubahan';
+                  }
+                  alert('Terjadi kesalahan saat mengedit kategori: ' + error.message);
+                });
+              });
+            }
+          } else {
+            alert('Gagal memuat data kategori: ' + (data.message || 'Data tidak ditemukan'));
+          }
+        })
+        .catch(function(error) {
+          console.error('Error fetching category:', error);
+          alert('Terjadi kesalahan saat memuat data kategori');
         });
     }
 

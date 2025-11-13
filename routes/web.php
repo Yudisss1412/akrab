@@ -887,6 +887,8 @@ Route::middleware(['auth', 'admin.role'])->group(function () {
     Route::post('/api/categories', [App\Http\Controllers\Api\CategoryController::class, 'store']);
     Route::get('/api/categories/{id}/product-count', [App\Http\Controllers\Api\CategoryController::class, 'getProductCount']);
     Route::delete('/api/categories/{id}', [App\Http\Controllers\Api\CategoryController::class, 'destroy']);
+    Route::put('/api/categories/{id}', [App\Http\Controllers\Api\CategoryController::class, 'update']);
+    Route::get('/api/categories/{id}', [App\Http\Controllers\Api\CategoryController::class, 'show']);
 });
 
 // API routes for subcategories

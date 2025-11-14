@@ -18,11 +18,11 @@
       --ak-radius: 12px;
       --ak-space: 16px;
     }
-    
+
     * {
       box-sizing: border-box;
     }
-    
+
     body {
       font-family: 'Poppins', sans-serif;
       margin: 0;
@@ -33,20 +33,20 @@
       display: flex;
       flex-direction: column;
     }
-    
+
     .main-layout {
       flex: 1;
       display: flex;
       flex-direction: column;
     }
-    
+
     .content-wrapper {
       flex: 1;
       display: flex;
       flex-direction: column;
       padding: 0 1.5rem;
     }
-    
+
     /* Welcome Banner */
     .page-header {
       background: var(--ak-white);
@@ -56,14 +56,14 @@
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
       border: 1px solid var(--ak-border);
     }
-    
+
     .page-header h1 {
       margin: 0;
       font-size: 1.5rem;
       font-weight: 600;
       color: var(--ak-primary);
     }
-    
+
     /* Control Bar */
     .control-bar {
       display: flex;
@@ -76,12 +76,12 @@
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
       border: 1px solid var(--ak-border);
     }
-    
+
     .control-bar-left {
       display: flex;
       gap: 1rem;
     }
-    
+
     .btn {
       border: 1px solid transparent;
       border-radius: var(--ak-radius);
@@ -94,22 +94,22 @@
       display: inline-block;
       text-align: center;
     }
-    
+
     .btn-primary {
       background: var(--ak-primary);
       color: white;
     }
-    
+
     .btn-primary:hover {
       background: #005a4a;
     }
-    
+
     .search {
       position: relative;
       display: flex;
       align-items: center;
     }
-    
+
     .search input {
       padding: 0.5rem 0.75rem 0.5rem 2.5rem;
       border: 1px solid var(--ak-border);
@@ -117,7 +117,7 @@
       font-size: 0.875rem;
       width: 250px;
     }
-    
+
     .search svg {
       position: absolute;
       left: 0.75rem;
@@ -127,7 +127,7 @@
       height: 18px;
       color: var(--ak-muted);
     }
-    
+
     /* Table */
     .table-card {
       background: var(--ak-white);
@@ -137,12 +137,12 @@
       border: 1px solid var(--ak-border);
       margin-bottom: 1.5rem;
     }
-    
+
     .table {
       width: 100%;
       border-collapse: collapse;
     }
-    
+
     .table th {
       text-align: left;
       padding: 0.75rem 1rem;
@@ -151,23 +151,23 @@
       font-weight: 600;
       border-bottom: 1px solid var(--ak-border);
     }
-    
+
     .table td {
       padding: 0.75rem 1rem;
       font-size: 0.875rem;
       border-bottom: 1px solid var(--ak-border);
     }
-    
+
     .table tr:last-child td {
       border-bottom: none;
     }
-    
+
     .product-cell {
       display: flex;
       align-items: center;
       gap: 0.75rem;
     }
-    
+
     .product-thumb {
       width: 40px;
       height: 40px;
@@ -175,7 +175,7 @@
       object-fit: cover;
       background: #f3f4f6;
     }
-    
+
     .status-badge {
       display: inline-block;
       padding: 0.25rem 0.75rem;
@@ -183,27 +183,27 @@
       font-size: 0.75rem;
       font-weight: 500;
     }
-    
+
     .status-active {
       background: rgba(34, 197, 94, 0.1);
       color: #16a34a;
     }
-    
+
     .status-pending {
       background: rgba(234, 179, 8, 0.1);
       color: #ca8a04;
     }
-    
+
     .status-suspended {
       background: rgba(239, 68, 68, 0.1);
       color: #dc2626;
     }
-    
+
     .action-buttons {
       display: flex;
       gap: 0.5rem;
     }
-    
+
     .action-btn {
       width: 32px;
       height: 32px;
@@ -216,18 +216,18 @@
       cursor: pointer;
       transition: all 0.2s ease;
     }
-    
+
     .action-btn:hover {
       background: var(--ak-primary);
       color: white;
       border-color: var(--ak-primary);
     }
-    
+
     .action-btn svg {
       width: 16px;
       height: 16px;
     }
-    
+
     /* Pagination */
     .pagination {
       display: flex;
@@ -235,17 +235,17 @@
       align-items: center;
       margin-top: 1rem;
     }
-    
+
     .pagination-info {
       color: var(--ak-muted);
       font-size: 0.875rem;
     }
-    
+
     .pagination-nav {
       display: flex;
       gap: 0.5rem;
     }
-    
+
     .pagination-btn {
       width: 32px;
       height: 32px;
@@ -259,25 +259,25 @@
       cursor: pointer;
       transition: all 0.2s ease;
     }
-    
+
     .pagination-btn:hover {
       background: var(--ak-primary);
       color: white;
       border-color: var(--ak-primary);
     }
-    
+
     .pagination-btn.active {
       background: var(--ak-primary);
       color: white;
       border-color: var(--ak-primary);
     }
-    
+
     .pagination-separator {
       display: flex;
       align-items: center;
       margin: 0 0.5rem;
     }
-    
+
     /* Modal */
     .modal {
       position: fixed;
@@ -294,12 +294,12 @@
       visibility: hidden;
       transition: all 0.3s ease;
     }
-    
+
     .modal.active {
       opacity: 1;
       visibility: visible;
     }
-    
+
     .modal-content {
       background-color: var(--ak-white);
       border-radius: var(--ak-radius);
@@ -312,11 +312,11 @@
       display: flex;
       flex-direction: column;
     }
-    
+
     .modal.active .modal-content {
       transform: translateY(0);
     }
-    
+
     .modal-header {
       padding: 1.5rem;
       border-bottom: 1px solid var(--ak-border);
@@ -325,14 +325,14 @@
       align-items: center;
       flex-shrink: 0;
     }
-    
+
     .modal-title {
       margin: 0;
       font-size: 1.25rem;
       font-weight: 600;
       color: var(--ak-primary);
     }
-    
+
     .modal-close {
       background: none;
       border: none;
@@ -347,22 +347,22 @@
       border-radius: 50%;
       transition: all 0.2s ease;
     }
-    
+
     .modal-close:hover {
       background-color: #f3f4f6;
       color: var(--ak-text);
     }
-    
+
     .modal-body {
       padding: 1.5rem;
       overflow-y: auto;
       flex: 1;
     }
-    
+
     .form-group {
       margin-bottom: 1rem;
     }
-    
+
     .form-group label {
       display: block;
       margin-bottom: 0.5rem;
@@ -370,7 +370,7 @@
       color: var(--ak-text);
       font-weight: 500;
     }
-    
+
     .form-control {
       width: 100%;
       padding: 0.5rem 0.75rem;
@@ -379,21 +379,21 @@
       font-size: 0.875rem;
       transition: border-color 0.2s ease;
     }
-    
+
     .form-control:focus {
       outline: none;
       border-color: var(--ak-primary);
     }
-    
+
     .form-row {
       display: flex;
       gap: 1rem;
     }
-    
+
     .form-row .form-group {
       flex: 1;
     }
-    
+
     .modal-footer {
       padding: 1rem 1.5rem;
       border-top: 1px solid var(--ak-border);
@@ -401,7 +401,7 @@
       justify-content: flex-end;
       gap: 0.5rem;
     }
-    
+
     /* Image Upload */
     .image-upload {
       border: 2px dashed var(--ak-border);
@@ -412,21 +412,21 @@
       transition: border-color 0.2s ease;
       margin-bottom: 1rem;
     }
-    
+
     .image-upload:hover {
       border-color: var(--ak-primary);
     }
-    
+
     .image-upload p {
       margin: 0;
       color: var(--ak-muted);
       font-size: 0.875rem;
     }
-    
+
     .image-upload input[type="file"] {
       display: none;
     }
-    
+
     .image-preview {
       width: 100%;
       height: 150px;
@@ -438,24 +438,24 @@
       overflow: hidden;
       margin-top: 1rem;
     }
-    
+
     .image-preview img {
       max-width: 100%;
       max-height: 100%;
       object-fit: cover;
     }
-    
+
     /* Ensure modal appears above header and footer */
     .ak-navbar,
     .ak-footer {
       position: relative;
       z-index: 10;
     }
-    
+
     .modal {
       z-index: 1000;
     }
-    
+
     .loading {
       display: inline-block;
       width: 20px;
@@ -465,7 +465,7 @@
       border-top-color: #fff;
       animation: spin 1s ease-in-out infinite;
     }
-    
+
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
@@ -477,24 +477,24 @@
       const openModalBtn = document.querySelector('.btn-primary');
       const closeModalBtn = document.querySelector('.modal-close');
       const modalBackdrop = modal.querySelector('.modal');
-      
+
       openModalBtn.addEventListener('click', function() {
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
       });
-      
+
       closeModalBtn.addEventListener('click', function() {
         modal.classList.remove('active');
         document.body.style.overflow = '';
       });
-      
+
       modalBackdrop.addEventListener('click', function(e) {
         if (e.target === modalBackdrop) {
           modal.classList.remove('active');
           document.body.style.overflow = '';
         }
       });
-      
+
       // Close modal with Escape key
       document.addEventListener('keydown', function(e) {
         const modal = document.getElementById('productModal');
@@ -503,16 +503,16 @@
           document.body.style.overflow = '';
         }
       });
-      
+
       // Function to handle adding/updating products via AJAX
       document.getElementById('saveProductBtn').addEventListener('click', function() {
         const saveBtn = document.getElementById('saveProductBtn');
         const originalText = saveBtn.textContent;
-        
+
         // Show loading state
         saveBtn.innerHTML = '<div class="loading"></div>';
         saveBtn.disabled = true;
-        
+
         // Get form data
         const formData = new FormData();
         formData.append('name', document.getElementById('productName').value);
@@ -521,17 +521,17 @@
         formData.append('category_id', document.getElementById('productCategory').value);
         formData.append('stock', document.getElementById('productStock').value);
         formData.append('weight', document.getElementById('productWeight').value);
-        
+
         // Get all selected images
         const imageInput = document.getElementById('productImage');
         for (let i = 0; i < imageInput.files.length; i++) {
           formData.append('images[]', imageInput.files[i]);
         }
-        
+
         // Add variants if needed (simplified for now)
         const isEdit = document.querySelector('.modal-title').textContent.includes('Edit');
         const productId = document.querySelector('.modal-title').dataset.productId;
-        
+
         fetch(isEdit ? `/penjual/produk/${productId}` : '/penjual/produk', {
           method: isEdit ? 'PUT' : 'POST',
           headers: {
@@ -558,55 +558,55 @@
           saveBtn.disabled = false;
         });
       });
-      
+
       // Image preview functionality
       const imageUploadArea = document.getElementById('imageUploadArea');
       const imageInput = document.getElementById('productImage');
       const imagePreview = document.getElementById('imagePreview');
-      
+
       imageUploadArea.addEventListener('click', function() {
         imageInput.click();
       });
-      
+
       imageInput.addEventListener('change', function() {
         if (this.files && this.files[0]) {
           const reader = new FileReader();
-          
+
           reader.onload = function(e) {
             imagePreview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
           }
-          
+
           reader.readAsDataURL(this.files[0]);
         }
       });
-      
+
       // Drag and drop functionality
       imageUploadArea.addEventListener('dragover', function(e) {
         e.preventDefault();
         this.style.borderColor = 'var(--ak-primary)';
       });
-      
+
       imageUploadArea.addEventListener('dragleave', function() {
         this.style.borderColor = 'var(--ak-border)';
       });
-      
+
       imageUploadArea.addEventListener('drop', function(e) {
         e.preventDefault();
         this.style.borderColor = 'var(--ak-border)';
-        
+
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
           imageInput.files = e.dataTransfer.files;
-          
+
           const reader = new FileReader();
           reader.onload = function(e) {
             imagePreview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
           }
-          
+
           reader.readAsDataURL(e.dataTransfer.files[0]);
         }
       });
     });
-    
+
     // Function to handle editing a product
     function editProduct(productId, productName, productPrice, productStock, productCategory, productDescription, productWeight) {
       document.querySelector('.modal-title').textContent = 'Edit Produk';
@@ -618,12 +618,12 @@
       document.getElementById('productDescription').value = productDescription;
       document.getElementById('productWeight').value = productWeight;
       document.getElementById('saveProductBtn').textContent = 'Update Produk';
-      
+
       const modal = document.getElementById('productModal');
       modal.classList.add('active');
       document.body.style.overflow = 'hidden';
     }
-    
+
     // Function to handle deleting a product
     function deleteProduct(productId, productName) {
       if (confirm(`Apakah Anda yakin ingin menghapus produk "${productName}"?`)) {
@@ -648,7 +648,7 @@
         });
       }
     }
-    
+
     // Function to update URL with filters
     function updateFilters() {
         const url = new URL(window.location);
@@ -728,19 +728,19 @@
       <main class="content admin-page-content" role="main">
         <!-- Page Header -->
         <section class="page-header">
-          <h1>
-            <a href="{{ route('seller.dashboard') }}" class="btn btn-sm" style="margin-right: 1rem; vertical-align: middle; background: var(--ak-primary); color: white; border: none; width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;">
-              <i class="fas fa-arrow-left"></i>
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <a href="{{ route('seller.dashboard') }}" style="display: inline-flex; align-items: center; justify-content: center; text-decoration: none; color: inherit;">
+              <i class="fas fa-arrow-left" style="font-size: 1.2rem;"></i>
             </a>
-            Manajemen Produk untuk {{ auth()->user()->name }}
-          </h1>
+            <h1 style="margin: 0; font-size: 1.5rem; display: inline-block;">Manajemen Produk untuk {{ auth()->user()->name }}</h1>
+          </div>
         </section>
 
         <!-- Control Bar -->
         <div class="control-bar">
           <div class="control-bar-left">
             <a href="{{ route('penjual.produk.create') }}" class="btn btn-primary">+ Tambah Produk</a>
-            
+
             <!-- Filter Kategori -->
             <select class="form-control" id="categoryFilter" style="width: 200px; margin-left: 1rem;">
               <option value="">Semua Kategori</option>
@@ -750,7 +750,7 @@
                 </option>
               @endforeach
             </select>
-            
+
             <!-- Filter Status -->
             <select class="form-control" id="statusFilter" style="width: 150px; margin-left: 1rem;">
               <option value="">Semua Status</option>
@@ -761,7 +761,7 @@
               <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>Draft</option>
             </select>
           </div>
-          
+
           <div class="search">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -800,9 +800,9 @@
                 <td>{{ $product->category ? $product->category->name : 'N/A' }}</td>
                 <td>{{ $product->stock }}</td>
                 <td>
-                  <span class="status-badge 
-                    @if($product->status === 'aktif') status-active 
-                    @elseif($product->status === 'pending') status-pending 
+                  <span class="status-badge
+                    @if($product->status === 'aktif') status-active
+                    @elseif($product->status === 'pending') status-pending
                     @else status-suspended @endif">
                     {{ ucfirst($product->status) }}
                   </span>
@@ -850,11 +850,11 @@
                 </svg>
               </a>
             @endif
-            
+
             @for ($i = 1; $i <= $products->lastPage(); $i++)
               <a href="{{ $products->url($i) }}" class="pagination-btn {{ $i == $products->currentPage() ? 'active' : '' }}">{{ $i }}</a>
             @endfor
-            
+
             @if ($products->hasMorePages())
               <a href="{{ $products->nextPageUrl() }}" class="pagination-btn">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

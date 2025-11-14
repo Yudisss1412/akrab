@@ -34,6 +34,7 @@ class Product extends Model
         'discount_price',
         'discount_start_date',
         'discount_end_date',
+        'image',
         'sku',
     ];
 

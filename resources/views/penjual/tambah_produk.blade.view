@@ -124,7 +124,7 @@
                                     
                                     <div class="mb-3">
                                         <label for="subcategory" class="form-label">Sub-Kategori</label>
-                                        <select class="form-select @error('subcategory') is-invalid @enderror" 
+                                        <select class="form-select @error('subcategory') is-invalid @enderror"
                                                 id="subcategory" name="subcategory">
                                             <option value="">Pilih Sub-Kategori (Opsional)</option>
                                             <!-- Sub-kategori akan diisi berdasarkan kategori yang dipilih -->
@@ -246,16 +246,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Event listener untuk perubahan kategori
     const categorySelect = document.getElementById('category_id');
     const subcategorySelect = document.getElementById('subcategory');
-    
+
     categorySelect.addEventListener('change', function() {
         const selectedCategoryName = this.options[this.selectedIndex].text;
         updateSubcategories(selectedCategoryName);
     });
-    
+
     function updateSubcategories(categoryName) {
         // Kosongkan sub-kategori sebelumnya
         subcategorySelect.innerHTML = '<option value="">Pilih Sub-Kategori (Opsional)</option>';
-        
+
         // Tambahkan sub-kategori berdasarkan kategori yang dipilih
         if (subcategories[categoryName]) {
             subcategories[categoryName].forEach(subcat => {
@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 subcategorySelect.appendChild(option);
             });
         }
-        
+
         // Jika tidak ada sub-kategori untuk kategori ini, tambahkan pesan
         if (!subcategories[categoryName] || subcategories[categoryName].length === 0) {
             const option = document.createElement('option');

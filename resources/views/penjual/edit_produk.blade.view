@@ -147,7 +147,7 @@
                                     
                                     <div class="mb-3">
                                         <label for="subcategory" class="form-label">Sub-Kategori</label>
-                                        <select class="form-select @error('subcategory') is-invalid @enderror" 
+                                        <select class="form-select @error('subcategory') is-invalid @enderror"
                                                 id="subcategory" name="subcategory">
                                             <option value="">Pilih Sub-Kategori (Opsional)</option>
                                             <!-- Sub-kategori akan diisi berdasarkan kategori yang dipilih -->
@@ -324,28 +324,28 @@ document.addEventListener('DOMContentLoaded', function() {
     // Event listener untuk perubahan kategori di edit form
     const categorySelect = document.getElementById('category_id');
     const subcategorySelect = document.getElementById('subcategory');
-    
+
     // Fungsi untuk mengisi sub-kategori
     function updateSubcategories(categoryName) {
         // Kosongkan sub-kategori sebelumnya
         subcategorySelect.innerHTML = '<option value="">Pilih Sub-Kategori (Opsional)</option>';
-        
+
         // Tambahkan sub-kategori berdasarkan kategori yang dipilih
         if (subcategories[categoryName]) {
             subcategories[categoryName].forEach(subcat => {
                 const option = document.createElement('option');
                 option.value = subcat.value;
                 option.textContent = subcat.label;
-                
+
                 // Jika produk memiliki sub-kategori saat ini, pilih opsi yang sesuai
                 if ("{{ old('subcategory', $product->subcategory) }}" === subcat.value) {
                     option.selected = true;
                 }
-                
+
                 subcategorySelect.appendChild(option);
             });
         }
-        
+
         // Jika tidak ada sub-kategori untuk kategori ini, tambahkan pesan
         if (!subcategories[categoryName] || subcategories[categoryName].length === 0) {
             const option = document.createElement('option');

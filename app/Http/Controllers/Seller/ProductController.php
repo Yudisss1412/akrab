@@ -101,6 +101,7 @@ class ProductController extends Controller
             'category_id' => 'required|exists:categories,id',
             'subcategory' => 'nullable|string|max:255', // Sub-kategori opsional
             'warranty' => 'nullable|string|max:255', // Garansi opsional
+            'origin' => 'nullable|string|max:255', // Asal wilayah opsional
             'stock' => 'required|integer|min:0',
             'weight' => 'required|numeric|min:0',
             'images' => 'required|array|min:1',
@@ -140,6 +141,7 @@ class ProductController extends Controller
                 'category_id' => $request->category_id,
                 'subcategory' => $request->subcategory, // Tambahkan sub-kategori
                 'warranty' => $request->warranty, // Tambahkan garansi
+                'origin' => $request->origin, // Tambahkan asal wilayah
                 'stock' => $request->stock,
                 'weight' => $request->weight,
                 'seller_id' => $seller->id,
@@ -260,6 +262,7 @@ class ProductController extends Controller
             'category_id' => 'required|exists:categories,id',
             'subcategory' => 'nullable|string|max:255', // Sub-kategori opsional
             'warranty' => 'nullable|string|max:255', // Garansi opsional
+            'origin' => 'nullable|string|max:255', // Asal wilayah opsional
             'stock' => 'required|integer|min:0',
             'weight' => 'required|numeric|min:0',
             'images' => 'array',
@@ -293,6 +296,7 @@ class ProductController extends Controller
                 'category_id' => $request->category_id,
                 'subcategory' => $request->subcategory, // Update sub-kategori
                 'warranty' => $request->warranty, // Update garansi
+                'origin' => $request->origin, // Update asal wilayah
                 'stock' => $request->stock,
                 'weight' => $request->weight,
                 'status' => $status,

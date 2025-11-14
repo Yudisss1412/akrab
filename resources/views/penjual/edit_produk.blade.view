@@ -166,6 +166,41 @@
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
+
+                                    <div class="mb-3">
+                                        <label for="origin" class="form-label">Asal Wilayah (Kecamatan di Banyuwangi)</label>
+                                        <select class="form-select @error('origin') is-invalid @enderror"
+                                                id="origin" name="origin">
+                                            <option value="">Pilih Kecamatan di Banyuwangi</option>
+                                            <option value="Banyuwangi" {{ old('origin', $product->origin) == 'Banyuwangi' ? 'selected' : '' }}>Banyuwangi</option>
+                                            <option value="Giri" {{ old('origin', $product->origin) == 'Giri' ? 'selected' : '' }}>Giri</option>
+                                            <option value="Wongsorejo" {{ old('origin', $product->origin) == 'Wongsorejo' ? 'selected' : '' }}>Wongsorejo</option>
+                                            <option value="Songgon" {{ old('origin', $product->origin) == 'Songgon' ? 'selected' : '' }}>Songgon</option>
+                                            <option value="Sempu" {{ old('origin', $product->origin) == 'Sempu' ? 'selected' : '' }}>Sempu</option>
+                                            <option value="Kalipuro" {{ old('origin', $product->origin) == 'Kalipuro' ? 'selected' : '' }}>Kalipuro</option>
+                                            <option value="Siliragung" {{ old('origin', $product->origin) == 'Siliragung' ? 'selected' : '' }}>Siliragung</option>
+                                            <option value="Srono" {{ old('origin', $product->origin) == 'Srono' ? 'selected' : '' }}>Srono</option>
+                                            <option value="Glenmore" {{ old('origin', $product->origin) == 'Glenmore' ? 'selected' : '' }}>Glenmore</option>
+                                            <option value="Singojuruh" {{ old('origin', $product->origin) == 'Singojuruh' ? 'selected' : '' }}>Singojuruh</option>
+                                            <option value="Rogojampi" {{ old('origin', $product->origin) == 'Rogojampi' ? 'selected' : '' }}>Rogojampi</option>
+                                            <option value="Kabat" {{ old('origin', $product->origin) == 'Kabat' ? 'selected' : '' }}>Kabat</option>
+                                            <option value="Genteng" {{ old('origin', $product->origin) == 'Genteng' ? 'selected' : '' }}>Genteng</option>
+                                            <option value="Sukojati" {{ old('origin', $product->origin) == 'Sukojati' ? 'selected' : '' }}>Sukojati</option>
+                                            <option value="Glagah" {{ old('origin', $product->origin) == 'Glagah' ? 'selected' : '' }}>Glagah</option>
+                                            <option value="Licin" {{ old('origin', $product->origin) == 'Licin' ? 'selected' : '' }}>Licin</option>
+                                            <option value="Tegaldlimo" {{ old('origin', $product->origin) == 'Tegaldlimo' ? 'selected' : '' }}>Tegaldlimo</option>
+                                            <option value="Blimbing" {{ old('origin', $product->origin) == 'Blimbing' ? 'selected' : '' }}>Blimbing</option>
+                                            <option value="Muncar" {{ old('origin', $product->origin) == 'Muncar' ? 'selected' : '' }}>Muncar</option>
+                                            <option value="Kalibaru" {{ old('origin', $product->origin) == 'Kalibaru' ? 'selected' : '' }}>Kalibaru</option>
+                                            <option value="Gambiran" {{ old('origin', $product->origin) == 'Gambiran' ? 'selected' : '' }}>Gambiran</option>
+                                            <option value="Sempol" {{ old('origin', $product->origin) == 'Sempol' ? 'selected' : '' }}>Sempol</option>
+                                            <option value="Tegalsari" {{ old('origin', $product->origin) == 'Tegalsari' ? 'selected' : '' }}>Tegalsari</option>
+                                        </select>
+                                        @error('origin')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                        <div class="form-text">Pilih kecamatan asal produk di Kabupaten Banyuwangi</div>
+                                    </div>
                                 </div>
 
                                 <!-- Status -->

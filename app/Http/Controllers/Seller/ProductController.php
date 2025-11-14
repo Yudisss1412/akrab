@@ -102,6 +102,11 @@ class ProductController extends Controller
             'subcategory' => 'nullable|string|max:255', // Sub-kategori opsional
             'warranty' => 'nullable|string|max:255', // Garansi opsional
             'origin' => 'nullable|string|max:255', // Asal wilayah opsional
+            'material' => 'nullable|string|max:255', // Material produk
+            'size' => 'nullable|string|max:255', // Ukuran produk
+            'color' => 'nullable|string|max:255', // Warna produk
+            'specifications' => 'nullable|string', // Spesifikasi produk
+            'features' => 'nullable|string', // Fitur produk
             'stock' => 'required|integer|min:0',
             'weight' => 'required|numeric|min:0',
             'images' => 'required|array|min:1',
@@ -142,6 +147,11 @@ class ProductController extends Controller
                 'subcategory' => $request->subcategory, // Tambahkan sub-kategori
                 'warranty' => $request->warranty, // Tambahkan garansi
                 'origin' => $request->origin, // Tambahkan asal wilayah
+                'material' => $request->material, // Tambahkan material
+                'size' => $request->size, // Tambahkan ukuran
+                'color' => $request->color, // Tambahkan warna
+                'specifications' => $request->specifications ? explode("\n", $request->specifications) : null, // Tambahkan spesifikasi
+                'features' => $request->features ? explode("\n", $request->features) : null, // Tambahkan fitur
                 'stock' => $request->stock,
                 'weight' => $request->weight,
                 'seller_id' => $seller->id,
@@ -262,6 +272,11 @@ class ProductController extends Controller
             'subcategory' => 'nullable|string|max:255', // Sub-kategori opsional
             'warranty' => 'nullable|string|max:255', // Garansi opsional
             'origin' => 'nullable|string|max:255', // Asal wilayah opsional
+            'material' => 'nullable|string|max:255', // Material produk
+            'size' => 'nullable|string|max:255', // Ukuran produk
+            'color' => 'nullable|string|max:255', // Warna produk
+            'specifications' => 'nullable|string', // Spesifikasi produk
+            'features' => 'nullable|string', // Fitur produk
             'stock' => 'required|integer|min:0',
             'weight' => 'required|numeric|min:0',
             'images' => 'array',
@@ -296,6 +311,11 @@ class ProductController extends Controller
                 'subcategory' => $request->subcategory, // Update sub-kategori
                 'warranty' => $request->warranty, // Update garansi
                 'origin' => $request->origin, // Update asal wilayah
+                'material' => $request->material, // Update material
+                'size' => $request->size, // Update ukuran
+                'color' => $request->color, // Update warna
+                'specifications' => $request->specifications ? explode("\n", $request->specifications) : null, // Update spesifikasi
+                'features' => $request->features ? explode("\n", $request->features) : null, // Update fitur
                 'stock' => $request->stock,
                 'weight' => $request->weight,
                 'status' => $status,

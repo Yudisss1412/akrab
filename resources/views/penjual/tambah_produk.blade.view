@@ -178,6 +178,64 @@
                                         @enderror
                                         <div class="form-text">Pilih kecamatan asal produk di Kabupaten Banyuwangi</div>
                                     </div>
+
+                                    <div class="mb-3">
+                                        <label for="material" class="form-label">Material</label>
+                                        <input type="text" class="form-control @error('material') is-invalid @enderror"
+                                               id="material" name="material" value="{{ old('material') }}"
+                                               placeholder="Contoh: Katun, Kulit, Kayu, dll">
+                                        @error('material')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="size" class="form-label">Ukuran</label>
+                                        <input type="text" class="form-control @error('size') is-invalid @enderror"
+                                               id="size" name="size" value="{{ old('size') }}"
+                                               placeholder="Contoh: S, M, L, XL, 30x20x10 cm, 100 cm x 50 cm, dll">
+                                        @error('size')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="color" class="form-label">Warna</label>
+                                        <input type="text" class="form-control @error('color') is-invalid @enderror"
+                                               id="color" name="color" value="{{ old('color') }}"
+                                               placeholder="Contoh: Merah, Biru, Hitam-Putih, dll">
+                                        @error('color')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <!-- Spesifikasi & Fitur -->
+                                <div class="mb-4">
+                                    <h5>Spesifikasi & Fitur</h5>
+                                    <hr>
+
+                                    <div class="mb-3">
+                                        <label for="specifications" class="form-label">Spesifikasi Produk</label>
+                                        <textarea class="form-control @error('specifications') is-invalid @enderror"
+                                                  id="specifications" name="specifications"
+                                                  placeholder="Contoh: Daya tahan baterai 12 jam, Tekanan maksimal 2 bar, dll">{{ old('specifications') }}</textarea>
+                                        @error('specifications')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                        <div class="form-text">Gunakan baris baru untuk setiap spesifikasi</div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="features" class="form-label">Fitur Produk</label>
+                                        <textarea class="form-control @error('features') is-invalid @enderror"
+                                                  id="features" name="features"
+                                                  placeholder="Contoh: Tahan air, Mudah dibersihkan, Dilengkapi remote, dll">{{ old('features') }}</textarea>
+                                        @error('features')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                        <div class="form-text">Gunakan baris baru untuk setiap fitur</div>
+                                    </div>
                                 </div>
 
                                 <!-- Status -->

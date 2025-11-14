@@ -386,9 +386,6 @@
         <!-- Page Header -->
         <section class="page-header">
           <h1>
-            <a href="{{ route('seller.dashboard') }}" class="btn btn-sm" style="margin-right: 1rem; vertical-align: middle; background: var(--ak-primary); color: white; border: none; width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;">
-              <i class="fas fa-arrow-left"></i>
-            </a>
             Manajemen Pesanan untuk {{ auth()->user()->name }}
           </h1>
         </section>
@@ -405,14 +402,14 @@
 
         <!-- Control Bar -->
         <div class="control-bar">
-          <form method="GET" action="{{ route('penjual.pesanan') }}" id="filterForm">
-            <div class="search-box">
+          <form method="GET" action="{{ route('penjual.pesanan') }}" id="filterForm" style="display: flex; gap: 1rem; width: 100%;">
+            <div class="search-box" style="flex: 1;">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
               <input type="text" name="search" placeholder="Cari pesanan..." value="{{ request('search') }}">
             </div>
-            <div class="date-filter">
+            <div class="date-filter" style="min-width: 200px;">
               <select name="date_filter" onchange="document.getElementById('filterForm').submit();">
                 <option value="">Filter Tanggal</option>
                 <option value="today" {{ request('date_filter') == 'today' ? 'selected' : '' }}>Hari Ini</option>
@@ -421,7 +418,7 @@
                 <option value="this_year" {{ request('date_filter') == 'this_year' ? 'selected' : '' }}>Tahun Ini</option>
               </select>
             </div>
-            <div class="bulk-action">
+            <div class="bulk-action" style="min-width: 200px;">
               <select name="status" onchange="document.getElementById('filterForm').submit();">
                 <option value="">Semua Status</option>
                 <option value="pending_payment" {{ request('status') == 'pending_payment' ? 'selected' : '' }}>Belum Dibayar</option>

@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <title>Saldo & Penarikan Dana — AKRAB</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ asset('css/admin_penjual/style.css') }}">
   <style>
@@ -327,7 +328,7 @@
         <!-- Saldo Summary Card -->
         <section class="saldo-card">
           <p class="saldo-title">Saldo Saat Ini (Dapat Ditarik)</p>
-          <p class="saldo-amount">Rp 5.450.000</p>
+          <p class="saldo-amount" id="saldoAmount">Rp 0</p>
           <button class="btn-primary" id="btnWithdraw">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -356,54 +357,14 @@
                   <th>Saldo Akhir</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>10 Okt 2025</td>
-                  <td>Penjualan Produk "Kaos Polos"</td>
-                  <td><span class="text-green">Pemasukan</span></td>
-                  <td class="text-green">+Rp 150.000</td>
-                  <td>Rp 5.450.000</td>
-                </tr>
-                <tr>
-                  <td>8 Okt 2025</td>
-                  <td>Pemrosesan Biaya Admin</td>
-                  <td><span class="text-red">Pengeluaran</span></td>
-                  <td class="text-red">-Rp 2.500</td>
-                  <td>Rp 5.300.000</td>
-                </tr>
-                <tr>
-                  <td>5 Okt 2025</td>
-                  <td>Penjualan Produk Setelan Celana</td>
-                  <td><span class="text-green">Pemasukan</span></td>
-                  <td class="text-green">+Rp 125.000</td>
-                  <td>Rp 5.302.500</td>
-                </tr>
-                <tr>
-                  <td>3 Okt 2025</td>
-                  <td>Penjualan Produk Jaket Hoodie</td>
-                  <td><span class="text-green">Pemasukan</span></td>
-                  <td class="text-green">+Rp 275.000</td>
-                  <td>Rp 5.177.500</td>
-                </tr>
-                <tr>
-                  <td>1 Okt 2025</td>
-                  <td>Penjualan Produk Celana Panjang</td>
-                  <td><span class="text-green">Pemasukan</span></td>
-                  <td class="text-green">+Rp 180.000</td>
-                  <td>Rp 4.902.500</td>
-                </tr>
+              <tbody id="transactionTableBody">
+                <!-- Data akan diisi secara dinamis -->
               </tbody>
             </table>
             
-            <!-- Pagination -->
-            <div class="pagination">
-              <a href="#" class="prev">‹ Sebelumnya</a>
-              <a href="#">1</a>
-              <a href="#">2</a>
-              <a href="#">3</a>
-              <span class="active">4</span>
-              <a href="#">5</a>
-              <a href="#" class="next">Berikutnya ›</a>
+            <!-- Pagination for transactions -->
+            <div class="pagination" id="transactionPagination">
+              <!-- Pagination will be filled dynamically -->
             </div>
           </section>
         </div>
@@ -422,53 +383,14 @@
                   <th>Status</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>5 Okt 2025</td>
-                  <td>WD-20251005001</td>
-                  <td>Rp 1.200.000</td>
-                  <td>BCA - 1234567890</td>
-                  <td><span class="badge badge-success">Berhasil</span></td>
-                </tr>
-                <tr>
-                  <td>2 Okt 2025</td>
-                  <td>WD-20251002001</td>
-                  <td>Rp 850.000</td>
-                  <td>BRI - 0987654321</td>
-                  <td><span class="badge badge-success">Berhasil</span></td>
-                </tr>
-                <tr>
-                  <td>28 Sep 2025</td>
-                  <td>WD-20250928001</td>
-                  <td>Rp 500.000</td>
-                  <td>Mandiri - 1122334455</td>
-                  <td><span class="badge badge-pending">Diproses</span></td>
-                </tr>
-                <tr>
-                  <td>20 Sep 2025</td>
-                  <td>WD-20250920001</td>
-                  <td>Rp 1.000.000</td>
-                  <td>BNI - 5566778899</td>
-                  <td><span class="badge badge-success">Berhasil</span></td>
-                </tr>
-                <tr>
-                  <td>15 Sep 2025</td>
-                  <td>WD-20250915001</td>
-                  <td>Rp 750.000</td>
-                  <td>BCA - 1234567890</td>
-                  <td><span class="badge badge-failed">Gagal</span></td>
-                </tr>
+              <tbody id="withdrawalTableBody">
+                <!-- Data will be filled dynamically -->
               </tbody>
             </table>
             
-            <!-- Pagination -->
-            <div class="pagination">
-              <a href="#" class="prev">‹ Sebelumnya</a>
-              <a href="#">1</a>
-              <a href="#">2</a>
-              <span class="active">3</span>
-              <a href="#">4</a>
-              <a href="#" class="next">Berikutnya ›</a>
+            <!-- Pagination for withdrawals -->
+            <div class="pagination" id="withdrawalPagination">
+              <!-- Pagination will be filled dynamically -->
             </div>
           </section>
         </div>
@@ -557,19 +479,202 @@
     });
     
     // Form submission
+    // Ambil data saldo dan riwayat transaksi saat halaman dimuat
+    document.addEventListener('DOMContentLoaded', function() {
+      loadBalanceData();
+      loadTransactionHistory();
+      loadWithdrawalHistory();
+    });
+
+    // Fungsi untuk memformat angka menjadi format Rupiah
+    function formatRupiah(angka) {
+      var reverse = angka.toString().split('').reverse().join('');
+      var ribuan = reverse.match(/\d{1,3}/g);
+      var hasil = ribuan.join('.').split('').reverse().join('');
+      return 'Rp ' + hasil;
+    }
+
+    // Fungsi untuk memuat data saldo
+    async function loadBalanceData() {
+      try {
+        const response = await fetch('/api/withdrawal/balance', {
+          headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          }
+        });
+        const data = await response.json();
+
+        if (data.balance !== undefined) {
+          document.getElementById('saldoAmount').textContent = formatRupiah(data.balance);
+        }
+      } catch (error) {
+        console.error('Error loading balance:', error);
+        document.getElementById('saldoAmount').textContent = 'Rp 0';
+      }
+    }
+
+    // Fungsi untuk memuat riwayat transaksi
+    async function loadTransactionHistory() {
+      try {
+        const response = await fetch('/api/withdrawal/transactions', {
+          headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          }
+        });
+        const data = await response.json();
+
+        if (data.transactions) {
+          populateTransactionTable(data.transactions);
+        }
+      } catch (error) {
+        console.error('Error loading transaction history:', error);
+      }
+    }
+
+    // Fungsi untuk memuat riwayat penarikan
+    async function loadWithdrawalHistory() {
+      try {
+        const response = await fetch('/api/withdrawal/history', {
+          headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          }
+        });
+        const data = await response.json();
+
+        if (data.withdrawals) {
+          populateWithdrawalTable(data.withdrawals.data); // Karena menggunakan paginate
+        }
+      } catch (error) {
+        console.error('Error loading withdrawal history:', error);
+      }
+    }
+
+    // Fungsi untuk mengisi tabel riwayat transaksi
+    function populateTransactionTable(transactions) {
+      const tbody = document.getElementById('transactionTableBody');
+      tbody.innerHTML = ''; // Kosongkan tabel sebelumnya
+
+      if (transactions.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Tidak ada riwayat transaksi</td></tr>';
+        return;
+      }
+
+      transactions.forEach(transaction => {
+        const row = document.createElement('tr');
+
+        // Format tanggal
+        const date = new Date(transaction.date);
+        const formattedDate = date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+
+        // Tentukan jenis transaksi
+        const isIncome = transaction.type === 'Pemasukan';
+        const amountSign = isIncome ? '+' : '-';
+        const amountClass = isIncome ? 'text-green' : 'text-red';
+        const typeText = isIncome ? 'Pemasukan' : 'Pengeluaran';
+
+        // Hitung saldo berdasarkan transaksi sebelumnya (dalam implementasi nyata, saldo akhir akan dihitung dengan lebih kompleks)
+        const formattedAmount = `${amountSign}${formatRupiah(transaction.amount)}`;
+
+        row.innerHTML = `
+          <td>${formattedDate}</td>
+          <td>${transaction.description || '-'}</td>
+          <td><span class="${isIncome ? 'text-green' : 'text-red'}">${typeText}</span></td>
+          <td class="${amountClass}">${formattedAmount}</td>
+          <td>${formatRupiah(transaction.amount || 0)}</td>
+        `;
+
+        tbody.appendChild(row);
+      });
+    }
+
+    // Fungsi untuk mengisi tabel riwayat penarikan
+    function populateWithdrawalTable(withdrawals) {
+      const tbody = document.getElementById('withdrawalTableBody');
+      tbody.innerHTML = ''; // Kosongkan tabel sebelumnya
+
+      if (withdrawals.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Tidak ada riwayat penarikan</td></tr>';
+        return;
+      }
+
+      withdrawals.forEach(withdrawal => {
+        const row = document.createElement('tr');
+
+        // Format tanggal
+        const date = new Date(withdrawal.request_date || withdrawal.created_at);
+        const formattedDate = date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+
+        // Status badge
+        let statusClass = '';
+        let statusText = '';
+        switch(withdrawal.status) {
+          case 'approved':
+          case 'completed':
+            statusClass = 'badge-success';
+            statusText = 'Berhasil';
+            break;
+          case 'pending':
+            statusClass = 'badge-pending';
+            statusText = 'Diproses';
+            break;
+          case 'rejected':
+            statusClass = 'badge-failed';
+            statusText = 'Gagal';
+            break;
+          default:
+            statusClass = 'badge-pending';
+            statusText = withdrawal.status || 'Diproses';
+        }
+
+        row.innerHTML = `
+          <td>${formattedDate}</td>
+          <td>${withdrawal.id || '-'}</td>
+          <td>${formatRupiah(withdrawal.amount || 0)}</td>
+          <td>${withdrawal.bank_account || withdrawal.account_number || '-'}</td>
+          <td><span class="badge ${statusClass}">${statusText}</span></td>
+        `;
+
+        tbody.appendChild(row);
+      });
+    }
+
     document.getElementById('confirmWithdraw').addEventListener('click', (e) => {
       e.preventDefault();
       // Simple validation
       const amount = document.getElementById('amount').value;
       const bank = document.getElementById('bank').value;
       const pin = document.getElementById('pin').value;
-      
+
       if(amount && bank && pin) {
-        // In a real application, you would submit the form to the server
-        alert('Permintaan penarikan dana berhasil dikirim!');
-        withdrawModal.classList.remove('active');
-        // Reset form
-        document.getElementById('withdrawForm').reset();
+        // Dalam implementasi nyata, kirim ke server
+        fetch('/withdrawal', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          },
+          body: JSON.stringify({
+            amount: parseFloat(amount),
+            bank_account: bank
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.message) {
+            alert(data.message);
+            if(data.withdrawal_request) {
+              withdrawModal.classList.remove('active');
+              document.getElementById('withdrawForm').reset();
+              // Refresh data
+              loadBalanceData();
+              loadWithdrawalHistory();
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Terjadi kesalahan saat membuat permintaan penarikan');
+        });
       } else {
         alert('Mohon lengkapi semua field!');
       }

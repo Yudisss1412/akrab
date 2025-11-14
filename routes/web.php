@@ -746,9 +746,7 @@ Route::post('/api/returns/{id}/approve', [App\Http\Controllers\Seller\SellerOrde
 Route::post('/api/returns/{id}/reject', [App\Http\Controllers\Seller\SellerOrderController::class, 'rejectReturn'])->name('api.returns.reject');
 Route::post('/api/returns/{id}/complete', [App\Http\Controllers\Seller\SellerOrderController::class, 'completeReturn'])->name('api.returns.complete');
 
-Route::get('/penjual/saldo', function () {
-    return view('penjual.saldo_penarikan');
-})->name('penjual.saldo');
+Route::get('/penjual/saldo', [App\Http\Controllers\WithdrawalController::class, 'showBalancePage'])->name('penjual.saldo');
 
 
 
@@ -797,8 +795,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/withdrawal', [App\Http\Controllers\WithdrawalController::class, 'index'])->name('withdrawal.index');
     Route::post('/withdrawal', [App\Http\Controllers\WithdrawalController::class, 'store'])->name('withdrawal.store');
     Route::get('/withdrawal/{id}', [App\Http\Controllers\WithdrawalController::class, 'show'])->name('withdrawal.show');
-    Route::post('/withdrawal/{id}/cancel', [App\Http\Controllers\WithdrawalController::class, 
+    Route::post('/withdrawal/{id}/cancel', [App\Http\Controllers\WithdrawalController::class,
 'cancel'])->name('withdrawal.cancel');
+
+    // API endpoints untuk saldo dan riwayat transaksi
+    Route::get('/api/withdrawal/balance', [App\Http\Controllers\WithdrawalController::class, 'getBalanceData'])->name('api.withdrawal.balance');
+    Route::get('/api/withdrawal/transactions', [App\Http\Controllers\WithdrawalController::class, 'getTransactionHistory'])->name('api.withdrawal.transactions');
+    Route::get('/api/withdrawal/history', [App\Http\Controllers\WithdrawalController::class, 'getWithdrawalHistory'])->name('api.withdrawal.history');
 });
 
 // Chat Routes

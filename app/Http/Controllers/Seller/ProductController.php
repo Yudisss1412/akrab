@@ -162,11 +162,10 @@ class ProductController extends Controller
                         'alt_text' => $request->name
                     ]);
                     
-                    // Gunakan gambar pertama sebagai gambar utama
+                    // Tandai gambar pertama sebagai gambar utama
                     if ($index === 0) {
-                        // Update produk dengan gambar utama
-                        $product->update([
-                            'image' => $path
+                        $productImage->update([
+                            'is_primary' => true
                         ]);
                     }
                 }
@@ -316,12 +315,14 @@ class ProductController extends Controller
                         'alt_text' => $request->name
                     ]);
                     
-                    // Gunakan gambar pertama sebagai gambar utama hanya jika produk belum memiliki gambar utama
-                    // atau menambahkan secara berurutan
-                    if ($index === 0 && !$product->image) {
-                        // Jika produk belum memiliki gambar utama, gunakan yang pertama sebagai gambar utama
-                        $product->update([
-                            'image' => $path
+                    // Tandai gambar pertama sebagai gambar utama
+                    if ($index === 0) {
+                        // Hapus tanda primary dari gambar-gambar sebelumnya
+                        $product->images()->update(['is_primary' => false]);
+
+                        // Tandai gambar baru sebagai primary
+                        $productImage->update([
+                            'is_primary' => true
                         ]);
                     }
                 }
@@ -495,11 +496,14 @@ class ProductController extends Controller
 
         $fixedCount = 0;
         foreach ($products as $product) {
-            // Buat entri di tabel product_images untuk gambar dari kolom image
-            $product->images()->create([
-                'image_path' => $product->image,
-                'alt_text' => $product->name
-            ]);
+            // Buat entri di tabel product_images untuk gambar utama jika tersedia
+            if ($product->main_image) {
+                $product->images()->create([
+                    'image_path' => $product->main_image,
+                    'alt_text' => $product->name,
+                    'is_primary' => true
+                ]);
+            }
             $fixedCount++;
         }
 

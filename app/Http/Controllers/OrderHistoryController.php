@@ -35,7 +35,7 @@ class OrderHistoryController extends Controller
                         'product_name' => $item->product->name,
                         'quantity' => $item->quantity,
                         'price' => $item->price,
-                        'image' => $item->product->image ? asset('storage/' . $item->product->image) : asset('src/placeholder_produk.png'),
+                        'image' => $item->product->main_image ? asset('storage/' . $item->product->main_image) : asset('src/placeholder_produk.png'),
                     ];
                 }),
                 'shipping_address' => $order->shipping_address ? [

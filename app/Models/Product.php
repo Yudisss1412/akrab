@@ -25,16 +25,13 @@ class Product extends Model
         'color',
         'brand',
         'features',
-        'additional_images',
         'min_order',
-        'ready_stock',
         'origin',
         'warranty',
         'view_count',
         'discount_price',
         'discount_start_date',
         'discount_end_date',
-        'image',
         'sku',
     ];
 
@@ -145,30 +142,28 @@ class Product extends Model
                    ->first();
     }
     
-    // Method untuk mendapatkan gambar utama (fallback ke gambar pertama dari product_images jika gambar utama tidak ada)
+    // Method untuk mendapatkan gambar utama dari product_images
     public function getMainImageAttribute()
     {
-        if ($this->image) {
-            return $this->image;
+        $primaryImage = $this->images()->where('is_primary', true)->first();
+        if ($primaryImage) {
+            return $primaryImage->image_path;
         }
-        
+
+        // Fallback ke gambar pertama jika tidak ada yang ditandai sebagai utama
         $firstImage = $this->images()->first();
         return $firstImage ? $firstImage->image_path : null;
     }
-    
+
     // Method untuk mendapatkan semua gambar (utama dan tambahan)
     public function getAllImagesAttribute()
     {
         $images = [];
-        
-        if ($this->image) {
-            $images[] = $this->image;
-        }
-        
+
         foreach ($this->images as $image) {
             $images[] = $image->image_path;
         }
-        
+
         return $images;
     }
     

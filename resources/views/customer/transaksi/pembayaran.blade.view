@@ -40,7 +40,7 @@
               @if(isset($order) && $order && $order->items->count() > 0)
                 @foreach($order->items as $item)
                   <div class="order-item">
-                    <img src="{{ asset($item->product->image ?? 'src/default-product.png') }}" alt="{{ $item->product->name ?? 'Produk' }}" class="item-image">
+                    <img src="{{ asset($item->product->main_image ?? 'src/default-product.png') }}" alt="{{ $item->product->name ?? 'Produk' }}" class="item-image">
                     <div class="item-details">
                       <h3 class="item-name">{{ $item->product->name ?? 'Produk tidak ditemukan' }}</h3>
                       @if($item->variant)

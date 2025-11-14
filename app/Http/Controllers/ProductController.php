@@ -91,7 +91,7 @@ class ProductController extends Controller
             'subkategori' => $product->subcategory ? $product->subcategory->name : ($product->subcategory ?? 'Umum'),
             'harga' => $product->price,
             'deskripsi' => $product->description,
-            'gambar_utama' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
+            'gambar_utama' => $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder.png'),
             'gambar' => $this->formatProductImages($product), // Tampilkan semua gambar termasuk tambahan
             'rating' => $product->averageRating, // Gunakan averageRating dari accessor
             'jumlah_ulasan' => $product->reviews_count, // Gunakan reviews_count dari accessor
@@ -213,7 +213,7 @@ class ProductController extends Controller
                 'name' => $product->name,
                 'description' => $product->description,
                 'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
-                'image' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
+                'image' => $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder.png'),
                 'average_rating' => round($product->averageRating, 1),
                 'review_count' => $product->reviews_count,
                 'category_name' => $product->category->name ?? 'Umum',
@@ -418,7 +418,6 @@ class ProductController extends Controller
             'origin' => $product->origin,
             'warranty' => $product->warranty,
             'min_order' => $product->min_order,
-            'ready_stock' => $product->ready_stock,
             'stock' => $product->stock,
             'weight' => $product->weight,
             'status' => $product->status,
@@ -625,8 +624,8 @@ class ProductController extends Controller
         $images = [];
         
         // Tambahkan gambar utama jika ada
-        if ($product->image) {
-            $images[] = asset('storage/' . $product->image);
+        if ($product->main_image) {
+            $images[] = asset('storage/' . $product->main_image);
         }
         
         // Tambahkan gambar tambahan dari tabel product_images

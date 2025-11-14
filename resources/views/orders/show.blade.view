@@ -313,8 +313,8 @@
                                     @foreach($order->items as $item)
                                     <tr>
                                         <td>
-                                            @if($item->product->image)
-                                            <img src="{{ asset('storage/' . $item->product->image) }}" alt="{{ $item->product->name }}" class="product-image">
+                                            @if($item->product->main_image)
+                                            <img src="{{ asset('storage/' . $item->product->main_image) }}" alt="{{ $item->product->name }}" class="product-image">
                                             @else
                                             <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
                                                 <i class="bi bi-image"></i>

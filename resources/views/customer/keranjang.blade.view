@@ -51,7 +51,7 @@
                   </td>
                   <td class="product-col" data-label="Produk">
                     <div class="product-thumb">
-                      <img src="{{ ($item['product'] ?? $item->product)->image ? asset('storage/' . ($item['product'] ?? $item->product)->image) : asset('src/placeholder.png') }}" alt="{{ ($item['product'] ?? $item->product)->name }}">
+                      <img src="{{ ($item['product'] ?? $item->product)->main_image ? asset('storage/' . ($item['product'] ?? $item->product)->main_image) : asset('src/placeholder.png') }}" alt="{{ ($item['product'] ?? $item->product)->name }}">
                     </div>
                     <div class="product-info">
                       <h3 class="product-name">{{ ($item['product'] ?? $item->product)->name }}</h3>

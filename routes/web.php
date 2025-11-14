@@ -203,7 +203,7 @@ Route::get('/api/reviews', function() {
                 'id' => $review->id,
                 'product_name' => $review->product->name ?? 'Produk Tidak Ditemukan',
                 'shop_name' => $review->product->seller->name ?? 'Toko Tidak Diketahui',
-                'product_image' => $review->product->image ? asset('storage/' . $review->product->image) : 
+                'product_image' => $review->product->main_image ? asset('storage/' . $review->product->main_image) :
 asset('src/placeholder_produk.png'),
                 'rating' => $review->rating,
                 'review_text' => $review->review_text,
@@ -241,7 +241,7 @@ Route::get('/api/orders', function() {
                         'product_name' => $item->product->name,
                         'quantity' => $item->quantity,
                         'price' => $item->price,
-                        'image' => $item->product->image ? asset('storage/' . $item->product->image) : asset('src/placeholder_produk.png'),
+                        'image' => $item->product->main_image ? asset('storage/' . $item->product->main_image) : asset('src/placeholder_produk.png'),
                     ];
                 }),
                 'shipping_address' => $order->shipping_address ? [
@@ -314,7 +314,7 @@ Route::get('/halaman_wishlist', function () {
                 'product_id' => $product->id,
                 'title' => $product->name,
                 'price' => $product->price,
-                'img' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
+                'img' => $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder.png'),
                 'shop' => $product->seller ? $product->seller->name : 'Toko Tidak Diketahui',
                 'date' => $wishlist->created_at->format('d M Y'),
                 'liked' => true,
@@ -342,7 +342,7 @@ Route::get('/api/customer/wishlist', function () {
                 'product_id' => $product->id,
                 'title' => $product->name,
                 'price' => $product->price,
-                'img' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
+                'img' => $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder.png'),
                 'shop' => $product->seller ? $product->seller->name : 'Toko Tidak Diketahui',
                 'date' => $wishlist->created_at->format('d M Y'),
                 'liked' => true,
@@ -392,7 +392,7 @@ Route::get('/kategori/kuliner', function () {
             'name' => $product->name,
             'description' => $product->description,
             'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
-            'image' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
+            'image' => $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder.png'),
         ];
     });
     
@@ -431,7 +431,7 @@ Route::get('/kategori/fashion', function () {
             'name' => $product->name,
             'description' => $product->description,
             'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
-            'image' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
+            'image' => $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder.png'),
         ];
     });
     
@@ -470,7 +470,7 @@ Route::get('/kategori/kerajinan', function () {
             'name' => $product->name,
             'description' => $product->description,
             'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
-            'image' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
+            'image' => $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder.png'),
         ];
     });
     
@@ -509,7 +509,7 @@ Route::get('/kategori/berkebun', function () {
             'name' => $product->name,
             'description' => $product->description,
             'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
-            'image' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
+            'image' => $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder.png'),
         ];
     });
     
@@ -548,7 +548,7 @@ Route::get('/kategori/kesehatan', function () {
             'name' => $product->name,
             'description' => $product->description,
             'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
-            'image' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
+            'image' => $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder.png'),
         ];
     });
     
@@ -587,7 +587,7 @@ Route::get('/kategori/mainan', function () {
             'name' => $product->name,
             'description' => $product->description,
             'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
-            'image' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
+            'image' => $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder.png'),
         ];
     });
     
@@ -626,7 +626,7 @@ Route::get('/kategori/hampers', function () {
             'name' => $product->name,
             'description' => $product->description,
             'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
-            'image' => $product->image ? asset('storage/' . $product->image) : asset('src/placeholder.png'),
+            'image' => $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder.png'),
         ];
     });
     
@@ -832,8 +832,7 @@ Route::middleware(['auth', 'admin.role'])->group(function () {
                 'weight' => 500,
                 'seller_id' => 2,
                 'status' => 'aktif',
-                'min_order' => 1,
-                'ready_stock' => 10
+                'min_order' => 1
             ]);
             
             return response()->json([

@@ -173,7 +173,7 @@ class ReviewController extends Controller
                 'date' => $review->created_at->format('j M Y'),
                 'product' => [
                     'name' => $review->product->name,
-                    'image' => $review->product->image ? asset('storage/' . $review->product->image) : asset('src/placeholder_produk.png')
+                    'image' => $review->product->main_image ? asset('storage/' . $review->product->main_image) : asset('src/placeholder_produk.png')
                 ],
                 'replied' => !empty($review->reply),
                 'reply' => $review->reply

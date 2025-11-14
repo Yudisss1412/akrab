@@ -121,7 +121,7 @@
                 @if($cartItems->count() > 0)
                   @foreach($cartItems as $item)
                     <div class="produk-item">
-                      <img src="{{ asset(($item['product'] ?? $item->product)->image ?? 'src/default-product.png') }}" alt="{{ ($item['product'] ?? $item->product)->name ?? 'Product' }}" />
+                      <img src="{{ asset(($item['product'] ?? $item->product)->main_image ?? 'src/default-product.png') }}" alt="{{ ($item['product'] ?? $item->product)->name ?? 'Product' }}" />
                       <div class="item-info">
                         <h4>{{ ($item['product'] ?? $item->product)->name ?? 'Produk tidak ditemukan' }}</h4>
                         <p>{{ $item['quantity'] ?? $item->quantity }} x Rp {{ number_format(($item['product'] ?? $item->product)->price ?? 0, 2, ',', '.') }}</p>
@@ -162,7 +162,7 @@
                 @if($cartItems->count() > 0)
                   @foreach($cartItems as $item)
                     <div class="produk-preview">
-                      <img src="{{ asset(($item['product'] ?? $item->product)->image ?? 'src/default-product.png') }}" alt="{{ ($item['product'] ?? $item->product)->name ?? 'Product' }}" />
+                      <img src="{{ asset(($item['product'] ?? $item->product)->main_image ?? 'src/default-product.png') }}" alt="{{ ($item['product'] ?? $item->product)->name ?? 'Product' }}" />
                       <div class="produk-info">
                         <h4>{{ ($item['product'] ?? $item->product)->name ?? 'Produk tidak ditemukan' }}</h4>
                         <p class="produk-harga">Rp {{ number_format(($item['product'] ?? $item->product)->price ?? 0, 2, ',', '.') }}</p>

@@ -16,7 +16,7 @@
       <h1>Beri Ulasan untuk Produk</h1>
       
       <div class="product-info">
-        <img src="{{ $orderItem->product->image ? asset('storage/' . $orderItem->product->image) : asset('src/placeholder_produk.png') }}" alt="{{ $orderItem->product->name }}">
+        <img src="{{ $orderItem->product->main_image ? asset('storage/' . $orderItem->product->main_image) : asset('src/placeholder_produk.png') }}" alt="{{ $orderItem->product->name }}">
         <div class="product-details">
           <h2>{{ $orderItem->product->name }}</h2>
           <p class="shop-name">Toko: {{ $orderItem->product->seller->name ?? 'Toko Tidak Diketahui' }}</p>

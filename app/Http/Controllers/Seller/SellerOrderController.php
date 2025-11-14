@@ -210,8 +210,8 @@ class SellerOrderController extends Controller
                 'total_amount' => $order->total_amount,
                 'customer_name' => $order->user->name ?? 'Pelanggan',
                 'product_name' => $firstItem && $firstItem->product ? $firstItem->product->name : 'Produk tidak ditemukan',
-                'product_image' => $firstItem && $firstItem->product && $firstItem->product->image ? 
-                    asset('storage/' . $firstItem->product->image) : 
+                'product_image' => $firstItem && $firstItem->product && $firstItem->product->main_image ?
+                    asset('storage/' . $firstItem->product->main_image) :
                     asset('src/placeholder_produk.png'),
                 'quantity' => $firstItem ? $firstItem->quantity : 1,
                 'subtotal' => $firstItem ? $firstItem->subtotal : 0

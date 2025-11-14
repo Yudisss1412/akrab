@@ -399,7 +399,7 @@
               <h3>Produk</h3>
               @foreach($order->items as $item)
               <div class="product-item">
-                <img src="{{ $item->product->image ? asset('storage/' . $item->product->image) : asset('src/placeholder_produk.png') }}" alt="{{ $item->product->name }}" class="product-thumb">
+                <img src="{{ $item->product->main_image ? asset('storage/' . $item->product->main_image) : asset('src/placeholder_produk.png') }}" alt="{{ $item->product->name }}" class="product-thumb">
                 <div class="product-info">
                   <div class="product-name">{{ $item->product->name }}</div>
                   @if($item->variant)

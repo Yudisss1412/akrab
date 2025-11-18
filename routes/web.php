@@ -742,6 +742,10 @@ Route::get('/penjual/pesanan/recent', [App\Http\Controllers\Seller\SellerOrderCo
 Route::get('/penjual/riwayat-penjualan', [App\Http\Controllers\Seller\SellerOrderController::class, 'salesHistory'])->name('penjual.riwayat.penjualan');
 Route::get('/penjual/urgent-tasks', [App\Http\Controllers\Seller\SellerOrderController::class, 'getUrgentTasks'])->name('penjual.urgent.tasks');
 Route::get('/penjual/komplain-retur', [App\Http\Controllers\Seller\SellerOrderController::class, 'complaintsAndReturns'])->name('penjual.komplain.retur');
+
+// API route untuk komplain & retur
+Route::get('/api/complaints', [App\Http\Controllers\Seller\ReviewController::class, 'getLowRatingReviews'])->name('api.complaints');
+Route::get('/api/returns', [App\Http\Controllers\Seller\SellerOrderController::class, 'getReturnsData'])->name('api.returns');
 Route::post('/api/returns/{id}/approve', [App\Http\Controllers\Seller\SellerOrderController::class, 'approveReturn'])->name('api.returns.approve');
 Route::post('/api/returns/{id}/reject', [App\Http\Controllers\Seller\SellerOrderController::class, 'rejectReturn'])->name('api.returns.reject');
 Route::post('/api/returns/{id}/complete', [App\Http\Controllers\Seller\SellerOrderController::class, 'completeReturn'])->name('api.returns.complete');

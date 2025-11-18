@@ -212,11 +212,18 @@
     }
     
     .star {
-      color: var(--ak-warning);
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 1px;
     }
-    
-    .star.empty {
-      color: #d1d5db;
+
+    .star svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .star.empty svg {
+      opacity: 0.4;
     }
     
     .review-content {
@@ -372,7 +379,19 @@
         <section class="stats-grid">
           <div class="stat-card">
             <p class="stat-title">Rating Rata-rata</p>
-            <p class="stat-value">{{ number_format($averageRating, 1) }} ⭐</p>
+            <div style="display: flex; align-items: center; gap: 2px;">
+              <span class="stat-value" style="margin-right: 0.5rem;">{{ number_format($averageRating, 1) }}</span>
+              <span class="star">@php
+                $fullStars = floor($averageRating);
+                $emptyStars = 5 - $fullStars;
+                for ($i = 0; $i < $fullStars; $i++) {
+                  echo '<svg width="20" height="20" viewBox="0 0 23 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.19074 18.8022L7.64565 12.5126L2.76611 8.28214L9.21247 7.72256L11.7194 1.79102L14.2263 7.72256L20.6727 8.28214L15.7931 12.5126L17.248 18.8022L11.7194 15.4671L6.19074 18.8022Z" fill="#FFF600"/></svg>';
+                }
+                for ($i = 0; $i < $emptyStars; $i++) {
+                  echo '<svg width="20" height="20" viewBox="0 0 23 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.87469 15.0642L11.695 13.3631L14.5153 15.0866L13.7766 11.8635L16.2611 9.71467L12.9932 9.42368L11.695 6.37957L10.3968 9.4013L7.12881 9.69228L9.61334 11.8635L8.87469 15.0642ZM6.16633 18.8022L7.62124 12.5126L2.7417 8.28214L9.18806 7.72256L11.695 1.79102L14.2019 7.72256L20.6483 8.28214L15.7687 12.5126L17.2236 18.8022L11.695 15.4671L6.16633 18.8022Z" fill="#FFF600"/></svg>';
+                }
+              @endphp</span>
+            </div>
           </div>
           
           <div class="stat-card">
@@ -386,7 +405,16 @@
               @foreach($ratingStats as $rating => $count)
               <div class="star-row">
                 <span class="star-label">
-                  <span class="star">⭐</span> {{ $rating }}
+                  <span class="star">@php
+                    $fullStars = floor($rating);
+                    $emptyStars = 5 - $fullStars;
+                    for ($i = 0; $i < $fullStars; $i++) {
+                      echo '<svg width="20" height="20" viewBox="0 0 23 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.19074 18.8022L7.64565 12.5126L2.76611 8.28214L9.21247 7.72256L11.7194 1.79102L14.2263 7.72256L20.6727 8.28214L15.7931 12.5126L17.248 18.8022L11.7194 15.4671L6.19074 18.8022Z" fill="#FFF600"/></svg>';
+                    }
+                    for ($i = 0; $i < $emptyStars; $i++) {
+                      echo '<svg width="20" height="20" viewBox="0 0 23 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.87469 15.0642L11.695 13.3631L14.5153 15.0866L13.7766 11.8635L16.2611 9.71467L12.9932 9.42368L11.695 6.37957L10.3968 9.4013L7.12881 9.69228L9.61334 11.8635L8.87469 15.0642ZM6.16633 18.8022L7.62124 12.5126L2.7417 8.28214L9.18806 7.72256L11.695 1.79102L14.2019 7.72256L20.6483 8.28214L15.7687 12.5126L17.2236 18.8022L11.695 15.4671L6.16633 18.8022Z" fill="#FFF600"/></svg>';
+                    }
+                  @endphp</span> {{ $rating }}
                 </span>
                 <div class="star-progress">
                   <div class="star-progress-bar" style="width: {{ $totalReviews > 0 ? ($count / $totalReviews) * 100 : 0 }}%"></div>
@@ -519,6 +547,16 @@
               console.error('Error submitting reply:', error);
               alert('Terjadi kesalahan saat mengirim balasan');
             });
+          },
+
+          generateStarRating(rating, total) {
+            // Kita akan menggunakan fungsi global untuk menghindari masalah parsing
+            // Fungsi ini hanya sebagai placeholder dan akan ditimpa oleh fungsi global
+            // setelah script diload
+            if (typeof window !== 'undefined' && typeof generateStarRatingGlobal !== 'undefined') {
+              return generateStarRatingGlobal(rating, total);
+            }
+            return '';
           }
         }">
           <div x-show="loading" class="text-center" style="padding: 2rem; text-align: center;">
@@ -533,11 +571,7 @@
                   <p class="review-date" x-text="review.date"></p>
                 </div>
                 
-                <div class="review-rating">
-                  <template x-for="n in 5" :key="n">
-                    <span class="star" x-bind:class="n <= review.rating ? '' : 'empty'">⭐</span>
-                  </template>
-                </div>
+                <div class="review-rating" x-html="generateStarRating(review.rating, 5)"></div>
               </div>
               
               <div class="review-content" x-text="review.comment"></div>
@@ -619,6 +653,33 @@
       meta.name = 'csrf-token';
       meta.content = '{{ csrf_token() }}';
       document.head.appendChild(meta);
+    }
+  </script>
+
+  <script>
+    // Fungsi global untuk membuat bintang SVG
+    function generateStarRatingGlobal(rating, total = 5) {
+      let stars = '';
+      const fullStars = Math.floor(rating);
+      const hasHalfStar = rating % 1 !== 0;
+
+      // Tambahkan bintang penuh
+      for (let i = 0; i < fullStars; i++) {
+        stars += '<span class="star"><svg width="20" height="20" viewBox="0 0 23 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.19074 18.8022L7.64565 12.5126L2.76611 8.28214L9.21247 7.72256L11.7194 1.79102L14.2263 7.72256L20.6727 8.28214L15.7931 12.5126L17.248 18.8022L11.7194 15.4671L6.19074 18.8022Z" fill="#FFF600"/></svg></span>';
+      }
+
+      // Tambahkan bintang setengah jika ada
+      if (hasHalfStar) {
+        stars += '<span class="star"><svg width="20" height="20" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.0275 15.0866L13.2888 11.8635L15.7734 9.71467L12.5054 9.42368L11.2072 6.37957V13.3631L14.0275 15.0866ZM5.67853 18.8022L7.13344 12.5126L2.25391 8.28214L8.70027 7.72256L11.2072 1.79102L13.7141 7.72256L20.1605 8.28214L15.2809 12.5126L16.7358 18.8022L11.2072 15.4671L5.67853 18.8022Z" fill="#FFF700"/></svg></span>';
+      }
+
+      // Tambahkan bintang kosong untuk sisa
+      const emptyStars = total - fullStars - (hasHalfStar ? 1 : 0);
+      for (let i = 0; i < emptyStars; i++) {
+        stars += '<span class="star empty"><svg width="20" height="20" viewBox="0 0 23 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.87469 15.0642L11.695 13.3631L14.5153 15.0866L13.7766 11.8635L16.2611 9.71467L12.9932 9.42368L11.695 6.37957L10.3968 9.4013L7.12881 9.69228L9.61334 11.8635L8.87469 15.0642ZM6.16633 18.8022L7.62124 12.5126L2.7417 8.28214L9.18806 7.72256L11.695 1.79102L14.2019 7.72256L20.6483 8.28214L15.7687 12.5126L17.2236 18.8022L11.695 15.4671L6.16633 18.8022Z" fill="#FFF600"/></svg></span>';
+      }
+
+      return stars;
     }
   </script>
 </body>

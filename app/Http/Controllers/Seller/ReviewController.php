@@ -310,4 +310,86 @@ class ReviewController extends Controller
             'reviews' => $formattedReviews
         ]);
     }
+
+    /**
+     * API endpoint untuk mendapatkan ulasan dengan rating rendah (komplain)
+     */
+    public function getLowRatingReviews(Request $request)
+    {
+        // Pastikan seller tersedia (seperti di constructor)
+        $user = Auth::user();
+        $seller = Seller::where('user_id', $user->id)->first();
+
+        if (!$seller) {
+            return response()->json(['error' => 'Seller not found'], 403);
+        }
+
+        $products = $seller->products()->pluck('id')->toArray();
+
+        // Query untuk ulasan
+        $reviewsQuery = Review::with(['user', 'product'])
+            ->whereIn('product_id', $products)
+            ->where('rating', '<=', 2); // Rating 2 ke bawah dianggap komplain
+
+        // Filter berdasarkan rating jika ada
+        if ($request->filled('filter_star')) {
+            $reviewsQuery->where('rating', $request->filter_star);
+        }
+
+        // Filter berdasarkan status balasan jika ada
+        if ($request->filled('filter_reply')) {
+            if ($request->filter_reply === 'replied') {
+                $reviewsQuery->whereNotNull('reply');
+            } else if ($request->filter_reply === 'pending') {
+                $reviewsQuery->whereNull('reply');
+            }
+        }
+
+        // Urutkan jika ada parameter sort
+        switch ($request->get('sort_by')) {
+            case 'oldest':
+                $reviewsQuery->orderBy('created_at', 'asc');
+                break;
+            case 'highest':
+                $reviewsQuery->orderBy('rating', 'desc');
+                break;
+            case 'lowest':
+                $reviewsQuery->orderBy('rating', 'asc');
+                break;
+            default: // newest
+                $reviewsQuery->orderBy('created_at', 'desc');
+                break;
+        }
+
+        $reviews = $reviewsQuery->paginate(10);
+
+        $formattedReviews = $reviews->map(function($review) {
+            return [
+                'id' => $review->id,
+                'name' => $review->user->name,
+                'rating' => $review->rating,
+                'comment' => $review->review_text,
+                'date' => $review->created_at->format('d M Y'),
+                'product' => [
+                    'id' => $review->product->id,
+                    'name' => $review->product->name,
+                    'image' => $review->product->main_image ?
+                        asset('storage/' . $review->product->main_image) :
+                        asset('src/placeholder_produk.png')
+                ],
+                'replied' => !empty($review->reply),
+                'reply' => $review->reply
+            ];
+        });
+
+        return response()->json([
+            'reviews' => $formattedReviews,
+            'pagination' => [
+                'current_page' => $reviews->currentPage(),
+                'last_page' => $reviews->lastPage(),
+                'total' => $reviews->total(),
+                'per_page' => $reviews->perPage()
+            ]
+        ]);
+    }
 }

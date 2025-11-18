@@ -397,49 +397,9 @@ class SellerOrderController extends Controller
             abort(403, 'Akses ditolak. Seller record tidak ditemukan.');
         }
 
-        // Ambil komplain dari ulasan dengan rating rendah (2 ke bawah)
+        // Kita tetap kirim data kosong karena sekarang data akan dimuat secara dinamis
         $complaints = [];
-        $reviews = \App\Models\Review::with(['user', 'product'])
-            ->whereHas('product', function ($q) use ($seller) {
-                $q->where('seller_id', $seller->id);
-            })
-            ->where('rating', '<=', 2)
-            ->latest()
-            ->get();
-
-        foreach ($reviews as $review) {
-            $complaints[] = [
-                'id' => $review->id,
-                'customer_name' => $review->user->name ?? 'Pelanggan',
-                'review_text' => $review->review_text ?? 'Tidak ada ulasan',
-                'rating' => $review->rating,
-                'product_name' => $review->product->name ?? 'Produk Tidak Ditemukan',
-                'created_at' => $review->created_at->format('d M Y, H:i')
-            ];
-        }
-
-        // Ambil permintaan retur yang terkait dengan produk penjual ini
         $returns = [];
-        $returnRequests = \App\Models\Models\ProductReturn::with(['user', 'orderItem.product'])
-            ->whereHas('orderItem.product', function ($q) use ($seller) {
-                $q->where('seller_id', $seller->id);
-            })
-            ->latest()
-            ->get();
-
-        foreach ($returnRequests as $return) {
-            $returns[] = [
-                'id' => $return->id,
-                'customer_name' => $return->user->name ?? 'Pelanggan',
-                'reason' => $return->reason,
-                'description' => $return->description ?? 'Tidak ada deskripsi',
-                'product_name' => $return->orderItem->product->name ?? 'Produk Tidak Ditemukan',
-                'status' => $return->status,
-                'created_at' => $return->requested_at->format('d M Y, H:i'),
-                'refund_amount' => $return->refund_amount,
-                'tracking_number' => $return->tracking_number
-            ];
-        }
 
         return view('penjual.komplain_retur', compact('complaints', 'returns'));
     }
@@ -576,6 +536,63 @@ class SellerOrderController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Permintaan retur berhasil diselesaikan'
+        ]);
+    }
+
+    /**
+     * API endpoint untuk mendapatkan data retur produk untuk ditampilkan di halaman komplain & retur
+     */
+    public function getReturnsData(Request $request)
+    {
+        // Hanya penjual yang bisa mengakses
+        $user = Auth::user();
+        if (!$user || !$user->role || $user->role->name !== 'seller') {
+            return response()->json(['error' => 'Akses ditolak'], 403);
+        }
+
+        // Ambil ID penjual dari tabel sellers berdasarkan user_id
+        $seller = Seller::where('user_id', $user->id)->first();
+        if (!$seller) {
+            return response()->json(['error' => 'Seller record tidak ditemukan'], 403);
+        }
+
+        // Query untuk permintaan retur
+        $returnsQuery = \App\Models\Models\ProductReturn::with(['user', 'orderItem.product'])
+            ->whereHas('orderItem.product', function ($q) use ($seller) {
+                $q->where('seller_id', $seller->id);
+            })
+            ->orderBy('requested_at', 'desc');
+
+        // Filter berdasarkan status jika ada
+        if ($request->has('status') && $request->status) {
+            $returnsQuery->where('status', $request->status);
+        }
+
+        $returns = $returnsQuery->paginate(10);
+
+        $formattedReturns = $returns->map(function($return) {
+            return [
+                'id' => $return->id,
+                'customer_name' => $return->user->name ?? 'Pelanggan',
+                'reason' => $return->reason,
+                'description' => $return->description ?? 'Tidak ada deskripsi',
+                'product_name' => $return->orderItem->product->name ?? 'Produk Tidak Ditemukan',
+                'status' => $return->status,
+                'status_label' => ucfirst(str_replace('_', ' ', $return->status)),
+                'created_at' => $return->requested_at->format('d M Y, H:i'),
+                'refund_amount' => $return->refund_amount,
+                'tracking_number' => $return->tracking_number
+            ];
+        });
+
+        return response()->json([
+            'returns' => $formattedReturns,
+            'pagination' => [
+                'current_page' => $returns->currentPage(),
+                'last_page' => $returns->lastPage(),
+                'total' => $returns->total(),
+                'per_page' => $returns->perPage()
+            ]
         ]);
     }
 }

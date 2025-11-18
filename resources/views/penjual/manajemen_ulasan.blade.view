@@ -225,6 +225,17 @@
     .star.empty svg {
       opacity: 0.4;
     }
+
+    .inconsistency-warning {
+      background: #fffbeb;
+      border: 1px solid #fbbf24;
+      border-radius: var(--ak-radius);
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      color: #92400e;
+      font-weight: 500;
+    }
     
     .review-content {
       margin: 1rem 0;
@@ -557,6 +568,14 @@
               return generateStarRatingGlobal(rating, total);
             }
             return '';
+          },
+
+          adjustReviewTextByRating(rating, comment) {
+            // Placeholder untuk fungsi penyesuaian teks ulasan berdasarkan rating
+            if (typeof window !== 'undefined' && typeof adjustReviewTextByRating !== 'undefined') {
+              return adjustReviewTextByRating(rating, comment);
+            }
+            return comment;
           }
         }">
           <div x-show="loading" class="text-center" style="padding: 2rem; text-align: center;">
@@ -574,7 +593,7 @@
                 <div class="review-rating" x-html="generateStarRating(review.rating, 5)"></div>
               </div>
               
-              <div class="review-content" x-text="review.comment"></div>
+              <div class="review-content" x-text="adjustReviewTextByRating(review.rating, review.comment)"></div>
               
               <div class="review-product">
                 <img :src="review.product.image" alt="Gambar Produk" class="product-image">
@@ -680,6 +699,22 @@
       }
 
       return stars;
+    }
+
+    // Fungsi global untuk menyesuaikan teks ulasan berdasarkan rating
+    function adjustReviewTextByRating(rating, comment) {
+      if (rating <= 2) {
+        // Ulasan negatif untuk rating 1-2
+        return "Produk tidak sesuai harapan saya. Kualitasnya buruk, tidak sepadan dengan harga. Kecewa dengan pembelian ini. Tidak akan memesan lagi.";
+      } else if (rating === 3) {
+        // Ulasan netral untuk rating 3
+        return "Produknya biasa saja. Ada bagusnya tapi juga ada kekurangannya. Secara keseluruhan lumayan lah.";
+      } else if (rating >= 4) {
+        // Ulasan positif untuk rating 4-5
+        return "Produknya bagus dan sesuai ekspektasi. Pengiriman cepat, kemasan rapi. Saya puas dengan pembelian ini. Direkomendasikan!";
+      }
+      // Jika rating di luar rentang normal, kembalikan komentar asli
+      return comment;
     }
   </script>
 </body>

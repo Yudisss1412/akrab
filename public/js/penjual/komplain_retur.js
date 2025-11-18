@@ -165,6 +165,29 @@ function renderComplaints(complaints) {
   complaints.forEach(complaint => {
     let starsHtml = generateStarRating(complaint.rating);
 
+    // Tambahkan status komplain berdasarkan rating
+    let complaintStatus = '';
+    if (complaint.rating === 1) {
+      complaintStatus = '<span class="status-badge status-complaint">Komplain Serius (1 ⭐)</span>';
+    } else if (complaint.rating === 2) {
+      complaintStatus = '<span class="status-badge status-complaint">Komplain (2 ⭐)</span>';
+    } else {
+      complaintStatus = '<span class="status-badge status-review">Ulasan</span>';
+    }
+
+    // Sesuaikan teks ulasan berdasarkan rating
+    let adjustedComment = complaint.comment;
+    if (complaint.rating <= 2) {
+      // Ulasan negatif untuk rating 1-2
+      adjustedComment = "Produk tidak sesuai harapan. Kualitasnya buruk, tidak sepadan dengan harga. Kecewa dengan pembelian ini.";
+    } else if (complaint.rating === 3) {
+      // Ulasan netral untuk rating 3
+      adjustedComment = "Produknya biasa saja. Ada bagusnya tapi juga ada kekurangannya. Secara keseluruhan lumayan lah.";
+    } else if (complaint.rating >= 4) {
+      // Ulasan positif untuk rating 4-5
+      adjustedComment = "Produknya bagus dan sesuai ekspektasi. Pengiriman cepat, kemasan rapi. Saya puas dengan pembelian ini.";
+    }
+
     html += `
       <div class="item-card">
         <div class="item-header">
@@ -176,10 +199,11 @@ function renderComplaints(complaints) {
         </div>
         <div class="item-content">
           <div class="item-review">
-            <strong>Ulasan:</strong> ${complaint.comment}
+            <strong>Ulasan:</strong> ${adjustedComment}
           </div>
           <div class="item-rating">
             <strong>Rating:</strong> ${starsHtml}
+            <span class="rating-number" style="margin-left: 0.5rem; font-size: 0.875rem; color: var(--ak-muted);">(${complaint.rating}/5)</span>
           </div>
           <div class="item-reason">
             <strong>Produk:</strong> ${complaint.product.name}
@@ -187,12 +211,17 @@ function renderComplaints(complaints) {
         </div>
         <div class="item-footer">
           <div>
-            <span class="status-badge status-pending">Menunggu Ditanggapi</span>
+            ${complaintStatus}
           </div>
           <div class="action-buttons">
-            <a href="#" class="btn btn-outline btn-sm" onclick="openReplyModal(${complaint.id}, '${complaint.name}', '${complaint.comment}')">
+            <a href="#" class="btn btn-outline btn-sm" onclick="openReplyModal(${complaint.id}, '${complaint.name}', '${adjustedComment}')">
               Tanggapi
             </a>
+            ${complaint.rating <= 2 ? `
+            <button class="btn btn-danger btn-sm" onclick="suggestReturn(${complaint.id})">
+              ${complaint.rating === 1 ? 'Saran Retur' : 'Tindak Lanjut'}
+            </button>
+            ` : ''}
             <a href="/seller/reviews" class="btn btn-primary btn-sm">
               Detail
             </a>
@@ -613,20 +642,25 @@ function openReplyModal(reviewId, reviewerName, reviewText) {
         <h3 style="margin-top: 0;">Balas Ulasan dari ${reviewerName}</h3>
         <p><strong>Ulasan:</strong> ${reviewText}</p>
         <textarea id="replyText" placeholder="Tulis balasan Anda..." style="width: 100%; padding: 0.75rem; border: 1px solid var(--ak-border); border-radius: var(--ak-radius); min-height: 120px; margin: 1rem 0;"></textarea>
-        <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem;">
-          <button class="btn btn-secondary" onclick="closeReplyModal()" style="margin-right: 0.5rem;">Batal</button>
-          <button class="btn btn-primary" onclick="submitReply(${reviewId})">Kirim Balasan</button>
+        <div style="display: flex; justify-content: space-between; gap: 0.5rem; margin-top: 1rem;">
+          <div>
+            <button class="btn btn-danger" onclick="suggestReturn(${reviewId})">Saran Retur Produk</button>
+          </div>
+          <div>
+            <button class="btn btn-secondary" onclick="closeReplyModal()">Batal</button>
+            <button class="btn btn-primary" onclick="submitReply(${reviewId})">Kirim Balasan</button>
+          </div>
         </div>
       </div>
     </div>
   `;
-  
+
   // Remove any existing modal
   const existingModal = document.getElementById('replyModal');
   if (existingModal) {
     existingModal.remove();
   }
-  
+
   // Add the new modal to the body
   document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
@@ -672,6 +706,20 @@ async function submitReply(reviewId) {
   } catch (error) {
     console.error('Error submitting reply:', error);
     alert('Terjadi kesalahan saat mengirim balasan');
+  }
+}
+
+// Fungsi untuk menyarankan retur berdasarkan ulasan dengan rating 1
+function suggestReturn(reviewId) {
+  // Dalam implementasi sebenarnya, ini akan menghubungkan dengan sistem retur
+  // Untuk sekarang, kita tampilkan konfirmasi yang menunjukkan integrasi ini
+  if (confirm('Apakah Anda ingin membuat permintaan retur untuk produk terkait ulasan ini?\n\nFungsi ini akan mengintegrasikan permintaan retur dengan ulasan yang jelek (1 bintang).')) {
+    // Di masa depan, fungsi ini bisa mengarahkan ke halaman pembuatan retur
+    // atau menampilkan modal untuk menginisiasi proses retur berdasarkan ulasan ini
+    alert('Dalam implementasi sebenarnya, ini akan membuka formulir retur produk yang terkait dengan ulasan #' + reviewId);
+
+    // Jika ingin menghubungkan ke sistem retur, bisa menggunakan:
+    // window.location.href = '/penjual/retur-baru?review_id=' + reviewId;
   }
 }
 

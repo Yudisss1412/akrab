@@ -38,6 +38,11 @@
 
         <!-- Tab Content: Complaints -->
         <div id="complaints-tab" class="tab-content active">
+          <!-- Info banner for complaints -->
+          <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: var(--ak-radius); padding: 1rem; margin-bottom: 1.5rem; color: #dc2626;">
+            <strong>Perhatian:</strong> Ulasan dengan rating 1 bintang (peringkat terendah) biasanya terkait dengan masalah produk dan kemungkinan besar akan mengarah pada permintaan retur. Penjual disarankan untuk merespon dengan cepat dan mempertimbangkan opsi retur.
+          </div>
+
           <!-- Filter Row for Complaints -->
           <div class="filter-row">
             <div class="filter-group">

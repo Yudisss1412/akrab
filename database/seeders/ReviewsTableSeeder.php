@@ -8,6 +8,7 @@ use App\Models\Review;
 use App\Models\User;
 use App\Models\Product;
 use App\Models\Order;
+use App\Models\Seller;
 use Carbon\Carbon;
 
 class ReviewsTableSeeder extends Seeder
@@ -17,11 +18,35 @@ class ReviewsTableSeeder extends Seeder
      */
     public function run(): void
     {
-        // Ambil user dan product untuk membuat review
-        $users = User::limit(10)->get(); // Ambil 10 user pertama
-        $products = Product::limit(20)->get(); // Ambil 20 produk pertama
+        // Ambil buyer users untuk membuat review (hanya pengguna dengan role buyer)
+        $buyers = User::whereHas('role', function($query) {
+            $query->where('name', 'buyer');
+        })->get();
 
-        // Buat beberapa review dummy untuk testing
+        // Ambil semua produk yang tersedia
+        $products = Product::all();
+
+        if ($buyers->count() === 0) {
+            $this->command->info('No buyer users found, calling UserSeeder to create buyers...');
+            $this->call(UserSeeder::class);
+            $buyers = User::whereHas('role', function($query) {
+                $query->where('name', 'buyer');
+            })->get();
+        }
+
+        if ($products->count() === 0) {
+            $this->command->info('No products found, calling ProductSeeder to create products...');
+            $this->call(ProductSeeder::class);
+            $products = Product::all();
+        }
+
+        // Jika tetap tidak ada buyers atau products, keluar dari seeder
+        if ($buyers->count() === 0 || $products->count() === 0) {
+            $this->command->error('Buyers or products still not available. Cannot create reviews.');
+            return;
+        }
+
+        // Buat beberapa review dummy untuk testing dari buyer yang sebenarnya
         $reviewTexts = [
             'Produk ini sangat bagus! Kualitasnya sesuai dengan deskripsi. Pengiriman cepat dan kemasan rapi.',
             'Kualitas produk sesuai dengan harapan saya. Harga terjangkau dan pengiriman cepat.',
@@ -32,88 +57,215 @@ class ReviewsTableSeeder extends Seeder
             'Kemasan rapi dan produk asli. Rekomendasi sekali.',
             'Tidak mengecewakan. Kualitas bagus dan pengiriman cepat sekali!',
             'Produknya memenuhi ekspektasi. Kualitas mantap!',
-            'Sangat senang dengan pembelian ini. Akan menjadi pelanggan tetap.'
+            'Sangat senang dengan pembelian ini. Akan menjadi pelanggan tetap.',
+            'Sesuai dengan deskripsi. Pengemasan rapi dan aman.',
+            'Barang bagus, kualitas oke untuk harga segini.',
+            'Pengiriman cepat sekali, barang juga sesuai pesanan.',
+            'Bagus banget! Bahan berkualitas dan jahitan rapi.',
+            'Sangat recomend sekali deh pokoknya.',
         ];
 
-        foreach ($users as $user) {
-            foreach ($products->random(3) as $product) { // Pilih 3 produk random per user
-                $order = Order::where('user_id', $user->id)->first();
+        // Kumpulkan semua order yang dibuat oleh buyer
+        $allOrders = collect();
+        foreach ($buyers as $buyer) {
+            $buyerOrders = Order::where('user_id', $buyer->id)->get();
+            $allOrders = $allOrders->concat($buyerOrders);
+        }
 
-                // Jika tidak ada order, buat order dummy atau gunakan order_id null
-                if (!$order) {
-                    // Dapatkan order_id dari order yang ada atau buat order dummy
-                    $existingOrder = Order::first();
-                    $orderId = $existingOrder ? $existingOrder->id : 1; // Gunakan order_id 1 jika tidak ada
-                } else {
-                    $orderId = $order->id;
+        // Set untuk melacak kombinasi user_id, product_id, order_id yang sudah dibuat dalam satu seeder
+        $createdReviews = [];
+
+        // Loop melalui setiap buyer untuk membuat review
+        foreach ($buyers as $buyer) {
+            // Ambil order yang dibuat oleh buyer ini
+            $buyerOrders = Order::where('user_id', $buyer->id)->get();
+
+            // Ambil produk acak yang dibeli dalam order
+            foreach ($buyerOrders as $order) {
+                // Ambil semua item dalam order
+                $orderItems = $order->items;
+
+                foreach ($orderItems as $orderItem) {
+                    // Pilih produk dari order item
+                    $product = $orderItem->product;
+
+                    // Pastikan produk ditemukan dan seller memiliki produk ini
+                    if ($product && $product->seller) {
+                        // Cek apakah kombinasi user_id, product_id, order_id sudah dibuat di seeder ini
+                        $reviewKey = $buyer->id . '-' . $product->id . '-' . $order->id;
+
+                        // Juga cek di database
+                        $existingReview = Review::where('user_id', $buyer->id)
+                                              ->where('product_id', $product->id)
+                                              ->where('order_id', $order->id)
+                                              ->first();
+
+                        if (!$existingReview && !in_array($reviewKey, $createdReviews)) {
+                            $createdReviews[] = $reviewKey;
+
+                            // Buat sebagian review dengan reply
+                            $hasReply = rand(1, 3) === 1; // ~33% chance untuk punya reply
+                            $replyText = null;
+                            $repliedAt = null;
+
+                            if ($hasReply) {
+                                $replyOptions = [
+                                    'Terima kasih atas ulasan dan feedback yang sangat positif. Kami sangat menghargai pengalaman Anda!',
+                                    'Kami senang Anda menyukai produk kami. Silakan berkunjung kembali ke toko kami.',
+                                    'Terima kasih atas kepercayaan Anda. Kami akan terus meningkatkan kualitas layanan.',
+                                    'Terima kasih atas kepercayaan Anda. Kami selalu berusaha memberikan yang terbaik.',
+                                    'Kami sangat menghargai masukan Anda, dan akan terus berusaha memperbaiki kualitas produk dan layanan kami.'
+                                ];
+                                $replyText = $replyOptions[array_rand($replyOptions)];
+                                $repliedAt = Carbon::now()->subDays(rand(0, 15));
+                            }
+
+                            // Buat distribusi rating yang lebih merata
+                            $rating = rand(1, 5);
+
+                            // Pastikan status valid
+                            $statusOptions = ['pending', 'approved', 'rejected'];
+                            $status = $statusOptions[array_rand($statusOptions)];
+
+                            Review::create([
+                                'user_id' => $buyer->id,
+                                'product_id' => $product->id,
+                                'order_id' => $order->id, // Gunakan order_id yang valid dari buyer ini
+                                'rating' => $rating,
+                                'review_text' => $reviewTexts[array_rand($reviewTexts)],
+                                'status' => $status,
+                                'media' => null, // No media for basic reviews
+                                'reply' => $replyText,
+                                'replied_at' => $repliedAt,
+                                'created_at' => Carbon::now()->subDays(rand(1, 30)),
+                                'updated_at' => Carbon::now()->subDays(rand(0, 30))
+                            ]);
+                        }
+                    }
                 }
+            }
 
-                // Hanya buat review jika belum ada
-                $existingReview = Review::where('user_id', $user->id)
-                                      ->where('product_id', $product->id)
-                                      ->first();
+            // Jika buyer tidak memiliki order, buat beberapa review manual
+            if ($buyerOrders->count() === 0) {
+                // Ambil produk dari seller acak
+                $randomProducts = $products->random(min(rand(1, 3), $products->count()));
 
-                if (!$existingReview) {
-                    Review::create([
-                        'user_id' => $user->id,
-                        'product_id' => $product->id,
-                        'order_id' => $orderId, // Gunakan order_id yang valid
-                        'rating' => rand(1, 5),
-                        'review_text' => $reviewTexts[array_rand($reviewTexts)],
-                        'status' => ['pending', 'approved', 'rejected'][array_rand(['pending', 'approved', 'rejected'])],
-                        'media' => null, // No media for basic reviews
-                        'created_at' => Carbon::now()->subDays(rand(1, 30)),
-                        'updated_at' => Carbon::now()->subDays(rand(0, 30))
-                    ]);
+                foreach ($randomProducts as $product) {
+                    // Pastikan produk ditemkan dan seller memiliki produk ini
+                    if ($product && $product->seller) {
+                        // Ambil order dari buyer ini sebagai referensi
+                        $order = $allOrders->first();
+
+                        if ($order) {
+                            // Cek apakah kombinasi user_id, product_id, order_id sudah dibuat di seeder ini
+                            $reviewKey = $buyer->id . '-' . $product->id . '-' . $order->id;
+
+                            // Juga cek di database
+                            $existingReview = Review::where('user_id', $buyer->id)
+                                                  ->where('product_id', $product->id)
+                                                  ->where('order_id', $order->id)
+                                                  ->first();
+
+                            if (!$existingReview && !in_array($reviewKey, $createdReviews)) {
+                                $createdReviews[] = $reviewKey;
+
+                                // Buat sebagian review dengan reply
+                                $hasReply = rand(1, 3) === 1; // ~33% chance untuk punya reply
+                                $replyText = null;
+                                $repliedAt = null;
+
+                                if ($hasReply) {
+                                    $replyOptions = [
+                                        'Terima kasih atas ulasan dan feedback yang sangat positif. Kami sangat menghargai pengalaman Anda!',
+                                        'Kami senang Anda menyukai produk kami. Silakan berkunjung kembali ke toko kami.',
+                                        'Terima kasih atas kepercayaan Anda. Kami akan terus meningkatkan kualitas layanan.',
+                                        'Terima kasih atas kepercayaan Anda. Kami selalu berusaha memberikan yang terbaik.',
+                                        'Kami sangat menghargai masukan Anda, dan akan terus berusaha memperbaiki kualitas produk dan layanan kami.'
+                                    ];
+                                    $replyText = $replyOptions[array_rand($replyOptions)];
+                                    $repliedAt = Carbon::now()->subDays(rand(0, 15));
+                                }
+
+                                Review::create([
+                                    'user_id' => $buyer->id,
+                                    'product_id' => $product->id,
+                                    'order_id' => $order->id, // Gunakan order_id dari order yang tersedia
+                                    'rating' => rand(1, 5),
+                                    'review_text' => $reviewTexts[array_rand($reviewTexts)],
+                                    'status' => ['pending', 'approved', 'rejected'][array_rand(['pending', 'approved', 'rejected'])],
+                                    'media' => null, // No media for basic reviews
+                                    'reply' => $replyText,
+                                    'replied_at' => $repliedAt,
+                                    'created_at' => Carbon::now()->subDays(rand(1, 30)),
+                                    'updated_at' => Carbon::now()->subDays(rand(0, 30))
+                                ]);
+                            }
+                        }
+                    }
                 }
             }
         }
 
-        // Juga tambahkan beberapa review dengan media dan reply
-        $users = User::limit(5)->get();
-        $products = Product::limit(10)->get();
-
-        $reviewWithMediaAndReply = [
-            [
-                'text' => 'Produk luar biasa! Kualitas terbaik dan pengiriman super cepat. Saya sangat merekomendasikan produk ini.',
-                'media' => ['images/review_images/review1.jpg', 'images/review_images/review2.jpg'],
-                'reply' => 'Terima kasih atas ulasan dan feedback yang sangat positif. Kami sangat menghargai pengalaman Anda!',
-                'replied_at' => Carbon::now()->subDays(rand(1, 15))
-            ],
-            [
-                'text' => 'Kualitas produk sangat memuaskan. Harga terjangkau dengan hasil yang memuaskan.',
-                'media' => ['images/review_images/review3.jpg'],
-                'reply' => 'Kami senang Anda menyukai produk kami. Silakan berkunjung kembali ke toko kami.',
-                'replied_at' => Carbon::now()->subDays(rand(1, 10))
-            ],
-            [
-                'text' => 'Pelayanan pelanggan sangat baik. Produk juga sesuai deskripsi dan kemasan rapi.',
-                'media' => ['images/review_images/review4.jpg', 'images/review_images/review5.jpg', 'images/review_images/review6.jpg'],
-                'reply' => 'Terima kasih atas kepercayaan Anda. Kami akan terus meningkatkan kualitas layanan.',
-                'replied_at' => Carbon::now()->subDays(rand(1, 7))
-            ]
+        // Sekarang tambahkan review secara merata ke semua seller untuk memastikan filtering berfungsi
+        // Kita akan membuat beberapa review untuk setiap penjual dengan berbagai kombinasi
+        $allSellers = Seller::all();
+        $replyOptions = [
+            'Terima kasih atas ulasan dan feedback yang sangat positif. Kami sangat menghargai pengalaman Anda!',
+            'Kami senang Anda menyukai produk kami. Silakan berkunjung kembali ke toko kami.',
+            'Terima kasih atas kepercayaan Anda. Kami akan terus meningkatkan kualitas layanan.',
+            'Terima kasih atas kepercayaan Anda. Kami selalu berusaha memberikan yang terbaik.',
+            'Kami sangat menghargai masukan Anda, dan akan terus berusaha memperbaiki kualitas produk dan layanan kami.'
         ];
 
-        foreach ($users as $user) {
-            foreach ($products->random(2) as $product) {
-                $order = Order::first();
-                $orderId = $order ? $order->id : 1;
+        foreach ($allSellers as $seller) {
+            // Ambil produk dari seller ini
+            $sellerProducts = $seller->products;
 
-                $reviewData = $reviewWithMediaAndReply[array_rand($reviewWithMediaAndReply)];
+            foreach ($sellerProducts as $product) {
+                // Buat beberapa review untuk produk ini dari berbagai buyer
+                for ($i = 0; $i < 3; $i++) {  // 3 review per produk
+                    $buyer = $buyers->random();
+                    $order = $allOrders->random(); // Gunakan order yang ada
 
-                Review::create([
-                    'user_id' => $user->id,
-                    'product_id' => $product->id,
-                    'order_id' => $orderId,
-                    'rating' => rand(4, 5), // Rating tinggi untuk review dengan media
-                    'review_text' => $reviewData['text'],
-                    'status' => 'approved',
-                    'media' => json_encode($reviewData['media']),
-                    'reply' => $reviewData['reply'],
-                    'replied_at' => $reviewData['replied_at'],
-                    'created_at' => Carbon::now()->subDays(rand(1, 30)),
-                    'updated_at' => Carbon::now()
-                ]);
+                    // Buat kombinasi yang mencakup semua skenario filtering
+                    $rating = ($i % 5) + 1; // Rating 1-5 berputar
+                    $hasReply = ($i % 3) === 0; // ~33% memiliki balasan
+                    $status = ['pending', 'approved', 'rejected'][$i % 3];
+
+                    $reviewKey = $buyer->id . '-' . $product->id . '-' . $order->id;
+
+                    // Cek jika sudah ada
+                    $existingReview = Review::where('user_id', $buyer->id)
+                                          ->where('product_id', $product->id)
+                                          ->where('order_id', $order->id)
+                                          ->first();
+
+                    if (!$existingReview && !in_array($reviewKey, $createdReviews)) {
+                        $createdReviews[] = $reviewKey;
+
+                        $replyText = null;
+                        $repliedAt = null;
+
+                        if ($hasReply) {
+                            $replyText = $replyOptions[array_rand($replyOptions)];
+                            $repliedAt = Carbon::now()->subDays(rand(1, 15));
+                        }
+
+                        Review::create([
+                            'user_id' => $buyer->id,
+                            'product_id' => $product->id,
+                            'order_id' => $order->id,
+                            'rating' => $rating,
+                            'review_text' => $reviewTexts[array_rand($reviewTexts)],
+                            'status' => $status,
+                            'media' => null,
+                            'reply' => $replyText,
+                            'replied_at' => $repliedAt,
+                            'created_at' => Carbon::now()->subDays(rand(1, 30)),
+                            'updated_at' => Carbon::now()->subDays(rand(0, 30))
+                        ]);
+                    }
+                }
             }
         }
     }

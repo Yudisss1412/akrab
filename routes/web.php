@@ -748,6 +748,94 @@ Route::post('/api/returns/{id}/complete', [App\Http\Controllers\Seller\SellerOrd
 
 Route::get('/penjual/saldo', [App\Http\Controllers\WithdrawalController::class, 'showBalancePage'])->name('penjual.saldo');
 
+// Debug route for filtering issue - with proper auth
+Route::middleware(['auth'])->get('/debug-filtering', function(\Illuminate\Http\Request $request) {
+    // Cek parameter
+    $filterStar = $request->get('filter_star');
+    $filterReply = $request->get('filter_reply');
+    $sortBy = $request->get('sort_by');
+
+    // Ambil user penjual yang sedang login
+    $user = auth()->user();
+    if (!$user || $user->role->name !== 'seller') {
+        return response()->json(['error' => 'Seller not authenticated'], 403);
+    }
+
+    $seller = \App\Models\Seller::where('user_id', $user->id)->first();
+    if (!$seller) {
+        return response()->json(['error' => 'Seller profile not found'], 403);
+    }
+
+    // Ambil produk milik seller
+    $products = $seller->products()->pluck('id')->toArray();
+
+    // Bangun query
+    $query = \App\Models\Review::with(['user', 'product'])->whereIn('product_id', $products);
+
+    // Log query sebelum filter
+    $beforeCount = $query->count();
+
+    // Terapkan filter
+    if ($filterStar) {
+        $query->where('rating', $filterStar);
+    }
+
+    if ($filterReply) {
+        if ($filterReply === 'replied') {
+            $query->whereNotNull('reply');
+        } else if ($filterReply === 'pending') {
+            $query->whereNull('reply');
+        }
+    }
+
+    // Urutkan
+    switch ($sortBy) {
+        case 'oldest':
+            $query->orderBy('created_at', 'asc');
+            break;
+        case 'highest':
+            $query->orderBy('rating', 'desc');
+            break;
+        case 'lowest':
+            $query->orderBy('rating', 'asc');
+            break;
+        default: // newest
+            $query->orderBy('created_at', 'desc');
+            break;
+    }
+
+    $reviews = $query->get();
+    $afterCount = $reviews->count();
+
+    return response()->json([
+        'debug_info' => [
+            'filter_star' => $filterStar,
+            'filter_reply' => $filterReply,
+            'sort_by' => $sortBy,
+            'product_ids' => $products,
+            'total_products' => count($products),
+            'total_reviews_before_filter' => $beforeCount,
+            'total_reviews_after_filter' => $afterCount,
+            'query_debug' => [
+                'filter_star_applied' => (bool)$filterStar,
+                'filter_reply_applied' => (bool)$filterReply,
+                'sort_applied' => $sortBy ?: 'newest'
+            ]
+        ],
+        'reviews' => $reviews->map(function($review) {
+            return [
+                'id' => $review->id,
+                'user_name' => $review->user->name,
+                'product_name' => $review->product->name,
+                'rating' => $review->rating,
+                'has_reply' => !empty($review->reply),
+                'reply' => $review->reply,
+                'status' => $review->status
+            ];
+        })
+    ]);
+});
+
 
 
 

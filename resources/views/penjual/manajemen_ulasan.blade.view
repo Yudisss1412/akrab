@@ -447,21 +447,37 @@
           
           fetchReviews() {
             this.loading = true;
-            
-            const params = new URLSearchParams();
-            params.append('page', this.currentPage);
-            params.append('filter_star', document.getElementById('filter-star').value);
-            params.append('filter_reply', document.getElementById('filter-reply').value);
-            params.append('sort_by', document.getElementById('sort-by').value);
-            
-            fetch(`{{ route('seller.reviews.api') }}?${params}`)
+
+            // Ambil nilai filter
+            const filterStar = document.getElementById('filter-star').value || null;
+            const filterReply = document.getElementById('filter-reply').value || null;
+            const sortBy = document.getElementById('sort-by').value || null;
+
+            // Bangun URL dengan parameter hanya jika tidak null
+            let url = new URL(`{{ route('seller.reviews.api') }}`, window.location.origin);
+            url.searchParams.append('page', this.currentPage);
+
+            if (filterStar) url.searchParams.append('filter_star', filterStar);
+            if (filterReply) url.searchParams.append('filter_reply', filterReply);
+            if (sortBy) url.searchParams.append('sort_by', sortBy);
+
+            console.log('--- DEBUG FILTERING ---');
+            console.log('Current page:', this.currentPage);
+            console.log('Filter Star:', filterStar, 'Type:', typeof filterStar);
+            console.log('Filter Reply:', filterReply, 'Type:', typeof filterReply);
+            console.log('Sort By:', sortBy, 'Type:', typeof sortBy);
+            console.log('Complete URL:', url.toString());
+            console.log('--- END DEBUG ---');
+
+            fetch(url)
               .then(response => response.json())
               .then(data => {
-                this.reviews = data.reviews;
-                this.currentPage = data.pagination.current_page;
-                this.lastPage = data.pagination.last_page;
-                this.total = data.pagination.total;
-                this.perPage = data.pagination.per_page;
+                console.log('API Response:', data);
+                this.reviews = data.reviews || [];
+                this.currentPage = data.pagination?.current_page || 1;
+                this.lastPage = data.pagination?.last_page || 1;
+                this.total = data.pagination?.total || 0;
+                this.perPage = data.pagination?.per_page || 10;
                 this.loading = false;
               })
               .catch(error => {

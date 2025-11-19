@@ -403,6 +403,239 @@ class SellerOrderController extends Controller
 
         return view('penjual.komplain_retur', compact('complaints', 'returns'));
     }
+
+    /**
+     * API endpoint untuk mendapatkan data komplain & retur dalam format JSON
+     */
+    public function getComplaintsAndReturnsJson(Request $request)
+    {
+        error_log("=== COMPLAINTS & RETURNS API DEBUG ===");
+        error_log("Request Params: " . json_encode($request->all()));
+
+        try {
+            // Pastikan penjual tersedia
+            $user = Auth::user();
+            if (!$user) {
+                error_log("=== API DEBUG - User not authenticated ===");
+                return response()->json(['error' => 'User not authenticated'], 401);
+            }
+
+            $seller = Seller::where('user_id', $user->id)->first();
+            if (!$seller) {
+                error_log("=== API DEBUG - Seller not found ===");
+                return response()->json(['error' => 'Seller not found'], 403);
+            }
+
+            $products = $seller->products()->pluck('id')->toArray();
+            error_log("Seller products count: " . count($products));
+
+            // Bangun query dasar untuk reviews (komplain)
+            $reviewsQuery = Review::with(['user', 'product'])->whereIn('product_id', $products);
+
+            // Debug sebelum filter komplain
+            $totalBeforeComplainFilter = $reviewsQuery->count();
+            $allRatingsBefore = $reviewsQuery->pluck('rating')->toArray();
+            error_log("=== DEBUG START ===");
+            error_log("Total reviews BEFORE low rating filter: " . $totalBeforeComplainFilter);
+            error_log("All ratings BEFORE low rating filter: " . json_encode(array_count_values($allRatingsBefore)));
+
+            // Filter untuk rating rendah (komplain) saja - INI ADALAH YANG MEMBUAT ENDPOINT INI KHUSUS UNTUK KOMPLAIN
+            $reviewsQuery->where('rating', '<=', 2);
+
+            // Debug setelah filter komplain
+            $totalAfterLowRating = (clone $reviewsQuery)->count();
+            $ratingsAfterLowRating = (clone $reviewsQuery)->pluck('rating')->toArray();
+            error_log("Total reviews AFTER low rating filter (≤2): " . $totalAfterLowRating);
+            error_log("All ratings AFTER low rating filter: " . json_encode(array_count_values($ratingsAfterLowRating)));
+
+            // Terapkan filter jika ada parameter
+            $filterStar = $request->get('filter_star');
+            if (!empty($filterStar)) {
+                error_log("Applying rating filter: " . $filterStar);
+                $reviewsQuery->where('rating', $filterStar);
+
+                // Debug setelah filter spesifik rating
+                $totalAfterSpecificRating = (clone $reviewsQuery)->count();
+                $ratingsAfterSpecificRating = (clone $reviewsQuery)->pluck('rating')->toArray();
+                error_log("Total reviews AFTER specific rating filter ($filterStar): " . $totalAfterSpecificRating);
+                error_log("Ratings after specific filter: " . json_encode(array_count_values($ratingsAfterSpecificRating)));
+            }
+
+            // Filter berdasarkan status balasan jika ada
+            $filterReply = $request->get('filter_reply');
+            if (!empty($filterReply)) {
+                error_log("Applying reply filter: " . $filterReply);
+                if ($filterReply === 'replied') {
+                    $reviewsQuery->whereNotNull('reply');
+                    error_log("Query now: WHERE reply IS NOT NULL");
+                } else if ($filterReply === 'pending') {
+                    $reviewsQuery->whereNull('reply');
+                    error_log("Query now: WHERE reply IS NULL");
+                }
+
+                // Debug setelah filter reply
+                $totalAfterReplyFilter = (clone $reviewsQuery)->count();
+                $repliesAfterFilter = (clone $reviewsQuery)->get()->map(function($r) {
+                    return !empty($r->reply) ? 'replied' : 'pending';
+                })->toArray();
+                error_log("Total reviews AFTER reply filter: " . $totalAfterReplyFilter);
+                error_log("Reply status after filter: " . json_encode(array_count_values($repliesAfterFilter)));
+            }
+
+            // Urutkan jika ada parameter
+            $sortBy = $request->get('sort_by', 'newest');
+            error_log("Applying sort: " . $sortBy);
+
+            switch ($sortBy) {
+                case 'oldest':
+                    $reviewsQuery->orderBy('created_at', 'asc');
+                    break;
+                case 'highest':
+                    $reviewsQuery->orderBy('rating', 'desc');
+                    break;
+                case 'lowest':
+                    $reviewsQuery->orderBy('rating', 'asc');
+                    break;
+                default: // newest
+                    $reviewsQuery->orderBy('created_at', 'desc');
+                    break;
+            }
+
+            // Ambil hasil dengan pagination
+            $reviews = $reviewsQuery->paginate(10);
+
+            // Format hasil - ambil data user dan produk secara manual untuk menghindari error relasi
+            $formattedReviews = $reviews->map(function($review) {
+                // Ambil nama user secara manual untuk menghindari error relasi
+                $userName = 'Unknown User';
+                try {
+                    $user = \App\Models\User::select(['id', 'name'])->find($review->user_id);
+                    if ($user) {
+                        $userName = $user->name;
+                    }
+                } catch (\Exception $e) {
+                    \Log::warning('Could not load user: ' . $e->getMessage());
+                }
+
+                // Ambil nama dan gambar produk secara manual untuk menghindari error relasi
+                $productName = 'Unknown Product';
+                $productImage = asset('src/product_1.png'); // default image
+                try {
+                    $product = \App\Models\Product::select(['id', 'name', 'main_image'])->find($review->product_id);
+                    if ($product) {
+                        $productName = $product->name;
+
+                        if (isset($product->main_image) && $product->main_image) {
+                            $productImage = asset('storage/' . $product->main_image);
+                        }
+                    }
+                } catch (\Exception $e) {
+                    \Log::warning('Could not load product: ' . $e->getMessage());
+                }
+
+                return [
+                    'id' => $review->id,
+                    'name' => $userName,
+                    'rating' => $review->rating,
+                    'comment' => $review->review_text,
+                    'date' => $review->created_at->format('j M Y'),
+                    'product' => [
+                        'name' => $productName,
+                        'image' => $productImage
+                    ],
+                    'replied' => !empty($review->reply),
+                    'reply' => $review->reply,
+                    'item_type' => 'review',  // Identifikasi bahwa ini adalah review/ulasan, bukan retur
+                    'source_endpoint' => 'complaints'  // Untuk debugging, tunjukkan ini dari endpoint komplain
+                ];
+            });
+
+            // Tambahkan debugging sebelum response
+            $finalRatings = $reviews->pluck('rating')->toArray();
+            $finalReplyStatus = $reviews->map(function($r) {
+                return !empty($r->reply) ? 'replied' : 'pending';
+            })->toArray();
+
+            error_log("Final results on page:");
+            error_log("- Reviews count: " . $reviews->count());
+            error_log("- Total reviews: " . $reviews->total());
+            error_log("- Ratings distribution: " . json_encode(array_count_values($finalRatings)));
+            error_log("- Reply status distribution: " . json_encode(array_count_values($finalReplyStatus)));
+
+            // Verification: semua rating ≤ 2 (komplain)
+            $allAreComplaints = count(array_filter($finalRatings, function($rating) { return $rating <= 2; })) == count($finalRatings);
+            error_log("Verification - All reviews are complaints (≤2 rating): " . ($allAreComplaints ? 'YES' : 'NO'));
+
+            if (!$allAreComplaints) {
+                $invalidRatings = array_filter($finalRatings, function($rating) { return $rating > 2; });
+                error_log("ERROR - Invalid ratings found (should be ≤2): " . json_encode($invalidRatings));
+            }
+
+            // Verifikasi filter jika diterapkan
+            if ($filterStar) {
+                $allMatchSpecificRating = count(array_filter($finalRatings, function($rating) use ($filterStar) {
+                    return $rating == $filterStar;
+                })) == count($finalRatings);
+                error_log("Rating filter verification - Expected: $filterStar, All match: " . ($allMatchSpecificRating ? 'YES' : 'NO'));
+            }
+
+            if ($filterReply) {
+                $expectedReplyStatus = $filterReply === 'replied';
+                $actualReplyValues = $reviews->pluck('replied')->toArray();
+                $allMatchReply = count(array_filter($actualReplyValues, function($r) use ($expectedReplyStatus) {
+                    return $expectedReplyStatus ? !empty($r) : empty($r);
+                })) == count($actualReplyValues);
+                error_log("Reply filter verification - Expected: $filterReply, All match: " . ($allMatchReply ? 'YES' : 'NO'));
+            }
+
+            error_log("=== COMPLAINTS API RESPONSE SENT ===");
+
+            // Variabel-variabel untuk verifikasi
+            $finalRatings = $reviews->pluck('rating')->toArray();
+            $finalReplyStatus = $reviews->map(function($r) {
+                return !empty($r->reply) ? 'replied' : 'pending';
+            })->toArray();
+            $allAreComplaints = count(array_filter($finalRatings, function($rating) { return $rating <= 2; })) == count($finalRatings);
+
+            // Definisikan $sortBy untuk menghindari error jika tidak didefinisikan
+            $sortBy = $request->get('sort_by', 'newest');
+
+            return response()->json([
+                'reviews' => $formattedReviews,
+                'pagination' => [
+                    'current_page' => $reviews->currentPage(),
+                    'last_page' => $reviews->lastPage(),
+                    'total' => $reviews->total(),
+                    'per_page' => $reviews->perPage()
+                ],
+                'verification_info' => [
+                    'total_reviews_returned' => count($finalRatings),
+                    'all_are_complaints' => $allAreComplaints, // Ini penting: harus selalu TRUE karena endpoint ini untuk komplain
+                    'rating_distribution' => array_count_values($finalRatings),
+                    'reply_status_distribution' => array_count_values($finalReplyStatus),
+                    'filters_applied' => [
+                        'filter_star' => $filterStar,
+                        'filter_reply' => $filterReply,
+                        'sort_by' => $sortBy
+                    ],
+                    'filter_verification' => [
+                        'rating_filter_works' => $filterStar ?
+                            (count(array_unique($finalRatings)) === 1 && in_array((int)$filterStar, $finalRatings)) :
+                            'Not applied',
+                        'reply_filter_works' => $filterReply ?
+                            (count(array_unique($finalReplyStatus)) === 1 && in_array(
+                                $filterReply === 'replied' ? 'replied' : 'pending',
+                                $finalReplyStatus
+                            )) :
+                            'Not applied'
+                    ]
+                ]
+            ]);
+        } catch (\Exception $e) {
+            error_log("API Error: " . $e->getMessage());
+            return response()->json(['error' => 'Internal server error'], 500);
+        }
+    }
     
     /**
      * Approve a return request
@@ -581,7 +814,9 @@ class SellerOrderController extends Controller
                 'status_label' => ucfirst(str_replace('_', ' ', $return->status)),
                 'created_at' => $return->requested_at->format('d M Y, H:i'),
                 'refund_amount' => $return->refund_amount,
-                'tracking_number' => $return->tracking_number
+                'tracking_number' => $return->tracking_number,
+                'item_type' => 'return',  // Identifikasi bahwa ini adalah data retur, bukan komplain
+                'source_endpoint' => 'returns'  // Untuk debugging, tunjukkan ini dari endpoint retur
             ];
         });
 

@@ -30,6 +30,11 @@ class DatabaseSeeder extends Seeder
             SellerReviewSeeder::class,
         ]);
 
+        // Jalankan seeder untuk data dummy dinamis
+        $this->call([
+            DynamicReviewSeeder::class,
+        ]);
+
         // Cek data
         $this->checkData();
     }

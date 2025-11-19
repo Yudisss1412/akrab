@@ -750,6 +750,9 @@ Route::post('/api/returns/{id}/approve', [App\Http\Controllers\Seller\SellerOrde
 Route::post('/api/returns/{id}/reject', [App\Http\Controllers\Seller\SellerOrderController::class, 'rejectReturn'])->name('api.returns.reject');
 Route::post('/api/returns/{id}/complete', [App\Http\Controllers\Seller\SellerOrderController::class, 'completeReturn'])->name('api.returns.complete');
 
+// API endpoint untuk komplain-retur yang digunakan oleh frontend
+Route::get('/penjual/komplain-retur/api', [App\Http\Controllers\Seller\SellerOrderController::class, 'getComplaintsAndReturnsJson'])->name('seller.complaints.returns.api');
+
 Route::get('/penjual/saldo', [App\Http\Controllers\WithdrawalController::class, 'showBalancePage'])->name('penjual.saldo');
 
 // Debug route for filtering issue - with proper auth

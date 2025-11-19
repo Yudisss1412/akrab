@@ -223,16 +223,11 @@ class ReviewController extends Controller
             \Log::info('Total after filter: ' . $totalAfter);
             \Log::info('All ratings after: ' . json_encode(array_count_values($allRatingsAfter)));
 
-            // Ambil hasil
+            // Ambil hasil dengan pagination
             $reviews = $reviewsQuery->paginate(10);
             \Log::info('Reviews on page: ' . $reviews->count());
 
             // Validasi hasil
-            $resultRatings = $reviews->pluck('rating')->toArray();
-            // Ambil review dan proses satu per satu untuk menghindari eager loading bermasalah
-            $reviews = $reviewsQuery->paginate(10);
-
-            // Hitung hasil setelah pagination
             $resultRatings = $reviews->pluck('rating')->toArray();
             $resultReplies = $reviews->map(function($r) {
                 return !empty($r->reply) ? 'replied' : 'pending';
@@ -250,9 +245,12 @@ class ReviewController extends Controller
 
             if (!empty($filterReply)) {
                 $expectedReplyStatus = $filterReply === 'replied';
-                $actualReplyStatuses = $reviews->pluck('replied')->toArray();
-                $replyMatches = count(array_filter($actualReplyStatuses, function($reply) use ($expectedReplyStatus) {
-                    return $expectedReplyStatus ? !empty($reply) : empty($reply);
+                $actualReplyStatuses = $reviews->map(function($r) {
+                    return !empty($r->reply) ? 'replied' : 'pending';
+                })->toArray();
+                $replyMatches = count(array_filter($actualReplyStatuses, function($r) use ($filterReply) {
+                    $shouldBeReplied = $filterReply === 'replied';
+                    return $shouldBeReplied ? $r === 'replied' : $r === 'pending';
                 }));
                 \Log::info("Reply filter verification - Expected: $filterReply, Matched: $replyMatches, Total on page: " . count($actualReplyStatuses));
             }

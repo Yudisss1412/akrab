@@ -24,5 +24,45 @@ class DatabaseSeeder extends Seeder
             SellerOrderSeeder::class,
             ReviewsTableSeeder::class,
         ]);
+
+        // Jalankan seeder review untuk penjual setelah semua data dasar dibuat
+        $this->call([
+            SellerReviewSeeder::class,
+        ]);
+
+        // Cek data
+        $this->checkData();
+    }
+
+    private function checkData()
+    {
+        $seller = \App\Models\Seller::first();
+        if ($seller) {
+            echo "Seller count: " . \App\Models\Seller::count() . "\n";
+            echo "Product count: " . \App\Models\Product::count() . "\n";
+            echo "Review count: " . \App\Models\Review::count() . "\n";
+            echo "First seller id: " . $seller->id . "\n";
+            echo "First seller products count: " . $seller->products()->count() . "\n";
+            echo "First seller user id: " . $seller->user_id . "\n";
+
+            // Cek produk milik seller ini
+            $products = $seller->products;
+            echo "Product IDs for this seller: ";
+            foreach ($products as $product) {
+                echo $product->id . " ";
+            }
+            echo "\n";
+
+            // Cek review untuk produk ini
+            $productIds = $products->pluck('id')->toArray();
+            $reviews = \App\Models\Review::whereIn('product_id', $productIds)->get();
+            echo "Reviews count for this seller's products: " . $reviews->count() . "\n";
+
+            foreach ($reviews as $review) {
+                echo "Review ID: " . $review->id . ", Product ID: " . $review->product_id . ", Rating: " . $review->rating . "\n";
+            }
+        } else {
+            echo "No seller found\n";
+        }
     }
 }

@@ -129,116 +129,171 @@ class ReviewController extends Controller
      */
     public function getReviewsJson(Request $request)
     {
-        try {
-            // Debug: Log parameter yang diterima
-            \Log::info('Review API Request:', [
-                'filter_star' => $request->get('filter_star'),
-                'filter_reply' => $request->get('filter_reply'),
-                'sort_by' => $request->get('sort_by'),
-                'page' => $request->get('page'),
-                'user_id' => Auth::id(),
-                'all_params' => $request->all()
-            ]);
+        // Tambahkan logging untuk debugging
+        \Log::info('=== API CALLED ===');
+        \Log::info('Request params:', $request->all());
 
-            // Pastikan seller tersedia (seperti di constructor)
+        try {
+            // Pastikan user dan seller tersedia
             $user = Auth::user();
             if (!$user) {
+                \Log::info('User not authenticated');
                 return response()->json(['error' => 'User not authenticated'], 401);
             }
-            
+
             $seller = Seller::where('user_id', $user->id)->first();
             if (!$seller) {
-                \Log::error('Seller not found for user', ['user_id' => $user->id]);
+                \Log::info('Seller not found');
                 return response()->json(['error' => 'Seller not found'], 403);
             }
 
+            // Ambil produk penjual
             $products = $seller->products()->pluck('id')->toArray();
-            \Log::info('Seller products', ['product_ids' => $products, 'count' => count($products)]);
+            \Log::info('API Request - Seller details:', [
+                'seller_id' => $seller->id,
+                'user_id' => $user->id,
+                'product_ids' => $products,
+                'product_count' => count($products)
+            ]);
 
-            // Bangun query tanpa eager loading dulu untuk menghindari error relasi
+            // Debug: cek apakah produk-produk ini memiliki ulasan
+            \Log::info('API Request - Product reviews check:', [
+                'checking_for_products' => $products,
+                'available_reviews_count' => Review::whereIn('product_id', $products)->count(),
+                'specific_ratings_found' => array_count_values(Review::whereIn('product_id', $products)->pluck('rating')->toArray())
+            ]);
+
+            // Bangun query dasar - hindari eager loading yang bisa menyebabkan error relasi
             $reviewsQuery = Review::whereIn('product_id', $products);
 
-            // Hitung total sebelum filter
-            $totalBeforeFilter = $reviewsQuery->count();
-            \Log::info('Total reviews before filters', ['count' => $totalBeforeFilter]);
+            // Debug: tampilkan total sebelum filter
+            $totalBefore = $reviewsQuery->count();
+            $allRatingsBefore = $reviewsQuery->pluck('rating')->toArray();
+            \Log::info('API Request - Query details:', [
+                'total_before_filter' => $totalBefore,
+                'all_ratings_before' => array_count_values($allRatingsBefore),
+                'filter_product_ids' => $products
+            ]);
+            \Log::info('All ratings before: ' . json_encode(array_count_values($allRatingsBefore)));
 
-            // Gunakan pendekatan lebih eksplisit untuk memastikan filtering bekerja
+            // Terapkan filter rating
             $filterStar = $request->get('filter_star');
-            $filterReply = $request->get('filter_reply');
-            $sortBy = $request->get('sort_by');
-
-            if (!is_null($filterStar) && $filterStar !== '') {
-                \Log::info('Applying rating filter', ['rating' => $filterStar]);
+            if (!empty($filterStar)) {
+                \Log::info('Applying rating filter: ' . $filterStar);
                 $reviewsQuery->where('rating', $filterStar);
+            } else {
+                \Log::info('No rating filter applied');
             }
 
-            if (!is_null($filterReply) && $filterReply !== '') {
-                \Log::info('Applying reply filter', ['type' => $filterReply]);
+            // Terapkan filter reply
+            $filterReply = $request->get('filter_reply');
+            if (!empty($filterReply)) {
+                \Log::info('Applying reply filter: ' . $filterReply);
                 if ($filterReply === 'replied') {
                     $reviewsQuery->whereNotNull('reply');
-                    \Log::info('Filtering for replied reviews only');
                 } else if ($filterReply === 'pending') {
                     $reviewsQuery->whereNull('reply');
-                    \Log::info('Filtering for reviews without reply only');
                 }
+            } else {
+                \Log::info('No reply filter applied');
             }
 
-            // Urutkan
+            // Terapkan sorting
+            $sortBy = $request->get('sort_by', 'newest');
+            \Log::info('Applying sort: ' . $sortBy);
             switch ($sortBy) {
                 case 'oldest':
                     $reviewsQuery->orderBy('created_at', 'asc');
-                    \Log::info('Sorting by oldest');
                     break;
                 case 'highest':
                     $reviewsQuery->orderBy('rating', 'desc');
-                    \Log::info('Sorting by highest rating');
                     break;
                 case 'lowest':
                     $reviewsQuery->orderBy('rating', 'asc');
-                    \Log::info('Sorting by lowest rating');
                     break;
-                default: // newest
+                default:
                     $reviewsQuery->orderBy('created_at', 'desc');
-                    \Log::info('Sorting by newest');
                     break;
             }
 
-            // Log query sebelum pagination
-            $countAfterAllOperations = $reviewsQuery->count();
-            \Log::info('Count after filters and sorting', ['count' => $countAfterAllOperations]);
+            // Debug: tampilkan total setelah filter
+            $totalAfter = $reviewsQuery->count();
+            $filteredRatings = clone $reviewsQuery;
+            $allRatingsAfter = $filteredRatings->pluck('rating')->toArray();
+            \Log::info('Total after filter: ' . $totalAfter);
+            \Log::info('All ratings after: ' . json_encode(array_count_values($allRatingsAfter)));
 
-            // Dapatkan ID review yang sudah difilter
-            $filteredReviewIds = $reviewsQuery->pluck('id');
-            \Log::info('Filtered review IDs', ['ids' => $filteredReviewIds->toArray()]);
-
-            // Sekarang baru gunakan with() untuk eager load relasi
-            $reviewsQuery = Review::with(['user', 'product'])->whereIn('id', $filteredReviewIds);
-
+            // Ambil hasil
             $reviews = $reviewsQuery->paginate(10);
-            \Log::info('Reviews after query', [
-                'count' => $reviews->count(), 
-                'total' => $reviews->total(),
-                'per_page' => $reviews->perPage(),
-                'current_page' => $reviews->currentPage()
-            ]);
-            
-            // Log hasil akhir
-            \Log::info('Final reviews sample', [
-                'count_in_page' => $reviews->count(),
-                'sample' => $reviews->items() ? collect($reviews->items())->take(2)->map(function($r) {
-                    return ['id' => $r->id, 'rating' => $r->rating, 'reply' => $r->reply, 'status' => $r->status ?? 'unknown'];
-                })->toArray() : []
-            ]);
-            
-            $formattedReviews = $reviews->map(function($review) {
-                // Pastikan relasi ada sebelum mengakses propertinya
-                $userName = $review->user ? $review->user->name : 'Unknown User';
-                $productName = $review->product ? $review->product->name : 'Unknown Product';
-                $productImage = $review->product && $review->product->main_image ? 
-                    asset('storage/' . $review->product->main_image) : 
-                    asset('src/product_1.png');
+            \Log::info('Reviews on page: ' . $reviews->count());
 
-                return [
+            // Validasi hasil
+            $resultRatings = $reviews->pluck('rating')->toArray();
+            // Ambil review dan proses satu per satu untuk menghindari eager loading bermasalah
+            $reviews = $reviewsQuery->paginate(10);
+
+            // Hitung hasil setelah pagination
+            $resultRatings = $reviews->pluck('rating')->toArray();
+            $resultReplies = $reviews->map(function($r) {
+                return !empty($r->reply) ? 'replied' : 'pending';
+            })->toArray();
+
+            \Log::info('Reviews on page: ' . $reviews->count());
+            \Log::info('Result ratings: ' . json_encode(array_count_values($resultRatings)));
+            \Log::info('Result reply status: ' . json_encode(array_count_values($resultReplies)));
+
+            // Verifikasi filter berhasil
+            if (!empty($filterStar)) {
+                $ratingMatches = count(array_filter($resultRatings, function($r) use ($filterStar) { return $r == $filterStar; }));
+                \Log::info("Rating filter verification - Expected: $filterStar, Matched: $ratingMatches, Total on page: " . count($resultRatings));
+            }
+
+            if (!empty($filterReply)) {
+                $expectedReplyStatus = $filterReply === 'replied';
+                $actualReplyStatuses = $reviews->pluck('replied')->toArray();
+                $replyMatches = count(array_filter($actualReplyStatuses, function($reply) use ($expectedReplyStatus) {
+                    return $expectedReplyStatus ? !empty($reply) : empty($reply);
+                }));
+                \Log::info("Reply filter verification - Expected: $filterReply, Matched: $replyMatches, Total on page: " . count($actualReplyStatuses));
+            }
+
+            // Format hasil - ambil data produk secara individual untuk menghindari error relasi
+            $formattedReviews = collect(); // Buat koleksi baru yang aman
+
+            foreach ($reviews as $review) {
+                // Ambil data user secara manual untuk menghindari error relasi
+                $userName = 'Unknown User';
+
+                try {
+                    $user = \App\Models\User::select(['id', 'name'])->find($review->user_id);
+                    if ($user) {
+                        $userName = $user->name;
+                    }
+                } catch (\Exception $e) {
+                    \Log::warning('Could not load user safely: ' . $e->getMessage());
+                    // Gunakan nilai default
+                }
+
+                // Ambil data produk secara manual untuk menghindari error relasi
+                $productName = 'Unknown Product';
+                $productImage = asset('src/product_1.png'); // default image
+
+                try {
+                    // Akses produk dengan SELECT spesifik untuk menghindari memicu relasi bermasalah
+                    $product = \App\Models\Product::select(['id', 'name', 'main_image'])->find($review->product_id);
+                    if ($product) {
+                        $productName = $product->name;
+
+                        if (isset($product->main_image) && $product->main_image) {
+                            $productImage = asset('storage/' . $product->main_image);
+                        }
+                    }
+                } catch (\Exception $e) {
+                    \Log::warning('Could not load product safely: ' . $e->getMessage());
+                    // Gunakan nilai default
+                }
+
+                $formattedReviews->push([
                     'id' => $review->id,
                     'name' => $userName,
                     'rating' => $review->rating,
@@ -250,8 +305,10 @@ class ReviewController extends Controller
                     ],
                     'replied' => !empty($review->reply),
                     'reply' => $review->reply
-                ];
-            });
+                ]);
+            }
+
+            \Log::info('=== API RESPONSE SENT ===');
 
             return response()->json([
                 'reviews' => $formattedReviews,
@@ -260,16 +317,21 @@ class ReviewController extends Controller
                     'last_page' => $reviews->lastPage(),
                     'total' => $reviews->total(),
                     'per_page' => $reviews->perPage()
+                ],
+                'validation' => [
+                    'total_before' => $totalBefore,
+                    'total_after' => $totalAfter,
+                    'original_ratings' => array_count_values($allRatingsBefore),
+                    'filtered_ratings' => array_count_values($allRatingsAfter),
+                    'result_ratings' => array_unique($resultRatings),
+                    'result_replies' => array_unique($resultReplies),
+                    'filter_star_applied' => $filterStar,
+                    'filter_reply_applied' => $filterReply
                 ]
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error in getReviewsJson: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString()
-            ]);
-            return response()->json([
-                'error' => 'Internal server error',
-                'message' => $e->getMessage()
-            ], 500);
+            \Log::error('API Error: ' . $e->getMessage());
+            return response()->json(['error' => 'Internal server error'], 500);
         }
     }
 

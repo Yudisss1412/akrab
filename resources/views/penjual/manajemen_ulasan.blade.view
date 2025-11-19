@@ -441,7 +441,10 @@
         <div class="filter-row">
           <div class="filter-group">
             <label for="filter-star">Filter berdasarkan Bintang</label>
-            <select id="filter-star" class="filter-control" @change="fetchReviews()">
+            <select id="filter-star" class="filter-control" x-ref="filterStar"
+                    @change="updateFilter('filterStar', $event.target.value);
+                              console.log('Filter star changed and state updated to:', $event.target.value);
+                              fetchReviews();">
               <option value="">Semua Bintang</option>
               <option value="5">5 Bintang</option>
               <option value="4">4 Bintang</option>
@@ -450,19 +453,25 @@
               <option value="1">1 Bintang</option>
             </select>
           </div>
-          
+
           <div class="filter-group">
             <label for="filter-reply">Filter berdasarkan Status Balasan</label>
-            <select id="filter-reply" class="filter-control" @change="fetchReviews()">
+            <select id="filter-reply" class="filter-control" x-ref="filterReply"
+                    @change="updateFilter('filterReply', $event.target.value);
+                              console.log('Filter reply changed and state updated to:', $event.target.value);
+                              fetchReviews();">
               <option value="">Semua Status</option>
               <option value="replied">Telah Dibalas</option>
               <option value="pending">Belum Dibalas</option>
             </select>
           </div>
-          
+
           <div class="filter-group">
             <label for="sort-by">Urutkan berdasarkan</label>
-            <select id="sort-by" class="filter-control" @change="fetchReviews()">
+            <select id="sort-by" class="filter-control" x-ref="sortBy"
+                    @change="updateFilter('sortBy', $event.target.value);
+                              console.log('Sort by changed and state updated to:', $event.target.value);
+                              fetchReviews();">
               <option value="newest">Terbaru</option>
               <option value="oldest">Terlama</option>
               <option value="highest">Rating Tertinggi</option>
@@ -479,48 +488,154 @@
           total: 0,
           perPage: 10,
           loading: true,
-          
+
+          // State untuk menyimpan filter saat ini
+          currentFilters: {
+            filterStar: null,
+            filterReply: null,
+            sortBy: 'newest'
+          },
+
           init() {
+            // Set initial filter values from URL parameters only (since .view might not process blade syntax)
+            const urlParams = new URLSearchParams(window.location.search);
+            const filterStar = urlParams.get('filter_star') || null;
+            const filterReply = urlParams.get('filter_reply') || null;
+            const sortBy = urlParams.get('sort_by') || 'newest';
+
+            // Set the select values
+            if (filterStar) {
+              document.getElementById('filter-star').value = filterStar;
+            }
+            if (filterReply) {
+              document.getElementById('filter-reply').value = filterReply;
+            }
+            document.getElementById('sort-by').value = sortBy;
+
+            // Update state filter
+            this.currentFilters = {
+              filterStar: filterStar,
+              filterReply: filterReply,
+              sortBy: sortBy
+            };
+
             this.fetchReviews();
+          },
+
+          // Fungsi untuk mendapatkan nilai filter saat ini
+          getFilterValues() {
+            return this.currentFilters;
+          },
+
+          // Fungsi untuk memperbarui state filter
+          updateFilter(filterName, value) {
+            this.currentFilters[filterName] = value;
+            console.log('Updated filter state:', this.currentFilters);
+
+            // Tambahkan logging tambahan untuk debugging
+            console.log('Filter update - Name:', filterName, 'Value:', value);
           },
           
           fetchReviews() {
             this.loading = true;
 
-            // Ambil nilai filter
-            const filterStar = document.getElementById('filter-star').value || null;
-            const filterReply = document.getElementById('filter-reply').value || null;
-            const sortBy = document.getElementById('sort-by').value || null;
+            // Ambil nilai filter menggunakan state Alpine.js
+            const { filterStar, filterReply, sortBy } = this.getFilterValues();
 
-            // Bangun URL dengan parameter hanya jika tidak null
-            let url = new URL(`{{ route('seller.reviews.api') }}`, window.location.origin);
-            url.searchParams.append('page', this.currentPage);
+            console.log('=== FRONTEND DEBUG START ===');
+            console.log('Filter values being sent:', { filterStar, filterReply, sortBy });
 
-            if (filterStar) url.searchParams.append('filter_star', filterStar);
-            if (filterReply) url.searchParams.append('filter_reply', filterReply);
-            if (sortBy) url.searchParams.append('sort_by', sortBy);
+            // Bangun URL
+            const baseUrl = `{{ route('seller.reviews.api') }}`;
+            let url = new URL(baseUrl, window.location.origin);
 
-            console.log('--- DEBUG FILTERING ---');
-            console.log('Current page:', this.currentPage);
-            console.log('Filter Star:', filterStar, 'Type:', typeof filterStar);
-            console.log('Filter Reply:', filterReply, 'Type:', typeof filterReply);
-            console.log('Sort By:', sortBy, 'Type:', typeof sortBy);
-            console.log('Complete URL:', url.toString());
-            console.log('--- END DEBUG ---');
+            // Reset ke halaman 1 dan tambahkan parameter
+            url.searchParams.set('page', '1');
+            if (filterStar) url.searchParams.set('filter_star', filterStar);
+            if (filterReply) url.searchParams.set('filter_reply', filterReply);
+            if (sortBy) url.searchParams.set('sort_by', sortBy);
+
+            // Tambahkan timestamp untuk mencegah cache
+            url.searchParams.set('t', new Date().getTime());
+
+            console.log('FETCH URL:', url.toString());
+            console.log('=== FRONTEND DEBUG END ===');
 
             fetch(url)
-              .then(response => response.json())
+              .then(response => {
+                console.log('Response Status:', response.status);
+                return response.json();
+              })
               .then(data => {
-                console.log('API Response:', data);
-                this.reviews = data.reviews || [];
-                this.currentPage = data.pagination?.current_page || 1;
-                this.lastPage = data.pagination?.last_page || 1;
-                this.total = data.pagination?.total || 0;
-                this.perPage = data.pagination?.per_page || 10;
-                this.loading = false;
+                console.log('=== RESPONSE DATA ===');
+                console.log('Total items:', data.pagination?.total);
+                console.log('Items on page:', data.reviews.length);
+
+                // Tampilkan informasi validasi dari API
+                if (data.validation) {
+                  console.log('VALIDATION FROM API:', data.validation);
+                }
+
+                // Tampilkan informasi rating dan reply status dari hasil
+                const ratingsReceived = data.reviews.map(r => r.rating);
+                const repliesReceived = data.reviews.map(r => r.replied ? 'replied' : 'pending');
+
+                console.log('Ratings received (first 10):', ratingsReceived.slice(0, 10));
+                console.log('Reply status received (first 10):', repliesReceived.slice(0, 10));
+
+                // Verifikasi apakah hasil sesuai filter
+                if (filterStar) {
+                  const allMatchRating = data.reviews.every(r => r.rating == filterStar);
+                  console.log('Rating Filter Check:', {
+                    expected: filterStar,
+                    allMatch: allMatchRating,
+                    uniqueRatings: [...new Set(ratingsReceived)]
+                  });
+                }
+
+                if (filterReply) {
+                  const expectedReplyStatus = filterReply === 'replied';
+                  const allMatchReply = data.reviews.every(r => r.replied === expectedReplyStatus);
+                  console.log('Reply Filter Check:', {
+                    expected: filterReply,
+                    expectedReplyStatus: expectedReplyStatus,
+                    allMatch: allMatchReply,
+                    uniqueReplyStatus: [...new Set(repliesReceived)]
+                  });
+                }
+
+                console.log('=== RESPONSE DATA END ===');
+
+                // Validasi data dari API sebelum menggunakannya
+                if (!data || !data.reviews || !Array.isArray(data.reviews)) {
+                  console.error('Invalid API response:', data);
+                  this.reviews = [];
+                  this.loading = false;
+                  return;
+                }
+
+                // Force update dengan mengosongkan dulu
+                this.reviews = [];
+
+                // Gunakan nextTick untuk memastikan DOM diperbarui
+                this.$nextTick(() => {
+                  // Update state
+                  this.reviews = [...data.reviews] || []; // Gunakan spread untuk memastikan reaktivitas
+                  this.currentPage = 1;
+                  this.lastPage = data.pagination?.last_page || 1;
+                  this.total = data.pagination?.total || 0;
+                  this.perPage = data.pagination?.per_page || 10;
+                  this.loading = false;
+
+                  console.log('State updated. New reviews count:', this.reviews.length);
+                  console.log('Sample of new data:', this.reviews.slice(0, 3).map(r => ({id: r.id, rating: r.rating, comment: r.comment?.substring(0, 30) || 'no comment'})));
+                });
+
+                // Debug tambahan: tampilkan informasi filter yang aktif
+                console.log('Active filters:', { filterStar, filterReply, sortBy });
               })
               .catch(error => {
-                console.error('Error fetching reviews:', error);
+                console.error('Fetch Error:', error);
                 this.loading = false;
               });
           },
@@ -570,11 +685,10 @@
             return '';
           },
 
+          // Fungsi ini seharusnya hanya digunakan dalam kondisi khusus, bukan untuk tampilan biasa
+          // Untuk sekarang kita hanya kembalikan komentar asli
           adjustReviewTextByRating(rating, comment) {
-            // Placeholder untuk fungsi penyesuaian teks ulasan berdasarkan rating
-            if (typeof window !== 'undefined' && typeof adjustReviewTextByRating !== 'undefined') {
-              return adjustReviewTextByRating(rating, comment);
-            }
+            // Kembalikan komentar asli dari API
             return comment;
           }
         }">
@@ -582,19 +696,19 @@
             <p>Memuat ulasan...</p>
           </div>
           
-          <template x-for="review in reviews" :key="review.id">
+          <template x-for="review in reviews" :key="'review-' + review.id + '-v' + (Math.random() * 100000000).toFixed(0)">
             <div class="review-card" x-data="{ isReplying: false, replyText: '' }">
               <div class="review-header">
                 <div class="reviewer-info">
                   <h3 class="reviewer-name" x-text="review.name"></h3>
                   <p class="review-date" x-text="review.date"></p>
                 </div>
-                
+
                 <div class="review-rating" x-html="generateStarRating(review.rating, 5)"></div>
               </div>
-              
-              <div class="review-content" x-text="adjustReviewTextByRating(review.rating, review.comment)"></div>
-              
+
+              <div class="review-content" x-text="review.comment"></div>
+
               <div class="review-product">
                 <img :src="review.product.image" alt="Gambar Produk" class="product-image">
                 <div class="product-info">
@@ -603,23 +717,37 @@
                   </h4>
                 </div>
               </div>
-              
+
+              <div class="review-info" style="margin-top: 0.5rem; padding: 0.5rem; background: #f9f9f9; border-radius: var(--ak-radius); font-size: 0.8rem;">
+                <strong>Info:</strong> Rating: <span x-text="review.rating"></span>, ID: <span x-text="review.id"></span>
+                <span x-show="review.replied" style="color: green;"> • Dibalas</span>
+                <span x-show="!review.replied" style="color: orange;"> • Belum Dibalas</span>
+
+                <!-- Tambahkan indikator filter untuk debugging -->
+                <div x-show="currentFilters.filterStar" style="margin-top: 0.2rem; font-weight: bold; color: blue;">
+                  Filter: <span x-text="'Bintang ' + currentFilters.filterStar"></span>
+                </div>
+                <div x-show="currentFilters.filterReply" style="margin-top: 0.2rem; font-weight: bold; color: purple;">
+                  Filter: <span x-text="currentFilters.filterReply === 'replied' ? 'Telah Dibalas' : 'Belum Dibalas'"></span>
+                </div>
+              </div>
+
               <button class="reply-btn" @click="isReplying = !isReplying">
                 <span x-text="isReplying ? 'Batal' : (review.replied ? 'Lihat Balasan' : 'Balas')"></span>
               </button>
-              
+
               <div class="reply-form" x-show="isReplying" x-cloak>
-                <textarea 
-                  class="reply-textarea" 
-                  placeholder="Tulis balasan untuk ulasan ini..." 
+                <textarea
+                  class="reply-textarea"
+                  placeholder="Tulis balasan untuk ulasan ini..."
                   x-model="replyText"
                   x-ref="replyTextarea"
                   x-effect="if (isReplying) $refs.replyTextarea.focus()"
                   maxlength="500"
                 ></textarea>
-                
+
                 <div class="char-count" x-text="`${replyText.length}/500 karakter`"></div>
-                
+
                 <div class="reply-actions">
                   <button class="btn-secondary" @click="isReplying = false; replyText = ''">Batal</button>
                   <button class="reply-btn" @click="submitReply(review.id, replyText, (reply) => { review.reply = reply; review.replied = true; isReplying = false; replyText = ''; })">
@@ -627,7 +755,7 @@
                   </button>
                 </div>
               </div>
-              
+
               <div x-show="review.replied && !isReplying" class="reply-display" style="margin-top: 1rem; padding: 1rem; background: #f0fdfa; border-left: 3px solid var(--ak-primary); border-radius: 0 var(--ak-radius) var(--ak-radius) 0;">
                 <strong>Balasan:</strong>
                 <p style="margin: 0.5rem 0 0;" x-text="review.reply"></p>
@@ -702,18 +830,10 @@
     }
 
     // Fungsi global untuk menyesuaikan teks ulasan berdasarkan rating
+    // SEKARANG: Kita kembalikan komentar asli dari database agar sesuai dengan data yang difilter
     function adjustReviewTextByRating(rating, comment) {
-      if (rating <= 2) {
-        // Ulasan negatif untuk rating 1-2
-        return "Produk tidak sesuai harapan saya. Kualitasnya buruk, tidak sepadan dengan harga. Kecewa dengan pembelian ini. Tidak akan memesan lagi.";
-      } else if (rating === 3) {
-        // Ulasan netral untuk rating 3
-        return "Produknya biasa saja. Ada bagusnya tapi juga ada kekurangannya. Secara keseluruhan lumayan lah.";
-      } else if (rating >= 4) {
-        // Ulasan positif untuk rating 4-5
-        return "Produknya bagus dan sesuai ekspektasi. Pengiriman cepat, kemasan rapi. Saya puas dengan pembelian ini. Direkomendasikan!";
-      }
-      // Jika rating di luar rentang normal, kembalikan komentar asli
+      // Kembalikan komentar asli dari database, bukan teks default
+      // Ini memungkinkan perbedaan komentar benar-benar terlihat setelah filter diterapkan
       return comment;
     }
   </script>

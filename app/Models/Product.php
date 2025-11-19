@@ -145,12 +145,21 @@ class Product extends Model
     // Method untuk mendapatkan gambar utama dari product_images
     public function getMainImageAttribute()
     {
-        $primaryImage = $this->images()->where('is_primary', true)->first();
-        if ($primaryImage) {
-            return $primaryImage->image_path;
+        // Coba akses kolom is_primary, tapi hindari error jika tidak ada
+        try {
+            // Periksa apakah kolom is_primary ada dalam schema
+            $schema = \Illuminate\Support\Facades\Schema::hasColumn('product_images', 'is_primary');
+            if ($schema) {
+                $primaryImage = $this->images()->where('is_primary', true)->first();
+                if ($primaryImage) {
+                    return $primaryImage->image_path;
+                }
+            }
+        } catch (\Exception $e) {
+            // Kolom tidak ditemukan, abaikan error
         }
 
-        // Fallback ke gambar pertama jika tidak ada yang ditandai sebagai utama
+        // Fallback ke gambar pertama
         $firstImage = $this->images()->first();
         return $firstImage ? $firstImage->image_path : null;
     }

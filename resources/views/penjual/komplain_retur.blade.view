@@ -364,254 +364,257 @@
           </h1>
         </section>
 
-        <!-- Tab Navigation -->
-        <div class="tab-nav" x-data="{
+        <!-- Tab Navigation and Contents with Unified Alpine.js -->
+        <div x-data="{
           activeTab: 'complaints',
+          complaintsTotal: 0,
+          returnsTotal: 0,
+
+          // Complaints data
+          complaints: [],
+          complaintsCurrentPage: 1,
+          complaintsLastPage: 1,
+          complaintsPerPage: 10,
+          complaintsLoading: true,
+
+          // Returns data
+          returns: [],
+          returnsCurrentPage: 1,
+          returnsLastPage: 1,
+          returnsPerPage: 10,
+          returnsLoading: true,
+
           setActiveTab(tab) {
             this.activeTab = tab;
+          },
+
+          init() {
+            this.fetchComplaints();
+            this.fetchReturns();
+          },
+
+          fetchComplaints() {
+            this.complaintsLoading = true;
+
+            const filterStar = document.getElementById('filter-star-complaints')?.value || null;
+            const filterReply = document.getElementById('filter-reply-complaints')?.value || null;
+            const sortBy = document.getElementById('sort-by-complaints')?.value || 'newest';
+
+            let url = new URL('/penjual/komplain-retur/api', window.location.origin);
+            url.searchParams.append('page', this.complaintsCurrentPage);
+
+            if (filterStar) url.searchParams.append('filter_star', filterStar);
+            if (filterReply) url.searchParams.append('filter_reply', filterReply);
+            if (sortBy) url.searchParams.append('sort_by', sortBy);
+
+            fetch(url)
+              .then(response => response.json())
+              .then(data => {
+                this.complaints = data.reviews || [];
+                this.complaintsCurrentPage = 1; // Reset to page 1 when filters change
+                this.complaintsLastPage = data.pagination?.last_page || 1;
+                this.complaintsTotal = data.pagination?.total || 0; // Update the tab count here
+                this.complaintsPerPage = data.pagination?.per_page || 10;
+                this.complaintsLoading = false;
+              })
+              .catch(error => {
+                console.error('Error fetching complaints:', error);
+                this.complaintsLoading = false;
+              });
+          },
+
+          fetchReturns() {
+            this.returnsLoading = true;
+
+            const filterStatus = document.getElementById('filter-status-returns')?.value || null;
+
+            let url = new URL('/api/returns', window.location.origin);
+            url.searchParams.append('page', this.returnsCurrentPage);
+
+            if (filterStatus) url.searchParams.append('filter_status', filterStatus);
+
+            fetch(url)
+              .then(response => response.json())
+              .then(data => {
+                this.returns = data.returns || [];
+                this.returnsCurrentPage = 1; // Reset to page 1 when filters change
+                this.returnsLastPage = data.pagination?.last_page || 1;
+                this.returnsTotal = data.pagination?.total || 0; // Update the tab count here
+                this.returnsPerPage = data.pagination?.per_page || 10;
+                this.returnsLoading = false;
+              })
+              .catch(error => {
+                console.error('Error fetching returns:', error);
+                this.returnsLoading = false;
+              });
           }
         }">
-          <div class="tab-item" :class="{ 'active': activeTab === 'complaints' }" @click="setActiveTab('complaints')">
-            Komplain
-            <span class="tab-badge">0</span>
-          </div>
-          <div class="tab-item" :class="{ 'active': activeTab === 'returns' }" @click="setActiveTab('returns')">
-            Retur
-            <span class="tab-badge">0</span>
-          </div>
-        </div>
-
-        <!-- Tab Contents with Alpine.js -->
-        <div x-show="activeTab === 'complaints'" x-cloak>
-          <!-- Info banner for complaints -->
-          <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: var(--ak-radius); padding: 1rem; margin-bottom: 1.5rem; color: #dc2626;">
-            <strong>Perhatian:</strong> Ulasan dengan rating 1 bintang (peringkat terendah) biasanya terkait dengan masalah produk dan kemungkinan besar akan mengarah pada permintaan retur. Penjual disarankan untuk merespon dengan cepat dan mempertimbangkan opsi retur.
-          </div>
-
-          <!-- Filter Row for Complaints -->
-          <div class="filter-row">
-            <div class="filter-group">
-              <label for="filter-star-complaints">Filter berdasarkan Bintang</label>
-              <select id="filter-star-complaints" class="filter-control" @change="fetchComplaints()">
-                <option value="">Semua Bintang</option>
-                <option value="1">1 Bintang</option>
-                <option value="2">2 Bintang</option>
-              </select>
+          <!-- Tab Navigation -->
+          <div class="tab-nav">
+            <div class="tab-item" :class="{ 'active': activeTab === 'complaints' }" @click="setActiveTab('complaints'); fetchComplaints();">
+              Komplain
+              <span class="tab-badge" x-text="complaintsTotal"></span>
             </div>
-
-            <div class="filter-group">
-              <label for="filter-reply-complaints">Filter berdasarkan Status Balasan</label>
-              <select id="filter-reply-complaints" class="filter-control" @change="fetchComplaints()">
-                <option value="">Semua Status</option>
-                <option value="replied">Telah Dibalas</option>
-                <option value="pending">Belum Dibalas</option>
-              </select>
-            </div>
-
-            <div class="filter-group">
-              <label for="sort-by-complaints">Urutkan berdasarkan</label>
-              <select id="sort-by-complaints" class="filter-control" @change="fetchComplaints()">
-                <option value="newest">Terbaru</option>
-                <option value="oldest">Terlama</option>
-                <option value="highest">Rating Tertinggi</option>
-                <option value="lowest">Rating Terendah</option>
-              </select>
+            <div class="tab-item" :class="{ 'active': activeTab === 'returns' }" @click="setActiveTab('returns'); fetchReturns();">
+              Retur
+              <span class="tab-badge" x-text="returnsTotal"></span>
             </div>
           </div>
 
-          <!-- Complaints List with Alpine.js -->
-          <div x-data="{
-            complaints: [],
-            currentPage: 1,
-            lastPage: 1,
-            total: 0,
-            perPage: 10,
-            loading: true,
-
-            init() {
-              this.fetchComplaints();
-            },
-
-            fetchComplaints() {
-              this.loading = true;
-
-              const filterStar = document.getElementById('filter-star-complaints').value || null;
-              const filterReply = document.getElementById('filter-reply-complaints').value || null;
-              const sortBy = document.getElementById('sort-by-complaints').value || 'newest';
-
-              let url = new URL('/penjual/komplain-retur/api', window.location.origin);
-              url.searchParams.append('page', this.currentPage);
-              
-              if (filterStar) url.searchParams.append('filter_star', filterStar);
-              if (filterReply) url.searchParams.append('filter_reply', filterReply);
-              if (sortBy) url.searchParams.append('sort_by', sortBy);
-
-              fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                  this.complaints = data.reviews || [];
-                  this.currentPage = 1; // Reset to page 1 when filters change
-                  this.lastPage = data.pagination?.last_page || 1;
-                  this.total = data.pagination?.total || 0;
-                  this.perPage = data.pagination?.per_page || 10;
-                  this.loading = false;
-                })
-                .catch(error => {
-                  console.error('Error fetching complaints:', error);
-                  this.loading = false;
-                });
-            }
-          }">
-            <div x-show="loading" class="loading">
-              <p>Memuat komplain...</p>
+          <!-- Tab Contents -->
+          <div x-show="activeTab === 'complaints'" x-cloak>
+            <!-- Info banner for complaints -->
+            <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: var(--ak-radius); padding: 1rem; margin-bottom: 1.5rem; color: #dc2626;">
+              <strong>Perhatian:</strong> Ulasan dengan rating 1 bintang (peringkat terendah) biasanya terkait dengan masalah produk dan kemungkinan besar akan mengarah pada permintaan retur. Penjual disarankan untuk merespon dengan cepat dan mempertimbangkan opsi retur.
             </div>
 
-            <div x-show="!loading && complaints.length === 0" class="empty-state">
-              <p>Belum ada komplain</p>
-            </div>
-
-            <template x-for="complaint in complaints" :key="'complaint-' + complaint.id">
-              <div class="item-card" x-data="{ isReplying: false, replyText: '' }">
-                <div class="item-header">
-                  <div>
-                    <h3 class="customer-name" x-text="complaint.name"></h3>
-                    <span class="item-date" x-text="complaint.date"></span>
-                  </div>
-                  <div class="item-rating" x-html="generateStarRating(complaint.rating, 5)"></div>
-                </div>
-
-                <div class="item-content">
-                  <div class="item-comment" x-text="complaint.comment"></div>
-                  <div class="item-product">
-                    <img :src="complaint.product.image" alt="Gambar Produk" style="width: 50px; height: 50px; border-radius: var(--ak-radius); object-fit: cover; margin-right: 0.5rem; border: 1px solid var(--ak-border);">
-                    <span x-text="complaint.product.name"></span>
-                  </div>
-                </div>
-
-                <div class="item-footer">
-                  <span class="status-badge" :class="complaint.replied ? 'status-approved' : 'status-pending'" x-text="complaint.replied ? 'Telah Dibalas' : 'Belum Dibalas'"></span>
-                  <div class="action-buttons">
-                    <button class="btn btn-sm btn-outline" @click="isReplying = !isReplying">
-                      <span x-text="isReplying ? 'Batal' : 'Balas'"></span>
-                    </button>
-                  </div>
-                </div>
-
-                <div x-show="isReplying" x-cloak style="padding: 1rem; background: #f9fafb; border-top: 1px solid var(--ak-border);">
-                  <textarea 
-                    class="filter-control" 
-                    placeholder="Tulis balasan untuk ulasan ini..." 
-                    x-model="replyText"
-                    x-ref="replyTextarea" 
-                    x-effect="if (isReplying) $refs.replyTextarea.focus()"
-                    style="width: 100%; padding: 0.5rem; margin-bottom: 0.5rem; resize: vertical; min-height: 80px;"
-                  ></textarea>
-                  <div class="action-buttons">
-                    <button class="btn btn-sm btn-outline" @click="isReplying = false; replyText = ''">Batal</button>
-                    <button class="btn btn-sm btn-primary" @click="replyToComplaint(complaint.id, replyText, () => { complaint.reply = replyText; complaint.replied = true; isReplying = false; replyText = ''; })">
-                      Kirim Balasan
-                    </button>
-                  </div>
-                </div>
+            <!-- Filter Row for Complaints -->
+            <div class="filter-row">
+              <div class="filter-group">
+                <label for="filter-star-complaints">Filter berdasarkan Bintang</label>
+                <select id="filter-star-complaints" class="filter-control" @change="fetchComplaints()">
+                  <option value="">Semua Bintang</option>
+                  <option value="1">1 Bintang</option>
+                  <option value="2">2 Bintang</option>
+                </select>
               </div>
-            </template>
-          </div>
-        </div>
 
-        <div x-show="activeTab === 'returns'" x-cloak>
-          <!-- Filter Row for Returns -->
-          <div class="filter-row">
-            <div class="filter-group">
-              <label for="filter-status-returns">Filter berdasarkan Status</label>
-              <select id="filter-status-returns" class="filter-control" @change="fetchReturns()">
-                <option value="">Semua Status</option>
-                <option value="pending">Menunggu</option>
-                <option value="approved">Disetujui</option>
-                <option value="rejected">Ditolak</option>
-                <option value="completed">Selesai</option>
-              </select>
-            </div>
+              <div class="filter-group">
+                <label for="filter-reply-complaints">Filter berdasarkan Status Balasan</label>
+                <select id="filter-reply-complaints" class="filter-control" @change="fetchComplaints()">
+                  <option value="">Semua Status</option>
+                  <option value="replied">Telah Dibalas</option>
+                  <option value="pending">Belum Dibalas</option>
+                </select>
+              </div>
 
-            <div class="filter-group">
-              <label>&nbsp;</label>
-              <div style="display: flex; gap: 0.5rem;">
-                <a href="{{ route('seller.reviews.index') }}" class="btn btn-primary">Lihat Semua Ulasan</a>
+              <div class="filter-group">
+                <label for="sort-by-complaints">Urutkan berdasarkan</label>
+                <select id="sort-by-complaints" class="filter-control" @change="fetchComplaints()">
+                  <option value="newest">Terbaru</option>
+                  <option value="oldest">Terlama</option>
+                  <option value="highest">Rating Tertinggi</option>
+                  <option value="lowest">Rating Terendah</option>
+                </select>
               </div>
             </div>
+
+            <!-- Complaints List -->
+            <div>
+              <div x-show="complaintsLoading" class="loading">
+                <p>Memuat komplain...</p>
+              </div>
+
+              <div x-show="!complaintsLoading && complaints.length === 0" class="empty-state">
+                <p>Belum ada komplain</p>
+              </div>
+
+              <template x-for="complaint in complaints" :key="'complaint-' + complaint.id">
+                <div class="item-card" x-data="{ isReplying: false, replyText: '' }">
+                  <div class="item-header">
+                    <div>
+                      <h3 class="customer-name" x-text="complaint.name"></h3>
+                      <span class="item-date" x-text="complaint.date"></span>
+                    </div>
+                    <div class="item-rating" x-html="generateStarRating(complaint.rating, 5)"></div>
+                  </div>
+
+                  <div class="item-content">
+                    <div class="item-comment" x-text="complaint.comment"></div>
+                    <div class="item-product">
+                      <img :src="complaint.product.image" alt="Gambar Produk" style="width: 50px; height: 50px; border-radius: var(--ak-radius); object-fit: cover; margin-right: 0.5rem; border: 1px solid var(--ak-border);">
+                      <span x-text="complaint.product.name"></span>
+                    </div>
+                  </div>
+
+                  <div class="item-footer">
+                    <span class="status-badge" :class="complaint.replied ? 'status-approved' : 'status-pending'" x-text="complaint.replied ? 'Telah Dibalas' : 'Belum Dibalas'"></span>
+                    <div class="action-buttons">
+                      <button class="btn btn-sm btn-outline" @click="isReplying = !isReplying">
+                        <span x-text="isReplying ? 'Batal' : 'Balas'"></span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div x-show="isReplying" x-cloak style="padding: 1rem; background: #f9fafb; border-top: 1px solid var(--ak-border);">
+                    <textarea
+                      class="filter-control"
+                      placeholder="Tulis balasan untuk ulasan ini..."
+                      x-model="replyText"
+                      x-ref="replyTextarea"
+                      x-effect="if (isReplying) $refs.replyTextarea.focus()"
+                      style="width: 100%; padding: 0.5rem; margin-bottom: 0.5rem; resize: vertical; min-height: 80px;"
+                    ></textarea>
+                    <div class="action-buttons">
+                      <button class="btn btn-sm btn-outline" @click="isReplying = false; replyText = ''">Batal</button>
+                      <button class="btn btn-sm btn-primary" @click="replyToComplaint(complaint.id, replyText, () => { complaint.reply = replyText; complaint.replied = true; isReplying = false; replyText = ''; })">
+                        Kirim Balasan
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </div>
           </div>
 
-          <!-- Returns List with Alpine.js -->
-          <div x-data="{
-            returns: [],
-            currentPage: 1,
-            lastPage: 1,
-            total: 0,
-            perPage: 10,
-            loading: true,
+          <div x-show="activeTab === 'returns'" x-cloak>
+            <!-- Filter Row for Returns -->
+            <div class="filter-row">
+              <div class="filter-group">
+                <label for="filter-status-returns">Filter berdasarkan Status</label>
+                <select id="filter-status-returns" class="filter-control" @change="fetchReturns()">
+                  <option value="">Semua Status</option>
+                  <option value="pending">Menunggu</option>
+                  <option value="approved">Disetujui</option>
+                  <option value="rejected">Ditolak</option>
+                  <option value="completed">Selesai</option>
+                </select>
+              </div>
 
-            init() {
-              this.fetchReturns();
-            },
-
-            fetchReturns() {
-              this.loading = true;
-
-              const filterStatus = document.getElementById('filter-status-returns').value || null;
-
-              let url = new URL('/api/returns', window.location.origin);
-              url.searchParams.append('page', this.currentPage);
-              
-              if (filterStatus) url.searchParams.append('filter_status', filterStatus);
-
-              fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                  this.returns = data.returns || [];
-                  this.currentPage = 1; // Reset to page 1 when filters change
-                  this.lastPage = data.pagination?.last_page || 1;
-                  this.total = data.pagination?.total || 0;
-                  this.perPage = data.pagination?.per_page || 10;
-                  this.loading = false;
-                })
-                .catch(error => {
-                  console.error('Error fetching returns:', error);
-                  this.loading = false;
-                });
-            }
-          }">
-            <div x-show="loading" class="loading">
-              <p>Memuat retur...</p>
-            </div>
-
-            <div x-show="!loading && returns.length === 0" class="empty-state">
-              <p>Belum ada permintaan retur</p>
-            </div>
-
-            <template x-for="returnItem in returns" :key="'return-' + returnItem.id">
-              <div class="item-card">
-                <div class="item-header">
-                  <div>
-                    <h3 class="customer-name" x-text="returnItem.customer_name"></h3>
-                    <span class="item-date" x-text="returnItem.created_at"></span>
-                  </div>
-                  <span class="status-badge" :class="'status-' + returnItem.status" x-text="returnItem.status_label"></span>
-                </div>
-
-                <div class="item-content">
-                  <p><strong>Produk:</strong> <span x-text="returnItem.product_name"></span></p>
-                  <p><strong>Alasan:</strong> <span x-text="returnItem.reason"></span></p>
-                  <p><strong>Deskripsi:</strong> <span x-text="returnItem.description"></span></p>
-                  <p><strong>Jumlah Pengembalian:</strong> Rp <span x-text="returnItem.refund_amount.toLocaleString()"></span></p>
-                </div>
-
-                <div class="item-footer">
-                  <div class="action-buttons">
-                    <button class="btn btn-sm btn-outline" :disabled="returnItem.status !== 'pending'" @click="approveReturn(returnItem.id)">Setujui</button>
-                    <button class="btn btn-sm btn-outline btn-danger" :disabled="returnItem.status !== 'pending'" @click="rejectReturn(returnItem.id)">Tolak</button>
-                  </div>
+              <div class="filter-group">
+                <label>&nbsp;</label>
+                <div style="display: flex; gap: 0.5rem;">
+                  <a href="{{ route('seller.reviews.index') }}" class="btn btn-primary">Lihat Semua Ulasan</a>
                 </div>
               </div>
-            </template>
+            </div>
+
+            <!-- Returns List -->
+            <div>
+              <div x-show="returnsLoading" class="loading">
+                <p>Memuat retur...</p>
+              </div>
+
+              <div x-show="!returnsLoading && returns.length === 0" class="empty-state">
+                <p>Belum ada permintaan retur</p>
+              </div>
+
+              <template x-for="returnItem in returns" :key="'return-' + returnItem.id">
+                <div class="item-card">
+                  <div class="item-header">
+                    <div>
+                      <h3 class="customer-name" x-text="returnItem.customer_name"></h3>
+                      <span class="item-date" x-text="returnItem.created_at"></span>
+                    </div>
+                    <span class="status-badge" :class="'status-' + returnItem.status" x-text="returnItem.status_label"></span>
+                  </div>
+
+                  <div class="item-content">
+                    <p><strong>Produk:</strong> <span x-text="returnItem.product_name"></span></p>
+                    <p><strong>Alasan:</strong> <span x-text="returnItem.reason"></span></p>
+                    <p><strong>Deskripsi:</strong> <span x-text="returnItem.description"></span></p>
+                    <p><strong>Jumlah Pengembalian:</strong> Rp <span x-text="returnItem.refund_amount.toLocaleString()"></span></p>
+                  </div>
+
+                  <div class="item-footer">
+                    <div class="action-buttons">
+                      <button class="btn btn-sm btn-outline" :disabled="returnItem.status !== 'pending'" @click="approveReturn(returnItem.id)">Setujui</button>
+                      <button class="btn btn-sm btn-outline btn-danger" :disabled="returnItem.status !== 'pending'" @click="rejectReturn(returnItem.id)">Tolak</button>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </div>
           </div>
         </div>
       </main>

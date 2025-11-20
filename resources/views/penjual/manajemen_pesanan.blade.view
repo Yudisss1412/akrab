@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <title>Manajemen Pesanan — AKRAB</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ asset('css/admin_penjual/style.css') }}">
   <style>
@@ -434,7 +435,7 @@
         <!-- Orders Container -->
         <section class="orders-container" id="ordersContainer">
           @forelse($orders as $order)
-          <div class="order-card" data-status="{{ $order->status }}">
+          <div class="order-card" id="order-{{ $order->id }}" data-status="{{ $order->status }}">
             <div class="order-header">
               <div>
                 <div class="order-id">#{{ $order->order_number }}</div>
@@ -455,12 +456,12 @@
             </div>
             <div class="order-footer">
               <div>
-                <span class="status-badge 
-                  @if($order->status === 'pending_payment') status-pending-payment 
-                  @elseif($order->status === 'processing') status-processing 
-                  @elseif($order->status === 'shipping') status-shipping 
-                  @elseif($order->status === 'completed') status-completed 
-                  @elseif($order->status === 'cancelled') status-cancelled 
+                <span class="status-badge
+                  @if($order->status === 'pending_payment') status-pending-payment
+                  @elseif($order->status === 'processing') status-processing
+                  @elseif($order->status === 'shipping') status-shipping
+                  @elseif($order->status === 'completed') status-completed
+                  @elseif($order->status === 'cancelled') status-cancelled
                   @else status-pending-payment @endif">
                   {{ ucfirst(str_replace('_', ' ', $order->status)) }}
                 </span>
@@ -533,36 +534,56 @@
     // Tab navigation functionality
     document.addEventListener('DOMContentLoaded', function() {
       const tabItems = document.querySelectorAll('.tab-item');
-      const orderCards = document.querySelectorAll('.order-card');
-      
+
+      // Function to handle tab click - this will navigate to the appropriate URL
+      function handleTabClick(tabElement) {
+        // Remove active class from all tabs
+        tabItems.forEach(t => t.classList.remove('active'));
+
+        // Add active class to clicked tab
+        tabElement.classList.add('active');
+
+        // Get the status filter
+        const status = tabElement.getAttribute('data-status');
+
+        // Navigate to the appropriate URL based on the tab clicked
+        let newUrl;
+        if (status === 'all') {
+          // Remove status parameter to show all orders
+          const currentUrl = new URL(window.location);
+          currentUrl.searchParams.delete('status');
+          newUrl = currentUrl.toString();
+        } else {
+          // Add status parameter to filter orders
+          const currentUrl = new URL(window.location);
+          currentUrl.searchParams.set('status', status);
+          newUrl = currentUrl.toString();
+        }
+
+        // Navigate to the new URL
+        window.location.href = newUrl;
+      }
+
       tabItems.forEach(tab => {
         tab.addEventListener('click', function() {
-          // Remove active class from all tabs
-          tabItems.forEach(t => t.classList.remove('active'));
-          
-          // Add active class to clicked tab
-          this.classList.add('active');
-          
-          // Get the status filter
-          const status = this.getAttribute('data-status');
-          
-          // Filter orders based on status
-          orderCards.forEach(card => {
-            if (status === 'all') {
-              card.style.display = 'block';
-            } else {
-              const cardStatus = card.getAttribute('data-status');
-              if (cardStatus === status) {
-                card.style.display = 'block';
-              } else {
-                card.style.display = 'none';
-              }
-            }
-          });
+          handleTabClick(this);
         });
       });
+
+      // Check URL parameters to activate the correct tab on page load
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlStatus = urlParams.get('status');
+
+      if (urlStatus) {
+        const targetTab = document.querySelector(`.tab-item[data-status="${urlStatus}"]`);
+        if (targetTab) {
+          // Update tab to be active
+          tabItems.forEach(t => t.classList.remove('active'));
+          targetTab.classList.add('active');
+        }
+      }
     });
-    
+
     // Function to update order status
     function updateOrderStatus(orderId, newStatus) {
       if (confirm('Apakah Anda yakin ingin mengubah status pesanan ini?')) {
@@ -579,9 +600,29 @@
         .then(response => response.json())
         .then(data => {
           if (data.success) {
+            // Update status badge in the UI without page reload
+            const statusBadge = document.querySelector(`#order-${orderId} .status-badge`);
+            if (statusBadge) {
+              statusBadge.textContent = getStatusText(data.order.status);
+              statusBadge.className = 'status-badge ' + getStatusClass(data.order.status);
+            }
+
+            // Update status in dropdown if present
+            const statusSelect = document.querySelector(`#order-${orderId} .status-select`);
+            if (statusSelect) {
+              statusSelect.value = data.order.status;
+            }
+
+            // Update timestamp if present
+            const updatedAtElement = document.querySelector(`#order-${orderId} .updated-at`);
+            if (updatedAtElement) {
+              updatedAtElement.textContent = new Date().toLocaleString('id-ID');
+            }
+
+            // Refresh status counts to update the tab badges
+            updateOrderStatusCounts();
+
             alert(data.message);
-            // Refresh page to show updated status
-            location.reload();
           } else {
             alert('Gagal mengubah status: ' + (data.message || 'Unknown error'));
           }
@@ -592,6 +633,73 @@
         });
       }
     }
+
+    // Helper functions to convert status to readable text and appropriate CSS class
+    function getStatusText(status) {
+      const statusMap = {
+        'pending_payment': 'Menunggu Pembayaran',
+        'processing': 'Diproses',
+        'shipping': 'Dikirim',
+        'completed': 'Selesai',
+        'cancelled': 'Dibatalkan'
+      };
+      return statusMap[status] || status;
+    }
+
+    function getStatusClass(status) {
+      const classMap = {
+        'pending_payment': 'status-badge-pending',
+        'processing': 'status-badge-processing',
+        'shipping': 'status-badge-shipping',
+        'completed': 'status-badge-completed',
+        'cancelled': 'status-badge-cancelled'
+      };
+      return classMap[status] || 'status-badge-default';
+    }
+
+    // Fungsi untuk mengupdate jumlah status pesanan secara dinamis
+    function updateOrderStatusCounts() {
+      const csrfToken = document.querySelector('meta[name="csrf-token"]');
+      const csrfTokenValue = csrfToken ? csrfToken.getAttribute('content') : '';
+
+      fetch('{{ route('penjual.order.status.counts') }}', {
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-TOKEN': csrfTokenValue
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          console.log('Updating order status counts:', data.status_counts);
+          // Update badge untuk setiap status
+          for (const [status, count] of Object.entries(data.status_counts)) {
+            const badgeElement = document.querySelector(`.tab-item[data-status="${status}"] .badge`);
+            if (badgeElement) {
+              console.log(`Updating ${status} badge to ${count}`);
+              badgeElement.textContent = count;
+            } else {
+              console.log(`Badge element not found for status: ${status}`);
+            }
+          }
+        } else {
+          console.error('API call failed:', data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching order status counts:', error);
+      });
+    }
+
+    // Panggil fungsi update saat halaman dimuat
+    document.addEventListener('DOMContentLoaded', function() {
+      // Panggil update setelah DOM selesai dimuat
+      updateOrderStatusCounts();
+
+      // Refresh jumlah status setiap 30 detik
+      setInterval(updateOrderStatusCounts, 30000);
+    });
   </script>
 </body>
 </html>

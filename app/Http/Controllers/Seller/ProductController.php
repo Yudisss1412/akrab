@@ -27,11 +27,18 @@ class ProductController extends Controller
         // Ambil ID penjual dari tabel sellers berdasarkan user_id
         $seller = \App\Models\Seller::where('user_id', $user->id)->first();
         if (!$seller) {
+            \Log::info("Seller record not found for user: " . $user->id);
             // Jika tidak ada seller record, kembalikan koleksi kosong
             $products = collect();
             $categories = \App\Models\Category::all();
             return view('penjual.manajemen_produk', compact('products', 'categories'));
         }
+
+        \Log::info("Seller found for user " . $user->id . ", seller_id: " . $seller->id);
+
+        // Hitung jumlah produk milik seller ini
+        $productCount = \App\Models\Product::where('seller_id', $seller->id)->count();
+        \Log::info("Product count for seller " . $seller->id . ": " . $productCount);
         
         // Query builder untuk produk milik penjual saat ini
         $query = Product::where('seller_id', $seller->id)
@@ -61,6 +68,7 @@ class ProductController extends Controller
 
         // Paginate hasil
         $products = $query->paginate(10)->appends($request->query());
+        \Log::info("Products retrieved for pagination: " . $products->count());
 
         // Ambil kategori untuk filter dropdown
         $categories = \App\Models\Category::all();

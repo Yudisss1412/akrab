@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <title>Dashboard Penjual — AKRAB</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ asset('css/admin_penjual/style.css') }}">
   <style>
@@ -440,9 +441,9 @@
                       <path d="M9 12.5H15" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                       <path d="M9 17.5H13" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    Komplain & Retur Baru
+                    Komplain & Retur
                   </a>
-                  <span class="action-count" id="new-complaints-count">0</span>
+                  <span class="action-count" id="total-urgent-count">0</span>
                 </li>
               </ul>
             </section>
@@ -475,7 +476,7 @@
                   <div class="activity-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                      <path d="M8 12H12M12H16M12 16V12V16ZM12 12L8 8L16 8L12 12Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M12 8V12M12 16H12.01" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                   </div>
                   <div class="activity-content">
@@ -599,19 +600,15 @@
   
   <script>
     // Ambil jumlah tugas mendesak secara dinamis
-    document.addEventListener('DOMContentLoaded', function() {
-      fetchUrgentTasks();
-      
-      // Refresh setiap 30 detik
-      setInterval(fetchUrgentTasks, 30000);
-    });
-    
     function fetchUrgentTasks() {
+      const csrfToken = document.querySelector('meta[name="csrf-token"]');
+      const csrfTokenValue = csrfToken ? csrfToken.getAttribute('content') : '';
+
       fetch('{{ route('penjual.urgent.tasks') }}', {
         headers: {
           'Accept': 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          'X-CSRF-TOKEN': csrfTokenValue
         }
       })
       .then(response => response.json())
@@ -619,9 +616,14 @@
         if (data.success) {
           document.getElementById('pending-orders-count').textContent = data.urgent_tasks.pending_orders;
           document.getElementById('unreplied-chats-count').textContent = data.urgent_tasks.unreplied_chats;
+
+          // Update individual counts for reference
           document.getElementById('new-complaints-count').textContent = data.urgent_tasks.new_complaints;
-          // Update the return requests count
-          document.getElementById('new-complaints-count').textContent = data.urgent_tasks.pending_returns;
+          document.getElementById('pending-returns-count').textContent = data.urgent_tasks.pending_returns;
+
+          // Update total urgent count (komplain + retur)
+          const totalUrgent = data.urgent_tasks.new_complaints + data.urgent_tasks.pending_returns;
+          document.getElementById('total-urgent-count').textContent = totalUrgent;
         } else {
           console.error('Error fetching urgent tasks:', data.message);
         }
@@ -630,6 +632,28 @@
         console.error('Error:', error);
       });
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Buat elemen tersembunyi untuk menyimpan data individual
+      if (!document.getElementById('new-complaints-count')) {
+        const hiddenComplaints = document.createElement('span');
+        hiddenComplaints.id = 'new-complaints-count';
+        hiddenComplaints.style.display = 'none';
+        document.body.appendChild(hiddenComplaints);
+      }
+
+      if (!document.getElementById('pending-returns-count')) {
+        const hiddenReturns = document.createElement('span');
+        hiddenReturns.id = 'pending-returns-count';
+        hiddenReturns.style.display = 'none';
+        document.body.appendChild(hiddenReturns);
+      }
+
+      fetchUrgentTasks();
+
+      // Refresh setiap 30 detik
+      setInterval(fetchUrgentTasks, 30000);
+    });
   </script>
 </body>
 </html>

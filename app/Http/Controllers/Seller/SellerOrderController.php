@@ -7,6 +7,8 @@ use App\Models\Order;
 use App\Models\Seller;
 use App\Models\OrderItem;
 use App\Models\Review;
+use App\Models\ProductReturn;
+use App\Models\ViolationReport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -44,7 +46,17 @@ class SellerOrderController extends Controller
 
         // Filter berdasarkan status jika ada
         if ($request->has('status') && $request->status) {
-            $query->where('status', $request->status);
+            // Mapping status aplikasi ke status database
+            $statusMapping = [
+                'pending_payment' => 'pending',    // Menunggu Pembayaran
+                'processing' => 'confirmed',       // Diproses
+                'shipping' => 'shipped',           // Dikirim
+                'completed' => 'delivered',        // Selesai
+                'cancelled' => 'cancelled'         // Dibatalkan
+            ];
+
+            $dbStatus = $statusMapping[$request->status] ?? $request->status;
+            $query->where('status', $dbStatus);
         }
 
         // Filter berdasarkan pencarian jika ada
@@ -80,7 +92,23 @@ class SellerOrderController extends Controller
         // Paginate hasil
         $orders = $query->paginate(10)->appends($request->query());
 
-        // Hitung jumlah pesanan per status
+        // Debug: lihat apakah seller_id valid dan berapa banyak produk yang dimiliki (fungsi index)
+        \Log::info("Seller ID (index function): " . $seller->id);
+        $productCount = DB::table('products')->where('seller_id', $seller->id)->count();
+        \Log::info("Product count for seller (index function): " . $productCount);
+
+        // Debug: query untuk mendapatkan semua pesanan yang terkait dengan penjual
+        $allOrders = DB::table('orders')
+            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->where('products.seller_id', $seller->id)
+            ->select('orders.id', 'orders.status')
+            ->get();
+
+        \Log::info("All orders for seller (index function): " . $seller->id . ", count: " . $allOrders->count());
+        \Log::info("Order statuses (index function): " . $allOrders->pluck('status')->toJson());
+
+        // Hitung jumlah pesanan per status dari database
         $statusCounts = DB::table('orders')
             ->join('order_items', 'orders.id', '=', 'order_items.order_id')
             ->join('products', 'order_items.product_id', '=', 'products.id')
@@ -89,13 +117,132 @@ class SellerOrderController extends Controller
             ->groupBy('orders.status')
             ->pluck('count', 'orders.status');
 
+        \Log::info("Raw status counts from database (index function): " . json_encode($statusCounts->toArray()));
+
+        // Mapping status database ke status aplikasi
+        $statusMapping = [
+            'pending' => 'pending_payment',    // Menunggu Pembayaran
+            'confirmed' => 'processing',       // Diproses
+            'shipped' => 'shipping',           // Dikirim
+            'delivered' => 'completed',        // Selesai
+            'cancelled' => 'cancelled'         // Dibatalkan
+        ];
+
+        // Terapkan mapping dan hitung jumlah untuk setiap status aplikasi
         $allStatus = ['pending_payment', 'processing', 'shipping', 'completed', 'cancelled'];
         $statusData = [];
-        foreach ($allStatus as $status) {
-            $statusData[$status] = $statusCounts[$status] ?? 0;
+        foreach ($allStatus as $appStatus) {
+            $statusData[$appStatus] = 0; // Inisialisasi dengan 0
+
+            // Tambahkan jumlah dari setiap status database yang dipetakan ke status aplikasi ini
+            foreach ($statusMapping as $dbStatus => $mappedStatus) {
+                if ($mappedStatus === $appStatus && $statusCounts->has($dbStatus)) {
+                    $statusData[$appStatus] += $statusCounts[$dbStatus];
+                }
+            }
         }
 
+        \Log::info("Mapped status counts (index function): " . json_encode($statusData));
+
+        \Log::info("Returning statusData from index: " . json_encode($statusData));
+
         return view('penjual.manajemen_pesanan', compact('orders', 'statusData'));
+    }
+
+    /**
+     * API endpoint untuk mendapatkan jumlah pesanan per status
+     */
+    public function getOrderStatusCounts()
+    {
+        \Log::info("getOrderStatusCounts API endpoint called");
+
+        // Hanya penjual yang bisa mengakses
+        $user = Auth::user();
+        if (!$user || !$user->role || $user->role->name !== 'seller') {
+            return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
+        }
+
+        \Log::info("User authenticated: " . $user->id . ", role: " . ($user->role->name ?? 'no role'));
+
+        // Ambil ID penjual dari tabel sellers berdasarkan user_id
+        $seller = Seller::where('user_id', $user->id)->first();
+        if (!$seller) {
+            \Log::info("No seller record found for user: " . $user->id);
+            return response()->json(['success' => false, 'message' => 'Seller record tidak ditemukan'], 403);
+        }
+
+        \Log::info("Seller authenticated: " . $user->id . ", seller_id: " . $seller->id);
+
+        // Debug: lihat apakah seller_id valid dan berapa banyak produk yang dimiliki (fungsi getOrderStatusCounts)
+        \Log::info("Seller ID (getOrderStatusCounts function): " . $seller->id);
+        $productCount = DB::table('products')->where('seller_id', $seller->id)->count();
+        \Log::info("Product count for seller (getOrderStatusCounts function): " . $productCount);
+
+        // Debug: query untuk mendapatkan semua pesanan yang terkait dengan penjual
+        $allOrders = DB::table('orders')
+            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->where('products.seller_id', $seller->id)
+            ->select('orders.id', 'orders.status')
+            ->get();
+
+        \Log::info("All orders for seller (getOrderStatusCounts function): " . $seller->id . ", count: " . $allOrders->count());
+        \Log::info("Order statuses (getOrderStatusCounts function): " . $allOrders->pluck('status')->toJson());
+
+        // Debug tambahan: lihat apakah benar-benar ada order_items dan products untuk seller ini
+        $orderItems = DB::table('order_items')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->where('products.seller_id', $seller->id)
+            ->count();
+        \Log::info("Order items count for seller: " . $orderItems);
+
+        $products = DB::table('products')
+            ->where('seller_id', $seller->id)
+            ->count();
+        \Log::info("Products count for seller (verification): " . $products);
+
+        // Hitung jumlah pesanan per status dari database
+        $statusCounts = DB::table('orders')
+            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->where('products.seller_id', $seller->id)
+            ->selectRaw('orders.status, count(*) as count')
+            ->groupBy('orders.status')
+            ->pluck('count', 'orders.status');
+
+        \Log::info("Raw status counts from database (getOrderStatusCounts function): " . json_encode($statusCounts->toArray()));
+
+        // Mapping status database ke status aplikasi
+        $statusMapping = [
+            'pending' => 'pending_payment',    // Menunggu Pembayaran
+            'confirmed' => 'processing',       // Diproses
+            'shipped' => 'shipping',           // Dikirim
+            'delivered' => 'completed',        // Selesai
+            'cancelled' => 'cancelled'         // Dibatalkan
+        ];
+
+        // Terapkan mapping dan hitung jumlah untuk setiap status aplikasi
+        $allStatus = ['pending_payment', 'processing', 'shipping', 'completed', 'cancelled'];
+        $statusData = [];
+        foreach ($allStatus as $appStatus) {
+            $statusData[$appStatus] = 0; // Inisialisasi dengan 0
+
+            // Tambahkan jumlah dari setiap status database yang dipetakan ke status aplikasi ini
+            foreach ($statusMapping as $dbStatus => $mappedStatus) {
+                if ($mappedStatus === $appStatus && $statusCounts->has($dbStatus)) {
+                    $statusData[$appStatus] += $statusCounts[$dbStatus];
+                }
+            }
+        }
+
+        \Log::info("Mapped status counts (getOrderStatusCounts function): " . json_encode($statusData));
+
+        \Log::info("Returning status counts: " . json_encode($statusData));
+
+        return response()->json([
+            'success' => true,
+            'status_counts' => $statusData
+        ]);
     }
 
     /**
@@ -171,7 +318,7 @@ class SellerOrderController extends Controller
             'order' => $order
         ]);
     }
-    
+
     /**
      * API endpoint untuk mendapatkan pesanan terbaru untuk ditampilkan di profil penjual
      */
@@ -202,7 +349,7 @@ class SellerOrderController extends Controller
         $formattedOrders = $recentOrders->map(function($order) {
             // Ambil item pertama untuk ditampilkan (bisa disesuaikan)
             $firstItem = $order->items->first();
-            
+
             return [
                 'id' => $order->id,
                 'order_number' => $order->order_number,
@@ -224,7 +371,7 @@ class SellerOrderController extends Controller
             'orders' => $formattedOrders
         ]);
     }
-    
+
     /**
      * Display the sales history page for sellers
      */
@@ -314,14 +461,14 @@ class SellerOrderController extends Controller
         $avgPerTransaction = $totalTransactions > 0 ? $monthlyRevenue / $totalTransactions : 0;
 
         return view('penjual.riwayat_penjualan', compact(
-            'completedOrders', 
-            'totalSales', 
-            'totalTransactions', 
-            'monthlyRevenue', 
+            'completedOrders',
+            'totalSales',
+            'totalTransactions',
+            'monthlyRevenue',
             'avgPerTransaction'
         ));
     }
-    
+
     /**
      * API endpoint to fetch urgent tasks counts for the seller dashboard
      */
@@ -355,16 +502,16 @@ class SellerOrderController extends Controller
             ->count();
 
         $unrepliedChatsCount = 0; // Placeholder - bisa diintegrasikan dengan sistem chat
-        
-        // Hitung jumlah komplain (ulasan dengan rating 2 ke bawah)
-        $newComplaintsCount = \App\Models\Review::whereHas('product', function ($q) use ($seller) {
+
+        // Hitung jumlah komplain yang belum diproses (violation reports dengan status pending)
+        $newComplaintsCount = \App\Models\ViolationReport::whereHas('product', function ($q) use ($seller) {
                 $q->where('seller_id', $seller->id);
             })
-            ->where('rating', '<=', 2)
+            ->where('status', 'pending')
             ->count();
-            
+
         // Hitung jumlah permintaan retur yang belum diproses (status pending)
-        $pendingReturnsCount = \App\Models\Models\ProductReturn::whereHas('orderItem.product', function ($q) use ($seller) {
+        $pendingReturnsCount = \App\Models\ProductReturn::whereHas('orderItem.product', function ($q) use ($seller) {
                 $q->where('seller_id', $seller->id);
             })
             ->where('status', 'pending')
@@ -380,7 +527,7 @@ class SellerOrderController extends Controller
             ]
         ]);
     }
-    
+
     /**
      * Display the complaints and returns page
      */
@@ -637,7 +784,7 @@ class SellerOrderController extends Controller
             return response()->json(['error' => 'Internal server error'], 500);
         }
     }
-    
+
     /**
      * Approve a return request
      */
@@ -656,7 +803,7 @@ class SellerOrderController extends Controller
         }
 
         // Ambil permintaan retur
-        $return = \App\Models\Models\ProductReturn::where('id', $id)
+        $return = \App\Models\ProductReturn::where('id', $id)
             ->whereHas('orderItem.product', function ($q) use ($seller) {
                 $q->where('seller_id', $seller->id);
             })
@@ -682,7 +829,7 @@ class SellerOrderController extends Controller
             'message' => 'Permintaan retur berhasil disetujui'
         ]);
     }
-    
+
     /**
      * Reject a return request
      */
@@ -701,7 +848,7 @@ class SellerOrderController extends Controller
         }
 
         // Ambil permintaan retur
-        $return = \App\Models\Models\ProductReturn::where('id', $id)
+        $return = \App\Models\ProductReturn::where('id', $id)
             ->whereHas('orderItem.product', function ($q) use ($seller) {
                 $q->where('seller_id', $seller->id);
             })
@@ -727,7 +874,7 @@ class SellerOrderController extends Controller
             'message' => 'Permintaan retur berhasil ditolak'
         ]);
     }
-    
+
     /**
      * Complete a return request
      */
@@ -746,7 +893,7 @@ class SellerOrderController extends Controller
         }
 
         // Ambil permintaan retur
-        $return = \App\Models\Models\ProductReturn::where('id', $id)
+        $return = \App\Models\ProductReturn::where('id', $id)
             ->whereHas('orderItem.product', function ($q) use ($seller) {
                 $q->where('seller_id', $seller->id);
             })
@@ -791,7 +938,7 @@ class SellerOrderController extends Controller
         }
 
         // Query untuk permintaan retur
-        $returnsQuery = \App\Models\Models\ProductReturn::with(['user', 'orderItem.product'])
+        $returnsQuery = \App\Models\ProductReturn::with(['user', 'orderItem.product'])
             ->whereHas('orderItem.product', function ($q) use ($seller) {
                 $q->where('seller_id', $seller->id);
             })

@@ -35,6 +35,11 @@ class DatabaseSeeder extends Seeder
             DynamicReviewSeeder::class,
         ]);
 
+        // Jalankan seeder untuk data dummy order
+        $this->call([
+            DummyOrdersSeeder::class,
+        ]);
+
         // Cek data
         $this->checkData();
     }

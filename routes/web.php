@@ -741,6 +741,7 @@ Route::get('/penjual/pesanan', [App\Http\Controllers\Seller\SellerOrderControlle
 Route::get('/penjual/pesanan/recent', [App\Http\Controllers\Seller\SellerOrderController::class, 'getRecentOrders'])->name('penjual.pesanan.recent');
 Route::get('/penjual/riwayat-penjualan', [App\Http\Controllers\Seller\SellerOrderController::class, 'salesHistory'])->name('penjual.riwayat.penjualan');
 Route::get('/penjual/urgent-tasks', [App\Http\Controllers\Seller\SellerOrderController::class, 'getUrgentTasks'])->name('penjual.urgent.tasks');
+Route::get('/penjual/order-status-counts', [App\Http\Controllers\Seller\SellerOrderController::class, 'getOrderStatusCounts'])->name('penjual.order.status.counts');
 Route::get('/penjual/komplain-retur', [App\Http\Controllers\Seller\SellerOrderController::class, 'complaintsAndReturns'])->name('penjual.komplain.retur');
 
 // API route untuk komplain & retur

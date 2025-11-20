@@ -601,39 +601,84 @@
   <script>
     // Ambil jumlah tugas mendesak secara dinamis
     function fetchUrgentTasks() {
+      console.log('Fetching urgent tasks for dashboard penjual...');
       const csrfToken = document.querySelector('meta[name="csrf-token"]');
       const csrfTokenValue = csrfToken ? csrfToken.getAttribute('content') : '';
 
       fetch('{{ route('penjual.urgent.tasks') }}', {
+        method: 'GET',
         headers: {
           'Accept': 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
           'X-CSRF-TOKEN': csrfTokenValue
         }
       })
-      .then(response => response.json())
+      .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+            throw new Error('Network response was not ok: ' + response.status);
+        }
+        return response.json();
+      })
       .then(data => {
-        if (data.success) {
-          document.getElementById('pending-orders-count').textContent = data.urgent_tasks.pending_orders;
-          document.getElementById('unreplied-chats-count').textContent = data.urgent_tasks.unreplied_chats;
+        console.log('Received data:', data);
+        if (data && data.success && data.urgent_tasks) {
+          console.log('Pending orders from API:', data.urgent_tasks.pending_orders);
+
+          // Update pending orders count
+          const pendingOrdersElement = document.getElementById('pending-orders-count');
+          if (pendingOrdersElement) {
+            pendingOrdersElement.textContent = data.urgent_tasks.pending_orders;
+            console.log('Updated pending-orders-count to:', data.urgent_tasks.pending_orders);
+          }
+
+          // Update unreplied chats count
+          const unrepliedChatsElement = document.getElementById('unreplied-chats-count');
+          if (unrepliedChatsElement) {
+            unrepliedChatsElement.textContent = data.urgent_tasks.unreplied_chats;
+            console.log('Updated unreplied-chats-count to:', data.urgent_tasks.unreplied_chats);
+          }
 
           // Update individual counts for reference
-          document.getElementById('new-complaints-count').textContent = data.urgent_tasks.new_complaints;
-          document.getElementById('pending-returns-count').textContent = data.urgent_tasks.pending_returns;
+          const newComplaintsElement = document.getElementById('new-complaints-count');
+          if (newComplaintsElement) {
+            newComplaintsElement.textContent = data.urgent_tasks.new_complaints;
+            console.log('Updated new-complaints-count to:', data.urgent_tasks.new_complaints);
+          }
+
+          const pendingReturnsElement = document.getElementById('pending-returns-count');
+          if (pendingReturnsElement) {
+            pendingReturnsElement.textContent = data.urgent_tasks.pending_returns;
+            console.log('Updated pending-returns-count to:', data.urgent_tasks.pending_returns);
+          }
 
           // Update total urgent count (komplain + retur)
           const totalUrgent = data.urgent_tasks.new_complaints + data.urgent_tasks.pending_returns;
-          document.getElementById('total-urgent-count').textContent = totalUrgent;
+          const totalUrgentElement = document.getElementById('total-urgent-count');
+          if (totalUrgentElement) {
+            totalUrgentElement.textContent = totalUrgent;
+            console.log('Updated total-urgent-count to:', totalUrgent);
+          }
         } else {
-          console.error('Error fetching urgent tasks:', data.message);
+          console.error('Error fetching urgent tasks:', data.message || 'Invalid response format');
+          if(data.message) {
+            console.error('Error message:', data.message);
+          }
         }
       })
       .catch(error => {
-        console.error('Error:', error);
+        console.error('Fetch error:', error);
+        // Tampilkan error di UI untuk debugging
+        const pendingOrdersElement = document.getElementById('pending-orders-count');
+        if (pendingOrdersElement) {
+          pendingOrdersElement.textContent = 'Err';
+        }
       });
     }
 
     document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM loaded for dashboard penjual, fetching urgent tasks...');
+
       // Buat elemen tersembunyi untuk menyimpan data individual
       if (!document.getElementById('new-complaints-count')) {
         const hiddenComplaints = document.createElement('span');
@@ -649,10 +694,12 @@
         document.body.appendChild(hiddenReturns);
       }
 
+      // Panggil fungsi untuk pertama kali
       fetchUrgentTasks();
 
       // Refresh setiap 30 detik
-      setInterval(fetchUrgentTasks, 30000);
+      const intervalId = setInterval(fetchUrgentTasks, 30000);
+      console.log('Auto-refresh started with interval ID:', intervalId);
     });
   </script>
 </body>

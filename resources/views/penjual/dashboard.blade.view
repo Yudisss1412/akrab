@@ -38,14 +38,15 @@
                 <div class="col-md-3 mb-3">
                     <div class="card bg-warning text-white">
                         <div class="card-body">
-                            <h5 class="card-title">Ulasan</h5>
-                            <h2>4.7</h2>
-                            <p class="card-text">Rata-rata</p>
+                            <h5 class="card-title">Pesanan Perlu Diproses</h5>
+                            <h2 id="pending-orders-count">Memuat...</h2>
+                            <p class="card-text">Status: <span id="order-status">Memuat...</span></p>
+                            <div class="small mt-2" style="color: rgba(255,255,255,0.7);">* Data diperbarui otomatis</div>
                         </div>
                     </div>
                 </div>
             </div>
-            
+
             <div class="row">
                 <div class="col-md-8">
                     <div class="card">
@@ -110,4 +111,77 @@
         </div>
     </div>
 </div>
+@section('scripts')
+<script>
+    // Ambil jumlah tugas mendesak secara dinamis
+    function fetchUrgentTasks() {
+        console.log('Fetching urgent tasks...');
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        const csrfTokenValue = csrfToken ? csrfToken.getAttribute('content') : '';
+
+        fetch('{{ route('penjual.urgent.tasks') }}', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': csrfTokenValue
+            }
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+                throw new Error('Network response was not ok: ' + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Received data:', data);
+            if (data && data.success && data.urgent_tasks) {
+                const pendingOrdersCount = data.urgent_tasks.pending_orders;
+                console.log('Pending orders count:', pendingOrdersCount);
+
+                // Pastikan element tersedia sebelum update
+                const countElement = document.getElementById('pending-orders-count');
+                if (countElement) {
+                    countElement.textContent = pendingOrdersCount;
+                }
+
+                // Update status text
+                const orderStatusElement = document.getElementById('order-status');
+                if (orderStatusElement) {
+                    if (pendingOrdersCount > 0) {
+                        orderStatusElement.textContent = 'Perlu Ditindak';
+                        orderStatusElement.className = 'text-success';
+                    } else {
+                        orderStatusElement.textContent = 'Tidak Ada';
+                        orderStatusElement.className = 'text-muted';
+                    }
+                }
+            } else {
+                console.error('Error fetching urgent tasks:', data.message || 'Invalid response format');
+                if(data.message) {
+                    console.error('Error message:', data.message);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Fetch error:', error);
+            // Tampilkan error di UI untuk debugging
+            const countElement = document.getElementById('pending-orders-count');
+            if (countElement) {
+                countElement.textContent = 'Err';
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded, fetching urgent tasks...');
+        // Panggil fungsi untuk pertama kali
+        fetchUrgentTasks();
+
+        // Refresh setiap 30 detik
+        const intervalId = setInterval(fetchUrgentTasks, 30000);
+        console.log('Auto-refresh started with interval ID:', intervalId);
+    });
+</script>
 @endsection

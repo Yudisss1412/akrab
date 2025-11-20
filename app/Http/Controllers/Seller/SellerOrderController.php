@@ -487,19 +487,27 @@ class SellerOrderController extends Controller
         }
 
         // Hitung pesanan yang perlu diproses (status processing atau pending_payment)
+        // Berdasarkan mapping status di fungsi lain, status database adalah: pending, confirmed, shipped, delivered, cancelled
+        // Sedangkan status aplikasi adalah: pending_payment, processing, shipping, completed, cancelled
         $pendingPaymentCount = DB::table('orders')
             ->join('order_items', 'orders.id', '=', 'order_items.order_id')
             ->join('products', 'order_items.product_id', '=', 'products.id')
             ->where('products.seller_id', $seller->id)
-            ->whereIn('orders.status', ['pending_payment'])
+            ->where('orders.status', 'pending')  // mapping dari pending_payment
             ->count();
 
         $processingCount = DB::table('orders')
             ->join('order_items', 'orders.id', '=', 'order_items.order_id')
             ->join('products', 'order_items.product_id', '=', 'products.id')
             ->where('products.seller_id', $seller->id)
-            ->where('orders.status', 'processing')
+            ->where('orders.status', 'confirmed')  // mapping dari processing
             ->count();
+
+        // Debug logging untuk memastikan perhitungan benar
+        \Log::info("getUrgentTasks - seller_id: " . $seller->id);
+        \Log::info("getUrgentTasks - pendingPaymentCount (pending): " . $pendingPaymentCount);
+        \Log::info("getUrgentTasks - processingCount (confirmed): " . $processingCount);
+        \Log::info("getUrgentTasks - total pending_orders: " . ($pendingPaymentCount + $processingCount));
 
         $unrepliedChatsCount = 0; // Placeholder - bisa diintegrasikan dengan sistem chat
 

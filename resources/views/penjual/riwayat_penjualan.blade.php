@@ -100,6 +100,7 @@
     /* Control Bar */
     .control-bar {
       display: flex;
+      flex-direction: row;
       gap: 1rem;
       margin-bottom: 1.5rem;
       background: var(--ak-white);
@@ -107,15 +108,16 @@
       border-radius: var(--ak-radius);
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
       border: 1px solid var(--ak-border);
-      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-start;
     }
-    
+
     .search-box {
       flex: 1;
       min-width: 250px;
       position: relative;
     }
-    
+
     .search-box input {
       width: 100%;
       padding: 0.5rem 0.75rem 0.5rem 2.5rem;
@@ -123,7 +125,7 @@
       border-radius: var(--ak-radius);
       font-size: 0.875rem;
     }
-    
+
     .search-box svg {
       position: absolute;
       left: 0.75rem;
@@ -133,11 +135,13 @@
       height: 18px;
       color: var(--ak-muted);
     }
-    
+
     .date-filter {
+      min-width: 200px;
       width: 200px;
+      flex-shrink: 0;
     }
-    
+
     .date-filter select {
       width: 100%;
       padding: 0.5rem 0.75rem;
@@ -329,11 +333,18 @@
     /* Responsive */
     @media (max-width: 768px) {
       .control-bar {
-        flex-direction: column;
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: wrap;
       }
-      
+
+      .search-box {
+        min-width: 150px;
+        flex: 1;
+      }
+
       .date-filter {
-        width: 100%;
+        min-width: 130px;
       }
     }
   </style>
@@ -347,14 +358,8 @@
         <!-- Page Header -->
         <section class="page-header">
           <h1>
-            <a href="{{ route('seller.dashboard') }}" class="btn btn-sm" style="margin-right: 1rem; vertical-align: middle; background: var(--ak-primary); color: white; border: none; width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;">
-              <i class="fas fa-arrow-left"></i>
-            </a>
             Riwayat Penjualan untuk {{ auth()->user()->name }}
           </h1>
-          <div class="page-actions">
-            <a href="{{ route('penjual.pesanan') }}" class="btn btn-outline">Kembali ke Manajemen Pesanan</a>
-          </div>
         </section>
 
         <!-- Sales Stats -->
@@ -379,7 +384,7 @@
 
         <!-- Control Bar -->
         <div class="control-bar">
-          <form method="GET" action="{{ route('penjual.riwayat.penjualan') }}" id="filterForm">
+          <form method="GET" action="{{ route('penjual.riwayat.penjualan') }}" id="filterForm" style="display: flex; gap: 1rem; width: 100%; align-items: center;">
             <div class="search-box">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 10 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -430,9 +435,106 @@
             </div>
           </div>
           @empty
-          <div class="text-center p-4">
-            <p>Tidak ada riwayat penjualan ditemukan</p>
+          <!-- Data Dummy untuk Riwayat Penjualan -->
+          @php
+            $dummyOrders = [
+              [
+                'id' => 1,
+                'order_number' => 'ORD-001',
+                'created_at' => \Carbon\Carbon::now()->subDays(2),
+                'user' => ['name' => 'Budi Santoso'],
+                'items' => [
+                  [
+                    'id' => 1,
+                    'quantity' => 2,
+                    'product' => [
+                      'name' => 'Keripik Singkong Balado',
+                      'main_image' => 'src/placeholder_produk.png'
+                    ]
+                  ],
+                  [
+                    'id' => 2,
+                    'quantity' => 1,
+                    'product' => [
+                      'name' => 'Kerudung Instan Paris',
+                      'main_image' => 'src/placeholder_produk.png'
+                    ]
+                  ]
+                ]
+              ],
+              [
+                'id' => 2,
+                'order_number' => 'ORD-002',
+                'created_at' => \Carbon\Carbon::now()->subDays(5),
+                'user' => ['name' => 'Siti Aminah'],
+                'items' => [
+                  [
+                    'id' => 3,
+                    'quantity' => 1,
+                    'product' => [
+                      'name' => 'Kaos Polos Premium',
+                      'main_image' => 'src/placeholder_produk.png'
+                    ]
+                  ]
+                ]
+              ],
+              [
+                'id' => 3,
+                'order_number' => 'ORD-003',
+                'created_at' => \Carbon\Carbon::now()->subDays(7),
+                'user' => ['name' => 'Ahmad Fauzi'],
+                'items' => [
+                  [
+                    'id' => 4,
+                    'quantity' => 3,
+                    'product' => [
+                      'name' => 'Gantungan Kunci Akrab',
+                      'main_image' => 'src/placeholder_produk.png'
+                    ]
+                  ],
+                  [
+                    'id' => 5,
+                    'quantity' => 1,
+                    'product' => [
+                      'name' => 'Tumbler Stainless Steel',
+                      'main_image' => 'src/placeholder_produk.png'
+                    ]
+                  ]
+                ]
+              ]
+            ];
+          @endphp
+
+          @foreach($dummyOrders as $order)
+          <div class="sale-card">
+            <div class="sale-header">
+              <div>
+                <div class="sale-id">#{{ $order['order_number'] }}</div>
+                <div class="sale-date">{{ \Carbon\Carbon::parse($order['created_at'])->format('d M Y, H:i') }}</div>
+              </div>
+              <div class="customer-name">{{ $order['user']['name'] ?? 'Customer' }}</div>
+            </div>
+            <div class="sale-content">
+              @foreach($order['items'] as $item)
+              <div class="product-item">
+                <img src="{{ $item['product']['main_image'] ? asset($item['product']['main_image']) : asset('src/placeholder_produk.png') }}" alt="{{ $item['product']['name'] }}" class="product-thumb">
+                <div class="product-info">
+                  <div class="product-name">{{ $item['product']['name'] }}</div>
+                  <div class="product-quantity">Jumlah: {{ $item['quantity'] }}</div>
+                </div>
+              </div>
+              @endforeach
+            </div>
+            <div class="sale-footer">
+              <div>
+                <span class="status-badge status-completed">Selesai</span>
+              </div>
+              <div class="action-buttons">
+                <a href="{{ route('penjual.pesanan.show', $order['id']) }}" class="btn btn-outline">Lihat Detail</a>
+              </div>
+            </div>
           </div>
+          @endforeach
           @endforelse
         </section>
 

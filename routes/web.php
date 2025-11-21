@@ -22,15 +22,15 @@ Route::get('/debug-buyers', function() {
     $role = Role::where('name', 'buyer')->first();
     $roleExists = $role !== null;
     $buyerRoleId = $role ? $role->id : null;
-    
+
     $allUsersCount = User::count();
     $usersWithBuyerRoleId = $role ? User::where('role_id', $role->id)->count() : 0;
     $usersWithBuyerRoleCheck = User::whereHas('role', function($q) {
         $q->where('name', 'buyer');
     })->count();
-    
+
     $sampleBuyers = $role ? User::where('role_id', $role->id)->limit(5)->get(['id', 'name', 'email', 'role_id']) : collect([]);
-    
+
     return [
         'role_exists' => $roleExists,
         'buyer_role_id' => $buyerRoleId,
@@ -46,7 +46,7 @@ Route::get('/debug-controller', function() {
     $tab = request('tab', 'sellers');
     $buyerRole = \App\Models\Role::where('name', 'buyer')->first();
     $buyerRoleId = $buyerRole ? $buyerRole->id : null;
-    
+
     if ($tab === 'buyers' && $buyerRoleId) {
         $buyersQuery = \App\Models\User::where('role_id', $buyerRoleId);
         $buyers = $buyersQuery->orderBy('created_at', 'desc')->with(['role', 'orders'])->paginate(15);
@@ -69,20 +69,20 @@ Route::get('/debug-controller', function() {
 // Route untuk Manajemen Promosi - ditempatkan di awal untuk menghindari konflik
 Route::get('/penjual/promosi', [App\Http\Controllers\PromotionController::class, 'index'])->name('penjual.promosi');
 
-Route::get('/penjual/promosi/diskon', [App\Http\Controllers\PromotionController::class, 
+Route::get('/penjual/promosi/diskon', [App\Http\Controllers\PromotionController::class,
 'createDiscount'])->name('penjual.promosi.diskon');
-Route::post('/penjual/promosi/diskon', [App\Http\Controllers\PromotionController::class, 
+Route::post('/penjual/promosi/diskon', [App\Http\Controllers\PromotionController::class,
 'storeDiscount'])->name('penjual.promosi.diskon.store');
-Route::get('/penjual/promosi/voucher', [App\Http\Controllers\PromotionController::class, 
+Route::get('/penjual/promosi/voucher', [App\Http\Controllers\PromotionController::class,
 'createVoucher'])->name('penjual.promosi.voucher');
-Route::post('/penjual/promosi/voucher', [App\Http\Controllers\PromotionController::class, 
+Route::post('/penjual/promosi/voucher', [App\Http\Controllers\PromotionController::class,
 'storeVoucher'])->name('penjual.promosi.voucher.store');
 Route::get('/penjual/promosi/{id}/edit', [App\Http\Controllers\PromotionController::class, 'edit'])->name('penjual.promosi.edit');
 Route::put('/penjual/promosi/{id}/update', [App\Http\Controllers\PromotionController::class, 'updateVoucher'])->name('penjual.promosi.update');
 Route::put('/penjual/promosi/{id}/update/discount', [App\Http\Controllers\PromotionController::class, 'updateDiscount'])->name('penjual.promosi.discount.update');
-Route::post('/penjual/promosi/{id}/nonaktifkan', [App\Http\Controllers\PromotionController::class, 
+Route::post('/penjual/promosi/{id}/nonaktifkan', [App\Http\Controllers\PromotionController::class,
 'nonaktifkan'])->name('penjual.promosi.nonaktifkan');
-Route::delete('/penjual/promosi/{id}', [App\Http\Controllers\PromotionController::class, 
+Route::delete('/penjual/promosi/{id}', [App\Http\Controllers\PromotionController::class,
 'destroy'])->name('penjual.promosi.destroy');
 
 /*
@@ -116,14 +116,14 @@ Route::prefix('admin')->name('sellers.')->group(function () {
     Route::post('/sellers/{seller}/activate', [SellerManagementController::class, 'activate'])->name('activate');
     Route::post('/sellers/bulk-action', [SellerManagementController::class, 'bulkAction'])->name('bulk_action');
     Route::get('/sellers/dashboard-stats', [SellerManagementController::class, 'getDashboardStats'])->name('dashboard_stats');
-    
+
     // User management routes for buyers
     Route::post('/users/{user}/suspend', [SellerManagementController::class, 'suspendUser'])->name('suspend_user');
     Route::post('/users/{user}/activate', [SellerManagementController::class, 'activateUser'])->name('activate_user');
     Route::get('/users/{user}/history', [SellerManagementController::class, 'userHistory'])->name('user_history');
     Route::get('/users/{user}/edit', [SellerManagementController::class, 'editUser'])->name('edit_user');
     Route::put('/users/{user}', [SellerManagementController::class, 'updateUser'])->name('update_user');
-    
+
     // Export routes
     Route::get('/sellers/export', [SellerManagementController::class, 'exportSellers'])->name('export_sellers');
     Route::get('/buyers/export', [SellerManagementController::class, 'exportBuyers'])->name('export_buyers');
@@ -175,7 +175,7 @@ Route::post('/checkout', [App\Http\Controllers\CheckoutController::class, 'proce
 
 Route::get('/pengiriman', [App\Http\Controllers\CheckoutController::class, 'showShipping'])->name('cust.pengiriman');
 Route::get('/pengiriman/{order}', [App\Http\Controllers\CheckoutController::class, 'showShipping'])->name('cust.pengiriman.order');
-Route::post('/pengiriman/update-shipping', [App\Http\Controllers\CheckoutController::class, 
+Route::post('/pengiriman/update-shipping', [App\Http\Controllers\CheckoutController::class,
 'updateShipping'])->name('cust.pengiriman.update');
 
 Route::get('/pembayaran', [App\Http\Controllers\CheckoutController::class, 'showPayment'])->name('cust.pembayaran');
@@ -185,7 +185,7 @@ Route::post('/pembayaran/process', [App\Http\Controllers\CheckoutController::cla
 Route::get('/ulasan', [App\Http\Controllers\ReviewController::class, 'index'])->name('ulasan.index');
 Route::post('/ulasan', [App\Http\Controllers\ReviewController::class, 'store'])->name('ulasan.store');
 Route::get('/ulasan/{orderItemId}/create', [App\Http\Controllers\ReviewController::class, 'create'])->name('ulasan.create');
-Route::get('/ulasan/produk/{productId}', [App\Http\Controllers\ReviewController::class, 
+Route::get('/ulasan/produk/{productId}', [App\Http\Controllers\ReviewController::class,
 'showByProduct'])->name('ulasan.show_by_product');
 
 // API endpoint untuk mengambil ulasan pengguna
@@ -193,7 +193,7 @@ Route::get('/api/reviews', function() {
     if (!auth()->check()) {
         return response()->json(['reviews' => []]);
     }
-    
+
     $reviews = \App\Models\Review::with(['product', 'product.seller'])
         ->where('user_id', auth()->id())
         ->latest()
@@ -213,7 +213,7 @@ asset('src/placeholder_produk.png'),
                 'created_at' => $review->created_at->format('d M Y')
             ];
         });
-    
+
     return response()->json(['reviews' => $reviews]);
 })->name('api.reviews');
 
@@ -222,7 +222,7 @@ Route::get('/api/orders', function() {
     if (!auth()->check()) {
         return response()->json(['orders' => []]);
     }
-    
+
     $orders = \App\Models\Order::with(['items.product', 'shipping_address', 'logs'])
         ->where('user_id', auth()->id())
         ->latest()
@@ -255,7 +255,7 @@ Route::get('/api/orders', function() {
                 'latest_log' => $order->logs->sortByDesc('created_at')->first(),
             ];
         });
-    
+
     return response()->json(['orders' => $orders]);
 })->name('api.orders');
 
@@ -287,7 +287,7 @@ Route::get('/api/staff', function () {
     $staff = \App\Models\User::whereHas('role', function($query) {
         $query->whereIn('name', ['admin', 'staff', 'support']);
     })->get(['id', 'name']);
-    
+
     return response()->json(['staff' => $staff]);
 })->name('api.staff');
 
@@ -295,7 +295,7 @@ Route::get('/api/staff', function () {
 Route::put('/api/reviews/{reviewId}', [App\Http\Controllers\ReviewController::class, 'updateReview'])->name('api.update_review');
 
 // API endpoint for deleting user's review
-Route::delete('/api/reviews/{reviewId}', [App\Http\Controllers\ReviewController::class, 
+Route::delete('/api/reviews/{reviewId}', [App\Http\Controllers\ReviewController::class,
 'deleteReview'])->name('api.delete_review');
 
 Route::get('/halaman_wishlist', function () {
@@ -303,7 +303,7 @@ Route::get('/halaman_wishlist', function () {
     if (!auth()->check()) {
         return redirect()->route('login');
     }
-    
+
     $wishlists = \App\Models\Wishlist::with(['product.seller', 'product.images'])
         ->where('user_id', auth()->id())
         ->get()
@@ -321,7 +321,7 @@ Route::get('/halaman_wishlist', function () {
                 'url' => '/produk/' . $product->id
             ];
         });
-    
+
     return view('customer.koleksi.halaman_wishlist', compact('wishlists'));
 })->name('halaman_wishlist')->middleware('auth');
 
@@ -331,7 +331,7 @@ Route::get('/api/customer/wishlist', function () {
     if (!auth()->check()) {
         return response()->json([]);
     }
-    
+
     $wishlists = \App\Models\Wishlist::with(['product.seller'])
         ->where('user_id', auth()->id())
         ->get()
@@ -349,7 +349,7 @@ Route::get('/api/customer/wishlist', function () {
                 'url' => '/produk/' . $product->id
             ];
         });
-    
+
     return response()->json($wishlists);
 })->name('api.wishlist')->middleware('auth');
 
@@ -357,13 +357,15 @@ Route::get('/dashboard_penjual', function () {
     return view('penjual.dashboard_penjual');
 })->name('dashboard.penjual');
 
-Route::get('/profil_penjual', function () {
-    return view('penjual.profil_penjual');
-})->name('profil.penjual');
+Route::middleware(['auth', 'seller.role'])->group(function () {
+    Route::get('/profil_penjual', function () {
+        return view('penjual.profil_penjual');
+    })->name('profil.penjual');
 
-Route::get('/edit_profil_penjual', function () {
-    return view('penjual.edit_profil_penjual');
-})->name('edit.profil.penjual');
+    Route::get('/edit_profil_penjual', [App\Http\Controllers\Seller\ProfileController::class, 'edit'])->name('edit.profil.penjual');
+
+    Route::put('/profil_penjual', [App\Http\Controllers\Seller\ProfileController::class, 'update'])->name('profil.penjual.update');
+});
 
 Route::get('/invoice', function () {
     return view('customer.transaksi.invoice');
@@ -376,7 +378,7 @@ Route::get('/kategori', function () {
 Route::get('/kategori/kuliner', function () {
     // Ambil produk dari database sesuai kategori
     $category = \App\Models\Category::where('name', 'Kuliner')->first();
-    
+
     $products = collect(); // Inisialisasi sebagai collection kosong
     if ($category) {
         $products = \App\Models\Product::with(['variants', 'seller', 'category'])
@@ -384,7 +386,7 @@ Route::get('/kategori/kuliner', function () {
                      ->where('status', 'active')
                      ->get();
     }
-    
+
     // Format data produk
     $formattedProducts = $products->map(function($product) {
         return [
@@ -395,17 +397,17 @@ Route::get('/kategori/kuliner', function () {
             'image' => $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder.png'),
         ];
     });
-    
+
     // Bagi produk ke dalam chunk untuk pagination
     $productChunks = $formattedProducts->chunk(8);
-    
+
     // Siapkan data untuk setiap halaman
     $pageData = [];
     for ($i = 1; $i <= min(5, count($productChunks)); $i++) {
         $chunk = $productChunks->get($i - 1, collect([]))->values();
         $pageData["page_{$i}_products"] = $chunk->toArray();
     }
-    
+
     return view('customer.kategori.kuliner', array_merge([
         'categoryTitle' => 'Kuliner',
         'categoryDescription' => 'Temukan berbagai produk kuliner menarik dari UMKM lokal',
@@ -415,7 +417,7 @@ Route::get('/kategori/kuliner', function () {
 Route::get('/kategori/fashion', function () {
     // Ambil produk dari database sesuai kategori
     $category = \App\Models\Category::where('name', 'Fashion')->first();
-    
+
     $products = collect(); // Inisialisasi sebagai collection kosong
     if ($category) {
         $products = \App\Models\Product::with(['variants', 'seller', 'category'])
@@ -423,7 +425,7 @@ Route::get('/kategori/fashion', function () {
                      ->where('status', 'active')
                      ->get();
     }
-    
+
     // Format data produk
     $formattedProducts = $products->map(function($product) {
         return [
@@ -434,17 +436,17 @@ Route::get('/kategori/fashion', function () {
             'image' => $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder.png'),
         ];
     });
-    
+
     // Bagi produk ke dalam chunk untuk pagination
     $productChunks = $formattedProducts->chunk(8);
-    
+
     // Siapkan data untuk setiap halaman
     $pageData = [];
     for ($i = 1; $i <= min(5, count($productChunks)); $i++) {
         $chunk = $productChunks->get($i - 1, collect([]))->values();
         $pageData["page_{$i}_products"] = $chunk->toArray();
     }
-    
+
     return view('customer.kategori.fashion', array_merge([
         'categoryTitle' => 'Fashion',
         'categoryDescription' => 'Temukan berbagai produk fashion menarik dari UMKM lokal',
@@ -454,7 +456,7 @@ Route::get('/kategori/fashion', function () {
 Route::get('/kategori/kerajinan', function () {
     // Ambil produk dari database sesuai kategori
     $category = \App\Models\Category::where('name', 'Kerajinan Tangan')->first();
-    
+
     $products = collect(); // Inisialisasi sebagai collection kosong
     if ($category) {
         $products = \App\Models\Product::with(['variants', 'seller', 'category'])
@@ -462,7 +464,7 @@ Route::get('/kategori/kerajinan', function () {
                      ->where('status', 'active')
                      ->get();
     }
-    
+
     // Format data produk
     $formattedProducts = $products->map(function($product) {
         return [
@@ -473,17 +475,17 @@ Route::get('/kategori/kerajinan', function () {
             'image' => $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder.png'),
         ];
     });
-    
+
     // Bagi produk ke dalam chunk untuk pagination
     $productChunks = $formattedProducts->chunk(8);
-    
+
     // Siapkan data untuk setiap halaman
     $pageData = [];
     for ($i = 1; $i <= min(5, count($productChunks)); $i++) {
         $chunk = $productChunks->get($i - 1, collect([]))->values();
         $pageData["page_{$i}_products"] = $chunk->toArray();
     }
-    
+
     return view('customer.kategori.kerajinan', array_merge([
         'categoryTitle' => 'Kerajinan Tangan',
         'categoryDescription' => 'Temukan berbagai produk kerajinan tangan unik dari UMKM lokal',
@@ -493,7 +495,7 @@ Route::get('/kategori/kerajinan', function () {
 Route::get('/kategori/berkebun', function () {
     // Ambil produk dari database sesuai kategori
     $category = \App\Models\Category::where('name', 'Berkebun')->first();
-    
+
     $products = collect(); // Inisialisasi sebagai collection kosong
     if ($category) {
         $products = \App\Models\Product::with(['variants', 'seller', 'category'])
@@ -501,7 +503,7 @@ Route::get('/kategori/berkebun', function () {
                      ->where('status', 'active')
                      ->get();
     }
-    
+
     // Format data produk
     $formattedProducts = $products->map(function($product) {
         return [
@@ -512,17 +514,17 @@ Route::get('/kategori/berkebun', function () {
             'image' => $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder.png'),
         ];
     });
-    
+
     // Bagi produk ke dalam chunk untuk pagination
     $productChunks = $formattedProducts->chunk(8);
-    
+
     // Siapkan data untuk setiap halaman
     $pageData = [];
     for ($i = 1; $i <= min(5, count($productChunks)); $i++) {
         $chunk = $productChunks->get($i - 1, collect([]))->values();
         $pageData["page_{$i}_products"] = $chunk->toArray();
     }
-    
+
     return view('customer.kategori.berkebun', array_merge([
         'categoryTitle' => 'Produk Berkebun',
         'categoryDescription' => 'Temukan berbagai produk berkebun alami dari UMKM lokal',
@@ -532,7 +534,7 @@ Route::get('/kategori/berkebun', function () {
 Route::get('/kategori/kesehatan', function () {
     // Ambil produk dari database sesuai kategori
     $category = \App\Models\Category::where('name', 'Kesehatan')->first();
-    
+
     $products = collect(); // Inisialisasi sebagai collection kosong
     if ($category) {
         $products = \App\Models\Product::with(['variants', 'seller', 'category'])
@@ -540,7 +542,7 @@ Route::get('/kategori/kesehatan', function () {
                      ->where('status', 'active')
                      ->get();
     }
-    
+
     // Format data produk
     $formattedProducts = $products->map(function($product) {
         return [
@@ -551,17 +553,17 @@ Route::get('/kategori/kesehatan', function () {
             'image' => $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder.png'),
         ];
     });
-    
+
     // Bagi produk ke dalam chunk untuk pagination
     $productChunks = $formattedProducts->chunk(8);
-    
+
     // Siapkan data untuk setiap halaman
     $pageData = [];
     for ($i = 1; $i <= min(5, count($productChunks)); $i++) {
         $chunk = $productChunks->get($i - 1, collect([]))->values();
         $pageData["page_{$i}_products"] = $chunk->toArray();
     }
-    
+
     return view('customer.kategori.kesehatan', array_merge([
         'categoryTitle' => 'Produk Kesehatan',
         'categoryDescription' => 'Temukan berbagai produk kesehatan alami dari UMKM lokal',
@@ -571,7 +573,7 @@ Route::get('/kategori/kesehatan', function () {
 Route::get('/kategori/mainan', function () {
     // Ambil produk dari database sesuai kategori
     $category = \App\Models\Category::where('name', 'Mainan')->first();
-    
+
     $products = collect(); // Inisialisasi sebagai collection kosong
     if ($category) {
         $products = \App\Models\Product::with(['variants', 'seller', 'category'])
@@ -579,7 +581,7 @@ Route::get('/kategori/mainan', function () {
                      ->where('status', 'active')
                      ->get();
     }
-    
+
     // Format data produk
     $formattedProducts = $products->map(function($product) {
         return [
@@ -590,17 +592,17 @@ Route::get('/kategori/mainan', function () {
             'image' => $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder.png'),
         ];
     });
-    
+
     // Bagi produk ke dalam chunk untuk pagination
     $productChunks = $formattedProducts->chunk(8);
-    
+
     // Siapkan data untuk setiap halaman
     $pageData = [];
     for ($i = 1; $i <= min(5, count($productChunks)); $i++) {
         $chunk = $productChunks->get($i - 1, collect([]))->values();
         $pageData["page_{$i}_products"] = $chunk->toArray();
     }
-    
+
     return view('customer.kategori.mainan', array_merge([
         'categoryTitle' => 'Mainan',
         'categoryDescription' => 'Temukan berbagai produk mainan edukatif dari UMKM lokal',
@@ -610,7 +612,7 @@ Route::get('/kategori/mainan', function () {
 Route::get('/kategori/hampers', function () {
     // Ambil produk dari database sesuai kategori
     $category = \App\Models\Category::where('name', 'Hampers')->first();
-    
+
     $products = collect(); // Inisialisasi sebagai collection kosong
     if ($category) {
         $products = \App\Models\Product::with(['variants', 'seller', 'category'])
@@ -618,7 +620,7 @@ Route::get('/kategori/hampers', function () {
                      ->where('status', 'active')
                      ->get();
     }
-    
+
     // Format data produk
     $formattedProducts = $products->map(function($product) {
         return [
@@ -629,17 +631,17 @@ Route::get('/kategori/hampers', function () {
             'image' => $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder.png'),
         ];
     });
-    
+
     // Bagi produk ke dalam chunk untuk pagination
     $productChunks = $formattedProducts->chunk(8);
-    
+
     // Siapkan data untuk setiap halaman
     $pageData = [];
     for ($i = 1; $i <= min(5, count($productChunks)); $i++) {
         $chunk = $productChunks->get($i - 1, collect([]))->values();
         $pageData["page_{$i}_products"] = $chunk->toArray();
     }
-    
+
     return view('customer.kategori.hampers', array_merge([
         'categoryTitle' => 'Hampers',
         'categoryDescription' => 'Temukan berbagai produk hampers menarik dari UMKM lokal',
@@ -669,7 +671,7 @@ Route::middleware(['auth', 'admin.role'])->group(function () {
     Route::get('/support/tickets/{id}', [App\Http\Controllers\TicketController::class, 'show'])->name('support.tickets.detail');
     Route::post('/support/tickets/{id}/update-status', [App\Http\Controllers\TicketController::class, 'updateStatus'])->name('support.tickets.update-status');
     Route::get('/api/tickets/{id}/messages', [App\Http\Controllers\TicketController::class, 'getTicketMessages'])->name('api.tickets.messages');
-    
+
     // Withdrawal Request routes
     Route::get('/withdrawal-requests', [App\Http\Controllers\WithdrawalRequestController::class, 'index'])->name('withdrawal.requests');
     Route::get('/api/withdrawals/{id}', [App\Http\Controllers\WithdrawalRequestController::class, 'show'])->name('api.withdrawals.show');
@@ -707,7 +709,7 @@ Route::middleware(['auth', 'admin.role'])->prefix('admin')->name('admin.')->grou
     Route::put('/produk/{id}/suspend', [App\Http\Controllers\Admin\ProductController::class, 'suspendProduct'])->name('produk.suspend');
     Route::put('/produk/{id}/status', [App\Http\Controllers\Admin\ProductController::class, 'update'])->name('produk.update_status');
     Route::delete('/produk/{id}', [App\Http\Controllers\Admin\ProductController::class, 'destroy'])->name('produk.delete');
-    
+
     // Review Management Routes
     Route::put('/reviews/{id}/approve', [App\Http\Controllers\Admin\ProductController::class, 'approveReview'])->name('reviews.approve');
     Route::put('/reviews/{id}/reject', [App\Http\Controllers\Admin\ProductController::class, 'rejectReview'])->name('reviews.reject');
@@ -716,19 +718,19 @@ Route::middleware(['auth', 'admin.role'])->prefix('admin')->name('admin.')->grou
 
 
 Route::get('/penjual/produk', [App\Http\Controllers\Seller\ProductController::class, 'index'])->name('penjual.produk');
-Route::get('/penjual/produk/create', [App\Http\Controllers\Seller\ProductController::class, 
+Route::get('/penjual/produk/create', [App\Http\Controllers\Seller\ProductController::class,
 'create'])->name('penjual.produk.create');
 Route::post('/penjual/produk', [App\Http\Controllers\Seller\ProductController::class, 'store'])->name('penjual.produk.store');
 Route::get('/penjual/produk/{id}', [App\Http\Controllers\Seller\ProductController::class, 'show'])->name('penjual.produk.show');
-Route::get('/penjual/produk/{id}/edit', [App\Http\Controllers\Seller\ProductController::class, 
+Route::get('/penjual/produk/{id}/edit', [App\Http\Controllers\Seller\ProductController::class,
 'edit'])->name('penjual.produk.edit');
-Route::put('/penjual/produk/{id}', [App\Http\Controllers\Seller\ProductController::class, 
+Route::put('/penjual/produk/{id}', [App\Http\Controllers\Seller\ProductController::class,
 'update'])->name('penjual.produk.update');
-Route::delete('/penjual/produk/{id}', [App\Http\Controllers\Seller\ProductController::class, 
+Route::delete('/penjual/produk/{id}', [App\Http\Controllers\Seller\ProductController::class,
 'destroy'])->name('penjual.produk.destroy');
-Route::put('/penjual/produk/{id}/stock', [App\Http\Controllers\Seller\ProductController::class, 
+Route::put('/penjual/produk/{id}/stock', [App\Http\Controllers\Seller\ProductController::class,
 'updateStock'])->name('penjual.produk.stock.update');
-Route::delete('/penjual/product-image/{id}', [App\Http\Controllers\Seller\ProductController::class, 
+Route::delete('/penjual/product-image/{id}', [App\Http\Controllers\Seller\ProductController::class,
 'destroyImage'])->name('penjual.product.image.delete');
 
 // Route untuk manajemen ulasan penjual
@@ -873,9 +875,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/wishlist', [App\Http\Controllers\WishlistController::class, 'index'])->name('wishlist.index');
     Route::post('/wishlist', [App\Http\Controllers\WishlistController::class, 'store'])->name('wishlist.store');
     Route::delete('/wishlist/{id}', [App\Http\Controllers\WishlistController::class, 'destroy'])->name('wishlist.destroy');
-    Route::delete('/wishlist/product/{productId}', [App\Http\Controllers\WishlistController::class, 
+    Route::delete('/wishlist/product/{productId}', [App\Http\Controllers\WishlistController::class,
 'destroyByProductId'])->name('wishlist.destroy-by-product');
-    Route::post('/wishlist/{id}/move-to-cart', [App\Http\Controllers\WishlistController::class, 
+    Route::post('/wishlist/{id}/move-to-cart', [App\Http\Controllers\WishlistController::class,
 'moveToCart'])->name('wishlist.move-to-cart');
 });
 
@@ -905,20 +907,20 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/chat/{userId}', [App\Http\Controllers\ChatController::class, 'getMessages'])->name('chat.messages');
     Route::post('/chat/send', [App\Http\Controllers\ChatController::class, 'sendMessage'])->name('chat.send');
     Route::get('/chat/contacts', [App\Http\Controllers\ChatController::class, 'getContacts'])->name('chat.contacts');
-    Route::post('/chat/{userId}/mark-as-read', [App\Http\Controllers\ChatController::class, 
+    Route::post('/chat/{userId}/mark-as-read', [App\Http\Controllers\ChatController::class,
 'markAsRead'])->name('chat.mark-as-read');
 });
 
 // Role-based Dashboards
 Route::middleware(['auth', 'admin.role'])->group(function () {
-    Route::get('/admin/dashboard', [App\Http\Controllers\RoleDashboardController::class, 
+    Route::get('/admin/dashboard', [App\Http\Controllers\RoleDashboardController::class,
 'showAdminDashboard'])->name('admin.dashboard');
-    
+
     // API endpoints for admin dashboard
     Route::get('/api/admin/dashboard/stats', [App\Http\Controllers\Admin\AdminDashboardController::class, 'getDashboardStats'])->name('api.admin.dashboard.stats');
     Route::get('/api/admin/dashboard/users', [App\Http\Controllers\Admin\AdminDashboardController::class, 'getUserStats'])->name('api.admin.dashboard.users');
     Route::get('/api/admin/dashboard/products', [App\Http\Controllers\Admin\AdminDashboardController::class, 'getProductStats'])->name('api.admin.dashboard.products');
-    
+
     // Test endpoint for creating a product
     Route::post('/api/admin/test-create-product', function () {
         try {
@@ -933,7 +935,7 @@ Route::middleware(['auth', 'admin.role'])->group(function () {
                 'status' => 'aktif',
                 'min_order' => 1
             ]);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Produk berhasil dibuat',
@@ -955,10 +957,10 @@ Route::middleware(['auth', 'seller.role'])->group(function () {
 });
 
 Route::middleware(['auth', 'customer.role'])->group(function () {
-    Route::get('/customer/dashboard', [App\Http\Controllers\RoleDashboardController::class, 
+    Route::get('/customer/dashboard', [App\Http\Controllers\RoleDashboardController::class,
 'showCustomerDashboard'])->name('customer.dashboard');
     Route::get('/customer/riwayat-pesanan', [App\Http\Controllers\OrderHistoryController::class, 'index'])->name('customer.order.history');
-    
+
     // Customer ticket routes
     Route::get('/customer/tickets', [App\Http\Controllers\TicketController::class, 'getTicketsByUser'])->name('customer.tickets');
     Route::get('/customer/tickets/{id}', [App\Http\Controllers\TicketController::class, 'show'])->name('customer.tickets.detail');
@@ -974,7 +976,7 @@ Route::post('/register', [App\Http\Controllers\AuthController::class, 'register'
 Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout'])->name('logout');
 
 // General dashboard route that shows different content based on role
-Route::middleware(['auth'])->get('/dashboard', [App\Http\Controllers\RoleDashboardController::class, 
+Route::middleware(['auth'])->get('/dashboard', [App\Http\Controllers\RoleDashboardController::class,
 'showRoleBasedDashboard'])->name('dashboard');
 
 // API route for filtering products

@@ -24,6 +24,12 @@ class User extends Authenticatable
         'password',
         'role_id',
         'status',
+        'phone',
+        'address',
+        'shop_description',
+        'bank_name',
+        'bank_account_number',
+        'bank_account_name',
     ];
 
     /**

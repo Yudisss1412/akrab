@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="utf-8">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>Edit Profil Penjual — AKRAB</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
@@ -32,7 +33,8 @@
             </div>
           </header>
 
-          <form class="edit-form" id="editSellerProfileForm" action="{{ route('profil.penjual') }}" method="POST" novalidate>
+          <form class="edit-form" id="editSellerProfileForm" action="{{ route('profil.penjual.update') }}" method="POST" novalidate>
+            @method('PUT')
             <div class="form-group field">
               <input type="text" id="shopName" name="shopName" value="{{ old('shopName', auth()->user()->name) }}" required placeholder=" ">
               <label for="shopName">Nama Toko</label>

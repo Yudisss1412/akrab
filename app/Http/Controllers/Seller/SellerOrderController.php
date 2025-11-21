@@ -504,10 +504,11 @@ class SellerOrderController extends Controller
             ->count();
 
         // Debug logging untuk memastikan perhitungan benar
-        \Log::info("getUrgentTasks - seller_id: " . $seller->id);
-        \Log::info("getUrgentTasks - pendingPaymentCount (pending): " . $pendingPaymentCount);
-        \Log::info("getUrgentTasks - processingCount (confirmed): " . $processingCount);
-        \Log::info("getUrgentTasks - total pending_orders: " . ($pendingPaymentCount + $processingCount));
+        \Log::info("getUrgentTasks - Current user ID: " . $user->id);
+        \Log::info("getUrgentTasks - Associated seller_id: " . $seller->id);
+        \Log::info("getUrgentTasks - Count of orders with status 'pending' for this seller: " . $pendingPaymentCount);
+        \Log::info("getUrgentTasks - Count of orders with status 'confirmed' for this seller: " . $processingCount);
+        \Log::info("getUrgentTasks - Total urgent pending_orders to return: " . ($pendingPaymentCount + $processingCount));
 
         $unrepliedChatsCount = 0; // Placeholder - bisa diintegrasikan dengan sistem chat
 

@@ -19,7 +19,9 @@ class ViewExtensionServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // Tambahkan ekstensi .blade.view ke daftar ekstensi view
+        // Tambahkan ekstensi .blade.view ke daftar ekstensi view (for backward compatibility)
         $this->app['view']->addExtension('blade.view', 'blade');
+
+        // Standard .blade.php extension is already handled by Laravel by default
     }
 }

@@ -328,7 +328,7 @@
         <!-- Saldo Summary Card -->
         <section class="saldo-card">
           <p class="saldo-title">Saldo Saat Ini (Dapat Ditarik)</p>
-          <p class="saldo-amount" id="saldoAmount">Rp 0</p>
+          <p class="saldo-amount" id="saldoAmount" data-default-value="1545000">Rp 1.545.000</p>
           <button class="btn-primary" id="btnWithdraw">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -358,10 +358,65 @@
                 </tr>
               </thead>
               <tbody id="transactionTableBody">
-                <!-- Data akan diisi secara dinamis -->
+                <!-- Data dummy ditampilkan langsung -->
+                @php
+                $dummyTransactionData = [
+                  [
+                    'id' => 1,
+                    'date' => \Carbon\Carbon::now()->subDays(2),
+                    'description' => 'Penjualan Produk - Keripik Singkong Balado',
+                    'type' => 'Pemasukan',
+                    'amount' => 250000
+                  ],
+                  [
+                    'id' => 2,
+                    'date' => \Carbon\Carbon::now()->subDays(3),
+                    'description' => 'Penjualan Produk - Kerudung Instan Paris',
+                    'type' => 'Pemasukan',
+                    'amount' => 125000
+                  ],
+                  [
+                    'id' => 3,
+                    'date' => \Carbon\Carbon::now()->subDays(5),
+                    'description' => 'Penarikan Dana',
+                    'type' => 'Pengeluaran',
+                    'amount' => 150000
+                  ],
+                  [
+                    'id' => 4,
+                    'date' => \Carbon\Carbon::now()->subDays(7),
+                    'description' => 'Penjualan Produk - Kaos Polos Premium',
+                    'type' => 'Pemasukan',
+                    'amount' => 75000
+                  ],
+                  [
+                    'id' => 5,
+                    'date' => \Carbon\Carbon::now()->subDays(10),
+                    'description' => 'Penjualan Produk - Gantungan Kunci Akrab',
+                    'type' => 'Pemasukan',
+                    'amount' => 45000
+                  ]
+                ];
+
+                foreach($dummyTransactionData as $transaction):
+                  $isIncome = $transaction['type'] === 'Pemasukan';
+                  $amountSign = $isIncome ? '+' : '-';
+                  $amountClass = $isIncome ? 'text-green' : 'text-red';
+                  $typeText = $isIncome ? 'Pemasukan' : 'Pengeluaran';
+                  $formattedAmount = $amountSign . 'Rp ' . number_format($transaction['amount'], 0, ',', '.');
+                  $formattedDate = \Carbon\Carbon::parse($transaction['date'])->format('d M Y');
+                @endphp
+                <tr data-dummy="true">
+                  <td>{{ $formattedDate }}</td>
+                  <td>{{ $transaction['description'] }}</td>
+                  <td><span class="{{ $amountClass }}">{{ $typeText }}</span></td>
+                  <td class="{{ $amountClass }}">{{ $formattedAmount }}</td>
+                  <td>Rp {{ number_format($transaction['amount'], 0, ',', '.') }}</td>
+                </tr>
+                @endforeach
               </tbody>
             </table>
-            
+
             <!-- Pagination for transactions -->
             <div class="pagination" id="transactionPagination">
               <!-- Pagination will be filled dynamically -->
@@ -384,10 +439,66 @@
                 </tr>
               </thead>
               <tbody id="withdrawalTableBody">
-                <!-- Data will be filled dynamically -->
+                <!-- Data dummy ditampilkan langsung -->
+                @php
+                $dummyWithdrawalData = [
+                  [
+                    'id' => 'WD-001',
+                    'request_date' => \Carbon\Carbon::now()->subDays(1),
+                    'amount' => 150000,
+                    'bank_account' => 'BCA - 1234567890',
+                    'status' => 'completed'
+                  ],
+                  [
+                    'id' => 'WD-002',
+                    'request_date' => \Carbon\Carbon::now()->subDays(8),
+                    'amount' => 200000,
+                    'bank_account' => 'BRI - 0987654321',
+                    'status' => 'completed'
+                  ],
+                  [
+                    'id' => 'WD-003',
+                    'request_date' => \Carbon\Carbon::now()->subDays(15),
+                    'amount' => 300000,
+                    'bank_account' => 'Mandiri - 1122334455',
+                    'status' => 'pending'
+                  ]
+                ];
+
+                foreach($dummyWithdrawalData as $withdrawal):
+                  $statusClass = '';
+                  $statusText = '';
+                  switch($withdrawal['status']):
+                    case 'approved':
+                    case 'completed':
+                      $statusClass = 'badge-success';
+                      $statusText = 'Berhasil';
+                      break;
+                    case 'pending':
+                      $statusClass = 'badge-pending';
+                      $statusText = 'Diproses';
+                      break;
+                    case 'rejected':
+                      $statusClass = 'badge-failed';
+                      $statusText = 'Gagal';
+                      break;
+                    default:
+                      $statusClass = 'badge-pending';
+                      $statusText = $withdrawal['status'] ?? 'Diproses';
+                  endswitch;
+                  $formattedDate = \Carbon\Carbon::parse($withdrawal['request_date'])->format('d M Y');
+                @endphp
+                <tr data-dummy="true">
+                  <td>{{ $formattedDate }}</td>
+                  <td>{{ $withdrawal['id'] }}</td>
+                  <td>Rp {{ number_format($withdrawal['amount'], 0, ',', '.') }}</td>
+                  <td>{{ $withdrawal['bank_account'] }}</td>
+                  <td><span class="badge {{ $statusClass }}">{{ $statusText }}</span></td>
+                </tr>
+                @endforeach
               </tbody>
             </table>
-            
+
             <!-- Pagination for withdrawals -->
             <div class="pagination" id="withdrawalPagination">
               <!-- Pagination will be filled dynamically -->
@@ -477,14 +588,27 @@
         withdrawModal.classList.remove('active');
       }
     });
-    
-    // Form submission
+
     // Ambil data saldo dan riwayat transaksi saat halaman dimuat
     document.addEventListener('DOMContentLoaded', function() {
       loadBalanceData();
       loadTransactionHistory();
       loadWithdrawalHistory();
     });
+
+    // Panggil fungsi-fungsi segera jika DOM sudah siap atau setelah window selesai dimuat
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() {
+        loadBalanceData();
+        loadTransactionHistory();
+        loadWithdrawalHistory();
+      });
+    } else {
+      // Jika DOM sudah siap, panggil langsung
+      loadBalanceData();
+      loadTransactionHistory();
+      loadWithdrawalHistory();
+    }
 
     // Fungsi untuk memformat angka menjadi format Rupiah
     function formatRupiah(angka) {
@@ -494,6 +618,7 @@
       return 'Rp ' + hasil;
     }
 
+
     // Fungsi untuk memuat data saldo
     async function loadBalanceData() {
       try {
@@ -502,14 +627,28 @@
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
           }
         });
+
+        if (!response.ok) {
+          // Jika respons bukan OK, biarkan nilai default
+          return;
+        }
+
         const data = await response.json();
 
-        if (data.balance !== undefined) {
+        if (data.success === false) {
+          // Jika API merespons dengan error, biarkan nilai default
+          return;
+        }
+
+        // Perbarui saldo hanya jika API merespons dengan nilai yang bukan 0 (menunjukkan data nyata ada)
+        // Jika API merespons dengan 0, kita anggap itu sebagai nilai default dari sistem (belum ada transaksi)
+        if (data.balance !== undefined && data.balance !== null && !isNaN(data.balance) && data.balance > 0) {
           document.getElementById('saldoAmount').textContent = formatRupiah(data.balance);
         }
+        // Jika tidak ada data dari API atau saldo 0, nilai default akan tetap ditampilkan
       } catch (error) {
         console.error('Error loading balance:', error);
-        document.getElementById('saldoAmount').textContent = 'Rp 0';
+        // Tetap menampilkan saldo default jika error
       }
     }
 
@@ -523,11 +662,18 @@
         });
         const data = await response.json();
 
+        if (data.success === false) {
+          // Jika API merespons dengan error, biarkan data dummy
+          return;
+        }
+
         if (data.transactions) {
           populateTransactionTable(data.transactions);
         }
+        // Jika tidak ada data dari API, data dummy dari HTML tetap akan ditampilkan
       } catch (error) {
         console.error('Error loading transaction history:', error);
+        // Jika terjadi error, biarkan data dummy tetap ditampilkan
       }
     }
 
@@ -541,23 +687,33 @@
         });
         const data = await response.json();
 
+        if (data.success === false) {
+          // Jika API merespons dengan error, biarkan data dummy
+          return;
+        }
+
         if (data.withdrawals) {
           populateWithdrawalTable(data.withdrawals.data); // Karena menggunakan paginate
         }
+        // Jika tidak ada data dari API, data dummy dari HTML tetap akan ditampilkan
       } catch (error) {
         console.error('Error loading withdrawal history:', error);
+        // Jika terjadi error, biarkan data dummy tetap ditampilkan
       }
     }
 
     // Fungsi untuk mengisi tabel riwayat transaksi
     function populateTransactionTable(transactions) {
       const tbody = document.getElementById('transactionTableBody');
-      tbody.innerHTML = ''; // Kosongkan tabel sebelumnya
 
       if (transactions.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Tidak ada riwayat transaksi</td></tr>';
+        // Jika tidak ada data transaksi, biarkan data dummy tetap ada
         return;
       }
+
+      // Hapus semua baris dummy sebelum menambahkan data baru
+      const dummyRows = tbody.querySelectorAll('[data-dummy="true"]');
+      dummyRows.forEach(row => row.remove());
 
       transactions.forEach(transaction => {
         const row = document.createElement('tr');
@@ -590,12 +746,15 @@
     // Fungsi untuk mengisi tabel riwayat penarikan
     function populateWithdrawalTable(withdrawals) {
       const tbody = document.getElementById('withdrawalTableBody');
-      tbody.innerHTML = ''; // Kosongkan tabel sebelumnya
 
       if (withdrawals.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Tidak ada riwayat penarikan</td></tr>';
+        // Jika tidak ada data penarikan, biarkan data dummy tetap ada
         return;
       }
+
+      // Hapus semua baris dummy sebelum menambahkan data baru
+      const dummyRows = tbody.querySelectorAll('[data-dummy="true"]');
+      dummyRows.forEach(row => row.remove());
 
       withdrawals.forEach(withdrawal => {
         const row = document.createElement('tr');

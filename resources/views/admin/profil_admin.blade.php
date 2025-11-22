@@ -98,43 +98,19 @@
     }
     
     /* Buat elemen untuk menempatkan tombol back di bawah header custom */
-    .custom-back-nav {
-      position: static; /* Mengubah dari sticky ke static agar tidak mengikuti scroll */
-      background-color: #f8f9fa; /* Warna latar navbar Bootstrap */
-      padding: 0.75rem 1.5rem;
-      border-bottom: 1px solid #dee2e6;
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-    }
-    
-    .custom-back-nav a {
-      display: flex;
-      align-items: center;
-      text-decoration: none;
-      color: inherit;
-    }
-    
     .main-layout {
-      margin-top: 0; /* Hilangkan margin-top agar tidak terlalu jauh dari tombol back */
+      margin-top: 0;
     }
-    
+
     /* Menjaga agar konten tidak tertutup oleh header sticky */
     .content.admin-page-content {
       margin-top: 0;
-      padding-top: 30px; /* Kurangi ruang antara tombol back dan isi konten */
     }
   </style>
 @endpush
 
 @section('content')
   @include('components.admin_penjual.header')
-  <!-- Custom back navigation -->
-  <div class="custom-back-nav">
-    <a href="javascript:history.back()" class="navbar-brand" title="Kembali ke halaman sebelumnya">
-      <i class="fas fa-arrow-left me-2"></i>UMKM AKRAB Admin
-    </a>
-  </div>
     <div class="main-layout">
       <div class="content-wrapper">
         <main class="content admin-page-content" role="main">
@@ -148,9 +124,9 @@
                   <i class="dot online"></i>
                 </div>
                 <div class="seller-meta">
-                  <h1 id="adminTitle" class="seller-name">Admin Utama</h1>
-                  <div class="seller-mail">admin@akrab.com</div>
-                  <div class="seller-since">Bergabung sejak <strong>2024</strong></div>
+                  <h1 id="adminTitle" class="seller-name">{{ $admin->name }}</h1>
+                  <div class="seller-mail">{{ $admin->email }}</div>
+                  <div class="seller-since">Bergabung sejak <strong>{{ $admin->created_at->year }}</strong></div>
                 </div>
               </div>
               <!-- kanan: aksi -->
@@ -171,19 +147,19 @@
             <dl class="info-list" aria-label="Info Admin">
               <div>
                 <dt>Nama Lengkap</dt>
-                <dd>Admin Utama</dd>
+                <dd>{{ $admin->name }}</dd>
               </div>
               <div>
                 <dt>Email</dt>
-                <dd>admin@akrab.com</dd>
+                <dd>{{ $admin->email }}</dd>
               </div>
               <div>
                 <dt>No. HP</dt>
-                <dd>+62 812-3456-7890</dd>
+                <dd>{{ $admin->phone ?? '+62 812-3456-7890' }}</dd>
               </div>
               <div>
                 <dt>Jabatan</dt>
-                <dd>Administrator</dd>
+                <dd>{{ $admin->role->name ?? 'Administrator' }}</dd>
               </div>
               <div>
                 <dt>Level Akses</dt>

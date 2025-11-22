@@ -652,18 +652,11 @@ Route::get('/dashboard_admin', function () {
     return view('admin.dashboard');
 })->name('dashboard.admin');
 
-Route::get('/profil_admin', function () {
-    return view('admin.profil_admin');
-})->name('profil.admin');
+Route::get('/profil_admin', [App\Http\Controllers\Admin\ProfileController::class, 'show'])->name('profil.admin');
 
-Route::get('/edit_profil_admin', function () {
-    return view('admin.edit_profil_admin');
-})->name('edit.profil.admin');
+Route::get('/edit_profil_admin', [App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('edit.profil.admin');
 
-Route::put('/admin/profil/update', function () {
-    // Logika untuk menyimpan perubahan profil admin
-    return redirect()->route('profil.admin')->with('success', 'Profil admin berhasil diperbarui!');
-})->name('profil.admin.update');
+Route::put('/admin/profil/update', [App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profil.admin.update');
 
 // Admin dashboard related routes
 Route::middleware(['auth', 'admin.role'])->group(function () {

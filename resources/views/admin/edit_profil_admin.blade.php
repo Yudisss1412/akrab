@@ -33,32 +33,28 @@
           </header>
 
           <form class="edit-form" id="editAdminProfileForm" action="{{ route('profil.admin.update') }}" method="POST" enctype="multipart/form-data" novalidate>
+            @csrf
+            @method('PUT')
             <div class="form-group field">
-              <input type="text" id="adminName" name="adminName" value="{{ old('adminName', 'Admin Utama') }}" required placeholder=" ">
-              <label for="adminName">Nama Lengkap</label>
-              <p class="error-message" id="adminName-error"></p>
+              <input type="text" id="name" name="name" value="{{ old('name', $admin->name) }}" required placeholder=" ">
+              <label for="name">Nama Lengkap</label>
+              <p class="error-message" id="name-error"></p>
             </div>
 
             <div class="form-group field">
-              <input type="text" id="username" name="username" value="{{ old('username', 'adminutama') }}" required placeholder=" ">
-              <label for="username">Username</label>
-              <p class="error-message" id="username-error"></p>
-            </div>
-
-            <div class="form-group field">
-              <input type="email" id="email" name="email" value="{{ old('email', 'admin@akrab.com') }}" required placeholder=" ">
+              <input type="email" id="email" name="email" value="{{ old('email', $admin->email) }}" required placeholder=" ">
               <label for="email">Email</label>
               <p class="error-message" id="email-error"></p>
             </div>
 
             <div class="form-group field">
-              <input type="tel" id="phone" name="phone" value="{{ old('phone', '+62 812-3456-7890') }}" required placeholder=" ">
+              <input type="tel" id="phone" name="phone" value="{{ old('phone', $admin->phone ?? '+62 812-3456-7890') }}" placeholder=" ">
               <label for="phone">Nomor Telepon</label>
               <p class="error-message" id="phone-error"></p>
             </div>
 
             <div class="form-group field">
-              <input type="text" id="position" name="position" value="{{ old('position', 'Administrator') }}" required placeholder=" ">
+              <input type="text" id="position" name="position" value="{{ old('position', $admin->role->name ?? 'Administrator') }}" required placeholder=" ">
               <label for="position">Jabatan</label>
               <p class="error-message" id="position-error"></p>
             </div>

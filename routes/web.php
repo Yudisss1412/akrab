@@ -944,9 +944,7 @@ Route::middleware(['auth', 'admin.role'])->group(function () {
 });
 
 Route::middleware(['auth', 'seller.role'])->group(function () {
-    Route::get('/penjual/dashboard', function () {
-        return view('penjual.dashboard_penjual');
-    })->name('seller.dashboard');
+    Route::get('/penjual/dashboard', [App\Http\Controllers\Seller\DashboardController::class, 'show'])->name('seller.dashboard');
 });
 
 Route::middleware(['auth', 'customer.role'])->group(function () {

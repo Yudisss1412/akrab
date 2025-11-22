@@ -364,9 +364,9 @@
               </svg>
             </div>
             <p class="stat-title">Pendapatan Bulan Ini</p>
-            <p class="stat-value">Rp 5.450.000</p>
+            <p class="stat-value">Rp {{ number_format($stats['this_month_revenue'], 0, ',', '.') }}</p>
           </div>
-          
+
           <div class="stat-card">
             <div class="stat-icon">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -375,9 +375,9 @@
               </svg>
             </div>
             <p class="stat-title">Pesanan Baru</p>
-            <p class="stat-value">8</p>
+            <p class="stat-value">{{ $stats['new_orders'] }}</p>
           </div>
-          
+
           <div class="stat-card">
             <div class="stat-icon">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -386,9 +386,9 @@
               </svg>
             </div>
             <p class="stat-title">Produk Dilihat</p>
-            <p class="stat-value">1.204</p>
+            <p class="stat-value">{{ number_format($stats['viewed_products']) }}</p>
           </div>
-          
+
           <div class="stat-card">
             <div class="stat-icon">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -396,7 +396,7 @@
               </svg>
             </div>
             <p class="stat-title">Rating Toko</p>
-            <p class="stat-value">4.8 ⭐</p>
+            <p class="stat-value">{{ $stats['store_rating'] }} ⭐</p>
           </div>
         </section>
 

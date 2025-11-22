@@ -90,6 +90,7 @@ body{
   border:1px solid var(--border-color);
   border-radius: var(--radius-lg);
   padding: var(--gap-md);
+  margin-bottom: var(--gap-lg);
 }
 .card-title{ margin:0; font-size:1.15rem; }
 

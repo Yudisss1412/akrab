@@ -20,13 +20,13 @@
         <!-- kiri: identitas -->
         <div class="seller-identity">
           <div class="avatar" aria-hidden="true">
-            <span>K</span>
+            <span>{{ strtoupper(substr($seller->store_name ?? $user->name, 0, 1)) }}</span>
             <i class="dot online"></i>
           </div>
           <div class="seller-meta">
-            <h1 id="sellerTitle" class="seller-name">{{ auth()->user()->name }}</h1>
-            <div class="seller-mail">{{ auth()->user()->email }}</div>
-            <div class="seller-since">Bergabung sejak <strong>{{ auth()->user()->created_at->year }}</strong></div>
+            <h1 id="sellerTitle" class="seller-name">{{ $seller->store_name ?? $user->name }}</h1>
+            <div class="seller-mail">{{ $user->email }}</div>
+            <div class="seller-since">Bergabung sejak <strong>{{ $user->created_at->year }}</strong></div>
           </div>
         </div>
         <!-- kanan: aksi -->
@@ -40,27 +40,27 @@
       <dl class="info-list" aria-label="Info Toko">
         <div>
           <dt>Nama Toko</dt>
-          <dd>{{ auth()->user()->name }}</dd>
+          <dd>{{ $seller->store_name ?? $user->name }}</dd>
         </div>
         <div>
           <dt>Email</dt>
-          <dd>{{ auth()->user()->email }}</dd>
+          <dd>{{ $user->email }}</dd>
         </div>
         <div>
           <dt>No. HP</dt>
-          <dd>{{ auth()->user()->phone ?? '+62 812-3456-7890' }}</dd>
+          <dd>{{ $user->phone ?? '+62 812-3456-7890' }}</dd>
         </div>
         <div>
           <dt>Alamat</dt>
-          <dd>{{ auth()->user()->address ?? 'Alamat belum diisi' }}</dd>
+          <dd>{{ $user->address ?? 'Alamat belum diisi' }}</dd>
         </div>
         <div>
           <dt>Deskripsi Toko</dt>
-          <dd>{{ auth()->user()->shop_description ?? 'Toko belum memiliki deskripsi' }}</dd>
+          <dd>{{ $user->shop_description ?? 'Toko belum memiliki deskripsi' }}</dd>
         </div>
         <div>
           <dt>Bank Penerima</dt>
-          <dd>{{ auth()->user()->bank_name ?? 'Nama Bank' }} • {{ auth()->user()->bank_account_number ?? 'Nomor Rekening' }} • a.n. {{ auth()->user()->bank_account_name ?? auth()->user()->name }}</dd>
+          <dd>{{ $user->bank_name ?? 'Nama Bank' }} • {{ $user->bank_account_number ?? 'Nomor Rekening' }} • a.n. {{ $user->bank_account_name ?? $user->name }}</dd>
         </div>
       </dl>
     </section>

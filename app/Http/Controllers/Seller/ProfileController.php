@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Seller;
 
 use App\Http\Controllers\Controller;
+use App\Models\Seller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -10,6 +11,23 @@ use Illuminate\Validation\Rule;
 
 class ProfileController extends Controller
 {
+    /**
+     * Display the seller's profile page.
+     */
+    public function show()
+    {
+        $user = Auth::user();
+
+        // Ambil data seller terkait
+        $seller = Seller::where('user_id', $user->id)->first();
+
+        if (!$seller) {
+            abort(403, 'Akses ditolak. Seller record tidak ditemukan.');
+        }
+
+        return view('penjual.profil_penjual', compact('user', 'seller'));
+    }
+
     /**
      * Show the form for editing the seller's profile.
      */

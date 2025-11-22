@@ -358,9 +358,7 @@ Route::get('/dashboard_penjual', function () {
 })->name('dashboard.penjual');
 
 Route::middleware(['auth', 'seller.role'])->group(function () {
-    Route::get('/profil_penjual', function () {
-        return view('penjual.profil_penjual');
-    })->name('profil.penjual');
+    Route::get('/profil_penjual', [App\Http\Controllers\Seller\ProfileController::class, 'show'])->name('profil.penjual');
 
     Route::get('/edit_profil_penjual', [App\Http\Controllers\Seller\ProfileController::class, 'edit'])->name('edit.profil.penjual');
 

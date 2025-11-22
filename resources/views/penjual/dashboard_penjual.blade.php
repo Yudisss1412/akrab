@@ -147,6 +147,7 @@
       padding: 1.5rem;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
       border: 1px solid var(--ak-border);
+      margin-bottom: 1.5rem;
     }
     
     .card h2 {
@@ -431,7 +432,6 @@
                     </svg>
                     Chat Belum Dibalas
                   </a>
-                  <span class="action-count" id="unreplied-chats-count">0</span>
                 </li>
                 <li class="action-item">
                   <a href="{{ route('penjual.komplain.retur') }}" class="action-link">

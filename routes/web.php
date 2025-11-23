@@ -141,9 +141,7 @@ Route::get('/register', function () {
     return view('auth.register');
 })->name('register');
 
-Route::get('/cust_welcome', function () {
-    return view('customer.cust_welcome');
-})->name('cust.welcome');
+Route::get('/cust_welcome', [App\Http\Controllers\Customer\WelcomeController::class, 'index'])->name('cust.welcome');
 
 Route::get('/halaman_produk', [App\Http\Controllers\ProductController::class, 'index'])->name('halaman.produk');
 Route::get('/produk', [App\Http\Controllers\ProductController::class, 'getAllProducts'])->name('produk.api');

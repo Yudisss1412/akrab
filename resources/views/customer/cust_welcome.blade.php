@@ -2,6 +2,32 @@
 
 @section('title', 'Selamat Datang - UMKM AKRAB')
 
+@php
+function formatRupiah($amount) {
+    return 'Rp ' . number_format($amount ?? 0, 0, ',', '.');
+}
+
+function createStarsHTML($rating) {
+    $rating = (float) $rating;
+    $fullStars = floor($rating);
+    $halfStar = ($rating - $fullStars) >= 0.5 ? 1 : 0;
+    $emptyStars = 5 - $fullStars - $halfStar;
+
+    $html = '';
+    for ($i = 0; $i < $fullStars; $i++) {
+        $html .= '<svg width="20" height="20" viewBox="0 0 47 47" xmlns="http://www.w3.org/2000/svg"><path d="M11.4076 41.1253L14.5899 27.368L3.91699 18.1149L18.017 16.891L23.5003 3.91699L28.9837 16.891L43.0837 18.1149L32.4107 27.368L35.593 41.1253L23.5003 33.8305L11.4076 41.1253Z" fill="#FFF600"/></svg>';
+    }
+    if ($halfStar) {
+        $html .= '<svg width="20" height="20" viewBox="0 0 47 47" xmlns="http://www.w3.org/2000/svg"><path d="M29.6691 32.9982L28.0534 25.9482L33.4878 21.2482L26.3399 20.6118L23.5003 13.9535V29.2285L29.6691 32.9982ZM11.4076 41.1253L14.5899 27.368L3.91699 18.1149L18.017 16.891L23.5003 3.91699L28.9837 16.891L43.0837 18.1149L32.4107 27.368L35.593 41.1253L23.5003 33.8305L11.4076 41.1253Z" fill="#FFF700"/></svg>';
+    }
+    for ($i = 0; $i < $emptyStars; $i++) {
+        $html .= '<svg width="20" height="20" viewBox="0 0 47 47" xmlns="http://www.w3.org/2000/svg"><path d="M17.3316 32.9493L23.5003 29.2285L29.6691 32.9982L28.0535 25.9482L33.4878 21.1993L26.3399 20.6118L23.5003 13.9535L20.6607 20.5628L13.5128 21.1993L18.9472 25.9482L17.3316 32.9493ZM11.4076 41.1253L14.5899 27.368L3.91699 18.1149L18.017 16.891L23.5003 3.91699L28.9837 16.891L43.0837 18.1149L32.4107 27.368L35.593 41.1253L23.5003 33.8305L11.4076 41.1253Z" fill="#D1D5DB"/></svg>';
+    }
+
+    return $html;
+}
+@endphp
+
 @section('header')
   @include('components.customer.header.header')
 @endsection
@@ -283,15 +309,16 @@
     /* ========== Modal Produk ========== */
     .modal-detail-produk {
       position: fixed;
-      inset: 0;
+      top: 0;
+      left: 0;
       width: 100vw;
       height: 100vh;
       z-index: 9999;
-      display: none;
+      display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(0, 0, 0, 0.20);
-      overflow-y: hidden !important;
+      background: rgba(0, 0, 0, 0.5);
+      overflow-y: auto;
     }
 
     .modal-content-new {
@@ -305,6 +332,7 @@
       flex-direction: column;
       position: relative;
       overflow: hidden;
+      margin: 20px; /* Jarak dari sisi viewport */
     }
     
     .modal-img-section {
@@ -623,7 +651,40 @@
             <h3>Produk Populer</h3>
             <a href="/halaman_produk" class="btn-lihat-semua">Lihat Semua</a>
         </div>
-        <div class="popular-products-grid" id="produk-populer-grid"></div>
+        <div class="popular-products-grid" id="produk-populer-grid">
+            @foreach($popularProducts as $product)
+            <div class="produk-card" data-product-id="{{ $product->id }}">
+                <img src="{{ $product->main_image ? asset('storage/' . $product->main_image) : ($product->images->first() ? asset('storage/' . $product->images->first()->image_path) : asset('src/product_1.png')) }}"
+                     alt="{{ $product->name }}"
+                     onerror="this.src='{{ asset('src/product_1.png') }}'">
+                <div class="produk-card-info">
+                    <h3 class="produk-card-name">{{ $product->name }}</h3>
+                    <div class="produk-card-sub">{{ $product->category->name ?? 'Umum' }}</div>
+                    <div class="produk-card-price">{{ formatRupiah($product->price ?? 0) }}</div>
+                    <div class="produk-card-toko">
+                        <a href="/toko/{{ $product->seller->id ?? 'toko-tidak-ditemukan' }}"
+                           class="toko-link"
+                           data-seller-name="{{ $product->seller->store_name ?? 'Toko Umum' }}">
+                            {{ $product->seller->store_name ?? 'Toko Umum' }}
+                        </a>
+                    </div>
+                    <div class="produk-card-stars" aria-label="Rating {{ $product->rating ?? 0 }} dari 5">
+                        {!! createStarsHTML($product->rating ?? 0) !!}
+                    </div>
+                    <div class="produk-rating-angka">{{ $product->rating ?? 0 }}</div>
+                </div>
+                <div class="produk-card-actions">
+                    <button class="btn-lihat lihat-detail-btn"
+                            data-product-id="{{ $product->id }}"
+                            data-idx="{{ $loop->index }}">Lihat Detail</button>
+                    <button class="btn-add"
+                            data-product-id="{{ $product->id }}"
+                            data-name="{{ $product->name }}"
+                            type="button">+ Keranjang</button>
+                </div>
+            </div>
+            @endforeach
+        </div>
     </section>
 
     <section class="content-section">
@@ -656,7 +717,6 @@
 
 <!-- Modal Produk Populer -->
 <div class="modal-detail-produk" id="modal-detail-produk" style="display: none;">
-    <div class="modal-overlay"></div>
     <div class="modal-content-new">
         <div class="modal-title-row">
             <span id="modal-product"></span>
@@ -681,6 +741,237 @@
     </div>
 </div>
 
+<script>
+// Check if products are already loaded from server, if so, use them instead of fetching from API
+document.addEventListener('DOMContentLoaded', function() {
+    // If products are already rendered from server, attach event listeners to them
+    const produkCards = document.querySelectorAll('.produk-card');
+    if (produkCards.length > 0) {
+        // Products are already loaded from server, attach event listeners
+        produkCards.forEach((card, idx) => {
+            const lihatDetailBtn = card.querySelector('.btn-lihat');
+            const addToCartBtn = card.querySelector('.btn-add');
+
+            if (lihatDetailBtn) {
+                lihatDetailBtn.addEventListener('click', function() {
+                    const productId = this.getAttribute('data-product-id');
+                    openProdukModal(idx, productId);
+                });
+            }
+
+            if (addToCartBtn) {
+                addToCartBtn.addEventListener('click', function() {
+                    const productId = this.getAttribute('data-product-id');
+                    addToCart(productId);
+                });
+            }
+        });
+    } else {
+        // If no products rendered from server, fall back to loading via JS (for compatibility)
+        loadProdukPopulerFromJS();
+    }
+});
+
+// Fallback function to load from JS if needed
+async function loadProdukPopulerFromJS() {
+    // This would implement the original fetch logic from cust_welcome.js
+    // But since we now render from server, this is just for backup
+    try {
+        const response = await fetch('/api/products/popular');
+        if (response.ok) {
+            const data = await response.json();
+            renderProdukPopulerJS(data);
+        }
+    } catch (error) {
+        console.error('Error loading products:', error);
+    }
+}
+
+// Modified modal functions to work with server-rendered content
+let currentProduk = null;
+
+function openProdukModal(idx, productId) {
+    // Try to get product data from server-rendered content first
+    const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+    if (productCard) {
+        // Get product details from the card (or fetch from API if needed)
+        fetch(`/api/products/${productId}`)
+            .then(response => response.json())
+            .then(produk => {
+                currentProduk = produk;
+
+                const modal = document.getElementById('modal-detail-produk');
+                const modalProduct = document.getElementById('modal-product');
+                const modalImg = document.getElementById('modal-img');
+                const modalPrice = document.getElementById('modal-price');
+                const modalDesc = document.getElementById('modal-desc');
+                const modalSpecs = document.getElementById('modal-specs');
+                const modalThumbs = document.getElementById('modal-thumbs');
+
+                modalProduct.textContent = produk.name;
+                modalImg.src = produk.image || '{{ asset("src/product_1.png") }}';
+                modalImg.alt = produk.name;
+                modalPrice.textContent = typeof produk.price === 'number' ?
+                    new Intl.NumberFormat('id-ID', {
+                        style: 'currency',
+                        currency: 'IDR',
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    }).format(produk.price) : produk.price;
+                modalDesc.textContent = produk.description || produk.desc || 'Deskripsi tidak tersedia';
+
+                // Clear and populate specifications
+                modalSpecs.innerHTML = '';
+                if (produk.spesifikasi || produk.specifications) {
+                    const specs = produk.spesifikasi || produk.specifications;
+
+                    // Handle both object and array formats
+                    if (typeof specs === 'object' && specs !== null && !Array.isArray(specs)) {
+                        // If it's an object format: { key: value }
+                        Object.entries(specs).forEach(([key, value]) => {
+                            if (value !== null && value !== undefined && value !== '') {
+                                const li = document.createElement('li');
+                                li.innerHTML = `<strong>${key}:</strong> ${value}`;
+                                modalSpecs.appendChild(li);
+                            }
+                        });
+                    } else if (Array.isArray(specs)) {
+                        // If it's an array format: [ { key: 'Kategori', value: 'Kuliner' }, ... ]
+                        specs.forEach(spec => {
+                            if (typeof spec === 'object' && spec.key && spec.value !== undefined) {
+                                const li = document.createElement('li');
+                                li.innerHTML = `<strong>${spec.key}:</strong> ${spec.value}`;
+                                modalSpecs.appendChild(li);
+                            } else if (typeof spec === 'string' && spec.includes(':')) {
+                                // If it's a string like "Kategori: Kuliner"
+                                const [key, ...valueParts] = spec.split(':');
+                                const value = valueParts.join(':').trim();
+                                const li = document.createElement('li');
+                                li.innerHTML = `<strong>${key.trim()}:</strong> ${value}`;
+                                modalSpecs.appendChild(li);
+                            }
+                        });
+                    } else {
+                        // For any other format, just try to display it properly
+                        const specsStr = String(specs);
+                        specsStr.split('\n').forEach(spec => {
+                            if (spec && spec.includes(':')) {
+                                const [key, ...valueParts] = spec.split(':');
+                                const value = valueParts.join(':').trim();
+                                const li = document.createElement('li');
+                                li.innerHTML = `<strong>${key.trim()}:</strong> ${value}`;
+                                modalSpecs.appendChild(li);
+                            }
+                        });
+                    }
+                }
+
+                // Set up thumbnail images
+                modalThumbs.innerHTML = '';
+                if (produk.images && produk.images.length > 0) {
+                    produk.images.forEach((img, i) => {
+                        const thumb = document.createElement('img');
+                        thumb.src = img.image_path;
+                        thumb.alt = `Gambar produk ${i+1}`;
+                        thumb.className = 'modal-thumb';
+                        thumb.onclick = () => {
+                            modalImg.src = img.image_path;
+                        };
+                        modalThumbs.appendChild(thumb);
+                    });
+                } else {
+                    const thumb = document.createElement('img');
+                    thumb.src = produk.image || '{{ asset("src/product_1.png") }}';
+                    thumb.alt = 'Gambar produk';
+                    thumb.className = 'modal-thumb';
+                    modalThumbs.appendChild(thumb);
+                }
+
+                // Store product ID in the add to cart button
+                document.getElementById('modal-addcart-btn').setAttribute('data-product-id', productId);
+
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            })
+            .catch(error => {
+                console.error('Error loading product details:', error);
+                alert('Gagal memuat detail produk');
+            });
+    }
+}
+
+function closeProdukModal() {
+    const modal = document.getElementById('modal-detail-produk');
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto'; // Re-enable scrolling
+}
+
+// Close modal when clicking outside
+document.getElementById('modal-detail-produk').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeProdukModal();
+    }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeProdukModal();
+    }
+});
+
+// Add to cart function
+async function addToCart(productId) {
+    if (!productId) {
+        alert('Produk tidak ditemukan');
+        return;
+    }
+
+    try {
+        const response = await fetch('/cart/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                product_id: productId,
+                quantity: 1
+            })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert(result.message || 'Produk berhasil ditambahkan ke keranjang');
+        } else {
+            alert(result.message || 'Gagal menambahkan produk ke keranjang');
+        }
+    } catch (error) {
+        console.error('Error adding to cart:', error);
+        alert('Terjadi kesalahan saat menambahkan ke keranjang');
+    }
+}
+
+// Attach event listeners to modal buttons
+document.getElementById('modal-close-btn').addEventListener('click', closeProdukModal);
+document.getElementById('modal-addcart-btn').addEventListener('click', function() {
+    const productId = this.getAttribute('data-product-id');
+    addToCart(productId);
+});
+document.getElementById('modal-lihatdetail-btn').addEventListener('click', function() {
+    if (currentProduk && currentProduk.id) {
+        window.location.href = `/produk_detail/${currentProduk.id}`;
+    } else {
+        alert('Menuju halaman detail produk (demo)');
+    }
+});
+
+// Prevent modal from closing when clicking on content
+document.querySelector('.modal-content-new').addEventListener('click', function(e) {
+    e.stopPropagation();
+});
+</script>
 <script src="{{ asset('js/customer/cust_welcome.js') }}?v=22"></script>
 @endsection
 

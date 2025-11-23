@@ -129,7 +129,7 @@ class TicketController extends Controller
             'status' => 'open',
         ]);
 
-        return redirect()->route('support.tickets.detail', $ticket->id)
+        return redirect()->route('customer.tickets')
             ->with('success', 'Tiket bantuan berhasil dibuat!');
     }
 

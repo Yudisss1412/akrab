@@ -35,7 +35,7 @@
         @csrf
         <!-- Field tersembunyi untuk metode pengiriman default -->
         <input type="hidden" name="shipping_method" value="reguler" id="hiddenShippingMethod" />
-        
+
         @if($errors->any())
         <div class="alert alert-danger">
             <ul class="mb-0">
@@ -45,6 +45,17 @@
             </ul>
         </div>
         @endif
+
+        <script>
+          // Jika ada error validasi, tampilkan form alamat dalam mode edit
+          @if($errors->any())
+            document.addEventListener('DOMContentLoaded', function() {
+              document.getElementById('alamatCard').style.display = 'none';
+              document.getElementById('alamatFormSection').style.display = 'block';
+              document.getElementById('editAlamatBtn').innerHTML = '<i class="bi bi-save"></i>';
+            });
+          @endif
+        </script>
         
         <div class="checkout-content">
           <div class="checkout-left">

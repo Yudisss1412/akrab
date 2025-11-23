@@ -16,7 +16,7 @@
       <!-- Header Halaman -->
       <div class="page-header">
         <h1 class="page-title">Keranjang Belanja</h1>
-        <a href="{{ route('kategori.kuliner') }}" class="continue-shopping-link">
+        <a href="{{ url()->previous() ?: route('cust.welcome') }}" class="continue-shopping-link">
           ← Lanjut Belanja
         </a>
       </div>
@@ -67,14 +67,14 @@
                       $variantPrice = ($item['product_variant'] ?? $item->productVariant ?? null) ? ($item['product_variant'] ?? $item->productVariant)->additional_price : 0;
                       $totalPrice = $basePrice + $variantPrice;
                     @endphp
-                    Rp {{ number_format($totalPrice, 2, ',', '.') }}
+                    Rp {{ number_format($totalPrice, 0, ',', '.') }}
                   </td>
                   <td class="qty-col" data-label="Jumlah">
                     <button class="qty-btn minus" data-item-id="{{ $item['id'] ?? $item->id }}">-</button>
                     <input type="number" class="qty-input" value="{{ $item['quantity'] ?? $item->quantity }}" min="0" max="99" data-item-id="{{ $item['id'] ?? $item->id }}">
                     <button class="qty-btn plus" data-item-id="{{ $item['id'] ?? $item->id }}">+</button>
                   </td>
-                  <td class="subtotal-col" data-label="Subtotal">Rp {{ number_format($totalPrice * ($item['quantity'] ?? $item->quantity), 2, ',', '.') }}</td>
+                  <td class="subtotal-col" data-label="Subtotal">Rp {{ number_format($totalPrice * ($item['quantity'] ?? $item->quantity), 0, ',', '.') }}</td>
                   <td class="action-col" data-label="Aksi">
                     <button class="delete-btn" data-item-id="{{ $item['id'] ?? $item->id }}">
                       <i class="bi bi-trash"></i>
@@ -84,7 +84,7 @@
                 @empty
                 <tr>
                   <td colspan="6" class="text-center">
-                    <p>Keranjang Anda kosong. <a href="{{ route('kategori.kuliner') }}">Lanjutkan belanja</a></p>
+                    <p>Keranjang Anda kosong. <a href="{{ url()->previous() ?: route('cust.welcome') }}">Lanjutkan belanja</a></p>
                   </td>
                 </tr>
                 @endforelse
@@ -97,27 +97,29 @@
         <div class="cart-summary">
           <div class="summary-card">
             <h2>Ringkasan Belanja</h2>
-            
-            <div class="summary-details">
-              <div class="summary-row">
-                <span>Subtotal (<span id="subtotal-count">{{ $cartItems->count() }}</span> produk)</span>
-                <span id="cart-subtotal">Rp {{ number_format($cartSubtotal, 2, ',', '.') }}</span>
+
+            <div class="summary-details-container">
+              <div class="summary-details">
+                <div class="summary-row">
+                  <span>Subtotal (<span id="subtotal-count">{{ $cartItems->count() }}</span> produk)</span>
+                  <span id="cart-subtotal">Rp {{ number_format($cartSubtotal, 0, ',', '.') }}</span>
+                </div>
+                <div class="summary-row">
+                  <span>Diskon</span>
+                  <span>- Rp {{ number_format($discount, 0, ',', '.') }}</span>
+                </div>
+                <div class="summary-row">
+                  <span>Total Berat</span>
+                  <span>{{ number_format($totalWeight, 2, ',', '.') }} kg</span>
+                </div>
               </div>
-              <div class="summary-row">
-                <span>Diskon</span>
-                <span>- Rp {{ number_format($discount, 2, ',', '.') }}</span>
-              </div>
-              <div class="summary-row">
-                <span>Estimasi Ongkos Kirim</span>
-                <span>{{ $shippingCost }}</span>
+
+              <div class="summary-total">
+                <span>Total</span>
+                <span id="cartTotal">Rp {{ number_format($cartTotal, 0, ',', '.') }}</span>
               </div>
             </div>
-            
-            <div class="summary-total">
-              <span>Total</span>
-              <span id="cartTotal">Rp {{ number_format($cartTotal, 2, ',', '.') }}</span>
-            </div>
-            
+
             <a href="{{ route('checkout') }}" class="btn-checkout">
               Lanjut ke Pembayaran
             </a>

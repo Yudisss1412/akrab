@@ -26,14 +26,24 @@ class CartController extends Controller
         // Hitung subtotal untuk tiap item dan total keseluruhan
         $cartSubtotal = $this->cartService->getSubtotal();
 
+        // Hitung total berat produk di keranjang
+        $totalWeight = 0;
+        foreach ($cartItems as $item) {
+            $product = $item['product'] ?? $item->product;
+            if ($product) {
+                $weightPerUnit = $product->weight ?? 0;
+                $quantity = $item['quantity'] ?? $item->quantity;
+                $totalWeight += $weightPerUnit * $quantity;
+            }
+        }
+
         // Nilai-nilai lain yang mungkin ditampilkan di keranjang
         $discount = 0; // Placeholder untuk diskon
-        $shippingCost = 'Gratis'; // Placeholder untuk ongkos kirim
         $cartTotal = $cartSubtotal - $discount; // Total akhir
 
         $totalItems = $this->cartService->getTotalItems();
 
-        return view('customer.keranjang', compact('cartItems', 'cartSubtotal', 'discount', 'shippingCost', 'cartTotal', 'totalItems'));
+        return view('customer.keranjang', compact('cartItems', 'cartSubtotal', 'discount', 'totalWeight', 'cartTotal', 'totalItems'));
     }
     
     public function add(Request $request)

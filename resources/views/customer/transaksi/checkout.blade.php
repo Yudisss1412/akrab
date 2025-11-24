@@ -36,6 +36,11 @@
         <!-- Field tersembunyi untuk metode pengiriman default -->
         <input type="hidden" name="shipping_method" value="reguler" id="hiddenShippingMethod" />
 
+        <!-- Debug: Menampilkan data yang dikirim -->
+        <div style="display: none;">
+          <input type="hidden" name="debug_trace" value="checkout_form" />
+        </div>
+
         @if($errors->any())
         <div class="alert alert-danger">
             <ul class="mb-0">
@@ -56,7 +61,7 @@
             });
           @endif
         </script>
-        
+
         <div class="checkout-content">
           <div class="checkout-left">
             <!-- Alamat Pengiriman -->
@@ -67,57 +72,69 @@
                   <i class="bi bi-pencil"></i>
                 </button>
               </div>
-              
+
               <div class="alamat-card" id="alamatCard">
                 <div class="alamat-content">
                   <div class="primary-badge">Utama</div>
-                  <h3 id="alamatNama">{{ $user->name ?? 'Nama Pengguna' }}</h3>
+                  <h3 id="alamatNama">{{ $tempAddress['recipient_name'] ?? $user->name ?? 'Nama Pengguna' }}</h3>
                   <p id="alamatDetail">
-                    @if($user && $user->shipping_address)
+                    @if(!empty($tempAddress['full_address']))
+                      {{ $tempAddress['full_address'] }}
+                    @elseif($user && $user->full_address)
+                      {{ $user->full_address }}
+                    @elseif($user && $user->address)
+                      {{ $user->address }}
+                    @elseif($user && $user->shipping_address)
                       {{ $user->shipping_address->full_address ?? 'Alamat tidak ditemukan' }}
                     @else
                       Alamat tidak ditemukan
                     @endif
                   </p>
-                  <p class="alamat-phone" id="alamatPhone">{{ $user->phone ?? 'Nomor telepon tidak tersedia' }}</p>
+                  <p class="alamat-phone" id="alamatPhone">{{ $tempAddress['phone'] ?? $user->phone ?? 'Nomor telepon tidak tersedia' }}</p>
                 </div>
               </div>
-              
+
               <!-- Form untuk alamat pengiriman -->
               <div class="alamat-form" id="alamatFormSection" style="display: none;">
                 <div class="form-group">
                   <label for="recipient_name">Nama Penerima</label>
-                  <input type="text" id="recipient_name" name="recipient_name" value="{{ old('recipient_name', $user->name ?? '') }}" required>
+                  <input type="text" id="recipient_name" name="recipient_name"
+                         value="{{ old('recipient_name', $tempAddress['recipient_name'] ?? $user->name ?? 'Nama Pengguna') }}" required>
                 </div>
-                
+
                 <div class="form-group">
                   <label for="phone">Nomor Telepon</label>
-                  <input type="tel" id="phone" name="phone" value="{{ old('phone', $user->phone ?? '') }}" required>
+                  <input type="tel" id="phone" name="phone"
+                         value="{{ old('phone', $tempAddress['phone'] ?? $user->phone ?? '') }}" required>
                 </div>
-                
+
                 <div class="form-group">
                   <label for="province">Provinsi</label>
-                  <input type="text" id="province" name="province" value="{{ old('province', 'Jawa Barat') }}" required>
+                  <input type="text" id="province" name="province"
+                         value="{{ old('province', $tempAddress['province'] ?? $user->province ?? 'Jawa Barat') }}" required>
                 </div>
-                
+
                 <div class="form-group">
                   <label for="city">Kota/Kabupaten</label>
-                  <input type="text" id="city" name="city" value="{{ old('city', 'Kota Bandung') }}" required>
+                  <input type="text" id="city" name="city"
+                         value="{{ old('city', $tempAddress['city'] ?? $user->city ?? 'Kota Bandung') }}" required>
                 </div>
-                
+
                 <div class="form-group">
                   <label for="district">Kecamatan</label>
-                  <input type="text" id="district" name="district" value="{{ old('district', 'Lembursitu') }}" required>
+                  <input type="text" id="district" name="district"
+                         value="{{ old('district', $tempAddress['district'] ?? $user->district ?? 'Lembursitu') }}" required>
                 </div>
-                
+
                 <div class="form-group">
                   <label for="ward">Kelurahan</label>
-                  <input type="text" id="ward" name="ward" value="{{ old('ward', 'Sukajadi') }}" required>
+                  <input type="text" id="ward" name="ward"
+                         value="{{ old('ward', $tempAddress['ward'] ?? $user->ward ?? 'Sukajadi') }}" required>
                 </div>
-                
+
                 <div class="form-group">
                   <label for="full_address">Alamat Lengkap</label>
-                  <textarea id="full_address" name="full_address" rows="3" required>{{ old('full_address', 'Jl. Merdeka No. 123') }}</textarea>
+                  <textarea id="full_address" name="full_address" rows="3" required>{{ old('full_address', $tempAddress['full_address'] ?? $user->full_address ?? $user->address ?? 'Jl. Merdeka No. 123') }}</textarea>
                 </div>
               </div>
             </section>
@@ -127,7 +144,7 @@
               <div class="section-header">
                 <h2>Ringkasan Pesanan</h2>
               </div>
-              
+
               <div class="ringkasan-content">
                 @if($cartItems->count() > 0)
                   @foreach($cartItems as $item)
@@ -143,7 +160,7 @@
                 @else
                   <p>Keranjang Anda kosong.</p>
                 @endif
-                
+
                 <div class="biaya-detail">
                   <div class="detail-row">
                     <span>Subtotal</span>
@@ -168,7 +185,7 @@
               <div class="section-header">
                 <h3>Ringkasan Belanja</h3>
               </div>
-              
+
               <div class="ringkasan-content">
                 @if($cartItems->count() > 0)
                   @foreach($cartItems as $item)
@@ -185,13 +202,13 @@
                   <p>Keranjang Anda kosong.</p>
                 @endif
               </div>
-              
+
               <div class="total-section">
                 <div class="total-row">
                   <span>Total Belanja</span>
                   <span>Rp {{ number_format($total, 2, ',', '.') }}</span>
                 </div>
-                
+
                 <button type="submit" class="btn btn-primary btn-checkout" id="prosesPesananBtn">
                   Proses Pesanan
                 </button>
@@ -211,12 +228,12 @@
       const shippingCostElement = document.getElementById('shippingCost');
       const totalHargaElement = document.getElementById('totalHarga');
       const prosesPesananBtn = document.getElementById('prosesPesananBtn');
-      
+
       // Ambil nilai awal dari data Blade
       let subtotal = {{ $subTotal }};
       // Gunakan biaya pengiriman default untuk tampilan awal
       let shippingCost = {{ $shippingCost }};
-      
+
       // Update tampilan harga awal
       shippingCostElement.textContent = new Intl.NumberFormat('id-ID', {
         style: 'currency',
@@ -230,25 +247,25 @@
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
       }).format(subtotal + shippingCost).replace('Rp', '').trim();
-      
+
       // Edit alamat functionality
       const editBtn = document.getElementById('editAlamatBtn');
       const alamatCard = document.getElementById('alamatCard');
       const alamatFormSection = document.getElementById('alamatFormSection');
-      
+
       if (editBtn) {
         // Gunakan state untuk melacak mode tombol
         let isEditMode = false;
-        
+
         editBtn.addEventListener('click', function() {
           if (!isEditMode) {
             // Mode edit: tampilkan form, sembunyikan card
             alamatCard.style.display = 'none';
             alamatFormSection.style.display = 'block';
-            editBtn.innerHTML = '<i class="bi bi-save"></i>';
+            editBtn.innerHTML = '<i class="bi bi-check"></i>';
             isEditMode = true;
           } else {
-            // Mode simpan: validasi dan kembalikan ke card
+            // Mode simpan: validasi dan kirim ke server untuk update temporary data
             const recipientName = document.getElementById('recipient_name').value;
             const phone = document.getElementById('phone').value;
             const province = document.getElementById('province').value;
@@ -256,26 +273,58 @@
             const district = document.getElementById('district').value;
             const ward = document.getElementById('ward').value;
             const fullAddress = document.getElementById('full_address').value;
-            
+
             if (!recipientName || !phone || !province || !city || !district || !ward || !fullAddress) {
               alert('Mohon lengkapi semua field alamat');
               return;
             }
-            
-            // Update tampilan card dengan data baru
-            document.getElementById('alamatNama').textContent = recipientName;
-            document.getElementById('alamatDetail').innerHTML = fullAddress.split(', ').join('<br>');
-            document.getElementById('alamatPhone').textContent = phone;
-            
-            // Kembali ke tampilan card
-            alamatCard.style.display = 'block';
-            alamatFormSection.style.display = 'none';
-            editBtn.innerHTML = '<i class="bi bi-pencil"></i>';
-            isEditMode = false;
+
+            // Kirim data ke server untuk update user address secara permanen
+            fetch('{{ route("user.address.update") }}', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    recipient_name: recipientName,
+                    phone: phone,
+                    province: province,
+                    city: city,
+                    district: district,
+                    ward: ward,
+                    full_address: fullAddress
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update tampilan card dengan data baru
+                    document.getElementById('alamatNama').textContent = recipientName;
+                    document.getElementById('alamatDetail').innerHTML = fullAddress.replace(/,/g, '<br>');
+                    document.getElementById('alamatPhone').textContent = phone;
+
+                    // Kembali ke tampilan card
+                    alamatCard.style.display = 'block';
+                    alamatFormSection.style.display = 'none';
+                    editBtn.innerHTML = '<i class="bi bi-pencil"></i>';
+                    isEditMode = false;
+
+                    // Tampilkan notifikasi sukses
+                    alert(data.message || 'Alamat berhasil diperbarui secara permanen');
+                } else {
+                    alert(data.message || 'Gagal memperbarui alamat pengguna');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan saat memperbarui alamat: ' + error.message);
+            });
           }
         });
       }
-      
+
       // Tambahkan validasi sebelum submit
       form.addEventListener('submit', function(e) {
         // Ambil semua nilai field alamat terlepas dari apakah form dalam mode tampil atau edit
@@ -286,22 +335,22 @@
         const district = document.getElementById('district').value.trim();
         const ward = document.getElementById('ward').value.trim();
         const fullAddress = document.getElementById('full_address').value.trim();
-        
+
         // Validasi apakah semua field alamat telah diisi
         if (!recipientName || !phone || !province || !city || !district || !ward || !fullAddress) {
           e.preventDefault(); // Mencegah pengiriman form
-          
+
           // Tampilkan pesan notifikasi yang lebih informatif
           alert('Mohon lengkapi semua field alamat pengiriman sebelum melanjutkan proses pesanan. Form alamat akan ditampilkan untuk Anda isi.');
-          
+
           // Tampilkan form alamat (karena mungkin sedang dalam mode kartu)
           document.getElementById('alamatCard').style.display = 'none';
           document.getElementById('alamatFormSection').style.display = 'block';
-          
+
           // Kembalikan status tombol
           prosesPesananBtn.innerHTML = 'Proses Pesanan';
           prosesPesananBtn.disabled = false;
-          
+
           // Fokus ke field pertama yang kosong untuk membantu user
           if (!recipientName) {
             document.getElementById('recipient_name').focus();
@@ -318,15 +367,15 @@
           } else if (!fullAddress) {
             document.getElementById('full_address').focus();
           }
-          
+
           return false;
         }
-        
+
         // Tampilkan loading pada tombol
         prosesPesananBtn.innerHTML = 'Memproses...';
         prosesPesananBtn.disabled = true;
       });
-      
+
       // Reset status tombol jika ada error
       @if($errors->any())
         if (prosesPesananBtn) {

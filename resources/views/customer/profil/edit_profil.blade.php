@@ -30,7 +30,9 @@
         </div>
       </header>
 
-      <form class="edit-form" id="editProfileForm" novalidate>
+      <form class="edit-form" id="editProfileForm" action="{{ route('profil.pembeli.update') }}" method="POST" novalidate>
+        @csrf
+        @method('PUT')
         <div class="form-group field">
           <input type="text" id="name" name="name" value="{{ old('name', auth()->user()->name) }}" required placeholder=" ">
           <label for="name">Nama Lengkap</label>
@@ -50,9 +52,33 @@
         </div>
 
         <div class="form-group field">
-          <textarea id="address" name="address" rows="3" required placeholder=" ">{{ old('address', auth()->user()->address ?? '') }}</textarea>
-          <label for="address">Alamat</label>
-          <p class="error-message" id="address-error"></p>
+          <input type="text" id="province" name="province" value="{{ old('province', auth()->user()->province ?? '') }}" required placeholder=" " />
+          <label for="province">Provinsi</label>
+          <p class="error-message" id="province-error"></p>
+        </div>
+
+        <div class="form-group field">
+          <input type="text" id="city" name="city" value="{{ old('city', auth()->user()->city ?? '') }}" required placeholder=" " />
+          <label for="city">Kota/Kabupaten</label>
+          <p class="error-message" id="city-error"></p>
+        </div>
+
+        <div class="form-group field">
+          <input type="text" id="district" name="district" value="{{ old('district', auth()->user()->district ?? '') }}" required placeholder=" " />
+          <label for="district">Kecamatan</label>
+          <p class="error-message" id="district-error"></p>
+        </div>
+
+        <div class="form-group field">
+          <input type="text" id="ward" name="ward" value="{{ old('ward', auth()->user()->ward ?? '') }}" required placeholder=" " />
+          <label for="ward">Kelurahan</label>
+          <p class="error-message" id="ward-error"></p>
+        </div>
+
+        <div class="form-group field">
+          <textarea id="full_address" name="full_address" rows="3" required placeholder=" ">{{ old('full_address', auth()->user()->full_address ?? auth()->user()->address ?? '') }}</textarea>
+          <label for="full_address">Alamat Lengkap</label>
+          <p class="error-message" id="full_address-error"></p>
         </div>
 
         <div class="form-group">

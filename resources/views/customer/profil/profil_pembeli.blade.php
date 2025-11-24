@@ -49,8 +49,24 @@
             <span>{{ auth()->user() ? (auth()->user()->phone ?? '+62 812 3456 7890') : '+62 812 3456 7890' }}</span>
           </div>
           <div class="detail-item">
-            <label>Alamat</label>
-            <span>{{ auth()->user() ? (auth()->user()->address ?? 'Alamat belum diisi') : 'Alamat belum diisi' }}</span>
+            <label>Provinsi</label>
+            <span>{{ auth()->user() ? (auth()->user()->province ?? 'Belum diisi') : 'Belum diisi' }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Kota/Kabupaten</label>
+            <span>{{ auth()->user() ? (auth()->user()->city ?? 'Belum diisi') : 'Belum diisi' }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Kecamatan</label>
+            <span>{{ auth()->user() ? (auth()->user()->district ?? 'Belum diisi') : 'Belum diisi' }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Kelurahan</label>
+            <span>{{ auth()->user() ? (auth()->user()->ward ?? 'Belum diisi') : 'Belum diisi' }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Alamat Lengkap</label>
+            <span>{{ auth()->user() ? (auth()->user()->full_address ?? auth()->user()->address ?? 'Alamat belum diisi') : 'Alamat belum diisi' }}</span>
           </div>
         </div>
       </div>

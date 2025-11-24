@@ -28,26 +28,48 @@ class CheckoutController extends Controller
     {
         // Ambil item keranjang
         $cartItems = $this->cartService->getCartItems();
-        
+
         // Hitung subtotal
         $subTotal = $this->cartService->getSubtotal();
-        
+
         // Biaya pengiriman default
         $shippingCost = 15000; // Harga default untuk REGULER
         $total = $subTotal + $shippingCost;
-        
+
         // Ambil alamat pengguna (misalnya dari profil pengguna)
         $user = Auth::user();
-        
+
+        // Ambil data alamat sementara jika ada
+        $tempAddress = session('temp_shipping_address', []);
+
+        if (empty($tempAddress) && $user) {
+            // Jika tidak ada temp address, coba buat dari data user sebagai fallback
+            $tempAddress = [
+                'recipient_name' => $user->name,
+                'phone' => $user->phone,
+                'province' => $user->province,
+                'city' => $user->city,
+                'district' => $user->district,
+                'ward' => $user->ward,
+                'full_address' => $user->full_address ?? $user->address,
+            ];
+        }
+
+        \Log::info('Temporary address data at checkout index:', [
+            'temp_address' => $tempAddress,
+            'user_id' => $user->id
+        ]);
+
         // Data untuk checkout page
         $checkoutData = [
             'cartItems' => $cartItems,
             'subTotal' => $subTotal,
             'shippingCost' => $shippingCost,
             'total' => $total,
-            'user' => $user
+            'user' => $user,
+            'tempAddress' => $tempAddress
         ];
-        
+
         return view('customer.transaksi.checkout', $checkoutData);
     }
 
@@ -56,6 +78,11 @@ class CheckoutController extends Controller
      */
     public function process(Request $request)
     {
+        \Log::info('Checkout process started', [
+            'user_id' => Auth::id(),
+            'request_data' => $request->all()
+        ]);
+
         $request->validate([
             'recipient_name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
@@ -67,14 +94,19 @@ class CheckoutController extends Controller
             'shipping_method' => 'required|in:reguler,express,same_day',
         ]);
 
+        \Log::info('Checkout validation passed');
+
         DB::beginTransaction();
 
         try {
             // Ambil item keranjang dari user
             $cartItems = $this->cartService->getCartItems();
             if ($cartItems->isEmpty()) {
+                \Log::warning('Cart is empty during checkout process');
                 return redirect()->back()->withErrors(['cart' => 'Keranjang Anda kosong.']);
             }
+
+            \Log::info('Cart items retrieved', ['count' => $cartItems->count()]);
 
             // Hitung subtotal
             $subTotal = $this->cartService->getSubtotal();
@@ -85,7 +117,7 @@ class CheckoutController extends Controller
                 'express' => 25000,
                 'same_day' => 50000,
             ];
-            
+
             $shippingCost = $shippingCostMap[$request->shipping_method] ?? 15000;
 
             // Buat nomor pesanan
@@ -105,17 +137,59 @@ class CheckoutController extends Controller
                 'shipping_courier' => $request->shipping_method
             ]);
 
+            \Log::info('Order created successfully', ['order_id' => $order->id]);
+
             // Buat alamat pengiriman
+        // Ambil data alamat dari request, jika tidak ada coba dari temporary address session,
+        // jika tidak ada juga ambil dari data user
+        $recipientName = $request->recipient_name ?: session('temp_shipping_address.recipient_name', $user->name ?? '');
+        $phone = $request->phone ?: session('temp_shipping_address.phone', $user->phone ?? '');
+        $province = $request->province ?: session('temp_shipping_address.province', $user->province ?? '');
+        $city = $request->city ?: session('temp_shipping_address.city', $user->city ?? '');
+        $district = $request->district ?: session('temp_shipping_address.district', $user->district ?? '');
+        $ward = $request->ward ?: session('temp_shipping_address.ward', $user->ward ?? '');
+        $fullAddress = $request->full_address ?: session('temp_shipping_address.full_address', $user->full_address ?? $user->address ?? '');
+
+        // Buat alamat pengiriman
+        \Log::info('Creating shipping address with data:', [
+            'order_id' => $order->id,
+            'recipient_name' => $recipientName,
+            'phone' => $phone,
+            'province' => $province,
+            'city' => $city,
+            'district' => $district,
+            'ward' => $ward,
+            'full_address' => $fullAddress,
+        ]);
+
+        try {
             $shippingAddress = ShippingAddress::create([
                 'order_id' => $order->id,
-                'recipient_name' => $request->recipient_name,
-                'phone' => $request->phone,
-                'province' => $request->province,
-                'city' => $request->city,
-                'district' => $request->district,
-                'ward' => $request->ward,
-                'full_address' => $request->full_address,
+                'recipient_name' => $recipientName,
+                'phone' => $phone,
+                'province' => $province,
+                'city' => $city,
+                'district' => $district,
+                'ward' => $ward,
+                'full_address' => $fullAddress,
             ]);
+
+            \Log::info('Shipping address created successfully with ID: ' . $shippingAddress->id);
+
+            // Kosongkan session temporary address setelah digunakan
+            session()->forget('temp_shipping_address');
+        } catch (\Exception $e) {
+            \Log::error('Failed to create shipping address: ' . $e->getMessage(), [
+                'error' => $e->getMessage(),
+                'order_id' => $order->id,
+                'request_data' => $request->all()
+            ]);
+
+            // Rollback transaksi jika pembuatan alamat gagal
+            DB::rollback();
+
+            return redirect()->back()->withErrors(['error' => 'Gagal membuat alamat pengiriman: ' . $e->getMessage()]);
+        }
 
             // Buat item pesanan dan kurangi stok
             foreach ($cartItems as $item) {
@@ -151,13 +225,32 @@ class CheckoutController extends Controller
 
             DB::commit();
 
+            \Log::info('Checkout process completed successfully', [
+                'order_id' => $order->id,
+                'shipping_address_id' => $shippingAddress->id ?? 'undefined',
+                'order_number' => $order->order_number
+            ]);
+
             // Redirect ke halaman pengiriman dengan nomor order
             return redirect()->route('cust.pengiriman.order', ['order' => $order->order_number])
                             ->with('success', 'Pesanan berhasil dibuat. Silakan lanjutkan ke pembayaran.');
 
         } catch (\Exception $e) {
-            DB::rollback();
+            // Hanya rollback jika transaksi masih aktif
+            if (DB::transactionLevel() > 0) {
+                DB::rollback();
+            }
+
             \Log::error('Checkout process error: ' . $e->getMessage() . ' in ' . $e->getFile() . ' line ' . $e->getLine() . ' Trace: ' . $e->getTraceAsString());
+
+            // Log error tambahan untuk debugging
+            \Log::error('Error during shipping address creation:', [
+                'error_message' => $e->getMessage(),
+                'error_code' => $e->getCode(),
+                'request_data' => $request->all(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
             return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan saat proses checkout: Silakan coba lagi atau hubungi admin jika masalah terus berlanjut.']);
         }
     }
@@ -243,6 +336,109 @@ class CheckoutController extends Controller
             'success' => true,
             'message' => 'Metode pengiriman berhasil diperbarui',
             'order' => $order
+        ]);
+    }
+
+    /**
+     * Update shipping address for an order
+     */
+    public function updateShippingAddress(Request $request, $orderId)
+    {
+        $request->validate([
+            'recipient_name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+            'province' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+            'district' => 'required|string|max:255',
+            'ward' => 'required|string|max:255',
+            'full_address' => 'required|string|max:500',
+        ]);
+
+        // Find the order
+        $order = Order::where('id', $orderId)
+                      ->where('user_id', Auth::id())
+                      ->first();
+
+        if (!$order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pesanan tidak ditemukan.'
+            ], 404);
+        }
+
+        // Find and update the shipping address
+        $shippingAddress = $order->shipping_address;
+
+        if (!$shippingAddress) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Alamat pengiriman tidak ditemukan.'
+            ], 404);
+        }
+
+        $shippingAddress->update([
+            'recipient_name' => $request->recipient_name,
+            'phone' => $request->phone,
+            'province' => $request->province,
+            'city' => $request->city,
+            'district' => $request->district,
+            'ward' => $request->ward,
+            'full_address' => $request->full_address,
+        ]);
+
+        // Refresh the data
+        $order->refresh();
+        $order->load(['shipping_address', 'items.product', 'items.variant']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Alamat pengiriman berhasil diperbarui',
+            'order' => $order
+        ]);
+    }
+
+    /**
+     * Update user's default shipping address permanently
+     */
+    public function updateUserAddress(Request $request)
+    {
+        $request->validate([
+            'recipient_name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+            'province' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+            'district' => 'required|string|max:255',
+            'ward' => 'required|string|max:255',
+            'full_address' => 'required|string|max:500',
+        ]);
+
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not authenticated.'
+            ], 401);
+        }
+
+        // Update user's address fields permanently
+        $user->update([
+            'name' => $request->recipient_name,
+            'phone' => $request->phone,
+            'province' => $request->province,
+            'city' => $request->city,
+            'district' => $request->district,
+            'ward' => $request->ward,
+            'full_address' => $request->full_address,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Alamat pengguna berhasil diperbarui secara permanen',
+            'data' => [
+                'recipient_name' => $user->name,
+                'phone' => $user->phone,
+                'full_address' => $user->address,
+            ]
         ]);
     }
 

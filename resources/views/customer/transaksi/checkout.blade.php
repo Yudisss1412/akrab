@@ -76,21 +76,17 @@
               <div class="alamat-card" id="alamatCard">
                 <div class="alamat-content">
                   <div class="primary-badge">Utama</div>
-                  <h3 id="alamatNama">{{ $tempAddress['recipient_name'] ?? $user->name ?? 'Nama Pengguna' }}</h3>
+                  <h3 id="alamatNama">{{ $user->name ?? 'Nama Pengguna' }}</h3>
                   <p id="alamatDetail">
-                    @if(!empty($tempAddress['full_address']))
-                      {{ $tempAddress['full_address'] }}
-                    @elseif($user && $user->full_address)
+                    @if($user && $user->full_address)
                       {{ $user->full_address }}
                     @elseif($user && $user->address)
                       {{ $user->address }}
-                    @elseif($user && $user->shipping_address)
-                      {{ $user->shipping_address->full_address ?? 'Alamat tidak ditemukan' }}
                     @else
                       Alamat tidak ditemukan
                     @endif
                   </p>
-                  <p class="alamat-phone" id="alamatPhone">{{ $tempAddress['phone'] ?? $user->phone ?? 'Nomor telepon tidak tersedia' }}</p>
+                  <p class="alamat-phone" id="alamatPhone">{{ $user->phone ?? 'Nomor telepon tidak tersedia' }}</p>
                 </div>
               </div>
 
@@ -99,42 +95,42 @@
                 <div class="form-group">
                   <label for="recipient_name">Nama Penerima</label>
                   <input type="text" id="recipient_name" name="recipient_name"
-                         value="{{ old('recipient_name', $tempAddress['recipient_name'] ?? $user->name ?? 'Nama Pengguna') }}" required>
+                         value="{{ old('recipient_name', $user->name ?? 'Nama Pengguna') }}" required>
                 </div>
 
                 <div class="form-group">
                   <label for="phone">Nomor Telepon</label>
                   <input type="tel" id="phone" name="phone"
-                         value="{{ old('phone', $tempAddress['phone'] ?? $user->phone ?? '') }}" required>
+                         value="{{ old('phone', $user->phone ?? '') }}" required>
                 </div>
 
                 <div class="form-group">
                   <label for="province">Provinsi</label>
                   <input type="text" id="province" name="province"
-                         value="{{ old('province', $tempAddress['province'] ?? $user->province ?? 'Jawa Barat') }}" required>
+                         value="{{ old('province', $user->province ?? 'Jawa Barat') }}" required>
                 </div>
 
                 <div class="form-group">
                   <label for="city">Kota/Kabupaten</label>
                   <input type="text" id="city" name="city"
-                         value="{{ old('city', $tempAddress['city'] ?? $user->city ?? 'Kota Bandung') }}" required>
+                         value="{{ old('city', $user->city ?? 'Kota Bandung') }}" required>
                 </div>
 
                 <div class="form-group">
                   <label for="district">Kecamatan</label>
                   <input type="text" id="district" name="district"
-                         value="{{ old('district', $tempAddress['district'] ?? $user->district ?? 'Lembursitu') }}" required>
+                         value="{{ old('district', $user->district ?? 'Lembursitu') }}" required>
                 </div>
 
                 <div class="form-group">
                   <label for="ward">Kelurahan</label>
                   <input type="text" id="ward" name="ward"
-                         value="{{ old('ward', $tempAddress['ward'] ?? $user->ward ?? 'Sukajadi') }}" required>
+                         value="{{ old('ward', $user->ward ?? 'Sukajadi') }}" required>
                 </div>
 
                 <div class="form-group">
                   <label for="full_address">Alamat Lengkap</label>
-                  <textarea id="full_address" name="full_address" rows="3" required>{{ old('full_address', $tempAddress['full_address'] ?? $user->full_address ?? $user->address ?? 'Jl. Merdeka No. 123') }}</textarea>
+                  <textarea id="full_address" name="full_address" rows="3" required>{{ old('full_address', $user->full_address ?? $user->address ?? 'Jl. Merdeka No. 123') }}</textarea>
                 </div>
               </div>
             </section>
@@ -312,9 +308,9 @@
                     isEditMode = false;
 
                     // Tampilkan notifikasi sukses
-                    alert(data.message || 'Alamat berhasil diperbarui secara permanen');
+                    alert(data.message || 'Alamat berhasil diperbarui');
                 } else {
-                    alert(data.message || 'Gagal memperbarui alamat pengguna');
+                    alert(data.message || 'Gagal memperbarui alamat');
                 }
             })
             .catch(error => {

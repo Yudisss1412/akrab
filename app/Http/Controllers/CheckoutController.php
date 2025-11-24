@@ -39,35 +39,13 @@ class CheckoutController extends Controller
         // Ambil alamat pengguna (misalnya dari profil pengguna)
         $user = Auth::user();
 
-        // Ambil data alamat sementara jika ada
-        $tempAddress = session('temp_shipping_address', []);
-
-        if (empty($tempAddress) && $user) {
-            // Jika tidak ada temp address, coba buat dari data user sebagai fallback
-            $tempAddress = [
-                'recipient_name' => $user->name,
-                'phone' => $user->phone,
-                'province' => $user->province,
-                'city' => $user->city,
-                'district' => $user->district,
-                'ward' => $user->ward,
-                'full_address' => $user->full_address ?? $user->address,
-            ];
-        }
-
-        \Log::info('Temporary address data at checkout index:', [
-            'temp_address' => $tempAddress,
-            'user_id' => $user->id
-        ]);
-
         // Data untuk checkout page
         $checkoutData = [
             'cartItems' => $cartItems,
             'subTotal' => $subTotal,
             'shippingCost' => $shippingCost,
             'total' => $total,
-            'user' => $user,
-            'tempAddress' => $tempAddress
+            'user' => $user
         ];
 
         return view('customer.transaksi.checkout', $checkoutData);
@@ -140,15 +118,14 @@ class CheckoutController extends Controller
             \Log::info('Order created successfully', ['order_id' => $order->id]);
 
             // Buat alamat pengiriman
-        // Ambil data alamat dari request, jika tidak ada coba dari temporary address session,
-        // jika tidak ada juga ambil dari data user
-        $recipientName = $request->recipient_name ?: session('temp_shipping_address.recipient_name', $user->name ?? '');
-        $phone = $request->phone ?: session('temp_shipping_address.phone', $user->phone ?? '');
-        $province = $request->province ?: session('temp_shipping_address.province', $user->province ?? '');
-        $city = $request->city ?: session('temp_shipping_address.city', $user->city ?? '');
-        $district = $request->district ?: session('temp_shipping_address.district', $user->district ?? '');
-        $ward = $request->ward ?: session('temp_shipping_address.ward', $user->ward ?? '');
-        $fullAddress = $request->full_address ?: session('temp_shipping_address.full_address', $user->full_address ?? $user->address ?? '');
+        // Ambil data alamat dari request - jika user mengedit di form checkout
+        $recipientName = $request->recipient_name ?: $user->name;
+        $phone = $request->phone ?: $user->phone;
+        $province = $request->province ?: old('province', '');
+        $city = $request->city ?: old('city', '');
+        $district = $request->district ?: old('district', '');
+        $ward = $request->ward ?: old('ward', '');
+        $fullAddress = $request->full_address ?: $user->address;
 
         // Buat alamat pengiriman
         \Log::info('Creating shipping address with data:', [

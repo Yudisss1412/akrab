@@ -150,7 +150,6 @@ Route::get('/produk/search', [App\Http\Controllers\ProductController::class, 'se
 Route::get('/produk/kategori/{category}', [App\Http\Controllers\ProductController::class, 'byCategory'])->name('produk.kategori');
 
 Route::get('/profil', [App\Http\Controllers\Customer\ProfileController::class, 'show'])->name('profil.pembeli');
-
 Route::get('/edit_profil', [App\Http\Controllers\Customer\ProfileController::class, 'edit'])->name('edit.profil');
 Route::put('/profil_pembeli/update', [App\Http\Controllers\Customer\ProfileController::class, 'update'])->name('profil.pembeli.update');
 
@@ -176,12 +175,6 @@ Route::post('/pengiriman/update-shipping', [App\Http\Controllers\CheckoutControl
 Route::put('/pengiriman/update-address/{orderId}', [App\Http\Controllers\CheckoutController::class,
 'updateShippingAddress'])->name('cust.pengiriman.update.address');
 
-// Temporary address routes for checkout page
-Route::middleware('auth')->group(function () {
-    // Update user address directly
-    Route::put('/user/address', [App\Http\Controllers\CheckoutController::class,
-    'updateUserAddress'])->name('user.address.update');
-});
 
 Route::get('/pembayaran', [App\Http\Controllers\CheckoutController::class, 'showPayment'])->name('cust.pembayaran');
 Route::post('/pembayaran/process', [App\Http\Controllers\CheckoutController::class, 'processPayment'])->name('payment.process');

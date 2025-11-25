@@ -45,16 +45,16 @@ class ProfileController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . Auth::id(),
             'phone' => 'required|string|max:20',
-            'province' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
-            'district' => 'required|string|max:255',
-            'ward' => 'required|string|max:255',
-            'full_address' => 'required|string|max:500',
+            'province' => 'sometimes|nullable|string|max:255',
+            'city' => 'sometimes|nullable|string|max:255',
+            'district' => 'sometimes|nullable|string|max:255',
+            'ward' => 'sometimes|nullable|string|max:255',
+            'full_address' => 'sometimes|nullable|string|max:500',
             'bio' => 'nullable|string|max:500',
         ]);
 
         $user = Auth::user();
-        
+
         if (!$user) {
             return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu');
         }

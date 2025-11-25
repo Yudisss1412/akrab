@@ -78,59 +78,109 @@
                   <div class="primary-badge">Utama</div>
                   <h3 id="alamatNama">{{ $user->name ?? 'Nama Pengguna' }}</h3>
                   <p id="alamatDetail">
-                    @if($user && $user->full_address)
-                      {{ $user->full_address }}
-                    @elseif($user && $user->address)
-                      {{ $user->address }}
+                    @if($user)
+                      @php
+                        $alamatParts = [];
+
+                        // Tambahkan full_address jika ada
+                        if($user->full_address) {
+                            $alamatParts[] = $user->full_address;
+                        }
+
+                        // Tambahkan address jika berbeda dari full_address
+                        if($user->address && $user->address !== $user->full_address) {
+                            $alamatParts[] = $user->address;
+                        }
+
+                        // Tambahkan ward jika ada dan belum ada di alamat
+                        if($user->ward) {
+                            $alamatParts[] = $user->ward;
+                        }
+
+                        // Tambahkan district jika ada dan belum ada di alamat
+                        if($user->district) {
+                            $alamatParts[] = $user->district;
+                        }
+
+                        // Tambahkan city jika ada dan belum ada di alamat
+                        if($user->city) {
+                            $alamatParts[] = $user->city;
+                        }
+
+                        // Tambahkan province jika ada dan belum ada di alamat
+                        if($user->province) {
+                            $alamatParts[] = $user->province;
+                        }
+
+                        // Hapus elemen duplikat dan kosong dari array
+                        $uniqueAlamatParts = array_unique(array_filter($alamatParts));
+                        $fullAlamat = implode(', ', $uniqueAlamatParts);
+                      @endphp
+
+                      @if(count($uniqueAlamatParts) > 0)
+                        {{ $fullAlamat }}
+                      @else
+                        Alamat tidak lengkap
+                      @endif
                     @else
-                      Alamat tidak ditemukan
+                      User tidak ditemukan
                     @endif
                   </p>
                   <p class="alamat-phone" id="alamatPhone">{{ $user->phone ?? 'Nomor telepon tidak tersedia' }}</p>
+
+                  <!-- Debug: Menampilkan data alamat user -->
+                  <div style="font-size: 0.8em; color: #666; margin-top: 10px; padding: 5px; background-color: #f9f9f9; border-radius: 4px; display: block;">
+                    <p>Debug: Full address: {{ $user->full_address ?? 'kosong' }}</p>
+                    <p>Debug: Address: {{ $user->address ?? 'kosong' }}</p>
+                    <p>Debug: Province: {{ $user->province ?? 'kosong' }}</p>
+                    <p>Debug: City: {{ $user->city ?? 'kosong' }}</p>
+                    <p>Debug: District: {{ $user->district ?? 'kosong' }}</p>
+                    <p>Debug: Ward: {{ $user->ward ?? 'kosong' }}</p>
+                  </div>
                 </div>
               </div>
 
               <!-- Form untuk alamat pengiriman -->
               <div class="alamat-form" id="alamatFormSection" style="display: none;">
-                <div class="form-group">
-                  <label for="recipient_name">Nama Penerima</label>
+                <div class="form-group field">
                   <input type="text" id="recipient_name" name="recipient_name"
-                         value="{{ old('recipient_name', $user->name ?? 'Nama Pengguna') }}" required>
+                         value="{{ old('recipient_name', $user->name ?? 'Nama Pengguna') }}" required placeholder=" " />
+                  <label for="recipient_name">Nama Penerima</label>
                 </div>
 
-                <div class="form-group">
-                  <label for="phone">Nomor Telepon</label>
+                <div class="form-group field">
                   <input type="tel" id="phone" name="phone"
-                         value="{{ old('phone', $user->phone ?? '') }}" required>
+                         value="{{ old('phone', $user->phone ?? '') }}" required placeholder=" " />
+                  <label for="phone">Nomor Telepon</label>
                 </div>
 
-                <div class="form-group">
-                  <label for="province">Provinsi</label>
+                <div class="form-group field">
                   <input type="text" id="province" name="province"
-                         value="{{ old('province', $user->province ?? 'Jawa Barat') }}" required>
+                         value="{{ old('province', $user->province ?? 'Jawa Barat') }}" required placeholder=" " />
+                  <label for="province">Provinsi</label>
                 </div>
 
-                <div class="form-group">
-                  <label for="city">Kota/Kabupaten</label>
+                <div class="form-group field">
                   <input type="text" id="city" name="city"
-                         value="{{ old('city', $user->city ?? 'Kota Bandung') }}" required>
+                         value="{{ old('city', $user->city ?? 'Kota Bandung') }}" required placeholder=" " />
+                  <label for="city">Kota/Kabupaten</label>
                 </div>
 
-                <div class="form-group">
-                  <label for="district">Kecamatan</label>
+                <div class="form-group field">
                   <input type="text" id="district" name="district"
-                         value="{{ old('district', $user->district ?? 'Lembursitu') }}" required>
+                         value="{{ old('district', $user->district ?? 'Lembursitu') }}" required placeholder=" " />
+                  <label for="district">Kecamatan</label>
                 </div>
 
-                <div class="form-group">
-                  <label for="ward">Kelurahan</label>
+                <div class="form-group field">
                   <input type="text" id="ward" name="ward"
-                         value="{{ old('ward', $user->ward ?? 'Sukajadi') }}" required>
+                         value="{{ old('ward', $user->ward ?? 'Sukajadi') }}" required placeholder=" " />
+                  <label for="ward">Kelurahan</label>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group field">
+                  <textarea id="full_address" name="full_address" rows="3" required placeholder=" ">{{ old('full_address', $user->full_address ?? $user->address ?? 'Jl. Merdeka No. 123') }}</textarea>
                   <label for="full_address">Alamat Lengkap</label>
-                  <textarea id="full_address" name="full_address" rows="3" required>{{ old('full_address', $user->full_address ?? $user->address ?? 'Jl. Merdeka No. 123') }}</textarea>
                 </div>
               </div>
             </section>
@@ -275,48 +325,20 @@
               return;
             }
 
-            // Kirim data ke server untuk update user address secara permanen
-            fetch('{{ route("user.address.update") }}', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({
-                    recipient_name: recipientName,
-                    phone: phone,
-                    province: province,
-                    city: city,
-                    district: district,
-                    ward: ward,
-                    full_address: fullAddress
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Update tampilan card dengan data baru
-                    document.getElementById('alamatNama').textContent = recipientName;
-                    document.getElementById('alamatDetail').innerHTML = fullAddress.replace(/,/g, '<br>');
-                    document.getElementById('alamatPhone').textContent = phone;
+            // Simpan alamat hanya di sisi klien (tidak dikirim ke server)
+            // Karena sistem kita hanya untuk sementara di sesi checkout ini
+            document.getElementById('alamatNama').textContent = recipientName;
+            document.getElementById('alamatDetail').innerHTML = fullAddress.replace(/,/g, '<br>');
+            document.getElementById('alamatPhone').textContent = phone;
 
-                    // Kembali ke tampilan card
-                    alamatCard.style.display = 'block';
-                    alamatFormSection.style.display = 'none';
-                    editBtn.innerHTML = '<i class="bi bi-pencil"></i>';
-                    isEditMode = false;
+            // Kembali ke tampilan card
+            alamatCard.style.display = 'block';
+            alamatFormSection.style.display = 'none';
+            editBtn.innerHTML = '<i class="bi bi-pencil"></i>';
+            isEditMode = false;
 
-                    // Tampilkan notifikasi sukses
-                    alert(data.message || 'Alamat berhasil diperbarui');
-                } else {
-                    alert(data.message || 'Gagal memperbarui alamat');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Terjadi kesalahan saat memperbarui alamat: ' + error.message);
-            });
+            // Tampilkan notifikasi sukses
+            alert('Alamat berhasil diperbarui untuk checkout saat ini');
           }
         });
       }
@@ -385,4 +407,4 @@
 
 @section('footer')
   @include('components.customer.footer.footer')
-@endsection
+@endsection"{{-- Debug: Tampilkan data alamat user --}}" 

@@ -230,6 +230,19 @@ section h2 {
   word-break: break-all; /* Untuk nomor telepon yang panjang */
 }
 
+/* Styling untuk masing-masing baris alamat */
+.alamat-line {
+  display: inline-block;
+  font-size: 0.95rem;
+  color: #444;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+#alamatDetail {
+  margin: 0.25rem 0;
+}
+
 .btn-edit {
   position: absolute;
   top: 0.5rem;

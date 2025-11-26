@@ -30,6 +30,12 @@ class User extends Authenticatable
         'bank_name',
         'bank_account_number',
         'bank_account_name',
+        'province',
+        'city',
+        'district',
+        'ward',
+        'full_address',
+        'bio',
     ];
 
     /**

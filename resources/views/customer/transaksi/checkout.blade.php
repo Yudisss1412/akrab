@@ -77,7 +77,7 @@
                 <div class="alamat-content">
                   <div class="primary-badge">Utama</div>
                   <h3 id="alamatNama">{{ $user->name ?? 'Nama Pengguna' }}</h3>
-                  <p id="alamatDetail">
+                  <div id="alamatDetail">
                     @if($user)
                       @php
                         $alamatParts = [];
@@ -87,56 +87,38 @@
                             $alamatParts[] = $user->full_address;
                         }
 
-                        // Tambahkan address jika berbeda dari full_address
-                        if($user->address && $user->address !== $user->full_address) {
-                            $alamatParts[] = $user->address;
-                        }
-
-                        // Tambahkan ward jika ada dan belum ada di alamat
-                        if($user->ward) {
-                            $alamatParts[] = $user->ward;
-                        }
-
-                        // Tambahkan district jika ada dan belum ada di alamat
-                        if($user->district) {
+                        // Tambahkan kecamatan jika ada dan berbeda dari full_address
+                        if($user->district && !str_contains($user->full_address, $user->district)) {
                             $alamatParts[] = $user->district;
                         }
 
-                        // Tambahkan city jika ada dan belum ada di alamat
-                        if($user->city) {
+                        // Tambahkan kota jika ada dan berbeda dari full_address
+                        if($user->city && !str_contains($user->full_address, $user->city)) {
                             $alamatParts[] = $user->city;
                         }
 
-                        // Tambahkan province jika ada dan belum ada di alamat
-                        if($user->province) {
+                        // Tambahkan provinsi jika ada dan berbeda dari full_address
+                        if($user->province && !str_contains($user->full_address, $user->province)) {
                             $alamatParts[] = $user->province;
                         }
 
                         // Hapus elemen duplikat dan kosong dari array
                         $uniqueAlamatParts = array_unique(array_filter($alamatParts));
-                        $fullAlamat = implode(', ', $uniqueAlamatParts);
                       @endphp
 
                       @if(count($uniqueAlamatParts) > 0)
-                        {{ $fullAlamat }}
+                        @foreach($uniqueAlamatParts as $alamatPart)
+                          <span class="alamat-line">{{ $alamatPart }}</span>
+                          @if(!$loop->last)<br />@endif
+                        @endforeach
                       @else
-                        Alamat tidak lengkap
+                        <span class="alamat-line">Alamat tidak lengkap</span>
                       @endif
                     @else
-                      User tidak ditemukan
+                      <span class="alamat-line">User tidak ditemukan</span>
                     @endif
-                  </p>
-                  <p class="alamat-phone" id="alamatPhone">{{ $user->phone ?? 'Nomor telepon tidak tersedia' }}</p>
-
-                  <!-- Debug: Menampilkan data alamat user -->
-                  <div style="font-size: 0.8em; color: #666; margin-top: 10px; padding: 5px; background-color: #f9f9f9; border-radius: 4px; display: block;">
-                    <p>Debug: Full address: {{ $user->full_address ?? 'kosong' }}</p>
-                    <p>Debug: Address: {{ $user->address ?? 'kosong' }}</p>
-                    <p>Debug: Province: {{ $user->province ?? 'kosong' }}</p>
-                    <p>Debug: City: {{ $user->city ?? 'kosong' }}</p>
-                    <p>Debug: District: {{ $user->district ?? 'kosong' }}</p>
-                    <p>Debug: Ward: {{ $user->ward ?? 'kosong' }}</p>
                   </div>
+                  <p class="alamat-phone" id="alamatPhone">{{ $user->phone ?? 'Nomor telepon tidak tersedia' }}</p>
                 </div>
               </div>
 
@@ -212,13 +194,14 @@
                     <span>Subtotal</span>
                     <span>Rp {{ number_format($subTotal, 2, ',', '.') }}</span>
                   </div>
-                  <div class="detail-row">
+                  <!-- Sembunyikan biaya pengiriman sampai pengguna memilih metode pengiriman -->
+                  <div class="detail-row" style="display: none;">
                     <span>Biaya Pengiriman</span>
                     <span id="shippingCost">Rp {{ number_format($shippingCost, 2, ',', '.') }}</span>
                   </div>
                   <div class="detail-row total">
                     <span>Total</span>
-                    <span id="totalHarga">Rp {{ number_format($total, 2, ',', '.') }}</span>
+                    <span id="totalHarga">Rp {{ number_format($subTotal, 2, ',', '.') }}</span>
                   </div>
                 </div>
               </div>
@@ -252,7 +235,7 @@
               <div class="total-section">
                 <div class="total-row">
                   <span>Total Belanja</span>
-                  <span>Rp {{ number_format($total, 2, ',', '.') }}</span>
+                  <span>Rp {{ number_format($subTotal, 2, ',', '.') }}</span>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-checkout" id="prosesPesananBtn">
@@ -277,22 +260,25 @@
 
       // Ambil nilai awal dari data Blade
       let subtotal = {{ $subTotal }};
-      // Gunakan biaya pengiriman default untuk tampilan awal
-      let shippingCost = {{ $shippingCost }};
+      // Biaya pengiriman disembunyikan sampai pengguna memilih metode pengiriman
+      let shippingCost = 0; // Set ke 0 karena biaya pengiriman disembunyikan
 
-      // Update tampilan harga awal
-      shippingCostElement.textContent = new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      }).format(shippingCost).replace('Rp', '').trim();
+      // Update tampilan harga awal - hanya tampilkan subtotal karena pengiriman belum dipilih
+      if (shippingCostElement) {
+        shippingCostElement.textContent = new Intl.NumberFormat('id-ID', {
+          style: 'currency',
+          currency: 'IDR',
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0
+        }).format(shippingCost).replace('Rp', '').trim();
+      }
+
       totalHargaElement.textContent = new Intl.NumberFormat('id-ID', {
         style: 'currency',
         currency: 'IDR',
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
-      }).format(subtotal + shippingCost).replace('Rp', '').trim();
+      }).format(subtotal).replace('Rp', '').trim();
 
       // Edit alamat functionality
       const editBtn = document.getElementById('editAlamatBtn');

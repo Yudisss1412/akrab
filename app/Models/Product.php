@@ -69,6 +69,30 @@ class Product extends Model
         return $this->seller ? $this->seller->store_name : 'Unknown Seller';
     }
 
+    /**
+     * Get the seller's bank account info
+     */
+    public function getSellerBankAccountAttribute()
+    {
+        return $this->seller ? $this->seller->bank_account_number : null;
+    }
+
+    /**
+     * Get the seller's bank name
+     */
+    public function getSellerBankNameAttribute()
+    {
+        return $this->seller ? $this->seller->bank_name : null;
+    }
+
+    /**
+     * Get the seller's account holder name
+     */
+    public function getSellerAccountHolderNameAttribute()
+    {
+        return $this->seller ? $this->seller->account_holder_name : null;
+    }
+
     // Relasi ke varian produk
     public function variants()
     {

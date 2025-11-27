@@ -231,11 +231,10 @@
           .then(response => response.json())
           .then(data => {
             if (data.success) {
-              // Show success message
-              alert('Pembayaran berhasil diproses! Terima kasih telah melakukan pembayaran.');
-              
-              // Redirect to invoice page for the specific order
-              window.location.href = '{{ route("order.invoice", ['order' => '__ORDER_NUMBER__']) }}'.replace('__ORDER_NUMBER__', data.order_number);
+              // Redirect to appropriate payment confirmation page based on selected method
+              const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+              const orderNumber = data.order_number;
+              window.location.href = '{{ route("payment.confirmation") }}?order=' + orderNumber + '&method=' + selectedMethod;
             } else {
               // Show error message
               alert(data.message || 'Terjadi kesalahan saat memproses pembayaran.');

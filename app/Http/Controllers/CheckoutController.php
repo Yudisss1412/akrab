@@ -460,45 +460,108 @@ class CheckoutController extends Controller
     {
         $request->validate([
             'payment_method' => 'required|in:bank_transfer,e_wallet,cod',
-            'order_number' => 'nullable|string'
+            'order_number' => 'required|string'  // Changed: make it required since we're using it in confirmation pages
         ]);
-        
-        // If order_number is provided, use that specific order; otherwise get the latest pending
-        if ($request->filled('order_number')) {
-            $order = Order::where('order_number', $request->order_number)
-                          ->where('user_id', Auth::id())
-                          ->where('status', 'pending')
-                          ->first();
-        } else {
-            $order = Order::where('user_id', Auth::id())
-                          ->where('status', 'pending')
-                          ->latest()
-                          ->first();
-        }
-        
+
+        // Find order by order number and user ID (not by status to avoid the issue where status has already changed)
+        $order = Order::where('order_number', $request->order_number)
+                      ->where('user_id', Auth::id())
+                      ->first();
+
         if (!$order) {
             return response()->json([
                 'success' => false,
                 'message' => 'Tidak ada pesanan yang ditemukan.'
             ], 404);
         }
-        
+
+        // For COD, if the order is already in a final state, consider it successful and return immediately
+        if ($request->payment_method === 'cod' && in_array($order->status, ['confirmed', 'paid', 'processing', 'shipped', 'delivered'])) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Pembayaran berhasil diproses',
+                'order_number' => $order->order_number
+            ]);
+        }
+
+        // Check if order is already processed to prevent duplicate processing for non-COD methods
+        if (in_array($order->status, ['paid', 'processing', 'shipped', 'delivered', 'cancelled'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pesanan sudah diproses sebelumnya.'
+            ], 400);
+        }
+
+        // Update the order status based on payment method
+        $newStatus = 'paid'; // Default status
+        $paidAt = null;
+
+        switch ($request->payment_method) {
+            case 'bank_transfer':
+                // For bank transfer, set status to waiting for payment verification
+                $newStatus = 'waiting_payment_verification';
+                break;
+            case 'e_wallet':
+                // For e-wallet, set status to confirmed immediately if using a payment gateway
+                $newStatus = 'paid';
+                $paidAt = now();
+                break;
+            case 'cod':
+                // For COD, set status to confirmed, payment will be done on delivery
+                $newStatus = 'confirmed';
+                break;
+        }
+
         // Update the order status and payment information
         $order->update([
-            'status' => 'paid', // or 'confirmed' depending on business logic
-            'paid_at' => now()
+            'status' => $newStatus,
+            'paid_at' => $paidAt
         ]);
-        
-        // Optional: Add order log to track payment
+
+        // Add order log to track payment
+        $statusForLog = $request->payment_method === 'cod' ? 'confirmed' : 'paid';
+        $description = 'Pembayaran ' . $request->payment_method . ' diproses. Status: ' . $newStatus;
+
         $order->logs()->create([
-            'status' => 'paid',
-            'description' => 'Pembayaran berhasil diproses melalui ' . $request->payment_method
+            'status' => $statusForLog,
+            'description' => $description
         ]);
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Pembayaran berhasil diproses',
             'order_number' => $order->order_number
         ]);
+    }
+
+    /**
+     * Show payment confirmation page based on payment method
+     */
+    public function showPaymentConfirmation(Request $request)
+    {
+        $request->validate([
+            'order' => 'required|string|exists:orders,order_number',
+            'method' => 'required|in:bank_transfer,e_wallet,cod'
+        ]);
+
+        $order = Order::where('order_number', $request->order)
+                      ->where('user_id', Auth::id())
+                      ->with(['items.product.seller', 'shipping_address'])
+                      ->firstOrFail();
+
+        $viewPath = "customer.transaksi.payment.{$request->method}";
+
+        // Return the appropriate view based on payment method
+        switch ($request->method) {
+            case 'bank_transfer':
+                return view($viewPath, compact('order'));
+            case 'e_wallet':
+                return view($viewPath, compact('order'));
+            case 'cod':
+                return view($viewPath, compact('order'));
+            default:
+                return redirect()->route('cust.pembayaran')
+                    ->withErrors(['method' => 'Metode pembayaran tidak valid.']);
+        }
     }
 }

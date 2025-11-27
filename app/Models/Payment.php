@@ -14,6 +14,7 @@ class Payment extends Model
         'amount',
         'paid_at',
         'payment_gateway_response',
+        'proof_image',
     ];
 
     protected $casts = [

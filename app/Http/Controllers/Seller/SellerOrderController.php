@@ -987,4 +987,146 @@ class SellerOrderController extends Controller
             ]
         ]);
     }
+
+    /**
+     * Display payment verification page for seller - orders waiting for payment verification
+     */
+    public function paymentVerification(Request $request)
+    {
+        // Hanya penjual yang bisa mengakses
+        $user = Auth::user();
+        if (!$user || !$user->role || $user->role->name !== 'seller') {
+            abort(403, 'Akses ditolak. Hanya penjual yang dapat mengakses halaman ini.');
+        }
+
+        // Ambil ID penjual dari tabel sellers berdasarkan user_id
+        $seller = Seller::where('user_id', $user->id)->first();
+        if (!$seller) {
+            abort(403, 'Akses ditolak. Seller record tidak ditemukan.');
+        }
+
+        // Query orders that need payment verification (with proof of payment)
+        $query = Order::with(['user', 'items.product', 'items.variant', 'shipping_address', 'payment'])
+            ->whereHas('items.product', function ($q) use ($seller) {
+                $q->where('seller_id', $seller->id);
+            })
+            ->whereHas('payment', function ($q) {
+                $q->where('payment_status', 'pending_verification')
+                  ->whereNotNull('proof_image');
+            })
+            ->orderBy('created_at', 'desc');
+
+        // Filter berdasarkan pencarian jika ada
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('order_number', 'LIKE', "%{$search}%")
+                  ->orWhereHas('user', function ($userQuery) use ($search) {
+                      $userQuery->where('name', 'LIKE', "%{$search}%");
+                  });
+            });
+        }
+
+        $pendingPayments = $query->paginate(10)->appends($request->query());
+
+        // Format data for display
+        $formattedPayments = $pendingPayments->map(function($order) {
+            return [
+                'id' => $order->id,
+                'order_number' => $order->order_number,
+                'customer_name' => $order->user->name ?? 'Pelanggan Tidak Ditemukan',
+                'total_amount' => $order->total_amount,
+                'proof_image' => $order->payment ? asset('storage/' . $order->payment->proof_image) : null,
+                'created_at' => $order->created_at->format('d M Y H:i'),
+                'payment_status' => $order->payment ? $order->payment->payment_status : 'Tidak Ditemukan',
+                'items' => $order->items->map(function($item) {
+                    return [
+                        'product_name' => $item->product->name ?? 'Produk Tidak Ditemukan',
+                        'quantity' => $item->quantity,
+                        'subtotal' => $item->subtotal
+                    ];
+                })
+            ];
+        });
+
+        return view('penjual.payment_verification', compact('pendingPayments'));
+    }
+
+    /**
+     * API endpoint to get pending payments that need verification
+     */
+    public function getPendingPayments(Request $request)
+    {
+        // Hanya penjual yang bisa mengakses
+        $user = Auth::user();
+        if (!$user || !$user->role || $user->role->name !== 'seller') {
+            return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
+        }
+
+        // Ambil ID penjual dari tabel sellers berdasarkan user_id
+        $seller = Seller::where('user_id', $user->id)->first();
+        if (!$seller) {
+            return response()->json(['success' => false, 'message' => 'Seller record tidak ditemukan'], 403);
+        }
+
+        // Query orders that need payment verification (with proof of payment)
+        $query = Order::with(['user', 'items.product', 'payment'])
+            ->whereHas('items.product', function ($q) use ($seller) {
+                $q->where('seller_id', $seller->id);
+            })
+            ->whereHas('payment', function ($q) {
+                $q->where('payment_status', 'pending_verification')
+                  ->whereNotNull('proof_image');
+            })
+            ->orderBy('created_at', 'desc');
+
+        // Apply search filter if provided
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('order_number', 'LIKE', "%{$search}%")
+                  ->orWhereHas('user', function ($userQuery) use ($search) {
+                      $userQuery->where('name', 'LIKE', "%{$search}%");
+                  });
+            });
+        }
+
+        $pendingPayments = $query->paginate($request->get('per_page', 10));
+
+        // Format data for API response
+        $formattedPayments = $pendingPayments->map(function($order) {
+            return [
+                'id' => $order->id,
+                'order_number' => $order->order_number,
+                'customer_name' => $order->user->name ?? 'Pelanggan Tidak Ditemukan',
+                'customer_phone' => $order->user->phone ?? 'Tidak Tersedia',
+                'total_amount' => $order->total_amount,
+                'formatted_amount' => 'Rp' . number_format($order->total_amount, 0, ',', '.'),
+                'proof_image' => $order->payment ? asset('storage/' . $order->payment->proof_image) : null,
+                'created_at' => $order->created_at->format('d M Y H:i'),
+                'payment_status' => $order->payment ? $order->payment->payment_status : 'Tidak Ditemukan',
+                'items' => $order->items->map(function($item) {
+                    return [
+                        'product_name' => $item->product->name ?? 'Produk Tidak Ditemukan',
+                        'quantity' => $item->quantity,
+                        'subtotal' => $item->subtotal,
+                        'formatted_subtotal' => 'Rp' . number_format($item->subtotal, 0, ',', '.')
+                    ];
+                })->toArray()
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $formattedPayments,
+            'pagination' => [
+                'current_page' => $pendingPayments->currentPage(),
+                'last_page' => $pendingPayments->lastPage(),
+                'total' => $pendingPayments->total(),
+                'per_page' => $pendingPayments->perPage(),
+                'from' => $pendingPayments->firstItem(),
+                'to' => $pendingPayments->lastItem()
+            ]
+        ]);
+    }
 }

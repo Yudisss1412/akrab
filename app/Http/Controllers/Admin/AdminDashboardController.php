@@ -277,4 +277,103 @@ class AdminDashboardController extends Controller
             ]
         ]);
     }
+
+    /**
+     * Display payment verification page for admin
+     */
+    public function paymentVerification(Request $request)
+    {
+        // Query orders that need payment verification (with proof of payment)
+        $query = Order::with(['user', 'seller', 'items.product', 'items.variant', 'shipping_address', 'payment'])
+            ->whereHas('payment', function ($q) {
+                $q->where('payment_status', 'pending_verification')
+                  ->whereNotNull('proof_image');
+            })
+            ->orderBy('created_at', 'desc');
+
+        // Filter berdasarkan pencarian jika ada
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('order_number', 'LIKE', "%{$search}%")
+                  ->orWhereHas('user', function ($userQuery) use ($search) {
+                      $userQuery->where('name', 'LIKE', "%{$search}%");
+                  })
+                  ->orWhereHas('seller', function ($sellerQuery) use ($search) {
+                      $sellerQuery->where('store_name', 'LIKE', "%{$search}%");
+                  });
+            });
+        }
+
+        $pendingPayments = $query->paginate(10)->appends($request->query());
+
+        return view('admin.payment_verification', compact('pendingPayments'));
+    }
+
+    /**
+     * API endpoint to get pending payments that need verification
+     */
+    public function getPendingPayments(Request $request)
+    {
+        // Query orders that need payment verification (with proof of payment)
+        $query = Order::with(['user', 'seller', 'items.product', 'payment'])
+            ->whereHas('payment', function ($q) {
+                $q->where('payment_status', 'pending_verification')
+                  ->whereNotNull('proof_image');
+            })
+            ->orderBy('created_at', 'desc');
+
+        // Apply search filter if provided
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('order_number', 'LIKE', "%{$search}%")
+                  ->orWhereHas('user', function ($userQuery) use ($search) {
+                      $userQuery->where('name', 'LIKE', "%{$search}%");
+                  })
+                  ->orWhereHas('seller', function ($sellerQuery) use ($search) {
+                      $sellerQuery->where('store_name', 'LIKE', "%{$search}%");
+                  });
+            });
+        }
+
+        $pendingPayments = $query->paginate($request->get('per_page', 10));
+
+        // Format data for API response
+        $formattedPayments = $pendingPayments->map(function($order) {
+            return [
+                'id' => $order->id,
+                'order_number' => $order->order_number,
+                'customer_name' => $order->user->name ?? 'Pelanggan Tidak Ditemukan',
+                'customer_phone' => $order->user->phone ?? 'Tidak Tersedia',
+                'total_amount' => $order->total_amount,
+                'formatted_amount' => 'Rp' . number_format($order->total_amount, 0, ',', '.'),
+                'proof_image' => $order->payment ? asset('storage/' . $order->payment->proof_image) : null,
+                'created_at' => $order->created_at->format('d M Y H:i'),
+                'payment_status' => $order->payment ? $order->payment->payment_status : 'Tidak Ditemukan',
+                'seller_name' => $order->items->first() ? ($order->items->first()->product->seller->store_name ?? 'Penjual Tidak Ditemukan') : 'Tidak Ada Produk',
+                'items' => $order->items->map(function($item) {
+                    return [
+                        'product_name' => $item->product->name ?? 'Produk Tidak Ditemukan',
+                        'quantity' => $item->quantity,
+                        'subtotal' => $item->subtotal,
+                        'formatted_subtotal' => 'Rp' . number_format($item->subtotal, 0, ',', '.')
+                    ];
+                })->toArray()
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $formattedPayments,
+            'pagination' => [
+                'current_page' => $pendingPayments->currentPage(),
+                'last_page' => $pendingPayments->lastPage(),
+                'total' => $pendingPayments->total(),
+                'per_page' => $pendingPayments->perPage(),
+                'from' => $pendingPayments->firstItem(),
+                'to' => $pendingPayments->lastItem()
+            ]
+        ]);
+    }
 }

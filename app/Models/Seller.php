@@ -20,6 +20,9 @@ class Seller extends Model
         'active_products_count',
         'total_sales',
         'rating',
+        'bank_account_number',
+        'bank_name',
+        'account_holder_name',
     ];
 
     protected $casts = [

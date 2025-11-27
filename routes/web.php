@@ -178,6 +178,33 @@ Route::put('/pengiriman/update-address/{orderId}', [App\Http\Controllers\Checkou
 
 Route::get('/pembayaran', [App\Http\Controllers\CheckoutController::class, 'showPayment'])->name('cust.pembayaran');
 Route::post('/pembayaran/process', [App\Http\Controllers\CheckoutController::class, 'processPayment'])->name('payment.process');
+Route::get('/pembayaran/confirm', [App\Http\Controllers\CheckoutController::class, 'showPaymentConfirmation'])->name('payment.confirmation');
+Route::post('/payment/upload-proof', [App\Http\Controllers\PaymentController::class, 'uploadProof'])->name('payment.upload-proof');
+Route::post('/payment/update-status', [App\Http\Controllers\PaymentController::class, 'updateStatus'])->name('payment.update-status');
+
+// Debug route untuk melihat informasi penjual
+Route::get('/debug/order-seller/{orderNumber}', function($orderNumber) {
+    $order = App\Models\Order::where('order_number', $orderNumber)
+                ->with(['items.product.seller'])
+                ->first();
+
+    if (!$order) {
+        return 'Order not found';
+    }
+
+    $seller = $order->items->first() ? $order->items->first()->product->seller : null;
+
+    return [
+        'order' => $order->order_number,
+        'seller' => $seller ? [
+            'id' => $seller->id,
+            'store_name' => $seller->store_name,
+            'bank_account_number' => $seller->bank_account_number,
+            'bank_name' => $seller->bank_name,
+            'account_holder_name' => $seller->account_holder_name
+        ] : 'No seller found'
+    ];
+})->name('debug.order.seller');
 
 // Routes untuk ulasan
 Route::get('/ulasan', [App\Http\Controllers\ReviewController::class, 'index'])->name('ulasan.index');
@@ -842,6 +869,8 @@ Route::middleware(['auth'])->get('/debug-filtering', function(\Illuminate\Http\R
 // Order Detail Route - parameter sebagai string karena menggunakan order number
 Route::get('/penjual/pesanan/{order}', [App\Http\Controllers\Seller\SellerOrderController::class, 'show'])->name('penjual.pesanan.show');
 Route::put('/penjual/pesanan/{order}/status', [App\Http\Controllers\Seller\SellerOrderController::class, 'updateStatus'])->name('penjual.pesanan.status.update');
+Route::get('/penjual/pembayaran/verifikasi', [App\Http\Controllers\Seller\SellerOrderController::class, 'paymentVerification'])->name('penjual.pembayaran.verifikasi');
+Route::get('/api/penjual/pembayaran/pending', [App\Http\Controllers\Seller\SellerOrderController::class, 'getPendingPayments'])->name('api.penjual.pembayaran.pending');
 
 // Order Invoice Route
 Route::get('/invoice/{order}', [App\Http\Controllers\OrderDetailController::class, 'invoice'])->name('order.invoice');
@@ -905,10 +934,14 @@ Route::middleware(['auth', 'admin.role'])->group(function () {
     Route::get('/admin/dashboard', [App\Http\Controllers\RoleDashboardController::class,
 'showAdminDashboard'])->name('admin.dashboard');
 
+    // Payment verification routes
+    Route::get('/admin/payment/verification', [App\Http\Controllers\Admin\AdminDashboardController::class, 'paymentVerification'])->name('admin.payment.verification');
+
     // API endpoints for admin dashboard
     Route::get('/api/admin/dashboard/stats', [App\Http\Controllers\Admin\AdminDashboardController::class, 'getDashboardStats'])->name('api.admin.dashboard.stats');
     Route::get('/api/admin/dashboard/users', [App\Http\Controllers\Admin\AdminDashboardController::class, 'getUserStats'])->name('api.admin.dashboard.users');
     Route::get('/api/admin/dashboard/products', [App\Http\Controllers\Admin\AdminDashboardController::class, 'getProductStats'])->name('api.admin.dashboard.products');
+    Route::get('/api/admin/payment/pending', [App\Http\Controllers\Admin\AdminDashboardController::class, 'getPendingPayments'])->name('api.admin.payment.pending');
 
     // Test endpoint for creating a product
     Route::post('/api/admin/test-create-product', function () {

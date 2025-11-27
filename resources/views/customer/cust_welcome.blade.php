@@ -35,7 +35,7 @@ function createStarsHTML($rating) {
 @section('content')
 <script>
     const auth = JSON.parse(localStorage.getItem('auth') || '{}');
-    if (auth.role !== 'buyer') window.location.href = '/cust_welcome';
+    if (!auth.role || auth.role !== 'buyer') window.location.href = '/cust_welcome';
 </script>
 
 <style>
@@ -642,7 +642,7 @@ function createStarsHTML($rating) {
 
 <main class="welcome-page">
     <section class="welcome-banner">
-        <h2>Selamat datang, {{ auth()->user()->name }}!</h2>
+        <h2>Selamat datang, {{ auth()->user() ? auth()->user()->name : 'Pengunjung' }}!</h2>
         <p>Temukan produk UMKM terbaik dari seluruh Indonesia.</p>
     </section>
 

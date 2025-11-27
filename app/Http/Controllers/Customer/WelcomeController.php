@@ -52,7 +52,7 @@ class WelcomeController extends Controller
 
         // Urutkan berdasarkan rating rata-rata (dihitung dari ulasan yang disetujui)
         $popularProducts = $safeProducts->sortByDesc(function ($product) {
-            // Akses relasi yang sudah di-load
+            // Akses relasi yang sudah di-loaded
             if ($product->relationLoaded('approvedReviews')) {
                 $approvedReviews = $product->approvedReviews;
             } else {

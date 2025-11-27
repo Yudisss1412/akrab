@@ -659,13 +659,13 @@ function createStarsHTML($rating) {
                      onerror="this.src='{{ asset('src/product_1.png') }}'">
                 <div class="produk-card-info">
                     <h3 class="produk-card-name">{{ $product->name }}</h3>
-                    <div class="produk-card-sub">{{ $product->category->name ?? 'Umum' }}</div>
+                    <div class="produk-card-sub">{{ $product->category ? $product->category->name : 'Umum' }}</div>
                     <div class="produk-card-price">{{ formatRupiah($product->price ?? 0) }}</div>
                     <div class="produk-card-toko">
-                        <a href="/toko/{{ $product->seller->id ?? 'toko-tidak-ditemukan' }}"
+                        <a href="/toko/{{ $product->seller ? $product->seller->id : 'toko-tidak-ditemukan' }}"
                            class="toko-link"
-                           data-seller-name="{{ $product->seller->store_name ?? 'Toko Umum' }}">
-                            {{ $product->seller->store_name ?? 'Toko Umum' }}
+                           data-seller-name="{{ $product->seller ? $product->seller->store_name : 'Toko Umum' }}">
+                            {{ $product->seller ? $product->seller->store_name : 'Toko Umum' }}
                         </a>
                     </div>
                     <div class="produk-card-stars" aria-label="Rating {{ $product->rating ?? 0 }} dari 5">
@@ -808,9 +808,9 @@ function openProdukModal(idx, productId) {
                 const modalSpecs = document.getElementById('modal-specs');
                 const modalThumbs = document.getElementById('modal-thumbs');
 
-                modalProduct.textContent = produk.name;
+                modalProduct.textContent = produk.name || 'Nama Produk Tidak Tersedia';
                 modalImg.src = produk.image || '{{ asset("src/product_1.png") }}';
-                modalImg.alt = produk.name;
+                modalImg.alt = produk.name || 'Foto Produk';
                 modalPrice.textContent = typeof produk.price === 'number' ?
                     new Intl.NumberFormat('id-ID', {
                         style: 'currency',

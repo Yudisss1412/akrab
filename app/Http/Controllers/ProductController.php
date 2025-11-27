@@ -376,12 +376,12 @@ class ProductController extends Controller
         // Tambahkan informasi kategori dan spesifikasi dasar jika tidak ada spesifikasi khusus
         if (empty($specs)) {
             $specs = [
-                'Kategori: ' . ($product->category->name ?? 'Umum'),
+                'Kategori: ' . ($product->category ? $product->category->name : 'Umum'),
                 'Stok: ' . $product->stock,
                 'Berat: ' . $product->weight . 'g',
                 'Status: ' . ucfirst($product->status)
             ];
-            
+
             // Tambahkan informasi tambahan jika tersedia
             if ($product->material) $specs[] = 'Bahan: ' . $product->material;
             if ($product->size) $specs[] = 'Ukuran: ' . $product->size;
@@ -401,7 +401,7 @@ class ProductController extends Controller
         $formattedProduct = [
             'id' => $product->id,
             'name' => $product->name,
-            'category_name' => $product->category->name ?? 'Umum',
+            'category_name' => $product->category ? $product->category->name : 'Umum',
             'subcategory_name' => $product->subcategory ? $product->subcategory->name : ($product->subcategory ?? 'Umum'),
             'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
             'image' => $mainImage ? asset('storage/' . $mainImage) : asset('src/placeholder.png'),

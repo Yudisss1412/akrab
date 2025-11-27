@@ -14,13 +14,6 @@
 
 @section('content')
   <div class="main-layout">
-    <!-- Back button -->
-    <a href="{{ url()->previous() }}" class="back-btn" aria-label="Kembali">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="15 18 9 12 15 6"/>
-      </svg>
-      Kembali
-    </a>
 
     <div class="pd-wrap" data-product-id="{{ $produk['id'] }}">
       <div class="pd-top">

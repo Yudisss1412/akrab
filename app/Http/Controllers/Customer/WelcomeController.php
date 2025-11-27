@@ -15,8 +15,17 @@ class WelcomeController extends Controller
         $user = Auth::user(); // Akan null jika belum login
 
         // Ambil produk populer - ambil dulu produk dan hitung rating masing-masing
+        // Gunakan whereHas untuk memastikan produk memiliki relasi seller dan category
         $productsQuery = Product::where('status', 'active')
-            ->with(['seller', 'category', 'images', 'reviews']);
+            ->whereHas('seller')  // Hanya produk dengan seller yang valid
+            ->whereHas('category') // Hanya produk dengan category yang valid
+            ->with([
+                'seller:id,user_id,store_name',
+                'category:id,name',
+                'images:id,product_id,image_path',
+                'reviews:id,product_id,user_id,rating,status',
+                'approvedReviews:id,product_id,user_id,rating,status'
+            ]);
 
         // Tambahkan order by total_sales jika field ada di tabel
         if (\Illuminate\Support\Facades\Schema::hasColumn('products', 'total_sales')) {
@@ -25,15 +34,35 @@ class WelcomeController extends Controller
             // Fallback: urutkan berdasarkan jumlah order items terbanyak
             $productsQuery = $productsQuery
                 ->withCount('orderItems')
+                ->withAvg('approvedReviews', 'rating') // Load average rating from approved reviews
                 ->orderBy('order_items_count', 'desc');
         }
 
-        // Ambil produk dulu (ambil lebih banyak untuk akurasi rating)
+        // Ambil produk-produk (ambil lebih banyak untuk akurasi rating)
         $products = $productsQuery->limit(20)->get();
 
-        // Urutkan berdasarkan rating rata-rata (dihitung dari reviews)
-        $popularProducts = $products->sortByDesc(function ($product) {
-            return $product->average_rating;
+        // Buat array produk dengan data yang dijamin aman
+        $safeProducts = collect([]);
+        foreach ($products as $product) {
+            // Cek apakah produk memiliki relasi yang valid
+            if ($product->seller && $product->category) {
+                $safeProducts->push($product); // Tidak perlu cloning, cukup filter
+            }
+        }
+
+        // Urutkan berdasarkan rating rata-rata (dihitung dari ulasan yang disetujui)
+        $popularProducts = $safeProducts->sortByDesc(function ($product) {
+            // Akses relasi yang sudah di-load
+            if ($product->relationLoaded('approvedReviews')) {
+                $approvedReviews = $product->approvedReviews;
+            } else {
+                $approvedReviews = $product->approvedReviews()->get();
+            }
+
+            if ($approvedReviews && $approvedReviews->count() > 0) {
+                return $approvedReviews->avg('rating');
+            }
+            return 0;
         })->take(8)->values();
 
         // Ambil beberapa kategori untuk ditampilkan

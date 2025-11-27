@@ -199,5 +199,11 @@ class Product extends Model
 
         return $images;
     }
-    
+
+    // Accessor untuk rating produk (sama dengan average_rating)
+    public function getRatingAttribute()
+    {
+        return $this->average_rating;
+    }
+
 }

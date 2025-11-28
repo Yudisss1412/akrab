@@ -153,29 +153,12 @@ function createStarsHTML($rating, $size = 20) {
         // Store product ID in the wishlist button
         const productId = '{{ $produk['id'] }}';
         wishlistBtn.dataset.productId = productId;
-        
+
         wishlistBtn.addEventListener('click', async function() {
           const heartIcon = this.querySelector('.heart-icon');
           const productId = this.dataset.productId;
           const wasActive = this.classList.contains('active');
-          
-          // Toggle visual state immediately for better UX
-          this.classList.toggle('active');
-          
-          if (!wasActive) {
-            // Add to wishlist
-            heartIcon.setAttribute('fill', '#FF4757');
-            heartIcon.setAttribute('stroke', '#FF4757');
-            heartIcon.classList.remove('heart-outline');
-            heartIcon.classList.add('heart-fill');
-          } else {
-            // Remove from wishlist
-            heartIcon.setAttribute('fill', 'none');
-            heartIcon.setAttribute('stroke', 'currentColor');
-            heartIcon.classList.remove('heart-fill');
-            heartIcon.classList.add('heart-outline');
-          }
-          
+
           try {
             let response;
             if (!wasActive) {
@@ -202,66 +185,54 @@ function createStarsHTML($rating, $size = 20) {
                 }
               });
             }
-            
+
             const result = await response.json();
-            
-            if (!response.ok) {
-              // Revert visual state if request failed
-              this.classList.toggle('active');
+
+            if (response.ok) {
+              // Update visual state based on successful operation
               if (!wasActive) {
-                heartIcon.setAttribute('fill', 'none');
-                heartIcon.setAttribute('stroke', 'currentColor');
-                heartIcon.classList.remove('heart-fill');
-                heartIcon.classList.add('heart-outline');
-              } else {
+                // Successfully added to wishlist
+                this.classList.add('active');
                 heartIcon.setAttribute('fill', '#FF4757');
                 heartIcon.setAttribute('stroke', '#FF4757');
                 heartIcon.classList.remove('heart-outline');
                 heartIcon.classList.add('heart-fill');
+              } else {
+                // Successfully removed from wishlist
+                this.classList.remove('active');
+                heartIcon.setAttribute('fill', 'none');
+                heartIcon.setAttribute('stroke', 'currentColor');
+                heartIcon.classList.remove('heart-fill');
+                heartIcon.classList.add('heart-outline');
               }
-              
-              // Handle unauthenticated case
+
+              // Show success message
+              if(result.message) {
+                alert(result.message);
+              }
+            } else {
+              // Handle various error scenarios
               if (response.status === 401 || response.status === 403) {
                 alert('Anda harus login terlebih dahulu untuk menambahkan produk ke wishlist');
                 window.location.href = '/login';
+              } else if (response.status === 400 && result?.message?.includes('sudah')) {
+                // Product already in wishlist - just update UI to reflect this
+                this.classList.add('active');
+                heartIcon.setAttribute('fill', '#FF4757');
+                heartIcon.setAttribute('stroke', '#FF4757');
+                heartIcon.classList.remove('heart-outline');
+                heartIcon.classList.add('heart-fill');
+                alert('Produk sudah ada di wishlist');
               } else {
                 alert('Gagal memperbarui wishlist: ' + (result?.message || 'Terjadi kesalahan saat memperbarui wishlist'));
               }
             }
           } catch (error) {
-            // Check if it's an authentication error
+            // Handle network errors
             if (error.message && (error.message.includes('401') || error.message.includes('403'))) {
-              // Revert visual state
-              this.classList.toggle('active');
-              if (!wasActive) {
-                heartIcon.setAttribute('fill', 'none');
-                heartIcon.setAttribute('stroke', 'currentColor');
-                heartIcon.classList.remove('heart-fill');
-                heartIcon.classList.add('heart-outline');
-              } else {
-                heartIcon.setAttribute('fill', '#FF4757');
-                heartIcon.setAttribute('stroke', '#FF4757');
-                heartIcon.classList.remove('heart-outline');
-                heartIcon.classList.add('heart-fill');
-              }
-              
               alert('Anda harus login terlebih dahulu untuk menambahkan produk ke wishlist');
               window.location.href = '/login';
             } else {
-              // Revert visual state if request failed
-              this.classList.toggle('active');
-              if (!wasActive) {
-                heartIcon.setAttribute('fill', 'none');
-                heartIcon.setAttribute('stroke', 'currentColor');
-                heartIcon.classList.remove('heart-fill');
-                heartIcon.classList.add('heart-outline');
-              } else {
-                heartIcon.setAttribute('fill', '#FF4757');
-                heartIcon.setAttribute('stroke', '#FF4757');
-                heartIcon.classList.remove('heart-outline');
-                heartIcon.classList.add('heart-fill');
-              }
-              
               console.error('Error updating wishlist:', error);
               alert('Terjadi kesalahan saat memperbarui wishlist: ' + (error.message || error.toString() || 'Terjadi kesalahan tidak terduga'));
             }
@@ -269,25 +240,87 @@ function createStarsHTML($rating, $size = 20) {
         });
       }
       
-      // Initialize wishlist icon state on page load
+      // Initialize wishlist icon state on page load by checking actual wishlist status
       const wishlistSmall = document.querySelector('.wish-small');
       if (wishlistSmall) {
         const heartIcon = wishlistSmall.querySelector('.heart-icon');
-        const isInWishlist = wishlistSmall.classList.contains('active');
         const productId = '{{ $produk['id'] }}';
-        
+
         // Store product ID in the wishlist button
         wishlistSmall.dataset.productId = productId;
-        
-        if (heartIcon) {
-          if (isInWishlist) {
-            // Ensure the filled heart is shown when page loads
+
+        // Check if product is in wishlist via API to ensure correct initial state
+        checkWishlistStatus(productId, wishlistSmall, heartIcon);
+      }
+
+      // Function to check wishlist status and update UI accordingly
+      async function checkWishlistStatus(productId, button, heartIcon) {
+        try {
+          // Get the complete wishlist to check if product exists
+          const response = await fetch('/wishlist', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+              'X-Requested-With': 'XMLHttpRequest'
+            }
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            let isInWishlist = false;
+
+            // Check if the product ID exists in the wishlist
+            if (result && Array.isArray(result.data)) {
+              isInWishlist = result.data.some(item => item.product_id == productId || item.id == productId);
+            } else if (result && Array.isArray(result)) {
+              isInWishlist = result.some(item => item.product_id == productId || item.id == productId);
+            }
+
+            // Update button and icon based on actual wishlist status
+            if (isInWishlist) {
+              // Product is in wishlist
+              button.classList.add('active');
+              heartIcon.setAttribute('fill', '#FF4757');
+              heartIcon.setAttribute('stroke', '#FF4757');
+              heartIcon.classList.remove('heart-outline');
+              heartIcon.classList.add('heart-fill');
+            } else {
+              // Product is not in wishlist
+              button.classList.remove('active');
+              heartIcon.setAttribute('fill', 'none');
+              heartIcon.setAttribute('stroke', 'currentColor');
+              heartIcon.classList.remove('heart-fill');
+              heartIcon.classList.add('heart-outline');
+            }
+          } else {
+            // Fallback to data from server side if API call fails
+            const initialStatus = {{ $produk['di_wishlist'] ?? 'false' }};
+            if (initialStatus) {
+              button.classList.add('active');
+              heartIcon.setAttribute('fill', '#FF4757');
+              heartIcon.setAttribute('stroke', '#FF4757');
+              heartIcon.classList.remove('heart-outline');
+              heartIcon.classList.add('heart-fill');
+            } else {
+              button.classList.remove('active');
+              heartIcon.setAttribute('fill', 'none');
+              heartIcon.setAttribute('stroke', 'currentColor');
+              heartIcon.classList.remove('heart-fill');
+              heartIcon.classList.add('heart-outline');
+            }
+          }
+        } catch (error) {
+          // Fallback to server-side data if API call fails
+          const initialStatus = {{ $produk['di_wishlist'] ?? 'false' }};
+          if (initialStatus) {
+            button.classList.add('active');
             heartIcon.setAttribute('fill', '#FF4757');
             heartIcon.setAttribute('stroke', '#FF4757');
             heartIcon.classList.remove('heart-outline');
             heartIcon.classList.add('heart-fill');
           } else {
-            // Ensure the outlined heart is shown when page loads
+            button.classList.remove('active');
             heartIcon.setAttribute('fill', 'none');
             heartIcon.setAttribute('stroke', 'currentColor');
             heartIcon.classList.remove('heart-fill');

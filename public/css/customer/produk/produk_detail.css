@@ -260,7 +260,12 @@
 .info-card .wish-small svg{
   width:27px;
   height:27px;
-  display:block
+  display:block;
+  transition: all 0.2s ease;
+}
+.info-card .wish-small.active svg {
+  fill: #FF4757 !important;
+  stroke: #FF4757 !important;
 }
 .stars-row{
   display:flex;

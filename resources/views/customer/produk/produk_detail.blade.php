@@ -12,6 +12,28 @@
   <link href="{{ asset('css/customer/produk/halaman_produk.css') }}" rel="stylesheet"/>
 @endpush
 
+@php
+function createStarsHTML($rating, $size = 20) {
+    $rating = (float) $rating;
+    $fullStars = floor($rating);
+    $halfStar = ($rating - $fullStars) >= 0.5 ? 1 : 0;
+    $emptyStars = 5 - $fullStars - $halfStar;
+
+    $html = '';
+    for ($i = 0; $i < $fullStars; $i++) {
+        $html .= '<svg width="'.$size.'" height="'.$size.'" viewBox="0 0 47 47" xmlns="http://www.w3.org/2000/svg"><path d="M11.4076 41.1253L14.5899 27.368L3.91699 18.1149L18.017 16.891L23.5003 3.91699L28.9837 16.891L43.0837 18.1149L32.4107 27.368L35.593 41.1253L23.5003 33.8305L11.4076 41.1253Z" fill="#FFF600"/></svg>';
+    }
+    if ($halfStar) {
+        $html .= '<svg width="'.$size.'" height="'.$size.'" viewBox="0 0 47 47" xmlns="http://www.w3.org/2000/svg"><path d="M29.6691 32.9982L28.0534 25.9482L33.4878 21.2482L26.3399 20.6118L23.5003 13.9535V29.2285L29.6691 32.9982ZM11.4076 41.1253L14.5899 27.368L3.91699 18.1149L18.017 16.891L23.5003 3.91699L28.9837 16.891L43.0837 18.1149L32.4107 27.368L35.593 41.1253L23.5003 33.8305L11.4076 41.1253Z" fill="#FFF700"/></svg>';
+    }
+    for ($i = 0; $i < $emptyStars; $i++) {
+        $html .= '<svg width="'.$size.'" height="'.$size.'" viewBox="0 0 47 47" xmlns="http://www.w3.org/2000/svg"><path d="M17.3316 32.9493L23.5003 29.2285L29.6691 32.9982L28.0535 25.9482L33.4878 21.1993L26.3399 20.6118L23.5003 13.9535L20.6607 20.5628L13.5128 21.1993L18.9472 25.9482L17.3316 32.9493ZM11.4076 41.1253L14.5899 27.368L3.91699 18.1149L18.017 16.891L23.5003 3.91699L28.9837 16.891L43.0837 18.1149L32.4107 27.368L35.593 41.1253L23.5003 33.8305L11.4076 41.1253Z" fill="#D1D5DB"/></svg>';
+    }
+
+    return $html;
+}
+@endphp
+
 @section('content')
   <div class="pd-wrap" data-product-id="{{ $produk['id'] }}">
     <a href="{{ url()->previous() != request()->url() ? url()->previous() : url('/produk') }}" class="back-btn">
@@ -42,13 +64,7 @@
 
         <div class="stars-row">
           <div class="rating-stars">
-            @for($i = 1; $i <= 5; $i++)
-              @if($i <= floor($produk['rating'] ?? 4.5))
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="#FFD700"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-              @else
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="#E0E0E0"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-              @endif
-            @endfor
+            {!! createStarsHTML($produk['rating'] ?? 0) !!}
           </div>
           <span class="rating-text">({{ $produk['jumlah_ulasan'] ?? '128' }} ulasan)</span>
         </div>
@@ -107,13 +123,7 @@
                   <time class="rev-date">{{ $review['created_at'] ?? '1 Jan 2023' }}</time>
                 </div>
                 <div class="rev-stars">
-                  @for($i = 1; $i <= 5; $i++)
-                    @if($i <= ($review['rating'] ?? 5))
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="#FFD700"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                    @else
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="#E0E0E0"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                    @endif
-                  @endfor
+                  {!! createStarsHTML($review['rating'] ?? 0, 18) !!}
                 </div>
                 <p class="rev-text">{{ $review['review_text'] ?? 'Ulasan pelanggan tentang produk ini.' }}</p>
               </div>

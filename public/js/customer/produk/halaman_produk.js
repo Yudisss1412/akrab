@@ -39,7 +39,7 @@ function starsHTML(num) {
   const r = Math.max(0, Math.min(5, parseFloat(num) || 0));
   let full = Math.floor(r), half = 0;
   const frac = r - full;
-  if (frac >= 0.75) full += 1; else if (frac >= 0.25) half = 1;
+  if (frac >= 0.5) half = 1;
   const empty = Math.max(0, 5 - full - half);
   return `${STAR_FULL.repeat(full)}${half ? STAR_HALF : ''}${STAR_EMPTY.repeat(empty)}`;
 }

@@ -4,6 +4,7 @@
   --primary-color:#a8d5c9;
   --primary-color-dark:#006E5C;
   --secondary-color:#FFFFFF;
+  --background-card:#FFFFFF; /* Menambahkan variabel background-card untuk card ulasan */
   --background-color:#f0fdfa;
   --text-color-light:#f5f5f5;
   --dark-text-color:#333;
@@ -15,7 +16,6 @@
   --card-radius:16px;
 }
 
-/* Main layout consistent with other pages */
 .pd-wrap {
   max-width: 1450px;
   margin: 0 auto;
@@ -74,31 +74,6 @@
 .header-right a.profile-ico{display:inline-flex; align-items:center; justify-content:center; text-decoration:none; color:inherit}
 .profile-ico,.cart-ico{width:27px; height:27px}
 
-/* Back button consistent with design system */
-.back-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
-  color: var(--primary-color-dark);
-  text-decoration: none;
-  font-size: 0.9rem;
-  margin-bottom: 1rem;
-  transition: color 0.2s, background-color 0.2s, transform 0.2s;
-  border-radius: 8px;
-  background: var(--secondary-color);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
-  font-weight: 500;
-  width: auto;
-}
-
-.back-btn:hover {
-  background: var(--primary-color);
-  color: white;
-  transform:translateY(-1px);
-  text-decoration: none;
-}
 
 /* Footer consistent with other pages */
 .footer{
@@ -361,28 +336,6 @@
   color: var(--primary-color-dark);
 }
 
-/* ===== BACK BUTTON ===== */
-.back-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
-  color: var(--primary);
-  text-decoration: none;
-  font-size: 0.9rem;
-  margin-bottom: 1rem;
-  transition: color 0.2s, background-color 0.2s, transform 0.2s;
-  border-radius: 8px;
-  background: var(--background-card);
-  box-shadow: var(--shadow);
-  font-weight: 500;
-  width: auto;
-}
-.back-btn:hover {
-  background: #f0fdfa;
-  color: #005a4a;
-  transform:translateY(-1px);
-}
 
 /* ===== ULASAN: horizontal scroller + tile persegi panjang ===== */
 .review-box{
@@ -434,27 +387,27 @@
   outline-offset:2px;
 }
 
-/* tile ulasan: ukuran dibatasi */
+/* tile ulasan: ukuran tetap */
 .review-card{
   background:var(--background-card);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
+  border:1px solid var(--border-color);
+  border-radius:var(--card-radius);
   padding:16px;
-  box-shadow:var(--shadow);
+  box-shadow:var(--shadow-sm);
   display:flex;
   gap:12px;
   flex:0 0 auto;
   scroll-snap-align:start;
-  width:var(--rev-w);
-  min-width:var(--rev-w);
-  max-width:var(--rev-w);
-  height:var(--rev-h);
+  width:340px;  /* Tetapkan ukuran lebar tetap */
+  min-width:340px;  /* Tetapkan ukuran lebar minimal */
+  max-width:340px;  /* Tetapkan ukuran lebar maksimal */
+  height:168px;  /* Tetapkan ukuran tinggi tetap */
   overflow:hidden;   /* jaga tetap rectangle */
   transition:transform 0.2s, box-shadow 0.2s;
 }
 .review-card:hover {
   transform: translateY(-2px);
-  box-shadow:0 6px 20px rgba(0,0,0,0.1);
+  box-shadow:var(--shadow-md);
 }
 .rev-avatar{
   width:42px;
@@ -473,6 +426,8 @@
   flex-direction:column;
   gap:6px;
   min-width:0; /* untuk ellipsis */
+  flex:1; /* Biar konten teks bisa mengisi ruang yang tersisa */
+  overflow:hidden; /* Pastikan teks tidak melewati batas card */
 }
 .rev-head{
   display:flex;
@@ -507,9 +462,10 @@
   color:var(--text-secondary);
   line-height:1.6;
   display:-webkit-box;
-  -webkit-line-clamp:var(--rev-lines);
+  -webkit-line-clamp:2;  /* Batasi teks ke 2 baris maksimal */
   -webkit-box-orient:vertical;
   overflow:hidden;
+  flex:1; /* Biar teks mengisi ruang secara fleksibel */
 }
 
 /* panah */
@@ -549,11 +505,17 @@
 
 /* responsif: tile sedikit mengecil di HP */
 @media (max-width:480px){
-  :root{
-    --rev-w:280px;
-    --rev-h:180px;
-    --rev-lines:3;
+  .review-card {
+    width:280px;  /* Ukuran lebar card di mobile */
+    min-width:280px;  /* Ukuran lebar minimal di mobile */
+    max-width:280px;  /* Ukuran lebar maksimal di mobile */
+    height:180px;  /* Ukuran tinggi card di mobile */
   }
+
+  .rev-text {
+    -webkit-line-clamp:3;  /* Di mobile, tampilkan 3 baris */
+  }
+
   .pd-top {
     grid-template-columns: 1fr;
     gap: 16px;

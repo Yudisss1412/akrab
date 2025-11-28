@@ -67,7 +67,7 @@
               </div>
               
               <div class="review-content">
-                <p>{{ $review->review_text }}</p>
+                <p>{!! preg_replace('/\(\d+\)/', '', $review->review_text) !!}</p>
               </div>
             </div>
           @endforeach

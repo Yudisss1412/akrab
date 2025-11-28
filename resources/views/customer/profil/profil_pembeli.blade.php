@@ -640,7 +640,7 @@
         </div>
         
         <div class="review-content">
-          <p>${review.review_text || 'Ulasan tidak tersedia'}</p>
+          <p>${(review.review_text || 'Ulasan tidak tersedia').replace(/\(\d+\)/g, '')}</p>
         </div>
         
         <div class="review-actions">

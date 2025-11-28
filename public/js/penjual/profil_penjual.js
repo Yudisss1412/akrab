@@ -474,7 +474,7 @@
         </div>
       </div>
       <div class="rev-body" style="padding:0 1rem 1rem;">
-        <div class="rev-text">${review.review_text || 'Tidak ada komentar'}</div>
+        <div class="rev-text">${(review.review_text || 'Tidak ada komentar').replace(/\(\d+\)/g, '')}</div>
         ${review.reply ? `
           <div class="rev-reply" style="margin-top: 0.75rem; padding: 0.75rem; background: #f0fdfa; border-left: 3px solid var(--ak-primary); border-radius: 0 var(--ak-radius) var(--ak-radius) 0;">
             <strong>Balasan:</strong>

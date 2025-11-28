@@ -757,7 +757,7 @@
                           @forelse($reviews ?? collect() as $review)
                           <tr id="review-row-{{ $review->id }}">
                             <td>
-                              <div>{{ $review->review_text }}</div>
+                              <div>{!! preg_replace('/\(\d+\)/', '', $review->review_text) !!}</div>
                               <div>
                                 <span class="badge bg-warning text-dark">
                                   <i class="fas fa-star"></i> {{ $review->rating }}

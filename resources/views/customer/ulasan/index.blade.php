@@ -45,7 +45,7 @@
             </div>
             
             <div class="review-content">
-              <p>{{ $review->review_text ?? 'Tidak ada komentar' }}</p>
+              <p>{!! preg_replace('/\(\d+\)/', '', $review->review_text ?? 'Tidak ada komentar') !!}</p>
               
               @if($review->media)
                 <div class="review-media">

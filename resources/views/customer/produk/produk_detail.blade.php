@@ -36,14 +36,6 @@ function createStarsHTML($rating, $size = 20) {
 
 @section('content')
   <div class="pd-wrap" data-product-id="{{ $produk['id'] }}">
-    <a href="{{ url()->previous() != request()->url() ? url()->previous() : url('/produk') }}" class="back-btn">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M19 12H5"></path>
-        <path d="M12 19l-7-7 7-7"></path>
-      </svg>
-      Kembali
-    </a>
-
     <div class="pd-top">
       <!-- Product Gallery -->
       <div class="gallery-card card">
@@ -125,7 +117,7 @@ function createStarsHTML($rating, $size = 20) {
                 <div class="rev-stars">
                   {!! createStarsHTML($review['rating'] ?? 0, 18) !!}
                 </div>
-                <p class="rev-text">{{ $review['review_text'] ?? 'Ulasan pelanggan tentang produk ini.' }}</p>
+                <p class="rev-text">{!! preg_replace('/\(\d+\)/', '', $review['review_text'] ?? 'Ulasan pelanggan tentang produk ini.') !!}</p>
               </div>
             </article>
           @endforeach

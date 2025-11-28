@@ -144,8 +144,89 @@ function createStarsHTML($rating, $size = 20) {
 @endsection
 
 @push('scripts')
+  <style>
+    .notification {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, 500%) scale(0.9);
+      padding: 16px 24px;
+      border-radius: 8px;
+      color: #fff;
+      z-index: 9999;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+      font-size: 15px;
+      max-width: 420px;
+      width: max-content;
+      word-wrap: break-word;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 300px;
+      text-align: center;
+    }
+    .notification.show {
+      transform: translate(-50%, 500%) scale(1);
+    }
+    .notification-success {
+      background-color: #10b981;
+    }
+    .notification-error {
+      background-color: #ef4444;
+    }
+    .notification-info {
+      background-color: #3b82f6;
+    }
+    .notification-icon {
+      font-size: 20px;
+    }
+  </style>
   <script>
     // Basic functionality for quantity selector and wishlist
+    // Create notification function
+    function showNotification(message, type = 'info') {
+      // Remove any existing notifications
+      const existingNotifications = document.querySelectorAll('.notification');
+      existingNotifications.forEach(notification => {
+        notification.remove();
+      });
+
+      // Create notification element
+      const notification = document.createElement('div');
+      notification.className = `notification notification-${type}`;
+
+      // Add icon based on type
+      let icon = 'ℹ️'; // default info icon
+      if (type === 'success') {
+        icon = '✅';
+      } else if (type === 'error') {
+        icon = '❌';
+      }
+
+      notification.innerHTML = `
+        <span class="notification-icon">${icon}</span>
+        <span class="notification-message">${message}</span>
+      `;
+
+      document.body.appendChild(notification);
+
+      // Show notification
+      setTimeout(() => {
+        notification.classList.add('show');
+      }, 10);
+
+      // Auto remove after 3 seconds
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+          }
+        }, 300);
+      }, 3000);
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
       // Wishlist button
       const wishlistBtn = document.querySelector('.wish-small');
@@ -208,13 +289,19 @@ function createStarsHTML($rating, $size = 20) {
 
               // Show success message
               if(result.message) {
-                alert(result.message);
+                showNotification(result.message, 'success');
+              } else if (!wasActive) {
+                showNotification('Produk berhasil ditambahkan ke wishlist', 'success');
+              } else {
+                showNotification('Produk berhasil dihapus dari wishlist', 'info');
               }
             } else {
               // Handle various error scenarios
               if (response.status === 401 || response.status === 403) {
-                alert('Anda harus login terlebih dahulu untuk menambahkan produk ke wishlist');
-                window.location.href = '/login';
+                showNotification('Anda harus login terlebih dahulu untuk menambahkan produk ke wishlist', 'error');
+                setTimeout(() => {
+                  window.location.href = '/login';
+                }, 1500);
               } else if (response.status === 400 && result?.message?.includes('sudah')) {
                 // Product already in wishlist - just update UI to reflect this
                 this.classList.add('active');
@@ -222,19 +309,21 @@ function createStarsHTML($rating, $size = 20) {
                 heartIcon.setAttribute('stroke', '#FF4757');
                 heartIcon.classList.remove('heart-outline');
                 heartIcon.classList.add('heart-fill');
-                alert('Produk sudah ada di wishlist');
+                showNotification('Produk sudah ada di wishlist', 'info');
               } else {
-                alert('Gagal memperbarui wishlist: ' + (result?.message || 'Terjadi kesalahan saat memperbarui wishlist'));
+                showNotification('Gagal memperbarui wishlist: ' + (result?.message || 'Terjadi kesalahan saat memperbarui wishlist'), 'error');
               }
             }
           } catch (error) {
             // Handle network errors
             if (error.message && (error.message.includes('401') || error.message.includes('403'))) {
-              alert('Anda harus login terlebih dahulu untuk menambahkan produk ke wishlist');
-              window.location.href = '/login';
+              showNotification('Anda harus login terlebih dahulu untuk menambahkan produk ke wishlist', 'error');
+              setTimeout(() => {
+                window.location.href = '/login';
+              }, 1500);
             } else {
               console.error('Error updating wishlist:', error);
-              alert('Terjadi kesalahan saat memperbarui wishlist: ' + (error.message || error.toString() || 'Terjadi kesalahan tidak terduga'));
+              showNotification('Terjadi kesalahan saat memperbarui wishlist: ' + (error.message || error.toString() || 'Terjadi kesalahan tidak terduga'), 'error');
             }
           }
         });
@@ -374,8 +463,8 @@ function createStarsHTML($rating, $size = 20) {
             
             if (result.success) {
               // Show success message
-              alert(result.message);
-              
+              showNotification(result.message, 'success');
+
               // Update cart count in header if exists
               const cartCount = document.querySelector('.cart-count');
               if (cartCount) {
@@ -383,11 +472,11 @@ function createStarsHTML($rating, $size = 20) {
                 cartCount.textContent = count + 1;
               }
             } else {
-              alert(result.message || 'Gagal menambahkan ke keranjang');
+              showNotification(result.message || 'Gagal menambahkan ke keranjang', 'error');
             }
           } catch (error) {
             console.error('Error adding to cart:', error);
-            alert('Terjadi kesalahan saat menambahkan ke keranjang');
+            showNotification('Terjadi kesalahan saat menambahkan ke keranjang', 'error');
           } finally {
             // Restore original button state
             this.innerHTML = originalText;
@@ -427,11 +516,11 @@ function createStarsHTML($rating, $size = 20) {
               // Redirect to checkout page
               window.location.href = '/keranjang';
             } else {
-              alert(addToCartResult.message || 'Gagal menambahkan ke keranjang');
+              showNotification(addToCartResult.message || 'Gagal menambahkan ke keranjang', 'error');
             }
           } catch (error) {
             console.error('Error with buy now:', error);
-            alert('Terjadi kesalahan saat proses pembelian');
+            showNotification('Terjadi kesalahan saat proses pembelian', 'error');
           } finally {
             // Restore original button state
             this.textContent = originalText;

@@ -235,14 +235,15 @@ function renderList(products = []) {
              onerror="handleImageError(this)"
              loading="lazy">
         <div class="produk-card-info">
-          <h3 class="produk-card-name">${p.nama}</h3>
-          <div class="produk-card-sub">${p.subkategori || p.kategori}</div>
-          <div class="produk-card-price">${p.harga}</div>
-          <div class="produk-card-toko">
-            <a href="${tokoHref}" class="toko-link" data-seller-name="${p.toko || p.seller?.name || 'Toko Umum'}">${p.toko || p.seller?.name || 'Toko Umum'}</a>
+          <div class="produk-card-content">
+            <h3 class="produk-card-name">${p.nama}</h3>
+            <div class="produk-card-sub">${p.subkategori || p.kategori}</div>
+            <div class="produk-card-price">${p.harga}</div>
+            <div class="produk-card-toko">
+              <a href="${tokoHref}" class="toko-link" data-seller-name="${p.toko || p.seller?.name || 'Toko Umum'}">${p.toko || p.seller?.name || 'Toko Umum'}</a>
+            </div>
+            <div class="produk-card-stars" aria-label="Rating ${p.rating} dari 5">${starsHTML(p.rating)}</div>
           </div>
-          <div class="produk-card-stars" aria-label="Rating ${p.rating} dari 5">${starsHTML(p.rating)}</div>
-          <div class="produk-rating-angka">${p.rating}</div>
         </div>
         <div class="produk-card-actions">
           <a class="btn-lihat" data-product-id="${p.id}" href="${href}">Lihat Detail</a>
@@ -271,14 +272,15 @@ function renderRekomendasi(products = [], maxItems = 8) {
              onerror="handleImageError(this)"
              loading="lazy">
         <div class="produk-card-info">
-          <h3 class="produk-card-name">${p.nama}</h3>
-          <div class="produk-card-sub">${p.subkategori || p.kategori}</div>
-          <div class="produk-card-price">${p.harga}</div>
-          <div class="produk-card-toko">
-            <a href="${tokoHref}" class="toko-link" data-seller-name="${p.toko || p.seller?.name || 'Toko Umum'}">${p.toko || p.seller?.name || 'Toko Umum'}</a>
+          <div class="produk-card-content">
+            <h3 class="produk-card-name">${p.nama}</h3>
+            <div class="produk-card-sub">${p.subkategori || p.kategori}</div>
+            <div class="produk-card-price">${p.harga}</div>
+            <div class="produk-card-toko">
+              <a href="${tokoHref}" class="toko-link" data-seller-name="${p.toko || p.seller?.name || 'Toko Umum'}">${p.toko || p.seller?.name || 'Toko Umum'}</a>
+            </div>
+            <div class="produk-card-stars" aria-label="Rating ${p.rating} dari 5">${starsHTML(p.rating)}</div>
           </div>
-          <div class="produk-card-stars" aria-label="Rating ${p.rating} dari 5">${starsHTML(p.rating)}</div>
-          <div class="produk-rating-angka">${p.rating}</div>
         </div>
         <div class="produk-card-actions">
           <a class="btn-lihat" data-product-id="${p.id}" href="${href}">Lihat Detail</a>
@@ -306,14 +308,15 @@ function renderProdukPopuler(products = [], maxItems = 8) {
              onerror="handleImageError(this)"
              loading="lazy">
         <div class="produk-card-info">
-          <h3 class="produk-card-name">${p.nama}</h3>
-          <div class="produk-card-sub">${p.subkategori || p.kategori}</div>
-          <div class="produk-card-price">${p.harga}</div>
-          <div class="produk-card-toko">
-            <a href="${tokoHref}" class="toko-link" data-seller-name="${p.toko || p.seller?.name || 'Toko Umum'}">${p.toko || p.seller?.name || 'Toko Umum'}</a>
+          <div class="produk-card-content">
+            <h3 class="produk-card-name">${p.nama}</h3>
+            <div class="produk-card-sub">${p.subkategori || p.kategori}</div>
+            <div class="produk-card-price">${p.harga}</div>
+            <div class="produk-card-toko">
+              <a href="${tokoHref}" class="toko-link" data-seller-name="${p.toko || p.seller?.name || 'Toko Umum'}">${p.toko || p.seller?.name || 'Toko Umum'}</a>
+            </div>
+            <div class="produk-card-stars" aria-label="Rating ${p.rating} dari 5">${starsHTML(p.rating)}</div>
           </div>
-          <div class="produk-card-stars" aria-label="Rating ${p.rating} dari 5">${starsHTML(p.rating)}</div>
-          <div class="produk-rating-angka">${p.rating}</div>
         </div>
         <div class="produk-card-actions">
           <a class="btn-lihat" data-product-id="${p.id}" href="${href}">Lihat Detail</a>

@@ -146,6 +146,7 @@ body {
 /* Actions */
 .produk-page .produk-aksi{
   display:flex; gap:.55rem; padding:10px 4px 4px;
+  margin-top: auto;
 }
 .produk-page .produk-aksi a,
 .produk-page .produk-aksi button{
@@ -212,7 +213,7 @@ body {
 .produk-page .produk-toko{ font-size:.9rem; color:var(--grey-text-color); margin:0 }
 .produk-page .produk-harga{ font-weight:700; color:var(--dark-text-color) }
 .produk-page .produk-rating{ display:flex; align-items:center; gap:5px; margin:5px 0; }
-.produk-page .produk-aksi{ margin-top:.5rem; display:flex; gap:.55rem }
+.produk-page .produk-aksi{ margin-top:auto; margin-top:.5rem; display:flex; gap:.55rem }
 .produk-page .btn-produk{
   flex:1; border:none; border-radius:8px; padding:.55rem .75rem; font-weight:600; cursor:pointer; transition:background .15s,color .15s;
   display: flex;
@@ -606,6 +607,9 @@ main[role="main"] {
 
 .produk-page .produk-card-info {
   padding: 8px 4px 6px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .produk-page .produk-card-name {
@@ -798,6 +802,9 @@ main[role="main"] {
 
 .produk-card-info, .rek-body {
   padding: 8px 4px 6px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
 }
 
 .produk-card-name, .rek-name {

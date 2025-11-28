@@ -147,6 +147,13 @@ function createStarsHTML($rating) {
 
     .produk-card-info {
       padding: 8px 4px 6px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      height: 100% !important;
+    }
+
+    .produk-card-content {
+      flex: 1 !important;
     }
 
     .produk-card-name {
@@ -169,12 +176,12 @@ function createStarsHTML($rating) {
       font-size: 13px !important;
       transition: color 0.2s !important;
     }
-    
+
     .produk-card .produk-card-toko a.toko-link:hover {
       color: var(--primary-color-dark) !important;
       text-decoration: underline !important;
     }
-    
+
     /* Agar link toko tidak mempengaruhi layout card */
     .produk-card .produk-card-toko {
       margin-bottom: 6px !important;
@@ -186,23 +193,18 @@ function createStarsHTML($rating) {
       color: var(--primary-color-dark) !important;
     }
 
-    .produk-card-stars { 
-      display: flex !important; 
-      gap: 2px !important; 
+    .produk-card-stars {
+      display: flex !important;
+      gap: 2px !important;
       margin-bottom: 6px !important;
     }
-    .produk-card-stars svg { 
-      width: 18px !important; 
-      height: 18px !important; 
-    }
-
-    .produk-rating-angka {
-      font-size: 14px !important;
-      color: var(--grey-text-color) !important;
-      margin-top: 4px !important;
+    .produk-card-stars svg {
+      width: 18px !important;
+      height: 18px !important;
     }
 
     .produk-card-actions {
+      margin-top: auto !important;
       margin-top: .5rem !important;
       display: flex !important;
       gap: .55rem !important;
@@ -222,24 +224,25 @@ function createStarsHTML($rating) {
       justify-content: center !important;
       text-decoration: none !important;
       text-align: center !important;
+      min-height: 42px !important;
     }
-    
+
     .produk-card-actions .btn-lihat {
       background: var(--primary-color-dark) !important;
       color: #fff !important;
     }
-    
+
     .produk-card-actions .btn-lihat:hover {
       background: var(--primary-color) !important;
       color: var(--primary-color-dark) !important;
     }
-    
+
     .produk-card-actions .btn-add {
       background: #f5fbf8 !important;
       color: var(--primary-color-dark) !important;
       border: 1px solid var(--primary-color-dark) !important;
     }
-    
+
     .produk-card-actions .btn-add:hover {
       background: var(--primary-color-dark) !important;
       color: #fff !important;
@@ -658,20 +661,21 @@ function createStarsHTML($rating) {
                      alt="{{ $product->name }}"
                      onerror="this.src='{{ asset('src/product_1.png') }}'">
                 <div class="produk-card-info">
-                    <h3 class="produk-card-name">{{ $product->name }}</h3>
-                    <div class="produk-card-sub">{{ $product->category ? $product->category->name : 'Umum' }}</div>
-                    <div class="produk-card-price">{{ formatRupiah($product->price ?? 0) }}</div>
-                    <div class="produk-card-toko">
-                        <a href="/toko/{{ $product->seller ? $product->seller->id : 'toko-tidak-ditemukan' }}"
-                           class="toko-link"
-                           data-seller-name="{{ $product->seller ? $product->seller->store_name : 'Toko Umum' }}">
-                            {{ $product->seller ? $product->seller->store_name : 'Toko Umum' }}
-                        </a>
+                    <div class="produk-card-content">
+                        <h3 class="produk-card-name">{{ $product->name }}</h3>
+                        <div class="produk-card-sub">{{ $product->category ? $product->category->name : 'Umum' }}</div>
+                        <div class="produk-card-price">{{ formatRupiah($product->price ?? 0) }}</div>
+                        <div class="produk-card-toko">
+                            <a href="/toko/{{ $product->seller ? $product->seller->id : 'toko-tidak-ditemukan' }}"
+                               class="toko-link"
+                               data-seller-name="{{ $product->seller ? $product->seller->store_name : 'Toko Umum' }}">
+                                {{ $product->seller ? $product->seller->store_name : 'Toko Umum' }}
+                            </a>
+                        </div>
+                        <div class="produk-card-stars" aria-label="Rating {{ $product->rating ?? 0 }} dari 5">
+                            {!! createStarsHTML($product->rating ?? 0) !!}
+                        </div>
                     </div>
-                    <div class="produk-card-stars" aria-label="Rating {{ $product->rating ?? 0 }} dari 5">
-                        {!! createStarsHTML($product->rating ?? 0) !!}
-                    </div>
-                    <div class="produk-rating-angka">{{ $product->rating ?? 0 }}</div>
                 </div>
                 <div class="produk-card-actions">
                     <button class="btn-lihat lihat-detail-btn"

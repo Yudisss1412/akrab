@@ -50,19 +50,9 @@ class WelcomeController extends Controller
             }
         }
 
-        // Urutkan berdasarkan rating rata-rata (dihitung dari ulasan yang disetujui)
+        // Urutkan berdasarkan rating rata-rata menggunakan accessor yang lebih efisien
         $popularProducts = $safeProducts->sortByDesc(function ($product) {
-            // Akses relasi yang sudah di-loaded
-            if ($product->relationLoaded('approvedReviews')) {
-                $approvedReviews = $product->approvedReviews;
-            } else {
-                $approvedReviews = $product->approvedReviews()->get();
-            }
-
-            if ($approvedReviews && $approvedReviews->count() > 0) {
-                return $approvedReviews->avg('rating');
-            }
-            return 0;
+            return $product->averageRating;
         })->take(8)->values();
 
         // Ambil beberapa kategori untuk ditampilkan

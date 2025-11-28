@@ -78,23 +78,92 @@ class ProductController extends Controller
     {
         // Ambil produk berdasarkan ID dengan relasi yang diperlukan
         $product = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews.user', 'images'])->find($id);
-        
+
         if (!$product) {
             abort(404, 'Produk tidak ditemukan');
         }
-        
-        // Format data produk sesuai dengan struktur yang digunakan di view
-        $produk = [
+
+        // Format data produk menggunakan metode konsisten
+        $produk = $this->formatSingleProduct($product);
+
+        return view('customer.produk.produk_detail', compact('produk'));
+    }
+
+    /**
+     * Format single product data consistently for both views and APIs
+     */
+    private function formatSingleProduct($product)
+    {
+        // Format spesifikasi produk
+        $specs = [];
+        if ($product->specifications) {
+            foreach ($product->specifications as $key => $value) {
+                $specs[] = "$key: $value";
+            }
+        }
+
+        // Tambahkan informasi kategori dan spesifikasi dasar jika tidak ada spesifikasi khusus
+        if (empty($specs)) {
+            $specs = [
+                'Kategori: ' . ($product->category ? $product->category->name : 'Umum'),
+                'Stok: ' . $product->stock,
+                'Berat: ' . $product->weight . 'g',
+                'Status: ' . ucfirst($product->status)
+            ];
+
+            // Tambahkan informasi tambahan jika tersedia
+            if ($product->material) $specs[] = 'Bahan: ' . $product->material;
+            if ($product->size) $specs[] = 'Ukuran: ' . $product->size;
+            if ($product->color) $specs[] = 'Warna: ' . $product->color;
+            if ($product->brand) $specs[] = 'Merek: ' . $product->brand;
+            if ($product->origin) $specs[] = 'Asal: ' . $product->origin;
+            if ($product->warranty) $specs[] = 'Garansi: ' . $product->warranty;
+        }
+
+        // Format fitur produk
+        $features = [];
+        if ($product->features) {
+            $features = array_values($product->features);
+        }
+
+        $mainImage = $product->main_image;
+        $formattedProduct = [
             'id' => $product->id,
             'nama' => $product->name,
+            'name' => $product->name,
             'kategori' => $product->category->name ?? 'Umum',
+            'category_name' => $product->category->name ?? 'Umum',
             'subkategori' => $product->subcategory ? $product->subcategory->name : ($product->subcategory ?? 'Umum'),
+            'subcategory_name' => $product->subcategory ? $product->subcategory->name : ($product->subcategory ?? 'Umum'),
             'harga' => $product->price,
+            'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
             'deskripsi' => $product->description,
-            'gambar_utama' => $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder.png'),
-            'gambar' => $this->formatProductImages($product), // Tampilkan semua gambar termasuk tambahan
-            'rating' => $product->averageRating, // Gunakan averageRating dari accessor
-            'jumlah_ulasan' => $product->reviews_count, // Gunakan reviews_count dari accessor
+            'description' => $product->description,
+            'gambar_utama' => $mainImage ? asset('storage/' . $mainImage) : asset('src/placeholder.png'),
+            'image' => $mainImage ? asset('storage/' . $mainImage) : asset('src/placeholder.png'),
+            'formatted_images' => collect($product->all_images)->map(function($img) {
+                return asset('storage/' . $img);
+            })->toArray(), // Tambahkan semua gambar untuk keperluan galeri
+            'specifications' => $specs,
+            'features' => $features,
+            'material' => $product->material,
+            'size' => $product->size,
+            'color' => $product->color,
+            'brand' => $product->brand,
+            'origin' => $product->origin,
+            'warranty' => $product->warranty,
+            'min_order' => $product->min_order,
+            'stock' => $product->stock,
+            'weight' => $product->weight,
+            'status' => $product->status,
+            'view_count' => $product->view_count,
+            'discount_price' => $product->discount_price ? 'Rp ' . number_format($product->discount_price, 0, ',', '.') : null,
+            'discount_start_date' => $product->discount_start_date,
+            'discount_end_date' => $product->discount_end_date,
+            'rating' => round($product->averageRating, 1),
+            'average_rating' => round($product->averageRating, 1),
+            'jumlah_ulasan' => $product->reviews_count,
+            'review_count' => $product->reviews_count,
             'ulasan' => $product->approvedReviews->map(function($review) {
                 return [
                     'id' => $review->id,
@@ -104,19 +173,21 @@ class ProductController extends Controller
                     'created_at' => $review->created_at->format('d M Y')
                 ];
             })->toArray(),
-            'stok' => $product->stock,
-            'berat' => $product->weight,
+            'toko' => $product->seller->store_name ?? 'Toko Umum',
+            'seller_name' => $product->seller->store_name ?? 'Toko Umum',
             'varian' => $product->variants->map(function($variant) {
                 return [
                     'id' => $variant->id,
                     'nama' => $variant->name,
+                    'name' => $variant->name,
                     'harga_tambahan' => $variant->additional_price,
+                    'additional_price' => $variant->additional_price,
                     'stok' => $variant->stock
                 ];
             })->toArray()
         ];
-        
-        return view('customer.produk.produk_detail', compact('produk'));
+
+        return $formattedProduct;
     }
 
     /**
@@ -252,22 +323,14 @@ class ProductController extends Controller
                         ->orderBy('created_at', 'desc') // Urutkan berdasarkan tanggal terbaru
                         ->limit(10)
                         ->get();
-        
-        // Tambahkan average rating dan review count ke setiap produk
-        $products = $products->map(function($product) {
-            $product->setAttribute('average_rating', $product->averageRating);
-            $product->setAttribute('review_count', $product->reviews_count);
-            $product->setAttribute('formatted_images', $this->formatProductImages($product));
-            return $product;
-        });
-        
+
+        // Gunakan accessor dan relasi untuk menghitung rating dan jumlah ulasan
         $formattedProducts = $products->map(function($product) {
-            $mainImage = $product->main_image; // Menggunakan accessor yang baru dibuat
             return [
                 'id' => $product->id,
                 'name' => $product->name,
                 'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
-                'image' => $mainImage ? asset('storage/' . $mainImage) : asset('src/placeholder.png'),
+                'image' => $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder.png'),
                 'formatted_images' => collect($product->all_images)->map(function($img) {
                     return asset('storage/' . $img);
                 })->toArray(), // Tambahkan semua gambar untuk keperluan modal
@@ -281,7 +344,7 @@ class ProductController extends Controller
                 ] // Spesifikasi sederhana
             ];
         });
-        
+
         return response()->json($formattedProducts);
     }
 
@@ -292,7 +355,7 @@ class ProductController extends Controller
     {
         // Ambil semua produk tanpa filter status untuk memastikan produk baru muncul
         $query = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images']);
-        
+
         // Tambahkan filter berdasarkan kategori jika ada
         $kategori = $request->query('kategori');
         if ($kategori && $kategori !== 'all') {
@@ -300,25 +363,21 @@ class ProductController extends Controller
                 $q->where('name', $kategori);
             });
         }
-        
+
         // Tambahkan pencarian jika ada
         $search = $request->query('search');
         if ($search) {
             $query = $query->where('name', 'LIKE', "%{$search}%");
         }
-        
+
         $products = $query->get();
-        
+
         // Format untuk keperluan JavaScript - menggunakan accessor dan logika yang konsisten
         $formattedProducts = $products->map(function($product) {
-            // Tambahkan average rating dan review count ke setiap produk
-            $product->setAttribute('average_rating', $product->averageRating);
-            $product->setAttribute('review_count', $product->reviews_count);
-            
-            // Gunakan accessor main_image dari model untuk mendapatkan gambar utama
+            // Gunakan accessor dari model untuk mendapatkan data yang konsisten
             $mainImage = $product->main_image;  // Ini menggunakan accessor dari model
             $gambarUrl = null;
-            
+
             if ($mainImage) {
                 // Jika gambar utama ada, gunakan asset() untuk menghasilkan URL yang benar
                 $gambarUrl = asset('storage/' . $mainImage);
@@ -329,12 +388,12 @@ class ProductController extends Controller
                     $gambarUrl = $formattedImages[0];
                 }
             }
-            
+
             // Jika tetap tidak ada gambar, gunakan placeholder
             if (!$gambarUrl) {
                 $gambarUrl = asset('src/placeholder.png');
             }
-            
+
             return [
                 'id' => $product->id,
                 'nama' => $product->name,
@@ -343,14 +402,14 @@ class ProductController extends Controller
                 'harga' => $product->price,
                 'gambar' => $gambarUrl,
                 'rating' => $product->averageRating,
-                'toko' => $product->seller->name ?? 'Toko Umum',
+                'toko' => $product->seller->store_name ?? 'Toko Umum',
                 'deskripsi' => $product->description,
                 'average_rating' => $product->averageRating,
                 'review_count' => $product->reviews_count,
                 'all_images' => $product->all_images,  // Ini juga dari accessor di model
             ];
         });
-        
+
         return response()->json($formattedProducts);
     }
     
@@ -360,75 +419,14 @@ class ProductController extends Controller
     public function apiShow($id)
     {
         $product = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images'])->find($id);
-        
+
         if (!$product) {
             return response()->json(['error' => 'Produk tidak ditemukan'], 404);
         }
-        
-        // Format spesifikasi produk
-        $specs = [];
-        if ($product->specifications) {
-            foreach ($product->specifications as $key => $value) {
-                $specs[] = "$key: $value";
-            }
-        }
-        
-        // Tambahkan informasi kategori dan spesifikasi dasar jika tidak ada spesifikasi khusus
-        if (empty($specs)) {
-            $specs = [
-                'Kategori: ' . ($product->category ? $product->category->name : 'Umum'),
-                'Stok: ' . $product->stock,
-                'Berat: ' . $product->weight . 'g',
-                'Status: ' . ucfirst($product->status)
-            ];
 
-            // Tambahkan informasi tambahan jika tersedia
-            if ($product->material) $specs[] = 'Bahan: ' . $product->material;
-            if ($product->size) $specs[] = 'Ukuran: ' . $product->size;
-            if ($product->color) $specs[] = 'Warna: ' . $product->color;
-            if ($product->brand) $specs[] = 'Merek: ' . $product->brand;
-            if ($product->origin) $specs[] = 'Asal: ' . $product->origin;
-            if ($product->warranty) $specs[] = 'Garansi: ' . $product->warranty;
-        }
-        
-        // Format fitur produk
-        $features = [];
-        if ($product->features) {
-            $features = array_values($product->features);
-        }
-        
-        $mainImage = $product->main_image; // Menggunakan accessor yang baru dibuat
-        $formattedProduct = [
-            'id' => $product->id,
-            'name' => $product->name,
-            'category_name' => $product->category ? $product->category->name : 'Umum',
-            'subcategory_name' => $product->subcategory ? $product->subcategory->name : ($product->subcategory ?? 'Umum'),
-            'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
-            'image' => $mainImage ? asset('storage/' . $mainImage) : asset('src/placeholder.png'),
-            'formatted_images' => collect($product->all_images)->map(function($img) {
-                return asset('storage/' . $img);
-            })->toArray(), // Tambahkan semua gambar untuk keperluan galeri
-            'description' => $product->description,
-            'specifications' => $specs,
-            'features' => $features,
-            'material' => $product->material,
-            'size' => $product->size,
-            'color' => $product->color,
-            'brand' => $product->brand,
-            'origin' => $product->origin,
-            'warranty' => $product->warranty,
-            'min_order' => $product->min_order,
-            'stock' => $product->stock,
-            'weight' => $product->weight,
-            'status' => $product->status,
-            'view_count' => $product->view_count,
-            'discount_price' => $product->discount_price ? 'Rp ' . number_format($product->discount_price, 0, ',', '.') : null,
-            'discount_start_date' => $product->discount_start_date,
-            'discount_end_date' => $product->discount_end_date,
-            'average_rating' => round($product->averageRating, 1),
-            'review_count' => $product->reviews_count,
-        ];
-        
+        // Format data produk menggunakan metode konsisten
+        $formattedProduct = $this->formatSingleProduct($product);
+
         return response()->json($formattedProduct);
     }
     

@@ -13,115 +13,124 @@
 @endpush
 
 @section('content')
-  <div class="main-layout">
+  <div class="pd-wrap" data-product-id="{{ $produk['id'] }}">
+    <a href="{{ url()->previous() != request()->url() ? url()->previous() : url('/produk') }}" class="back-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5"></path>
+        <path d="M12 19l-7-7 7-7"></path>
+      </svg>
+      Kembali
+    </a>
 
-    <div class="pd-wrap" data-product-id="{{ $produk['id'] }}">
-      <div class="pd-top">
-        <!-- Product Gallery -->
-        <div class="gallery-card card">
-          <div class="main-img-wrap">
-            <img id="mainImage" src="{{ $produk['gambar_utama'] ?? 'https://via.placeholder.com/600x600' }}" alt="{{ $produk['nama'] ?? 'Produk' }}" class="main-img">
-          </div>
-          <div class="thumbs" id="thumbnails">
-            @foreach(($produk['gambar'] ?? []) as $index => $img)
-              <img src="{{ $img }}" alt="{{ $produk['nama'] ?? 'Produk' }} {{ $index + 1 }}" 
-                   class="thumb {{ $index === 0 ? 'is-active' : '' }}" data-index="{{ $index }}">
-            @endforeach
-          </div>
+    <div class="pd-top">
+      <!-- Product Gallery -->
+      <div class="gallery-card card">
+        <div class="main-img-wrap">
+          <img id="mainImage" src="{{ $produk['gambar_utama'] ?? 'https://via.placeholder.com/600x600' }}" alt="{{ $produk['nama'] ?? 'Produk' }}" class="main-img">
         </div>
-
-        <!-- Product Info -->
-        <div class="info-card card">
-          <h1 class="pd-title" id="pdTitle" data-product-id="{{ $produk['id'] ?? '' }}" data-name="{{ $produk['nama'] ?? 'Nama Produk' }}">{{ $produk['nama'] ?? 'Nama Produk' }}</h1>
-          
-          <div class="stars-row">
-            <div class="rating-stars">
-              @for($i = 1; $i <= 5; $i++)
-                @if($i <= floor($produk['rating'] ?? 4.5))
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="#FFD700"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                @else
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="#E0E0E0"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                @endif
-              @endfor
-            </div>
-            <span class="rating-text">({{ $produk['jumlah_ulasan'] ?? '128' }} ulasan)</span>
-          </div>
-
-          <div class="price-wish-row">
-            <div class="price">Rp<span class="price-number">{{ number_format($produk['harga'] ?? 100000, 2, ',', '.') }}</span></div>
-            <button class="wish-small {{ $produk['di_wishlist'] ?? false ? 'active' : '' }}" type="button" aria-label="Wishlist">
-              <svg class="heart-icon {{ $produk['di_wishlist'] ?? false ? 'heart-fill' : 'heart-outline' }}" viewBox="0 0 24 24" width="24" height="24" fill="{{ $produk['di_wishlist'] ?? false ? '#FF4757' : 'none' }}" stroke="{{ $produk['di_wishlist'] ?? false ? '#FF4757' : 'currentColor' }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-              </svg>
-            </button>
-          </div>
-
-          <div class="desc-box">
-            <p>{{ $produk['deskripsi'] ?? 'Deskripsi lengkap produk akan muncul di sini. Ini adalah contoh deskripsi produk yang menjelaskan fitur-fitur, spesifikasi, dan manfaat dari produk ini.' }}</p>
-          </div>
-
-          <ul class="spec-list">
-            @foreach(($produk['spesifikasi'] ?? []) as $spec)
-              <li class="spec-item">
-                <span class="spec-key">{{ $spec['nama'] ?? 'Spesifikasi' }}:</span>
-                <span class="spec-value">{{ $spec['nilai'] ?? '-' }}</span>
-              </li>
-            @endforeach
-          </ul>
-
-          <div class="cta-row">
-            <button class="btn btn-outline btn-add-cart" data-product-id="{{ $produk['id'] }}">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="9" cy="21" r="1"/>
-                <circle cx="20" cy="21" r="1"/>
-                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-              </svg>
-              + Keranjang
-            </button>
-            <button class="btn btn-primary btn-buy-now" data-product-id="{{ $produk['id'] }}">Beli Sekarang</button>
-          </div>
+        <div class="thumbs" id="thumbnails">
+          @foreach(($produk['gambar'] ?? []) as $index => $img)
+            <img src="{{ $img }}" alt="{{ $produk['nama'] ?? 'Produk' }} {{ $index + 1 }}"
+                 class="thumb {{ $index === 0 ? 'is-active' : '' }}" data-index="{{ $index }}">
+          @endforeach
         </div>
       </div>
 
-      <!-- Reviews Section -->
-      <div class="review-box">
-        <div class="reviews-head">
-          <h2 class="section-title">Ulasan Pelanggan</h2>
-          <a href="{{ route('ulasan.show_by_product', ['productId' => $produk['id']]) }}" class="see-all">Lihat Semua</a>
-        </div>
-        
-        <div class="review-scroller">
-          <div class="review-row" id="reviewsContainer">
-            @foreach(($produk['ulasan'] ?? []) as $review)
-              <article class="review-card">
-                <div class="rev-avatar">{{ substr($review['user'], 0, 1) }}</div>
-                <div class="rev-content">
-                  <div class="rev-head">
-                    <div class="rev-name">{{ $review['user'] ?? 'Nama Pembeli' }}</div>
-                    <time class="rev-date">{{ $review['created_at'] ?? '1 Jan 2023' }}</time>
-                  </div>
-                  <div class="rev-stars">
-                    @for($i = 1; $i <= 5; $i++)
-                      @if($i <= ($review['rating'] ?? 5))
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#FFD700"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                      @else
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#E0E0E0"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                      @endif
-                    @endfor
-                  </div>
-                  <p class="rev-text">{{ $review['review_text'] ?? 'Ulasan pelanggan tentang produk ini.' }}</p>
-                </div>
-              </article>
-            @endforeach
+      <!-- Product Info -->
+      <div class="info-card card">
+        <h1 class="pd-title" id="pdTitle" data-product-id="{{ $produk['id'] ?? '' }}" data-name="{{ $produk['nama'] ?? 'Nama Produk' }}">{{ $produk['nama'] ?? 'Nama Produk' }}</h1>
+
+        <div class="stars-row">
+          <div class="rating-stars">
+            @for($i = 1; $i <= 5; $i++)
+              @if($i <= floor($produk['rating'] ?? 4.5))
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="#FFD700"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+              @else
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="#E0E0E0"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+              @endif
+            @endfor
           </div>
-          
-          @if(empty($produk['ulasan']))
-            <p class="no-reviews">Belum ada ulasan untuk produk ini. Jadilah yang pertama memberikan ulasan!</p>
-          @endif
+          <span class="rating-text">({{ $produk['jumlah_ulasan'] ?? '128' }} ulasan)</span>
+        </div>
+
+        <div class="price-wish-row">
+          <div class="price">Rp<span class="price-number">{{ number_format($produk['harga'] ?? 100000, 2, ',', '.') }}</span></div>
+          <button class="wish-small {{ $produk['di_wishlist'] ?? false ? 'active' : '' }}" type="button" aria-label="Wishlist">
+            <svg class="heart-icon {{ $produk['di_wishlist'] ?? false ? 'heart-fill' : 'heart-outline' }}" viewBox="0 0 24 24" width="24" height="24" fill="{{ $produk['di_wishlist'] ?? false ? '#FF4757' : 'none' }}" stroke="{{ $produk['di_wishlist'] ?? false ? '#FF4757' : 'currentColor' }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="desc-box">
+          <p>{{ $produk['deskripsi'] ?? 'Deskripsi lengkap produk akan muncul di sini. Ini adalah contoh deskripsi produk yang menjelaskan fitur-fitur, spesifikasi, dan manfaat dari produk ini.' }}</p>
+        </div>
+
+        <ul class="spec-list">
+          @foreach(($produk['spesifikasi'] ?? []) as $spec)
+            <li class="spec-item">
+              <span class="spec-key">{{ $spec['nama'] ?? 'Spesifikasi' }}:</span>
+              <span class="spec-value">{{ $spec['nilai'] ?? '-' }}</span>
+            </li>
+          @endforeach
+        </ul>
+
+        <div class="cta-row">
+          <button class="btn btn-add" data-product-id="{{ $produk['id'] }}">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="9" cy="21" r="1"/>
+              <circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+            + Keranjang
+          </button>
+          <button class="btn btn-lihat" data-product-id="{{ $produk['id'] }}">Beli Sekarang</button>
         </div>
       </div>
     </div>
+
+    <!-- Reviews Section -->
+    <div class="review-box">
+      <div class="reviews-head">
+        <h2 class="section-title">Ulasan Pelanggan</h2>
+        <a href="{{ route('ulasan.show_by_product', ['productId' => $produk['id']]) }}" class="see-all">Lihat Semua</a>
+      </div>
+
+      <div class="review-scroller">
+        <div class="review-row" id="reviewsContainer">
+          @foreach(($produk['ulasan'] ?? []) as $review)
+            <article class="review-card">
+              <div class="rev-avatar">{{ substr($review['user'], 0, 1) }}</div>
+              <div class="rev-content">
+                <div class="rev-head">
+                  <div class="rev-name">{{ $review['user'] ?? 'Nama Pembeli' }}</div>
+                  <time class="rev-date">{{ $review['created_at'] ?? '1 Jan 2023' }}</time>
+                </div>
+                <div class="rev-stars">
+                  @for($i = 1; $i <= 5; $i++)
+                    @if($i <= ($review['rating'] ?? 5))
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="#FFD700"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    @else
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="#E0E0E0"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    @endif
+                  @endfor
+                </div>
+                <p class="rev-text">{{ $review['review_text'] ?? 'Ulasan pelanggan tentang produk ini.' }}</p>
+              </div>
+            </article>
+          @endforeach
+        </div>
+
+        @if(empty($produk['ulasan']))
+          <p class="no-reviews">Belum ada ulasan untuk produk ini. Jadilah yang pertama memberikan ulasan!</p>
+        @endif
+      </div>
+    </div>
   </div>
+@endsection
+
+@section('footer')
+  @include('components.customer.footer.footer')
 @endsection
 
 @push('scripts')

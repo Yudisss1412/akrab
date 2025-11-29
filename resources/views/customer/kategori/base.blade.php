@@ -43,7 +43,7 @@
       justify-content: space-between;
       align-items: center;
     }
-    
+
     .close {
       font-size: 1.8rem;
       font-weight: bold;
@@ -58,7 +58,7 @@
       border-radius: 50%;
       transition: all 0.2s ease;
     }
-    
+
     .close:hover,
     .close:focus {
       color: #000;
@@ -175,6 +175,209 @@
       color: var(--primary-color-dark);
     }
   </style>
+
+  <!-- Produk Detail Modal CSS -->
+  <style>
+    .modal-detail-produk {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.5);
+      overflow-y: auto;
+    }
+
+    .modal-content-new {
+      max-width: 420px;
+      width: 90%;
+      max-height: 90vh;
+      background: #fff;
+      border-radius: 25px;
+      box-shadow: 0 8px 38px rgba(0, 0, 0, 0.22);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      margin: 20px; /* Jarak dari sisi viewport */
+    }
+
+    .modal-title-row {
+      padding: 1.2rem 2rem 0.5rem 2rem;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .close {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #aaa;
+      cursor: pointer;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      transition: all 0.2s ease;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: #000;
+      text-decoration: none;
+      background-color: #f0f0f0;
+      cursor: pointer;
+    }
+
+    .modal-img-section {
+      display: flex;
+      flex-direction: column;
+      background: #fafbfc;
+      padding: 0 0 1.2rem 0;
+      flex-shrink: 0; /* Prevents the image section from shrinking */
+    }
+
+    .modal-img-main {
+      width: 90%;
+      max-width: 220px;
+      height: auto;
+      object-fit: cover;
+      border-radius: 16px;
+      background: #e5e5e5;
+      margin: 0.5rem 0 0.7rem 0;
+    }
+
+    .modal-thumbs-new {
+      display: flex;
+      gap: 0.6rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-thumbs-new img {
+      width: 48px;
+      height: 36px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 2px solid #eee;
+      background: #eaeaea;
+      cursor: pointer;
+      transition: border 0.18s;
+    }
+
+    .modal-thumbs-new img.active {
+      border-color: var(--primary-color-dark);
+    }
+
+    .modal-body-scrollable {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 2rem 1.1rem 2rem;
+    }
+
+    .modal-price-new {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--primary-color-dark);
+      margin: 0 0 0.6rem 0;
+    }
+
+    .modal-desc-box-new {
+      background: #f2fbf7;
+      border-radius: 15px;
+      padding: 1rem 1.3rem 0.8rem 1.3rem;
+      margin: 0 0 1.1rem 0;
+      color: #444;
+      font-size: 1rem;
+    }
+
+    .modal-desc {
+      margin: 0 0 0.7rem 0;
+    }
+
+    .modal-detail-list {
+      margin: 0;
+      padding-left: 1.1rem;
+    }
+
+    .modal-detail-list li {
+      margin-bottom: 0.2rem;
+      font-size: 1rem;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 1.1rem;
+      padding: 0 2rem 1.2rem 2rem;
+    }
+
+    .modal-btn {
+      flex: 1;
+      border: none;
+      padding: 0.6rem 0;
+      font-size: 1.07rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.12s;
+    }
+
+    .modal-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .modal-btn-primary {
+      background: var(--primary-color-dark);
+      color: #fff;
+    }
+
+    .modal-btn-primary:hover {
+      background: var(--primary-color);
+      color: var(--primary-color-dark);
+    }
+
+    .modal-btn-secondary {
+      background: #fff;
+      border: 1.5px solid var(--primary-color-dark);
+      color: var(--primary-color-dark);
+    }
+  </style>
+
+  <!-- Produk Detail Modal HTML -->
+  <div class="modal-detail-produk" id="modal-detail-produk" style="display: none;">
+    <div class="modal-content-new">
+      <div class="modal-title-row">
+        <span id="modal-product"></span>
+        <span class="close" id="modal-close-btn">&times;</span>
+      </div>
+      <div class="modal-img-section">
+        <img class="modal-img-main" id="modal-img" src="" alt="Foto Produk">
+        <div class="modal-thumbs-new" id="modal-thumbs"></div>
+      </div>
+      <div class="modal-body-scrollable">
+        <div class="modal-price-new" id="modal-price"></div>
+        <div class="modal-desc-box-new">
+          <div class="modal-desc" id="modal-desc"></div>
+          <ul class="modal-detail-list" id="modal-specs"></ul>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-primary" id="modal-addcart-btn">Tambah ke Keranjang</button>
+        <button class="modal-btn modal-btn-secondary" id="modal-lihatdetail-btn">Lihat Detail</button>
+      </div>
+    </div>
+  </div>
 @endpush
 
 @section('content')
@@ -190,7 +393,7 @@
         <aside class="sidebar-filter">
           <div class="filter-card">
             <h2>Filter Produk</h2>
-            
+
             <!-- Sub-kategori Filter -->
             <div class="filter-section">
               <div class="filter-header" onclick="toggleFilterSection('subkategori')">
@@ -226,7 +429,7 @@
                 </div>
               </div>
             </div>
-            
+
             <!-- Rentang Harga Filter -->
             <div class="filter-section">
               <div class="filter-header" onclick="toggleFilterSection('harga')">
@@ -246,7 +449,7 @@
                 </div>
               </div>
             </div>
-            
+
             <!-- Rating Produk Filter -->
             <div class="filter-section">
               <div class="filter-header" onclick="toggleFilterSection('rating')">
@@ -270,7 +473,7 @@
                 </div>
               </div>
             </div>
-            
+
             <!-- Lokasi Toko Filter -->
             <div class="filter-section">
               <div class="filter-header" onclick="toggleFilterSection('lokasi')">
@@ -300,7 +503,7 @@
                 </div>
               </div>
             </div>
-            
+
             <!-- Sort Filter -->
             <div class="filter-section">
               <div class="filter-header" onclick="toggleFilterSection('sort')">
@@ -316,7 +519,7 @@
                 </select>
               </div>
             </div>
-            
+
             <!-- Filter Actions -->
             <div class="filter-actions">
               <button id="apply-filter" class="btn btn-primary">Terapkan Filter</button>
@@ -366,7 +569,7 @@
     function toggleFilterSection(sectionId) {
       const content = document.getElementById(sectionId + '-content');
       const toggle = content.previousElementSibling.querySelector('.filter-toggle');
-      
+
       if (content.style.display === 'block') {
         content.style.display = 'none';
         toggle.textContent = '+';
@@ -375,7 +578,7 @@
         toggle.textContent = '-';
       }
     }
-    
+
     // Initialize filter sections - all closed by default
     document.addEventListener('DOMContentLoaded', function() {
       const filterContents = document.querySelectorAll('.filter-content');
@@ -383,28 +586,28 @@
         content.style.display = 'none';
       });
     });
-      
+
       // View product modal functionality is handled by event delegation in the added script
-      
+
       // Apply filter button functionality
       document.getElementById('apply-filter').addEventListener('click', function() {
         // Get selected filters
         const minPrice = document.getElementById('min-price').value;
         const maxPrice = document.getElementById('max-price').value;
         const sortBy = document.getElementById('sort-by').value;
-        
+
         // Get selected subcategories
         const subkategoriCheckboxes = document.querySelectorAll('input[name="subkategori[]"]:checked');
         const selectedSubkategori = Array.from(subkategoriCheckboxes).map(cb => cb.value);
-        
+
         // Get selected ratings
         const ratingCheckboxes = document.querySelectorAll('input[name="rating[]"]:checked');
         const selectedRatings = Array.from(ratingCheckboxes).map(cb => cb.value);
-        
+
         // Get selected locations
         const lokasiCheckboxes = document.querySelectorAll('input[name="lokasi[]"]:checked');
         const selectedLocations = Array.from(lokasiCheckboxes).map(cb => cb.value);
-        
+
         console.log('Filters applied:', {
           minPrice,
           maxPrice,
@@ -413,10 +616,10 @@
           ratings: selectedRatings,
           locations: selectedLocations
         });
-        
+
         // Build query parameters for API call
         const params = new URLSearchParams();
-        
+
         if (minPrice) params.append('min_price', minPrice);
         if (maxPrice) params.append('max_price', maxPrice);
         if (sortBy) params.append('sort', sortBy);
@@ -429,11 +632,11 @@
         if (selectedLocations.length > 0) {
           selectedLocations.forEach(location => params.append('lokasi[]', location));
         }
-        
+
         // Get the current category from the URL
         const currentPath = window.location.pathname;
         let apiUrl = '/api/products/filter'; // Default API endpoint
-        
+
         // If we're on a specific category page, include it in the API call
         if (currentPath.includes('/kategori/')) {
           const categoryMatch = currentPath.split('/kategori/')[1];
@@ -442,12 +645,12 @@
             apiUrl = `/api/products/filter`;
           }
         }
-        
+
         // Add other filters that might be relevant
         // Apply the filter by making an API call and updating the product list
         applyProductFilters(apiUrl, params);
       });
-      
+
       // Function to apply product filters via API
       function applyProductFilters(apiUrl, params) {
         fetch(`${apiUrl}?${params.toString()}`, {
@@ -464,7 +667,7 @@
             const productsContainer = document.getElementById('products-container');
             if (productsContainer) {
               productsContainer.innerHTML = '';
-              
+
               if (data.products && data.products.length > 0) {
                 // Display filtered products
                 data.products.forEach(product => {
@@ -482,7 +685,7 @@
                   `;
                   productsContainer.appendChild(productCard);
                 });
-                
+
                 // Update product count
                 const productCount = document.getElementById('product-count');
                 if (productCount) {
@@ -507,36 +710,36 @@
           showNotification('Terjadi kesalahan saat menerapkan filter', 'error');
         });
       }
-      
+
       // Reset filter button functionality
       document.getElementById('reset-filter').addEventListener('click', function() {
         // Reset all filter inputs
         document.getElementById('min-price').value = '';
         document.getElementById('max-price').value = '';
         document.getElementById('sort-by').value = 'popular';
-        
+
         // Uncheck all checkboxes
         const checkboxes = document.querySelectorAll('input[type="checkbox"]');
         checkboxes.forEach(checkbox => {
           checkbox.checked = false;
         });
-        
+
         // Reset mobile sort
         document.getElementById('sort-by-mobile').value = 'popular';
-        
+
         console.log('Filters reset');
-        
+
         // Reload original products (without any filters)
         resetProductFilters();
       });
-      
+
       // Function to reset and reload original products
       function resetProductFilters() {
         // Get the current category from the URL to reload original products
         const currentPath = window.location.pathname;
         let apiUrl = '/api/products/filter'; // Default API endpoint
         const params = new URLSearchParams();
-        
+
         // If we're on a specific category page, include it to get original category products
         if (currentPath.includes('/kategori/')) {
           const categoryMatch = currentPath.split('/kategori/')[1];
@@ -545,19 +748,19 @@
             apiUrl = `/api/products/filter`;
           }
         }
-        
+
         // Call API to get original products without filters
         applyProductFilters(apiUrl, params);
         showNotification('Filter berhasil direset', 'success');
       }
-      
+
       // Mobile sort functionality
       document.getElementById('sort-by-mobile').addEventListener('change', function() {
         document.getElementById('sort-by').value = this.value;
         // Trigger the apply filter function or update products
         console.log('Sort changed to:', this.value);
       });
-      
+
       // Pagination functionality
       const pageButtons = document.querySelectorAll('.page-btn:not(#prev-page):not(#next-page):not(#first-page):not(#last-page)');
       const prevButton = document.getElementById('prev-page');
@@ -566,7 +769,7 @@
       const lastButton = document.getElementById('last-page');
       let currentPage = 1;
       const totalPages = 5;
-      
+
       // Sample products data for different pages
       const productsData = {
         1: @yield('page-1-products'),
@@ -575,15 +778,15 @@
         4: @yield('page-4-products'),
         5: @yield('page-5-products')
       };
-      
+
       // Function to render products for a specific page
       function renderProducts(page) {
         const productsContainer = document.getElementById('products-container');
         const products = productsData[page] || productsData[1];
-        
+
         // Clear current products
         productsContainer.innerHTML = '';
-        
+
         // Add products for this page
         products.forEach(product => {
           const productCard = document.createElement('div');
@@ -601,26 +804,26 @@
           `;
           productsContainer.appendChild(productCard);
         });
-        
+
         // Event listener is handled by event delegation, no need to attach here
       }
-      
+
       // Update active page button
       function updateActivePage(newPage) {
         // Remove active class from all page buttons
         pageButtons.forEach(button => {
           button.classList.remove('active');
         });
-        
+
         // Add active class to current page button
         const currentPageButton = document.querySelector(\`.page-btn[data-page="\${newPage}"]\`);
         if (currentPageButton) {
           currentPageButton.classList.add('active');
         }
-        
+
         currentPage = newPage;
       }
-      
+
       // Page button click handlers
       pageButtons.forEach(button => {
         button.addEventListener('click', function() {
@@ -631,7 +834,7 @@
           }
         });
       });
-      
+
       // Previous button handler
       prevButton.addEventListener('click', function() {
         if (currentPage > 1) {
@@ -639,7 +842,7 @@
           renderProducts(currentPage);
         }
       });
-      
+
       // Next button handler
       nextButton.addEventListener('click', function() {
         if (currentPage < totalPages) {
@@ -647,7 +850,7 @@
           renderProducts(currentPage);
         }
       });
-      
+
       // First page button handler
       firstButton.addEventListener('click', function() {
         if (currentPage > 1) {
@@ -655,7 +858,7 @@
           renderProducts(1);
         }
       });
-      
+
       // Last page button handler
       lastButton.addEventListener('click', function() {
         if (currentPage < totalPages) {
@@ -663,7 +866,7 @@
           renderProducts(totalPages);
         }
       });
-      
+
       // Function to show product detail modal
       function showModalDetail(name, image, price, description) {
         // Create modal elements if they don't exist
@@ -687,7 +890,7 @@
             opacity: 0;
             transition: opacity 0.3s ease;
           `;
-          
+
           // Create modal container
           const container = document.createElement('div');
           container.className = 'modal-container';
@@ -703,7 +906,7 @@
             transform: scale(0.8);
             transition: all 0.3s ease;
           `;
-          
+
           // Create close button
           const closeBtn = document.createElement('button');
           closeBtn.innerHTML = '&times;';
@@ -718,12 +921,12 @@
             z-index: 10;
           `;
           closeBtn.onclick = () => hideModal();
-          
+
           // Create modal content
           const content = document.createElement('div');
           content.className = 'modal-content';
           content.style.padding = '20px';
-          
+
           // Create modal structure
           content.innerHTML = `
             <div class="modal-product-image" style="text-align: center; margin-bottom: 15px;">
@@ -737,21 +940,21 @@
               <button id="modal-add-cart-btn" class="btn btn-outline" style="padding: 8px 16px; border-radius: 4px;">Tambah ke Keranjang</button>
             </div>
           `;
-          
+
           container.appendChild(closeBtn);
           container.appendChild(content);
           overlay.appendChild(container);
           document.body.appendChild(overlay);
-          
+
           modal = overlay;
-          
+
           // Add event listener to close modal when clicking on overlay
           modal.addEventListener('click', function(e) {
             if (e.target === modal) {
               hideModal();
             }
           });
-          
+
           // Add close button functionality
           document.getElementById('modal-view-detail-btn').addEventListener('click', function() {
             alert('Menuju halaman detail produk');
@@ -759,20 +962,20 @@
             // In a real implementation, this would redirect to the product detail page
             // window.location.href = '/produk_detail/' + productId;
           });
-          
+
           document.getElementById('modal-add-cart-btn').addEventListener('click', function() {
             alert('Produk ditambahkan ke keranjang');
             hideModal();
             // In a real implementation, this would add product to cart
           });
         }
-        
+
         // Set modal content
         document.getElementById('modal-product-image').src = image;
         document.getElementById('modal-product-name').textContent = name;
         document.getElementById('modal-product-price').textContent = price;
         document.getElementById('modal-product-description').textContent = description;
-        
+
         // Show modal
         modal.style.display = 'flex';
         setTimeout(() => {
@@ -780,25 +983,25 @@
           modal.querySelector('.modal-container').style.opacity = '1';
           modal.querySelector('.modal-container').style.transform = 'scale(1)';
         }, 10);
-        
+
         // Add Escape key listener
         document.addEventListener('keydown', handleEscKey, true);
       }
-      
+
       function hideModal() {
         const modal = document.getElementById('product-detail-modal');
         if (modal) {
           modal.style.opacity = '0';
           modal.querySelector('.modal-container').style.opacity = '0';
           modal.querySelector('.modal-container').style.transform = 'scale(0.8)';
-          
+
           setTimeout(() => {
             modal.style.display = 'none';
           }, 300);
         }
         document.removeEventListener('keydown', handleEscKey, true);
       }
-      
+
       function handleEscKey(e) {
         if (e.key === 'Escape') {
           hideModal();
@@ -874,7 +1077,83 @@
     function openProdukModal(idx, productId) {
       if (!modal) return;
 
-      // Fetch product data
+      // Try to find product data in global allProductData first (since we're using dummy data)
+      if (typeof allProductData !== 'undefined' && allProductData.length > 0) {
+        const product = allProductData.find(p => p.id == productId);
+
+        if (product) {
+          // Use product data from global variable
+          currentProduk = product;
+
+          modalProduct.textContent = product.name;
+          modalImg.src = product.image;
+          modalImg.alt = product.name;
+          modalPrice.textContent = product.price;
+          modalDesc.textContent = product.description;
+
+          // Specifications
+          modalSpecs.innerHTML = '';
+          const specs = product.specifications || product.spesifikasi || product.specs || [];
+
+          if (specs.length > 0) {
+            // Handle both object/array formats
+            if (Array.isArray(specs)) {
+              specs.forEach(spec => {
+                const li = document.createElement('li');
+                if (typeof spec === 'object' && spec.key && spec.value) {
+                  // If it's an object with key-value pairs
+                  li.innerHTML = `<strong>${spec.key}:</strong> ${spec.value}`;
+                } else if (typeof spec === 'string' && spec.includes(':')) {
+                  // If it's a string with colon separator
+                  const [key, ...valueParts] = spec.split(':');
+                  const value = valueParts.join(':');
+                  li.innerHTML = `<strong>${key.trim()}:</strong> ${value.trim()}`;
+                } else {
+                  // Just the spec as text
+                  li.textContent = spec;
+                }
+                modalSpecs.appendChild(li);
+              });
+            } else if (typeof specs === 'object') {
+              // Handle object format: { key: value }
+              Object.entries(specs).forEach(([key, value]) => {
+                const li = document.createElement('li');
+                li.innerHTML = `<strong>${key}:</strong> ${value}`;
+                modalSpecs.appendChild(li);
+              });
+            }
+          } else {
+            // Add default specifications if none provided
+            const li = document.createElement('li');
+            li.textContent = product.description || 'Spesifikasi tidak tersedia';
+            modalSpecs.appendChild(li);
+          }
+
+          // Thumbnails - using main image for now, but could be extended with multiple images
+          modalThumbs.innerHTML = '';
+          const thumb = document.createElement('img');
+          thumb.src = product.image;
+          thumb.alt = product.name || `Thumbnail`;
+          thumb.classList.add('active');
+          thumb.onclick = () => {
+            modalImg.src = product.image;
+            [...modalThumbs.children].forEach(img => img.classList.remove('active'));
+            thumb.classList.add('active');
+          };
+          modalThumbs.appendChild(thumb);
+
+          // Store product ID in the add to cart button for easy access
+          if (modalAddCart) {
+            modalAddCart.setAttribute('data-product-id', productId);
+          }
+
+          modal.style.display = 'flex';
+          document.body.style.overflow = 'hidden';
+          return; // Exit early if product found in global data
+        }
+      }
+
+      // If product not found in global data, fetch from API as fallback
       fetch(`/api/products/${productId}`)
         .then(response => response.json())
         .then(produk => {
@@ -917,15 +1196,60 @@
         })
         .catch(error => {
           console.error('Error loading product details:', error);
-          // Fallback to dummy data approach if API fails
+
+          // Attempt to find product data in the visible DOM as fallback
+          const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+          if (productCard) {
+            const productName = productCard.querySelector('.product-name')?.textContent;
+            const productImage = productCard.querySelector('.product-image')?.src;
+            const productDesc = productCard.querySelector('.product-description')?.textContent;
+            const productPrice = productCard.querySelector('.product-price')?.textContent;
+
+            if (productName && productImage && productPrice) {
+              // Use the data from the DOM
+              modalProduct.textContent = productName;
+              modalImg.src = productImage;
+              modalImg.alt = productName;
+              modalPrice.textContent = productPrice;
+              modalDesc.textContent = productDesc || 'Deskripsi produk tidak tersedia';
+
+              modalSpecs.innerHTML = '';
+              const li = document.createElement('li');
+              li.textContent = productDesc || 'Spesifikasi tidak tersedia';
+              modalSpecs.appendChild(li);
+
+              modalThumbs.innerHTML = '';
+              const thumb = document.createElement('img');
+              thumb.src = productImage;
+              thumb.alt = `Thumbnail`;
+              thumb.classList.add('active');
+              thumb.onclick = () => {
+                modalImg.src = productImage;
+                [...modalThumbs.children].forEach(img => img.classList.remove('active'));
+                thumb.classList.add('active');
+              };
+              modalThumbs.appendChild(thumb);
+
+              // Store product ID in the add to cart button for easy access
+              if (modalAddCart) {
+                modalAddCart.setAttribute('data-product-id', productId);
+              }
+
+              modal.style.display = 'flex';
+              document.body.style.overflow = 'hidden';
+              return; // Exit after using fallback data
+            }
+          }
+
+          // Final fallback to dummy data if product not found at all
           const produk = {
             name: "Produk Tidak Ditemukan",
-            image: "src/product_1.png",
+            image: "{{ asset('src/product_1.png') }}",
             price: "Rp 0",
             description: "Produk tidak ditemukan di sistem.",
             specifications: []
           };
-          
+
           currentProduk = produk;
           modalProduct.textContent = produk.name;
           modalImg.src = produk.image;
@@ -933,7 +1257,7 @@
           modalPrice.textContent = produk.price;
           modalDesc.textContent = produk.description;
           modalSpecs.innerHTML = '';
-          
+
           modal.style.display = 'flex';
           document.body.style.overflow = 'hidden';
         });
@@ -972,7 +1296,7 @@
 
       // Get CSRF token from the meta tag in the layout
       const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-      
+
       if (!csrfToken) {
         showNotification('Terjadi masalah dengan keamanan, silakan refresh halaman', 'error');
         return;
@@ -986,7 +1310,7 @@
             'X-CSRF-TOKEN': csrfToken,
             'X-Requested-With': 'XMLHttpRequest' // Important for Laravel to recognize AJAX requests
           },
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             product_id: productId,
             quantity: 1 // Default quantity
           })
@@ -1010,7 +1334,7 @@
       const notification = document.createElement('div');
       notification.className = `notification notification-${type}`;
       notification.textContent = message;
-      
+
       // Gaya dasar untuk notifikasi
       Object.assign(notification.style, {
         position: 'fixed',
@@ -1026,10 +1350,10 @@
         maxWidth: '400px',
         wordWrap: 'break-word'
       });
-      
+
       // Tambahkan ke body
       document.body.appendChild(notification);
-      
+
       // Hapus notifikasi setelah 3 detik
       setTimeout(() => {
         if (notification.parentNode) {
@@ -1038,7 +1362,7 @@
       }, 3000);
     }
   </script>
-  
+
   <!-- Subcategory filter script -->
   <script src="{{ asset('js/customer/kategori/subcategory-filter.js') }}"></script>
 @endpush

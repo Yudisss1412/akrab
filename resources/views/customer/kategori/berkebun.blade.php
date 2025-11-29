@@ -1,7 +1,75 @@
 @extends('customer.kategori.base')
 
 @section('category-title', 'Produk Berkebun')
-@section('category-description', 'Temukan berbagai produk berkebun alami dari UMKM lokal')
+@section('category-description', 'Temukan berbagai produk berkebun dari UMKM lokal')
+
+@push('scripts')
+  <script>
+    // Siapkan semua data produk untuk modal
+    window.allProductData = [
+      @if(isset($page_1_products))
+        @foreach($page_1_products as $product)
+          {
+            id: {{ $product['id'] }},
+            name: {{ json_encode($product['name']) }},
+            description: {{ json_encode($product['description']) }},
+            price: {{ json_encode($product['price']) }},
+            image: {{ json_encode($product['image']) }},
+            specifications: []
+          },
+        @endforeach
+      @endif
+      @if(isset($page_2_products))
+        @foreach($page_2_products as $product)
+          {
+            id: {{ $product['id'] }},
+            name: {{ json_encode($product['name']) }},
+            description: {{ json_encode($product['description']) }},
+            price: {{ json_encode($product['price']) }},
+            image: {{ json_encode($product['image']) }},
+            specifications: []
+          },
+        @endforeach
+      @endif
+      @if(isset($page_3_products))
+        @foreach($page_3_products as $product)
+          {
+            id: {{ $product['id'] }},
+            name: {{ json_encode($product['name']) }},
+            description: {{ json_encode($product['description']) }},
+            price: {{ json_encode($product['price']) }},
+            image: {{ json_encode($product['image']) }},
+            specifications: []
+          },
+        @endforeach
+      @endif
+      @if(isset($page_4_products))
+        @foreach($page_4_products as $product)
+          {
+            id: {{ $product['id'] }},
+            name: {{ json_encode($product['name']) }},
+            description: {{ json_encode($product['description']) }},
+            price: {{ json_encode($product['price']) }},
+            image: {{ json_encode($product['image']) }},
+            specifications: []
+          },
+        @endforeach
+      @endif
+      @if(isset($page_5_products))
+        @foreach($page_5_products as $product)
+          {
+            id: {{ $product['id'] }},
+            name: {{ json_encode($product['name']) }},
+            description: {{ json_encode($product['description']) }},
+            price: {{ json_encode($product['price']) }},
+            image: {{ json_encode($product['image']) }},
+            specifications: []
+          },
+        @endforeach
+      @endif
+    ];
+  </script>
+@endpush
 
 @section('category-products')
   @if(isset($page_1_products))

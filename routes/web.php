@@ -404,7 +404,7 @@ Route::get('/kategori/kuliner', function () {
 
     $products = collect(); // Inisialisasi sebagai collection kosong
     if ($category) {
-        $products = \App\Models\Product::with(['variants', 'seller', 'category'])
+        $products = \App\Models\Product::with(['variants', 'seller', 'category', 'subcategory'])
                      ->where('category_id', $category->id)
                      ->where('status', 'active')
                      ->get();
@@ -418,6 +418,7 @@ Route::get('/kategori/kuliner', function () {
             'description' => $product->description,
             'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
             'image' => $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder.png'),
+            'subcategory' => $product->subcategory, // Subcategory is now a string value, not a relation
         ];
     });
 
@@ -443,7 +444,7 @@ Route::get('/kategori/fashion', function () {
 
     $products = collect(); // Inisialisasi sebagai collection kosong
     if ($category) {
-        $products = \App\Models\Product::with(['variants', 'seller', 'category'])
+        $products = \App\Models\Product::with(['variants', 'seller', 'category', 'subcategory'])
                      ->where('category_id', $category->id)
                      ->where('status', 'active')
                      ->get();
@@ -457,6 +458,7 @@ Route::get('/kategori/fashion', function () {
             'description' => $product->description,
             'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
             'image' => $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder.png'),
+            'subcategory' => $product->subcategory, // Subcategory is now a string value, not a relation
         ];
     });
 
@@ -482,7 +484,7 @@ Route::get('/kategori/kerajinan', function () {
 
     $products = collect(); // Inisialisasi sebagai collection kosong
     if ($category) {
-        $products = \App\Models\Product::with(['variants', 'seller', 'category'])
+        $products = \App\Models\Product::with(['variants', 'seller', 'category', 'subcategory'])
                      ->where('category_id', $category->id)
                      ->where('status', 'active')
                      ->get();
@@ -496,6 +498,7 @@ Route::get('/kategori/kerajinan', function () {
             'description' => $product->description,
             'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
             'image' => $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder.png'),
+            'subcategory' => $product->subcategory, // Subcategory is now a string value, not a relation
         ];
     });
 
@@ -521,7 +524,7 @@ Route::get('/kategori/berkebun', function () {
 
     $products = collect(); // Inisialisasi sebagai collection kosong
     if ($category) {
-        $products = \App\Models\Product::with(['variants', 'seller', 'category'])
+        $products = \App\Models\Product::with(['variants', 'seller', 'category', 'subcategory'])
                      ->where('category_id', $category->id)
                      ->where('status', 'active')
                      ->get();
@@ -535,6 +538,7 @@ Route::get('/kategori/berkebun', function () {
             'description' => $product->description,
             'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
             'image' => $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder.png'),
+            'subcategory' => $product->subcategory, // Subcategory is now a string value, not a relation
         ];
     });
 
@@ -560,7 +564,7 @@ Route::get('/kategori/kesehatan', function () {
 
     $products = collect(); // Inisialisasi sebagai collection kosong
     if ($category) {
-        $products = \App\Models\Product::with(['variants', 'seller', 'category'])
+        $products = \App\Models\Product::with(['variants', 'seller', 'category', 'subcategory'])
                      ->where('category_id', $category->id)
                      ->where('status', 'active')
                      ->get();
@@ -574,6 +578,7 @@ Route::get('/kategori/kesehatan', function () {
             'description' => $product->description,
             'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
             'image' => $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder.png'),
+            'subcategory' => $product->subcategory, // Subcategory is now a string value, not a relation
         ];
     });
 
@@ -599,7 +604,7 @@ Route::get('/kategori/mainan', function () {
 
     $products = collect(); // Inisialisasi sebagai collection kosong
     if ($category) {
-        $products = \App\Models\Product::with(['variants', 'seller', 'category'])
+        $products = \App\Models\Product::with(['variants', 'seller', 'category', 'subcategory'])
                      ->where('category_id', $category->id)
                      ->where('status', 'active')
                      ->get();
@@ -613,6 +618,7 @@ Route::get('/kategori/mainan', function () {
             'description' => $product->description,
             'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
             'image' => $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder.png'),
+            'subcategory' => $product->subcategory, // Subcategory is now a string value, not a relation
         ];
     });
 
@@ -638,7 +644,7 @@ Route::get('/kategori/hampers', function () {
 
     $products = collect(); // Inisialisasi sebagai collection kosong
     if ($category) {
-        $products = \App\Models\Product::with(['variants', 'seller', 'category'])
+        $products = \App\Models\Product::with(['variants', 'seller', 'category', 'subcategory'])
                      ->where('category_id', $category->id)
                      ->where('status', 'active')
                      ->get();
@@ -652,6 +658,7 @@ Route::get('/kategori/hampers', function () {
             'description' => $product->description,
             'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
             'image' => $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder.png'),
+            'subcategory' => $product->subcategory, // Subcategory is now a string value, not a relation
         ];
     });
 

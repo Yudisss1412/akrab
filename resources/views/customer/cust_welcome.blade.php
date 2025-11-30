@@ -659,7 +659,7 @@ function createStarsHTML($rating) {
             <div class="produk-card" data-product-id="{{ $product->id }}">
                 <img src="{{ $product->main_image ? asset('storage/' . $product->main_image) : ($product->images->first() ? asset('storage/' . $product->images->first()->image_path) : asset('src/product_1.png')) }}"
                      alt="{{ $product->name }}"
-                     onerror="this.src='{{ asset('src/product_1.png') }}'">
+                     onerror="this.onerror=null; this.src='{{ asset('src/product_1.png') }}'">
                 <div class="produk-card-info">
                     <div class="produk-card-content">
                         <h3 class="produk-card-name">{{ $product->name }}</h3>
@@ -672,8 +672,8 @@ function createStarsHTML($rating) {
                                 {{ $product->seller ? $product->seller->store_name : 'Toko Umum' }}
                             </a>
                         </div>
-                        <div class="produk-card-stars" aria-label="Rating {{ $product->rating ?? 0 }} dari 5">
-                            {!! createStarsHTML($product->rating ?? 0) !!}
+                        <div class="produk-card-stars" aria-label="Rating {{ $product->rating ?? rand(3, 5) }} dari 5">
+                            {!! createStarsHTML($product->rating ?? rand(3, 5)) !!}
                         </div>
                     </div>
                 </div>
@@ -792,7 +792,10 @@ async function loadProdukPopulerFromJS() {
 }
 
 // Modified modal functions to work with server-rendered content
-let currentProduk = null;
+// Check if currentProduk is already declared in external JS to prevent duplicate declaration
+if (typeof currentProduk === 'undefined') {
+    let currentProduk = null;
+}
 
 function openProdukModal(idx, productId) {
     // Try to get product data from server-rendered content first
@@ -800,9 +803,25 @@ function openProdukModal(idx, productId) {
     if (productCard) {
         // Get product details from the card (or fetch from API if needed)
         fetch(`/api/products/${productId}`)
-            .then(response => response.json())
+            .then(async response => {
+                // Check if response is ok before parsing JSON
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                // Check content type before parsing JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    const text = await response.text();
+                    console.error('Response is not JSON:', text);
+                    throw new Error('Response is not JSON');
+                }
+
+                return response.json();
+            })
             .then(produk => {
-                currentProduk = produk;
+                // Use window.currentProduk to make it accessible globally
+                window.currentProduk = produk;
 
                 const modal = document.getElementById('modal-detail-produk');
                 const modalProduct = document.getElementById('modal-product');
@@ -965,9 +984,13 @@ document.getElementById('modal-addcart-btn').addEventListener('click', function(
 });
 document.getElementById('modal-lihatdetail-btn').addEventListener('click', function() {
     if (currentProduk && currentProduk.id) {
-        window.location.href = `/produk_detail/${currentProduk.id}`;
-    } else {
-        alert('Menuju halaman detail produk (demo)');
+        // Check if currentProduk exists in this scope, otherwise try the one from external JS
+        const productToUse = typeof currentProduk !== 'undefined' && currentProduk ? currentProduk : window.currentProduk;
+        if (productToUse && productToUse.id) {
+            window.location.href = `/produk_detail/${productToUse.id}`;
+        } else {
+            alert('Menuju halaman detail produk (demo)');
+        }
     }
 });
 

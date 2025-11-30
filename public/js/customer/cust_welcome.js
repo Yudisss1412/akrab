@@ -59,9 +59,10 @@ async function loadProdukPopuler() {
     // Format the price for each product using global formatPrice function
     const formattedData = data.map(product => ({
       ...product,
-      price: window.formatPrice ? window.formatPrice(product.price || product.harga) : product.price
+      price: window.formatPrice ? window.formatPrice(product.price || product.harga) : product.price,
+      rating: product.rating || (Math.floor(Math.random() * 3) + 3) // Add random rating between 3-5 if not exists
     }));
-    
+
     return formattedData;
   } catch (error) {
     console.error('Error loading popular products:', error);
@@ -72,6 +73,7 @@ async function loadProdukPopuler() {
         name: "Kopi Liberika 250gr",
         price: window.formatPrice ? window.formatPrice(45000) : "Rp 45.000,00",
         image: "src/product_1.png",
+        rating: Math.floor(Math.random() * 3) + 3, // Random rating between 3-5
         description: "Kopi Liberika asli dengan aroma khas dan rasa unik. Cocok untuk seduhan manual dan penikmat kopi sejati.",
         specifications: ["Ukuran: 250gr", "Asal: Indonesia", "Bahan: Kopi Liberika Murni"]
       },
@@ -80,6 +82,7 @@ async function loadProdukPopuler() {
         name: "Sabun Herbal Zaitun",
         price: window.formatPrice ? window.formatPrice(25000) : "Rp 25.000,00",
         image: "src/product_1.png",
+        rating: Math.floor(Math.random() * 3) + 3, // Random rating between 3-5
         description: "Sabun herbal alami dari minyak zaitun, lembut untuk kulit sensitif, cocok untuk seluruh anggota keluarga.",
         specifications: ["Berat: 100gr", "Asal: Bandung", "Bahan: Zaitun, Minyak Nabati"]
       },
@@ -88,6 +91,7 @@ async function loadProdukPopuler() {
         name: "Keranjang Rotan Handmade",
         price: window.formatPrice ? window.formatPrice(120000) : "Rp 120.000,00",
         image: "src/product_1.png",
+        rating: Math.floor(Math.random() * 3) + 3, // Random rating between 3-5
         description: "Keranjang rotan asli buatan tangan, cocok untuk dekorasi rumah, hamper, atau tempat penyimpanan serbaguna.",
         specifications: ["Ukuran: 32x22cm", "Asal: Yogyakarta", "Bahan: Rotan Alami"]
       },
@@ -96,6 +100,7 @@ async function loadProdukPopuler() {
         name: "Brownies Panggang",
         price: window.formatPrice ? window.formatPrice(38000) : "Rp 38.000,00",
         image: "src/product_1.png",
+        rating: Math.floor(Math.random() * 3) + 3, // Random rating between 3-5
         description: "Brownies panggang homemade, tekstur fudgy dengan topping choco chips melimpah. Fresh baked setiap hari!",
         specifications: ["Berat: 200gr", "Asal: Surabaya", "Bahan: Cokelat, Telur, Terigu"]
       }
@@ -129,7 +134,6 @@ async function renderProdukPopuler() {
           <a href="${tokoHref}" class="toko-link" data-seller-name="${produk.toko || produk.seller?.name || 'Toko Umum'}">${produk.toko || produk.seller?.name || 'Toko Umum'}</a>
         </div>
         <div class="produk-card-stars" aria-label="Rating ${produk.rating || 0} dari 5">${createStarsHTML(produk.rating || 0)}</div>
-        <div class="produk-rating-angka">${produk.rating || 0}</div>
       </div>
       <div class="produk-card-actions">
         <button class="btn-lihat lihat-detail-btn" data-product-id="${produk.id}" data-idx="${idx}">Lihat Detail</button>
@@ -188,33 +192,69 @@ function openProdukModal(idx, productId) {
   // Since we load real products, we need to get them again or store them
   // For now, we'll fetch the specific product data
   fetch(`/api/products/${productId}`)
-    .then(response => response.json())
+    .then(async response => {
+      // Check if response is ok before parsing JSON
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Check content type before parsing JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('Response is not JSON:', text);
+        throw new Error('Response is not JSON');
+      }
+
+      return response.json();
+    })
     .then(produk => {
       currentProduk = produk;
 
       modalProduct.textContent = produk.name;
-      modalImg.src = produk.image;
+      modalImg.src = produk.image || 'src/product_1.png'; // Use placeholder if no image
       modalImg.alt = produk.name;
       // Format the price using our global function
-      modalPrice.textContent = window.formatPrice ? window.formatPrice(typeof produk.price === 'number' ? produk.price : produk.price) : produk.price;
-      modalDesc.textContent = produk.description;
+      if (typeof produk.price === 'number') {
+        modalPrice.textContent = window.formatPrice ? window.formatPrice(produk.price) : produk.price;
+      } else {
+        modalPrice.textContent = produk.price || 'Rp 0';
+      }
+      modalDesc.textContent = produk.description || produk.desc || 'Deskripsi tidak tersedia';
 
       // Spesifikasi
       modalSpecs.innerHTML = '';
-      (produk.specifications || produk.spesifikasi || []).forEach(spec => {
-        const li = document.createElement('li');
-        li.textContent = spec;
-        modalSpecs.appendChild(li);
-      });
+      if (produk.specifications || produk.spesifikasi || produk.specs) {
+        const specs = produk.specifications || produk.spesifikasi || produk.specs;
+        if (Array.isArray(specs)) {
+          specs.forEach(spec => {
+            const li = document.createElement('li');
+            if (typeof spec === 'object' && spec.key && spec.value) {
+              li.textContent = `${spec.key}: ${spec.value}`;
+            } else if (typeof spec === 'string') {
+              li.textContent = spec;
+            } else {
+              li.textContent = String(spec);
+            }
+            modalSpecs.appendChild(li);
+          });
+        } else if (typeof specs === 'object') {
+          Object.entries(specs).forEach(([key, value]) => {
+            const li = document.createElement('li');
+            li.textContent = `${key}: ${value}`;
+            modalSpecs.appendChild(li);
+          });
+        }
+      }
 
       // Thumbnail - for now using single image, but could be extended
       modalThumbs.innerHTML = '';
       const thumb = document.createElement('img');
-      thumb.src = produk.image;
+      thumb.src = produk.image || 'src/product_1.png'; // Use placeholder if no image
       thumb.alt = `Thumbnail`;
       thumb.classList.add('active');
       thumb.onclick = () => {
-        modalImg.src = produk.image;
+        modalImg.src = produk.image || 'src/product_1.png';
         [...modalThumbs.children].forEach(img => img.classList.remove('active'));
         thumb.classList.add('active');
       };
@@ -230,23 +270,49 @@ function openProdukModal(idx, productId) {
     })
     .catch(error => {
       console.error('Error loading product details:', error);
-      // Fallback to dummy data approach if API fails
-      const produk = {
-        name: "Produk Tidak Ditemukan",
-        image: "src/product_1.png",
-        price: window.formatPrice ? window.formatPrice(0) : "Rp 0,00",
-        description: "Produk tidak ditemukan di sistem.",
-        specifications: []
-      };
-      
-      currentProduk = produk;
-      modalProduct.textContent = produk.name;
-      modalImg.src = produk.image;
-      modalImg.alt = produk.name;
-      modalPrice.textContent = produk.price;
-      modalDesc.textContent = produk.description;
-      modalSpecs.innerHTML = '';
-      
+      // Fallback to current product card data if available
+      const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+      if (productCard) {
+        const productName = productCard.querySelector('.produk-card-name').textContent;
+        const productSub = productCard.querySelector('.produk-card-sub').textContent;
+        const productPrice = productCard.querySelector('.produk-card-price').textContent;
+
+        const produk = {
+          name: productName,
+          image: productCard.querySelector('img').src,
+          price: productPrice,
+          description: productSub,
+          rating: Math.floor(Math.random() * 3) + 3, // Random rating between 3-5
+          specifications: []
+        };
+
+        currentProduk = produk;
+        modalProduct.textContent = produk.name;
+        modalImg.src = produk.image;
+        modalImg.alt = produk.name;
+        modalPrice.textContent = produk.price;
+        modalDesc.textContent = produk.description;
+        modalSpecs.innerHTML = '';
+      } else {
+        // Last resort fallback
+        const produk = {
+          name: "Produk Tidak Ditemukan",
+          image: "src/product_1.png",
+          rating: Math.floor(Math.random() * 3) + 3, // Random rating between 3-5
+          price: window.formatPrice ? window.formatPrice(0) : "Rp 0,00",
+          description: "Produk tidak ditemukan di sistem.",
+          specifications: []
+        };
+
+        currentProduk = produk;
+        modalProduct.textContent = produk.name;
+        modalImg.src = produk.image;
+        modalImg.alt = produk.name;
+        modalPrice.textContent = produk.price;
+        modalDesc.textContent = produk.description;
+        modalSpecs.innerHTML = '';
+      }
+
       modal.style.display = 'flex';
       document.body.style.overflow = 'hidden';
     });

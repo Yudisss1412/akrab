@@ -396,9 +396,8 @@
 
             <!-- Sub-kategori Filter -->
             <div class="filter-section">
-              <div class="filter-header" onclick="toggleFilterSection('subkategori')">
+              <div class="filter-header">
                 <h3>Sub-kategori</h3>
-                <span class="filter-toggle">+</span>
               </div>
               <div class="filter-content" id="subkategori-content">
                 <div class="filter-checkbox-group">
@@ -432,9 +431,8 @@
 
             <!-- Rentang Harga Filter -->
             <div class="filter-section">
-              <div class="filter-header" onclick="toggleFilterSection('harga')">
+              <div class="filter-header">
                 <h3>Rentang Harga</h3>
-                <span class="filter-toggle">+</span>
               </div>
               <div class="filter-content" id="harga-content">
                 <div class="price-range-inputs">
@@ -452,9 +450,8 @@
 
             <!-- Rating Produk Filter -->
             <div class="filter-section">
-              <div class="filter-header" onclick="toggleFilterSection('rating')">
+              <div class="filter-header">
                 <h3>Rating Produk</h3>
-                <span class="filter-toggle">+</span>
               </div>
               <div class="filter-content" id="rating-content">
                 <div class="filter-checkbox-group">
@@ -476,9 +473,8 @@
 
             <!-- Lokasi Toko Filter -->
             <div class="filter-section">
-              <div class="filter-header" onclick="toggleFilterSection('lokasi')">
+              <div class="filter-header">
                 <h3>Lokasi Toko</h3>
-                <span class="filter-toggle">+</span>
               </div>
               <div class="filter-content" id="lokasi-content">
                 <div class="filter-checkbox-group">
@@ -506,9 +502,8 @@
 
             <!-- Sort Filter -->
             <div class="filter-section">
-              <div class="filter-header" onclick="toggleFilterSection('sort')">
+              <div class="filter-header">
                 <h3>Urutkan</h3>
-                <span class="filter-toggle">+</span>
               </div>
               <div class="filter-content" id="sort-content">
                 <select id="sort-by" class="form-control">
@@ -565,30 +560,13 @@
 
 @push('scripts')
   <script>
-    // Toggle filter sections
-    function toggleFilterSection(sectionId) {
-      const content = document.getElementById(sectionId + '-content');
-      const toggle = content.previousElementSibling.querySelector('.filter-toggle');
-
-      if (content.style.display === 'block') {
-        content.style.display = 'none';
-        toggle.textContent = '+';
-      } else {
-        content.style.display = 'block';
-        toggle.textContent = '-';
-      }
+    // Function to get asset URL
+    function asset(path) {
+      return '{{ asset("") }}' + path;
     }
 
-    // Initialize filter sections - all closed by default
+    // Initialize when DOM is loaded
     document.addEventListener('DOMContentLoaded', function() {
-      const filterContents = document.querySelectorAll('.filter-content');
-      filterContents.forEach(content => {
-        content.style.display = 'none';
-      });
-    });
-
-      // View product modal functionality is handled by event delegation in the added script
-
       // Apply filter button functionality
       document.getElementById('apply-filter').addEventListener('click', function() {
         // Get selected filters
@@ -608,6 +586,16 @@
         const lokasiCheckboxes = document.querySelectorAll('input[name="lokasi[]"]:checked');
         const selectedLocations = Array.from(lokasiCheckboxes).map(cb => cb.value);
 
+        // Check if at least one filter is selected
+        const hasFilter = minPrice || maxPrice || selectedSubkategori.length > 0 ||
+                         selectedRatings.length > 0 || selectedLocations.length > 0 ||
+                         (sortBy && sortBy !== 'popular');
+
+        if (!hasFilter) {
+          showNotification('Pilih minimal satu filter sebelum menekan Terapkan Filter', 'warning');
+          return;
+        }
+
         console.log('Filters applied:', {
           minPrice,
           maxPrice,
@@ -622,7 +610,7 @@
 
         if (minPrice) params.append('min_price', minPrice);
         if (maxPrice) params.append('max_price', maxPrice);
-        if (sortBy) params.append('sort', sortBy);
+        if (sortBy && sortBy !== 'popular') params.append('sort', sortBy);
         if (selectedSubkategori.length > 0) {
           selectedSubkategori.forEach(sub => params.append('subkategori[]', sub));
         }
@@ -642,18 +630,52 @@
           const categoryMatch = currentPath.split('/kategori/')[1];
           if (categoryMatch) {
             params.append('kategori', categoryMatch);
-            apiUrl = `/api/products/filter`;
+            apiUrl = '/api/products/filter';
           }
         }
 
         // Add other filters that might be relevant
         // Apply the filter by making an API call and updating the product list
         applyProductFilters(apiUrl, params);
+
+        // Reset to page 1 after applying filters
+        updateActivePage(1);
+        currentPage = 1;
       });
+
+      // Reset filter button functionality
+      document.getElementById('reset-filter').addEventListener('click', function() {
+        // Reset all filter inputs
+        document.getElementById('min-price').value = '';
+        document.getElementById('max-price').value = '';
+        document.getElementById('sort-by').value = 'popular';
+
+        // Uncheck all checkboxes
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+          checkbox.checked = false;
+        });
+
+        // Reset mobile sort
+        document.getElementById('sort-by-mobile').value = 'popular';
+
+        console.log('Filters reset');
+
+        // Reload original products (without any filters)
+        resetProductFilters();
+      });
+
+      // Mobile sort functionality
+      document.getElementById('sort-by-mobile').addEventListener('change', function() {
+        document.getElementById('sort-by').value = this.value;
+        // Trigger the apply filter function or update products
+        console.log('Sort changed to:', this.value);
+      });
+    });
 
       // Function to apply product filters via API
       function applyProductFilters(apiUrl, params) {
-        fetch(`${apiUrl}?${params.toString()}`, {
+        fetch(apiUrl + '?' + params.toString(), {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -674,30 +696,69 @@
                   const productCard = document.createElement('div');
                   productCard.className = 'product-card';
                   productCard.setAttribute('data-product-id', product.id);
-                  productCard.innerHTML = `
-                    <img src="${product.image}" alt="${product.name}" class="product-image">
-                    <div class="product-info">
-                      <h3 class="product-name">${product.name}</h3>
-                      <p class="product-description">${product.description}</p>
-                      <div class="product-price">${product.price}</div>
-                      <button class="btn btn-primary view-product" data-product-id="${product.id}">Pratinjau</button>
-                    </div>
-                  `;
+
+                  // Create elements individually to avoid issues with special characters
+                  const img = document.createElement('img');
+                  img.src = product.image || asset('src/placeholder_produk.png');
+                  img.alt = product.name || 'Produk';
+                  img.className = 'product-image';
+                  // Handle image load error
+                  img.onerror = function() {
+                    this.onerror = null; // Prevent infinite loop
+                    this.src = asset('src/placeholder_produk.png'); // Fallback to default placeholder
+                  };
+
+                  const infoDiv = document.createElement('div');
+                  infoDiv.className = 'product-info';
+
+                  const nameH3 = document.createElement('h3');
+                  nameH3.className = 'product-name';
+                  // Basic sanitization for product name to prevent syntax errors
+                  const sanitizedName = (product.name || 'Nama Produk').toString().replace(/[&<>"']/g, '');
+                  nameH3.textContent = sanitizedName.substring(0, 200);
+
+                  const descP = document.createElement('p');
+                  descP.className = 'product-description';
+                  // Basic sanitization for product description to prevent syntax errors
+                  const sanitizedDesc = (product.description || 'Deskripsi produk').toString().replace(/[&<>"']/g, '');
+                  descP.textContent = sanitizedDesc.substring(0, 500);
+
+                  const priceDiv = document.createElement('div');
+                  priceDiv.className = 'product-price';
+                  // Basic sanitization for price to prevent syntax errors
+                  const sanitizedPrice = (product.price || 'Rp 0').toString().replace(/[&<>"']/g, '');
+                  priceDiv.textContent = sanitizedPrice.substring(0, 50);
+
+                  const button = document.createElement('button');
+                  button.className = 'btn btn-primary view-product';
+                  button.setAttribute('data-product-id', product.id);
+                  button.textContent = 'Pratinjau';
+
+                  // Append elements in order
+                  infoDiv.appendChild(nameH3);
+                  infoDiv.appendChild(descP);
+                  infoDiv.appendChild(priceDiv);
+                  infoDiv.appendChild(button);
+                  productCard.appendChild(img);
+                  productCard.appendChild(infoDiv);
+
                   productsContainer.appendChild(productCard);
                 });
 
                 // Update product count
                 const productCount = document.getElementById('product-count');
                 if (productCount) {
-                  productCount.textContent = `Menampilkan ${data.products.length} dari ${data.total} produk`;
+                  productCount.textContent = 'Menampilkan ' + data.products.length + ' dari ' + data.total + ' produk';
                 }
               } else {
                 // Show no results message
-                productsContainer.innerHTML = `
-                  <div class="no-products-message">
-                    <p>Maaf, tidak ada produk yang sesuai dengan filter Anda.</p>
-                  </div>
-                `;
+                productsContainer.innerHTML = '';
+                const noProductsDiv = document.createElement('div');
+                noProductsDiv.className = 'no-products-message';
+                const noProductsP = document.createElement('p');
+                noProductsP.textContent = 'Maaf, tidak ada produk yang sesuai dengan filter Anda.';
+                noProductsDiv.appendChild(noProductsP);
+                productsContainer.appendChild(noProductsDiv);
               }
             }
           } else {
@@ -735,6 +796,20 @@
 
       // Function to reset and reload original products
       function resetProductFilters() {
+        // Reset all filter inputs first
+        document.getElementById('min-price').value = '';
+        document.getElementById('max-price').value = '';
+        document.getElementById('sort-by').value = 'popular';
+
+        // Uncheck all checkboxes
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+          checkbox.checked = false;
+        });
+
+        // Reset mobile sort
+        document.getElementById('sort-by-mobile').value = 'popular';
+
         // Get the current category from the URL to reload original products
         const currentPath = window.location.pathname;
         let apiUrl = '/api/products/filter'; // Default API endpoint
@@ -745,12 +820,16 @@
           const categoryMatch = currentPath.split('/kategori/')[1];
           if (categoryMatch) {
             params.append('kategori', categoryMatch);
-            apiUrl = `/api/products/filter`;
+            apiUrl = '/api/products/filter';
           }
         }
 
         // Call API to get original products without filters
         applyProductFilters(apiUrl, params);
+
+        // Reset to page 1 after resetting filters
+        updateActivePage(1);
+        currentPage = 1;
         showNotification('Filter berhasil direset', 'success');
       }
 
@@ -770,42 +849,149 @@
       let currentPage = 1;
       const totalPages = 5;
 
-      // Sample products data for different pages
+      // Sample products data for different pages (now unused due to direct API calls)
       const productsData = {
-        1: @yield('page-1-products'),
-        2: @yield('page-2-products'),
-        3: @yield('page-3-products'),
-        4: @yield('page-4-products'),
-        5: @yield('page-5-products')
+        1: [],
+        2: [],
+        3: [],
+        4: [],
+        5: []
       };
 
       // Function to render products for a specific page
       function renderProducts(page) {
-        const productsContainer = document.getElementById('products-container');
-        const products = productsData[page] || productsData[1];
+        // Reload products with current filters applied
+        const params = new URLSearchParams();
+        params.append('page', page);
 
-        // Clear current products
-        productsContainer.innerHTML = '';
+        const currentPath = window.location.pathname;
+        let apiUrl = '/api/products/filter';
 
-        // Add products for this page
-        products.forEach(product => {
-          const productCard = document.createElement('div');
-          productCard.className = 'product-card';
-          // Add data-product-id attribute to the product card to make the modal work
-          productCard.setAttribute('data-product-id', product.id || 1);
-          productCard.innerHTML = `
-            <img src="\${product.image}" alt="Produk" class="product-image">
-            <div class="product-info">
-              <h3 class="product-name">\${product.name}</h3>
-              <p class="product-description">\${product.description}</p>
-              <div class="product-price">\${product.price}</div>
-              <button class="btn btn-primary view-product" data-product-id="\${product.id || 1}">Pratinjau</button>
-            </div>
-          `;
-          productsContainer.appendChild(productCard);
+        if (currentPath.includes('/kategori/')) {
+          const categoryMatch = currentPath.split('/kategori/')[1];
+          if (categoryMatch) {
+            params.append('kategori', categoryMatch);
+          }
+        }
+
+        // Apply filters if any - check if filters are active
+        const minPrice = document.getElementById('min-price').value;
+        const maxPrice = document.getElementById('max-price').value;
+        const sortBy = document.getElementById('sort-by').value;
+
+        if (minPrice) params.append('min_price', minPrice);
+        if (maxPrice) params.append('max_price', maxPrice);
+        if (sortBy && sortBy !== 'popular') params.append('sort', sortBy);
+
+        // Get selected subcategories
+        const subkategoriCheckboxes = document.querySelectorAll('input[name="subkategori[]"]:checked');
+        const selectedSubkategori = Array.from(subkategoriCheckboxes).map(cb => cb.value);
+        selectedSubkategori.forEach(sub => params.append('subkategori[]', sub));
+
+        // Get selected ratings
+        const ratingCheckboxes = document.querySelectorAll('input[name="rating[]"]:checked');
+        const selectedRatings = Array.from(ratingCheckboxes).map(cb => cb.value);
+        selectedRatings.forEach(rating => params.append('rating[]', rating));
+
+        // Get selected locations
+        const lokasiCheckboxes = document.querySelectorAll('input[name="lokasi[]"]:checked');
+        const selectedLocations = Array.from(lokasiCheckboxes).map(cb => cb.value);
+        selectedLocations.forEach(location => params.append('lokasi[]', location));
+
+        fetch(apiUrl + '?' + params.toString(), {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            const productsContainer = document.getElementById('products-container');
+            if (productsContainer) {
+              productsContainer.innerHTML = '';
+
+              if (data.products && data.products.length > 0) {
+                // Display products from API response
+                data.products.forEach(product => {
+                  const productCard = document.createElement('div');
+                  productCard.className = 'product-card';
+                  // Add data-product-id attribute to the product card to make the modal work
+                  productCard.setAttribute('data-product-id', product.id || 1);
+
+                  // Create elements individually to avoid issues with special characters
+                  const img = document.createElement('img');
+                  img.src = product.image || asset('src/placeholder_produk.png');
+                  img.alt = product.name || 'Produk';
+                  img.className = 'product-image';
+                  // Handle image load error
+                  img.onerror = function() {
+                    this.onerror = null; // Prevent infinite loop
+                    this.src = asset('src/placeholder_produk.png'); // Fallback to default placeholder
+                  };
+
+                  const infoDiv = document.createElement('div');
+                  infoDiv.className = 'product-info';
+
+                  const nameH3 = document.createElement('h3');
+                  nameH3.className = 'product-name';
+                  // Basic sanitization for product name to prevent syntax errors
+                  const sanitizedName = (product.name || 'Nama Produk').toString().replace(/[&<>"']/g, '');
+                  nameH3.textContent = sanitizedName.substring(0, 200);
+
+                  const descP = document.createElement('p');
+                  descP.className = 'product-description';
+                  // Basic sanitization for product description to prevent syntax errors
+                  const sanitizedDesc = (product.description || 'Deskripsi produk').toString().replace(/[&<>"']/g, '');
+                  descP.textContent = sanitizedDesc.substring(0, 500);
+
+                  const priceDiv = document.createElement('div');
+                  priceDiv.className = 'product-price';
+                  // Basic sanitization for price to prevent syntax errors
+                  const sanitizedPrice = (product.price || 'Rp 0').toString().replace(/[&<>"']/g, '');
+                  priceDiv.textContent = sanitizedPrice.substring(0, 50);
+
+                  const button = document.createElement('button');
+                  button.className = 'btn btn-primary view-product';
+                  button.setAttribute('data-product-id', product.id || 1);
+                  button.textContent = 'Pratinjau';
+
+                  // Append elements in order
+                  infoDiv.appendChild(nameH3);
+                  infoDiv.appendChild(descP);
+                  infoDiv.appendChild(priceDiv);
+                  infoDiv.appendChild(button);
+                  productCard.appendChild(img);
+                  productCard.appendChild(infoDiv);
+
+                  productsContainer.appendChild(productCard);
+                });
+
+                // Update product count
+                const productCount = document.getElementById('product-count');
+                if (productCount) {
+                  productCount.textContent = 'Menampilkan ' + data.products.length + ' dari ' + data.total + ' produk';
+                }
+              } else {
+                // Show no results message
+                productsContainer.innerHTML = '';
+                const noProductsDiv = document.createElement('div');
+                noProductsDiv.className = 'no-products-message';
+                const noProductsP = document.createElement('p');
+                noProductsP.textContent = 'Maaf, tidak ada produk yang sesuai dengan filter Anda.';
+                noProductsDiv.appendChild(noProductsP);
+                productsContainer.appendChild(noProductsDiv);
+              }
+            }
+          } else {
+            console.error('Error loading products for page:', data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error loading products for page:', error);
+          showNotification('Terjadi kesalahan saat memuat produk', 'error');
         });
-
-        // Event listener is handled by event delegation, no need to attach here
       }
 
       // Update active page button
@@ -816,7 +1002,7 @@
         });
 
         // Add active class to current page button
-        const currentPageButton = document.querySelector(\`.page-btn[data-page="\${newPage}"]\`);
+        const currentPageButton = document.querySelector('.page-btn[data-page="' + newPage + '"]');
         if (currentPageButton) {
           currentPageButton.classList.add('active');
         }
@@ -876,50 +1062,44 @@
           const overlay = document.createElement('div');
           overlay.id = 'product-detail-modal';
           overlay.className = 'modal-overlay';
-          overlay.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-          `;
+          overlay.style.position = 'fixed';
+          overlay.style.top = '0';
+          overlay.style.left = '0';
+          overlay.style.width = '100%';
+          overlay.style.height = '100%';
+          overlay.style.background = 'rgba(0,0,0,0.7)';
+          overlay.style.display = 'flex';
+          overlay.style.justifyContent = 'center';
+          overlay.style.alignItems = 'center';
+          overlay.style.zIndex = '10000';
+          overlay.style.opacity = '0';
+          overlay.style.transition = 'opacity 0.3s ease';
 
           // Create modal container
           const container = document.createElement('div');
           container.className = 'modal-container';
-          container.style.cssText = `
-            background: #fff;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-            opacity: 0;
-            transform: scale(0.8);
-            transition: all 0.3s ease;
-          `;
+          container.style.background = '#fff';
+          container.style.borderRadius = '8px';
+          container.style.width = '90%';
+          container.style.maxWidth = '600px';
+          container.style.maxHeight = '90vh';
+          container.style.overflowY = 'auto';
+          container.style.position = 'relative';
+          container.style.opacity = '0';
+          container.style.transform = 'scale(0.8)';
+          container.style.transition = 'all 0.3s ease';
 
           // Create close button
           const closeBtn = document.createElement('button');
           closeBtn.innerHTML = '&times;';
-          closeBtn.style.cssText = `
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            z-index: 10;
-          `;
+          closeBtn.style.position = 'absolute';
+          closeBtn.style.top = '10px';
+          closeBtn.style.right = '15px';
+          closeBtn.style.background = 'none';
+          closeBtn.style.border = 'none';
+          closeBtn.style.fontSize = '24px';
+          closeBtn.style.cursor = 'pointer';
+          closeBtn.style.zIndex = '10';
           closeBtn.onclick = () => hideModal();
 
           // Create modal content
@@ -927,19 +1107,53 @@
           content.className = 'modal-content';
           content.style.padding = '20px';
 
-          // Create modal structure
-          content.innerHTML = `
-            <div class="modal-product-image" style="text-align: center; margin-bottom: 15px;">
-              <img id="modal-product-image" src="" alt="" style="max-width: 100%; max-height: 300px; border-radius: 4px;">
-            </div>
-            <h3 id="modal-product-name" style="margin: 10px 0;"></h3>
-            <div id="modal-product-price" style="font-size: 1.5em; color: #e74c3c; font-weight: bold; margin: 10px 0;"></div>
-            <p id="modal-product-description" style="color: #555; margin: 15px 0; line-height: 1.5;"></p>
-            <div class="modal-actions" style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
-              <button id="modal-view-detail-btn" class="btn btn-primary" style="padding: 8px 16px; border-radius: 4px;">Lihat Detail</button>
-              <button id="modal-add-cart-btn" class="btn btn-outline" style="padding: 8px 16px; border-radius: 4px;">Tambah ke Keranjang</button>
-            </div>
-          `;
+          // Create modal structure using DOM methods to avoid issues with special characters
+          const modalImageDiv = document.createElement('div');
+          modalImageDiv.className = 'modal-product-image';
+          modalImageDiv.style.cssText = 'text-align: center; margin-bottom: 15px;';
+
+          const modalImage = document.createElement('img');
+          modalImage.id = 'modal-product-image';
+          modalImage.alt = '';
+          modalImage.style.cssText = 'max-width: 100%; max-height: 300px; border-radius: 4px;';
+          modalImageDiv.appendChild(modalImage);
+
+          const modalName = document.createElement('h3');
+          modalName.id = 'modal-product-name';
+          modalName.style.cssText = 'margin: 10px 0;';
+
+          const modalPrice = document.createElement('div');
+          modalPrice.id = 'modal-product-price';
+          modalPrice.style.cssText = 'font-size: 1.5em; color: #e74c3c; font-weight: bold; margin: 10px 0;';
+
+          const modalDescription = document.createElement('p');
+          modalDescription.id = 'modal-product-description';
+          modalDescription.style.cssText = 'color: #555; margin: 15px 0; line-height: 1.5;';
+
+          const modalActions = document.createElement('div');
+          modalActions.className = 'modal-actions';
+          modalActions.style.cssText = 'display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;';
+
+          const viewDetailBtn = document.createElement('button');
+          viewDetailBtn.id = 'modal-view-detail-btn';
+          viewDetailBtn.className = 'btn btn-primary';
+          viewDetailBtn.style.cssText = 'padding: 8px 16px; border-radius: 4px;';
+          viewDetailBtn.textContent = 'Lihat Detail';
+
+          const addCartBtn = document.createElement('button');
+          addCartBtn.id = 'modal-add-cart-btn';
+          addCartBtn.className = 'btn btn-outline';
+          addCartBtn.style.cssText = 'padding: 8px 16px; border-radius: 4px;';
+          addCartBtn.textContent = 'Tambah ke Keranjang';
+
+          modalActions.appendChild(viewDetailBtn);
+          modalActions.appendChild(addCartBtn);
+
+          content.appendChild(modalImageDiv);
+          content.appendChild(modalName);
+          content.appendChild(modalPrice);
+          content.appendChild(modalDescription);
+          content.appendChild(modalActions);
 
           container.appendChild(closeBtn);
           container.appendChild(content);
@@ -1085,11 +1299,16 @@
           // Use product data from global variable
           currentProduk = product;
 
-          modalProduct.textContent = product.name;
+          // Sanitize product data for modal
+          const sanitizedName = (product.name || '').toString().replace(/[&<>"']/g, '');
+          const sanitizedPrice = (product.price || '').toString().replace(/[&<>"']/g, '');
+          const sanitizedDesc = (product.description || '').toString().replace(/[&<>"']/g, '');
+
+          modalProduct.textContent = sanitizedName.substring(0, 200);
           modalImg.src = product.image;
-          modalImg.alt = product.name;
-          modalPrice.textContent = product.price;
-          modalDesc.textContent = product.description;
+          modalImg.alt = sanitizedName.substring(0, 100);
+          modalPrice.textContent = sanitizedPrice.substring(0, 50);
+          modalDesc.textContent = sanitizedDesc.substring(0, 500);
 
           // Specifications
           modalSpecs.innerHTML = '';
@@ -1102,15 +1321,28 @@
                 const li = document.createElement('li');
                 if (typeof spec === 'object' && spec.key && spec.value) {
                   // If it's an object with key-value pairs
-                  li.innerHTML = `<strong>${spec.key}:</strong> ${spec.value}`;
+                  const strong = document.createElement('strong');
+                  // Sanitize key and value to prevent syntax errors
+                  const sanitizedKey = spec.key.toString().replace(/[&<>"']/g, '').substring(0, 100);
+                  const sanitizedValue = spec.value.toString().replace(/[&<>"']/g, '').substring(0, 200);
+                  strong.textContent = sanitizedKey + ':';
+                  li.appendChild(strong);
+                  li.appendChild(document.createTextNode(' ' + sanitizedValue));
                 } else if (typeof spec === 'string' && spec.includes(':')) {
                   // If it's a string with colon separator
                   const [key, ...valueParts] = spec.split(':');
                   const value = valueParts.join(':');
-                  li.innerHTML = `<strong>${key.trim()}:</strong> ${value.trim()}`;
+                  const strong = document.createElement('strong');
+                  // Sanitize key and value to prevent syntax errors
+                  const sanitizedKey = key.trim().replace(/[&<>"']/g, '').substring(0, 100);
+                  const sanitizedValue = value.trim().replace(/[&<>"']/g, '').substring(0, 200);
+                  strong.textContent = sanitizedKey + ':';
+                  li.appendChild(strong);
+                  li.appendChild(document.createTextNode(' ' + sanitizedValue));
                 } else {
                   // Just the spec as text
-                  li.textContent = spec;
+                  const sanitizedSpec = spec.toString().replace(/[&<>"']/g, '').substring(0, 200);
+                  li.textContent = sanitizedSpec;
                 }
                 modalSpecs.appendChild(li);
               });
@@ -1118,14 +1350,21 @@
               // Handle object format: { key: value }
               Object.entries(specs).forEach(([key, value]) => {
                 const li = document.createElement('li');
-                li.innerHTML = `<strong>${key}:</strong> ${value}`;
+                const strong = document.createElement('strong');
+                // Sanitize key and value to prevent syntax errors
+                const sanitizedKey = key.toString().replace(/[&<>"']/g, '').substring(0, 100);
+                const sanitizedValue = value.toString().replace(/[&<>"']/g, '').substring(0, 200);
+                strong.textContent = sanitizedKey + ':';
+                li.appendChild(strong);
+                li.appendChild(document.createTextNode(' ' + sanitizedValue));
                 modalSpecs.appendChild(li);
               });
             }
           } else {
             // Add default specifications if none provided
             const li = document.createElement('li');
-            li.textContent = product.description || 'Spesifikasi tidak tersedia';
+            const defaultSpecDesc = (product.description || 'Spesifikasi tidak tersedia').toString().replace(/[&<>"']/g, '');
+            li.textContent = defaultSpecDesc.substring(0, 200);
             modalSpecs.appendChild(li);
           }
 
@@ -1133,7 +1372,8 @@
           modalThumbs.innerHTML = '';
           const thumb = document.createElement('img');
           thumb.src = product.image;
-          thumb.alt = product.name || `Thumbnail`;
+          const thumbAlt = (product.name || 'Thumbnail').toString().replace(/[&<>"']/g, '');
+          thumb.alt = thumbAlt.substring(0, 100);
           thumb.classList.add('active');
           thumb.onclick = () => {
             modalImg.src = product.image;
@@ -1154,22 +1394,28 @@
       }
 
       // If product not found in global data, fetch from API as fallback
-      fetch(`/api/products/${productId}`)
+      fetch('/api/products/' + productId)
         .then(response => response.json())
         .then(produk => {
           currentProduk = produk;
 
-          modalProduct.textContent = produk.name;
+          // Sanitize product data from API for modal
+          const apiProductName = (produk.name || '').toString().replace(/[&<>"']/g, '');
+          const apiProductPrice = (produk.price || '').toString().replace(/[&<>"']/g, '');
+          const apiProductDesc = (produk.description || '').toString().replace(/[&<>"']/g, '');
+
+          modalProduct.textContent = apiProductName.substring(0, 200);
           modalImg.src = produk.image;
-          modalImg.alt = produk.name;
-          modalPrice.textContent = produk.price;
-          modalDesc.textContent = produk.description;
+          modalImg.alt = apiProductName.substring(0, 100);
+          modalPrice.textContent = apiProductPrice.substring(0, 50);
+          modalDesc.textContent = apiProductDesc.substring(0, 500);
 
           // Specifications
           modalSpecs.innerHTML = '';
           (produk.specifications || produk.spesifikasi || []).forEach(spec => {
+            const sanitizedSpec = spec.toString().replace(/[&<>"']/g, '');
             const li = document.createElement('li');
-            li.textContent = spec;
+            li.textContent = sanitizedSpec.substring(0, 200);
             modalSpecs.appendChild(li);
           });
 
@@ -1177,7 +1423,8 @@
           modalThumbs.innerHTML = '';
           const thumb = document.createElement('img');
           thumb.src = produk.image;
-          thumb.alt = `Thumbnail`;
+          const thumbAlt = (produk.name || 'Thumbnail').toString().replace(/[&<>"']/g, '');
+          thumb.alt = thumbAlt.substring(0, 100);
           thumb.classList.add('active');
           thumb.onclick = () => {
             modalImg.src = produk.image;
@@ -1198,7 +1445,7 @@
           console.error('Error loading product details:', error);
 
           // Attempt to find product data in the visible DOM as fallback
-          const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+          const productCard = document.querySelector('[data-product-id="' + productId + '"]');
           if (productCard) {
             const productName = productCard.querySelector('.product-name')?.textContent;
             const productImage = productCard.querySelector('.product-image')?.src;
@@ -1206,22 +1453,29 @@
             const productPrice = productCard.querySelector('.product-price')?.textContent;
 
             if (productName && productImage && productPrice) {
+              // Sanitize the data from DOM as fallback
+              const fallbackName = productName.toString().replace(/[&<>"']/g, '');
+              const fallbackPrice = productPrice.toString().replace(/[&<>"']/g, '');
+              const fallbackDesc = (productDesc || 'Deskripsi produk tidak tersedia').toString().replace(/[&<>"']/g, '');
+
               // Use the data from the DOM
-              modalProduct.textContent = productName;
+              modalProduct.textContent = fallbackName.substring(0, 200);
               modalImg.src = productImage;
-              modalImg.alt = productName;
-              modalPrice.textContent = productPrice;
-              modalDesc.textContent = productDesc || 'Deskripsi produk tidak tersedia';
+              modalImg.alt = fallbackName.substring(0, 100);
+              modalPrice.textContent = fallbackPrice.substring(0, 50);
+              modalDesc.textContent = fallbackDesc.substring(0, 500);
 
               modalSpecs.innerHTML = '';
               const li = document.createElement('li');
-              li.textContent = productDesc || 'Spesifikasi tidak tersedia';
+              const fallbackSpec = (productDesc || 'Spesifikasi tidak tersedia').toString().replace(/[&<>"']/g, '');
+              li.textContent = fallbackSpec.substring(0, 200);
               modalSpecs.appendChild(li);
 
               modalThumbs.innerHTML = '';
               const thumb = document.createElement('img');
               thumb.src = productImage;
-              thumb.alt = `Thumbnail`;
+              const thumbAlt = fallbackName.substring(0, 100);
+              thumb.alt = thumbAlt;
               thumb.classList.add('active');
               thumb.onclick = () => {
                 modalImg.src = productImage;
@@ -1244,18 +1498,22 @@
           // Final fallback to dummy data if product not found at all
           const produk = {
             name: "Produk Tidak Ditemukan",
-            image: "{{ asset('src/product_1.png') }}",
+            image: asset('src/product_1.png'),
             price: "Rp 0",
             description: "Produk tidak ditemukan di sistem.",
             specifications: []
           };
 
           currentProduk = produk;
-          modalProduct.textContent = produk.name;
+          const dummyName = produk.name.toString().replace(/[&<>"']/g, '');
+          const dummyPrice = produk.price.toString().replace(/[&<>"']/g, '');
+          const dummyDesc = produk.description.toString().replace(/[&<>"']/g, '');
+
+          modalProduct.textContent = dummyName.substring(0, 200);
           modalImg.src = produk.image;
-          modalImg.alt = produk.name;
-          modalPrice.textContent = produk.price;
-          modalDesc.textContent = produk.description;
+          modalImg.alt = dummyName.substring(0, 100);
+          modalPrice.textContent = dummyPrice.substring(0, 50);
+          modalDesc.textContent = dummyDesc.substring(0, 500);
           modalSpecs.innerHTML = '';
 
           modal.style.display = 'flex';
@@ -1280,7 +1538,7 @@
     if (modalLihatDetail) {
       modalLihatDetail.onclick = () => {
         if (currentProduk && currentProduk.id) {
-          window.location.href = `/produk_detail/${currentProduk.id}`;
+          window.location.href = '/produk_detail/' + currentProduk.id;
         } else {
           alert('Menuju halaman detail produk (demo)');
         }
@@ -1330,10 +1588,15 @@
     }
 
     function showNotification(message, type = 'info') {
+      // Sanitize the message to prevent syntax errors
+      let sanitizedMessage = (message || '').toString().replace(/[&<>"']/g, '');
+      sanitizedMessage = sanitizedMessage.substring(0, 500); // Limit length
+
       // Buat elemen notifikasi
       const notification = document.createElement('div');
-      notification.className = `notification notification-${type}`;
-      notification.textContent = message;
+      const sanitizedType = (type || 'info').toString().replace(/[&<>"']/g, '').substring(0, 20);
+      notification.className = 'notification notification-' + sanitizedType;
+      notification.textContent = sanitizedMessage;
 
       // Gaya dasar untuk notifikasi
       Object.assign(notification.style, {

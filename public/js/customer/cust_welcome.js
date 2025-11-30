@@ -143,8 +143,35 @@ async function renderProdukPopuler() {
     grid.appendChild(card);
   });
 }
-// Load the products when the page is ready
-document.addEventListener('DOMContentLoaded', renderProdukPopuler);
+// Load the products when the page is ready - but only if no server-loaded products exist
+document.addEventListener('DOMContentLoaded', function() {
+    const produkCards = document.querySelectorAll('.produk-card');
+    if (produkCards.length === 0) {
+        // No products from server, load via JS
+        renderProdukPopuler();
+    } else {
+        // Products are already loaded from server, attach event listeners only
+        produkCards.forEach((card, idx) => {
+            const lihatDetailBtn = card.querySelector('.btn-lihat');
+            const addToCartBtn = card.querySelector('.btn-add');
+
+            if (lihatDetailBtn) {
+                lihatDetailBtn.addEventListener('click', function() {
+                    const productId = this.getAttribute('data-product-id');
+                    // Use the productId directly instead of idx
+                    openProdukModal(idx, productId);
+                });
+            }
+
+            if (addToCartBtn) {
+                addToCartBtn.addEventListener('click', function() {
+                    const productId = this.getAttribute('data-product-id');
+                    addToCart(productId);
+                });
+            }
+        });
+    }
+});
 
 // ----- Modal Handling -----
 const modal = document.getElementById('modal-detail-produk');

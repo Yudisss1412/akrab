@@ -17,19 +17,20 @@ class ProductController extends Controller
 
         
         // Bangun query produk awal
-        $query = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images']);
-        
+        $query = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images'])
+                       ->whereHas('seller'); // Hanya produk dengan seller yang valid
+
         // Tambahkan filter berdasarkan kategori jika ada
         $kategori = $request->query('kategori');
         if ($kategori && $kategori !== 'all') {
             // Jika kategori yang diminta adalah nama alternatif, gunakan nama sebenarnya
             $actualCategory = $kategori;
-            
+
             $query->whereHas('category', function($query) use ($actualCategory) {
                 $query->where('name', $actualCategory);
             });
         }
-        
+
         // Ambil produk berdasarkan query yang telah difilter
         $products = $query->get();
         
@@ -86,6 +87,17 @@ class ProductController extends Controller
         // Format data produk menggunakan metode konsisten
         $produk = $this->formatSingleProduct($product);
 
+        // Cek apakah produk ada dalam wishlist pengguna
+        if (auth()->check()) {
+            $userId = auth()->user()->id;
+            $isInWishlist = \App\Models\Wishlist::where('user_id', $userId)
+                                                ->where('product_id', $product->id)
+                                                ->exists();
+            $produk['di_wishlist'] = $isInWishlist;
+        } else {
+            $produk['di_wishlist'] = false;
+        }
+
         return view('customer.produk.produk_detail', compact('produk'));
     }
 
@@ -98,26 +110,26 @@ class ProductController extends Controller
         $specs = [];
         if ($product->specifications) {
             foreach ($product->specifications as $key => $value) {
-                $specs[] = "$key: $value";
+                $specs[] = ['nama' => $key, 'nilai' => $value];
             }
         }
 
         // Tambahkan informasi kategori dan spesifikasi dasar jika tidak ada spesifikasi khusus
         if (empty($specs)) {
             $specs = [
-                'Kategori: ' . ($product->category ? $product->category->name : 'Umum'),
-                'Stok: ' . $product->stock,
-                'Berat: ' . $product->weight . 'g',
-                'Status: ' . ucfirst($product->status)
+                ['nama' => 'Kategori', 'nilai' => ($product->category && is_object($product->category) ? $product->category->name : 'Umum')],
+                ['nama' => 'Stok', 'nilai' => $product->stock],
+                ['nama' => 'Berat', 'nilai' => $product->weight . 'g'],
+                ['nama' => 'Status', 'nilai' => ucfirst($product->status)]
             ];
 
             // Tambahkan informasi tambahan jika tersedia
-            if ($product->material) $specs[] = 'Bahan: ' . $product->material;
-            if ($product->size) $specs[] = 'Ukuran: ' . $product->size;
-            if ($product->color) $specs[] = 'Warna: ' . $product->color;
-            if ($product->brand) $specs[] = 'Merek: ' . $product->brand;
-            if ($product->origin) $specs[] = 'Asal: ' . $product->origin;
-            if ($product->warranty) $specs[] = 'Garansi: ' . $product->warranty;
+            if ($product->material) $specs[] = ['nama' => 'Bahan', 'nilai' => $product->material];
+            if ($product->size) $specs[] = ['nama' => 'Ukuran', 'nilai' => $product->size];
+            if ($product->color) $specs[] = ['nama' => 'Warna', 'nilai' => $product->color];
+            if ($product->brand) $specs[] = ['nama' => 'Merek', 'nilai' => $product->brand];
+            if ($product->origin) $specs[] = ['nama' => 'Asal', 'nilai' => $product->origin];
+            if ($product->warranty) $specs[] = ['nama' => 'Garansi', 'nilai' => $product->warranty];
         }
 
         // Format fitur produk
@@ -131,19 +143,22 @@ class ProductController extends Controller
             'id' => $product->id,
             'nama' => $product->name,
             'name' => $product->name,
-            'kategori' => $product->category->name ?? 'Umum',
-            'category_name' => $product->category->name ?? 'Umum',
-            'subkategori' => $product->subcategory ? $product->subcategory->name : ($product->subcategory ?? 'Umum'),
-            'subcategory_name' => $product->subcategory ? $product->subcategory->name : ($product->subcategory ?? 'Umum'),
+            'kategori' => $product->category && is_object($product->category) ? $product->category->name : 'Umum',
+            'category_name' => $product->category && is_object($product->category) ? $product->category->name : 'Umum',
+            'subkategori' => $product->subcategory && is_object($product->subcategory) ? $product->subcategory->name : ($product->subcategory ?? 'Umum'),
+            'subcategory_name' => $product->subcategory && is_object($product->subcategory) ? $product->subcategory->name : ($product->subcategory ?? 'Umum'),
             'harga' => $product->price,
-            'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
+            'price' => $product->price, // Hanya angka untuk perhitungan, bukan teks dengan format
             'deskripsi' => $product->description,
             'description' => $product->description,
             'gambar_utama' => $mainImage ? asset('storage/' . $mainImage) : asset('src/placeholder.png'),
-            'image' => $mainImage ? asset('storage/' . $mainImage) : asset('src/placeholder.png'),
+            'gambar' => collect($product->all_images)->map(function($img) {
+                return asset('storage/' . $img);
+            })->toArray(), // Format gambar untuk view produk_detail
             'formatted_images' => collect($product->all_images)->map(function($img) {
                 return asset('storage/' . $img);
             })->toArray(), // Tambahkan semua gambar untuk keperluan galeri
+            'spesifikasi' => $specs, // Ubah nama key untuk konsistensi dengan view
             'specifications' => $specs,
             'features' => $features,
             'material' => $product->material,
@@ -157,7 +172,7 @@ class ProductController extends Controller
             'weight' => $product->weight,
             'status' => $product->status,
             'view_count' => $product->view_count,
-            'discount_price' => $product->discount_price ? 'Rp ' . number_format($product->discount_price, 0, ',', '.') : null,
+            'discount_price' => $product->discount_price ? $product->discount_price : null,
             'discount_start_date' => $product->discount_start_date,
             'discount_end_date' => $product->discount_end_date,
             'rating' => round($product->averageRating, 1),
@@ -165,16 +180,17 @@ class ProductController extends Controller
             'jumlah_ulasan' => $product->reviews_count,
             'review_count' => $product->reviews_count,
             'ulasan' => $product->approvedReviews->map(function($review) {
+                $userName = is_object($review->user) ? $review->user->name : ($review->user ?? 'User Tidak Tersedia');
                 return [
                     'id' => $review->id,
-                    'user' => $review->user->name,
+                    'user' => $userName,
                     'rating' => $review->rating,
                     'review_text' => $review->review_text,
                     'created_at' => $review->created_at->format('d M Y')
                 ];
             })->toArray(),
-            'toko' => $product->seller->store_name ?? 'Toko Umum',
-            'seller_name' => $product->seller->store_name ?? 'Toko Umum',
+            'toko' => $product->seller && is_object($product->seller) ? $product->seller->store_name : 'Toko Umum',
+            'seller_name' => $product->seller && is_object($product->seller) ? $product->seller->store_name : 'Toko Umum',
             'varian' => $product->variants->map(function($variant) {
                 return [
                     'id' => $variant->id,
@@ -184,7 +200,8 @@ class ProductController extends Controller
                     'additional_price' => $variant->additional_price,
                     'stok' => $variant->stock
                 ];
-            })->toArray()
+            })->toArray(),
+            'di_wishlist' => false // Nilai default, nanti di view akan dicek secara dinamis
         ];
 
         return $formattedProduct;
@@ -220,6 +237,7 @@ class ProductController extends Controller
     public function byCategory($category)
     {
         $query = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images'])
+                        ->whereHas('seller') // Hanya produk dengan seller yang valid
                         ->whereHas('category', function($query) use ($category) {
                             $query->where('name', $category);
                         });
@@ -319,7 +337,9 @@ class ProductController extends Controller
     public function popular()
     {
         // Ambil produk terbaru atau produk dengan penjualan terbanyak sebagai produk populer
+        // Pastikan produk memiliki seller yang valid
         $products = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images'])
+                        ->whereHas('seller') // Hanya produk dengan seller yang valid
                         ->orderBy('created_at', 'desc') // Urutkan berdasarkan tanggal terbaru
                         ->limit(10)
                         ->get();
@@ -341,7 +361,8 @@ class ProductController extends Controller
                     'Kategori: ' . ($product->category->name ?? 'Umum'),
                     'Stok: ' . $product->stock,
                     'Berat: ' . $product->weight . 'g'
-                ] // Spesifikasi sederhana
+                ], // Spesifikasi sederhana
+                'toko' => $product->seller->store_name ?? 'Toko Umum' // Tambahkan informasi toko
             ];
         });
 
@@ -354,7 +375,9 @@ class ProductController extends Controller
     public function getAllProducts(Request $request)
     {
         // Ambil semua produk tanpa filter status untuk memastikan produk baru muncul
-        $query = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images']);
+        // Pastikan produk memiliki seller yang valid
+        $query = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images'])
+                       ->whereHas('seller'); // Hanya produk dengan seller yang valid
 
         // Tambahkan filter berdasarkan kategori jika ada
         $kategori = $request->query('kategori');
@@ -418,7 +441,9 @@ class ProductController extends Controller
      */
     public function apiShow($id)
     {
-        $product = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images'])->find($id);
+        $product = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images'])
+                         ->whereHas('seller') // Hanya produk dengan seller yang valid
+                         ->find($id);
 
         if (!$product) {
             return response()->json(['error' => 'Produk tidak ditemukan'], 404);
@@ -436,7 +461,8 @@ class ProductController extends Controller
     public function filter(Request $request)
     {
         $query = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images'])
-                      ->where('status', 'active'); // Hanya produk aktif
+                      ->where('status', 'active') // Hanya produk aktif
+                      ->whereHas('seller'); // Hanya produk dengan seller yang valid
         
         // Filter berdasarkan kategori
         $kategori = $request->query('kategori');
@@ -637,5 +663,34 @@ class ProductController extends Controller
         }
         
         return $images;
+    }
+
+    /**
+     * Update old products that don't have seller_id assigned
+     * This is for migration purposes to connect orphaned products to valid sellers
+     */
+    public function updateProductSellerRelationships()
+    {
+        // Get all products that don't have a seller_id assigned
+        $productsWithoutSeller = Product::whereNull('seller_id')->get();
+
+        $updatedCount = 0;
+
+        foreach ($productsWithoutSeller as $product) {
+            // Find a default seller to assign to this product
+            // For example, we can use the first seller in the system
+            $defaultSeller = \App\Models\Seller::first();
+
+            if ($defaultSeller) {
+                $product->update(['seller_id' => $defaultSeller->id]);
+                $updatedCount++;
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => "Berhasil mengupdate {$updatedCount} produk yang tidak memiliki penjual",
+            'updated_count' => $updatedCount
+        ]);
     }
 }

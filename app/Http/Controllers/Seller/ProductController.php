@@ -536,9 +536,47 @@ class ProductController extends Controller
         }
 
         return response()->json([
-            'success' => true, 
+            'success' => true,
             'message' => "Berhasil memperbaiki {$fixedCount} produk dengan gambar yang hilang",
             'fixed_count' => $fixedCount
+        ]);
+    }
+
+    /**
+     * Assign products without seller to the first seller in database
+     */
+    public function assignProductsToSellers()
+    {
+        $user = Auth::user();
+        if (!$user || !$user->role || $user->role->name !== 'seller') {
+            abort(403, 'Akses ditolak. Hanya penjual yang dapat mengakses halaman ini.');
+        }
+
+        // Ambil ID penjual dari tabel sellers berdasarkan user_id
+        $seller = \App\Models\Seller::where('user_id', $user->id)->first();
+        if (!$seller) {
+            return response()->json(['success' => false, 'message' => 'Akses ditolak. Seller record tidak ditemukan.'], 403);
+        }
+
+        // Ambil semua produk yang tidak memiliki seller_id
+        $productsWithoutSeller = \App\Models\Product::whereNull('seller_id')->get();
+
+        $assignedCount = 0;
+        foreach ($productsWithoutSeller as $product) {
+            // Coba cari seller berdasarkan user yang terkait dengan produk jika ada
+            // Kita asumsikan produk dibuat saat penjual sudah terdaftar
+            // Dalam skenario ini, kita akan assign ke seller pertama (ini hanya untuk data dummy)
+
+            // Jika produk ini adalah produk dummy yang dibuat sebelum fitur seller ada
+            // kita bisa assign ke seller yang sedang login
+            $product->update(['seller_id' => $seller->id]);
+            $assignedCount++;
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => "Berhasil menghubungkan {$assignedCount} produk ke penjual saat ini",
+            'assigned_count' => $assignedCount
         ]);
     }
 }

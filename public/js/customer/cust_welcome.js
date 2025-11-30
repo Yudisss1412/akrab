@@ -265,6 +265,11 @@ function openProdukModal(idx, productId) {
         modalAddCart.setAttribute('data-product-id', productId);
       }
 
+      // Store product ID in the detail button for easy access
+      if (modalLihatDetail) {
+        modalLihatDetail.setAttribute('data-product-id', productId);
+      }
+
       modal.style.display = 'flex';
       document.body.style.overflow = 'hidden';
     })
@@ -293,6 +298,11 @@ function openProdukModal(idx, productId) {
         modalPrice.textContent = produk.price;
         modalDesc.textContent = produk.description;
         modalSpecs.innerHTML = '';
+
+        // Store product ID in the detail button for easy access
+        if (modalLihatDetail) {
+          modalLihatDetail.setAttribute('data-product-id', productId);
+        }
       } else {
         // Last resort fallback
         const produk = {
@@ -311,6 +321,11 @@ function openProdukModal(idx, productId) {
         modalPrice.textContent = produk.price;
         modalDesc.textContent = produk.description;
         modalSpecs.innerHTML = '';
+
+        // Store product ID in the detail button for easy access
+        if (modalLihatDetail) {
+          modalLihatDetail.setAttribute('data-product-id', productId);
+        }
       }
 
       modal.style.display = 'flex';
@@ -337,7 +352,15 @@ if (modalLihatDetail) {
     if (currentProduk && currentProduk.id) {
       window.location.href = `/produk_detail/${currentProduk.id}`;
     } else {
-      alert('Menuju halaman detail produk (demo)');
+      // Fallback: coba ambil ID produk dari tombol itu sendiri atau dari elemen terkait
+      const productId = modalLihatDetail.getAttribute('data-product-id') ||
+                        document.querySelector('#modal-addcart-btn')?.getAttribute('data-product-id');
+
+      if (productId) {
+        window.location.href = `/produk_detail/${productId}`;
+      } else {
+        alert('Menuju halaman detail produk (demo)');
+      }
     }
   };
 }

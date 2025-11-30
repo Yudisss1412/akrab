@@ -94,6 +94,16 @@ function createStarsHTML($rating, $size = 20) {
           </button>
           <button class="btn btn-lihat" data-product-id="{{ $produk['id'] }}">Beli Sekarang</button>
         </div>
+
+        <!-- Link ke halaman wishlist -->
+        <div class="wishlist-link-row">
+          <a href="{{ route('wishlist.index') }}" class="btn btn-wishlist-page">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            Lihat Wishlist
+          </a>
+        </div>
       </div>
     </div>
 
@@ -137,6 +147,31 @@ function createStarsHTML($rating, $size = 20) {
 
 @push('scripts')
   <style>
+    .wishlist-link-row {
+      margin-top: 15px;
+      text-align: center;
+    }
+
+    .btn-wishlist-page {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border: 1px solid var(--primary-color-dark);
+      border-radius: 8px;
+      background-color: #fff;
+      color: var(--primary-color-dark);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-wishlist-page:hover {
+      background-color: var(--primary-color-dark);
+      color: #fff;
+    }
+
     .notification {
       position: fixed;
       top: 50%;
@@ -376,7 +411,7 @@ function createStarsHTML($rating, $size = 20) {
             }
           } else {
             // Fallback to data from server side if API call fails
-            const initialStatus = {{ $produk['di_wishlist'] ?? 'false' }};
+            const initialStatus = <?php echo json_encode($produk['di_wishlist'] ?? false); ?>;
             if (initialStatus) {
               button.classList.add('active');
               heartIcon.setAttribute('fill', '#FF4757');
@@ -393,7 +428,7 @@ function createStarsHTML($rating, $size = 20) {
           }
         } catch (error) {
           // Fallback to server-side data if API call fails
-          const initialStatus = {{ $produk['di_wishlist'] ?? 'false' }};
+          const initialStatus = <?php echo json_encode($produk['di_wishlist'] ?? false); ?>;
           if (initialStatus) {
             button.classList.add('active');
             heartIcon.setAttribute('fill', '#FF4757');

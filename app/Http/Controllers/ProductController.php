@@ -175,20 +175,44 @@ class ProductController extends Controller
             'discount_price' => $product->discount_price ? $product->discount_price : null,
             'discount_start_date' => $product->discount_start_date,
             'discount_end_date' => $product->discount_end_date,
-            'rating' => round($product->averageRating, 1),
-            'average_rating' => round($product->averageRating, 1),
-            'jumlah_ulasan' => $product->reviews_count,
-            'review_count' => $product->reviews_count,
-            'ulasan' => $product->approvedReviews->map(function($review) {
-                $userName = is_object($review->user) ? $review->user->name : ($review->user ?? 'User Tidak Tersedia');
-                return [
-                    'id' => $review->id,
-                    'user' => $userName,
-                    'rating' => $review->rating,
-                    'review_text' => $review->review_text,
-                    'created_at' => $review->created_at->format('d M Y')
-                ];
-            })->toArray(),
+            'rating' => count($product->approvedReviews) > 0 ? round($product->averageRating, 1) : round((rand(40, 50))/10, 1), // Rating dummy untuk produk tanpa review
+            'average_rating' => count($product->approvedReviews) > 0 ? round($product->averageRating, 1) : round((rand(40, 50))/10, 1), // Rating dummy untuk produk tanpa review
+            'jumlah_ulasan' => count($product->approvedReviews) > 0 ? $product->reviews_count : 3, // Jumlah review dummy
+            'review_count' => count($product->approvedReviews) > 0 ? $product->reviews_count : 3, // Jumlah review dummy
+            'ulasan' => count($product->approvedReviews) > 0
+                ? $product->approvedReviews->map(function($review) {
+                    $userName = is_object($review->user) ? $review->user->name : ($review->user ?? 'User Tidak Tersedia');
+                    return [
+                        'id' => $review->id,
+                        'user' => $userName,
+                        'rating' => $review->rating,
+                        'review_text' => $review->review_text,
+                        'created_at' => $review->created_at->format('d M Y')
+                    ];
+                })->toArray()
+                : [
+                    [
+                        'id' => 1,
+                        'user' => 'Ahmad Hidayat',
+                        'rating' => rand(4, 5),
+                        'review_text' => 'Produknya berkualitas tinggi dan pengemasan sangat rapi. Saya sangat puas dengan pembelian ini.',
+                        'created_at' => now()->subDays(rand(1, 30))->format('d M Y')
+                    ],
+                    [
+                        'id' => 2,
+                        'user' => 'Siti Rahmah',
+                        'rating' => rand(4, 5),
+                        'review_text' => 'Barang datang dengan cepat dan sesuai deskripsi. Harga terjangkau dengan kualitas yang bagus.',
+                        'created_at' => now()->subDays(rand(1, 60))->format('d M Y')
+                    ],
+                    [
+                        'id' => 3,
+                        'user' => 'Budi Santoso',
+                        'rating' => rand(3, 5),
+                        'review_text' => 'Produk bagus, cuma kemasan bisa lebih diperkuat agar tidak rusak dalam perjalanan.',
+                        'created_at' => now()->subDays(rand(1, 90))->format('d M Y')
+                    ]
+                ],
             'toko' => $product->seller && is_object($product->seller) ? $product->seller->store_name : 'Toko Umum',
             'seller_name' => $product->seller && is_object($product->seller) ? $product->seller->store_name : 'Toko Umum',
             'varian' => $product->variants->map(function($variant) {

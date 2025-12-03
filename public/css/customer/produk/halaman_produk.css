@@ -96,11 +96,40 @@ body {
 .produk-page .produk-title{
   margin:0; font-size:28px; font-weight:800; color:var(--primary-color-dark);
 }
-.produk-page .produk-filter-right{ display:flex; align-items:center; gap:10px }
-.produk-page .produk-filter-right label{ font-weight:600; color:var(--primary-color-dark) }
-.produk-page .produk-filter-right select{
+.produk-page .produk-filter-right{ display:flex; align-items:center; gap:10px; flex-wrap: wrap; }
+.produk-page .produk-filter-right label{ font-weight:600; color:var(--primary-color-dark); font-size: 14px; }
+.produk-page .produk-filter-right select,
+.produk-page .produk-filter-right input{
   border:1.5px solid var(--border-color); border-radius:8px; padding:8px 12px;
   background:#fff; font-size:14px;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 120px;
+}
+
+.filter-group label {
+  font-weight: 600;
+  color: var(--primary-color-dark);
+  font-size: 12px;
+  margin-bottom: 4px;
+  text-align: left;
+}
+
+.filter-group select,
+.filter-group input {
+  border: 1.5px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: #fff;
+  font-size: 14px;
+  min-width: 120px;
+}
+
+.filter-group input {
+  width: 120px;
 }
 
 /* Grid Produk */
@@ -175,7 +204,12 @@ body {
 
 /* Pagination */
 .produk-page .produk-pagination{
-  display:flex; justify-content:center; gap:6px; margin-top:22px; flex-wrap:wrap;
+  display:flex !important; justify-content:center !important; gap:6px !important; margin-top:22px !important; flex-wrap:wrap !important;
+  clear: both !important;
+  width: 100% !important;
+  position: static !important;
+  order: initial !important;
+  z-index: auto !important;
 }
 .produk-page .page-btn{
   border:none; background:var(--background-color); color:var(--dark-text-color); padding:10px 14px; border-radius:10px;
@@ -876,13 +910,218 @@ main[role="main"] {
   color: #fff !important;
 }
 
-/* Pagination styling */
-.produk-pagination {
+/* Ensure pagination appears below the grid - override any positioning */
+#produk-pagination {
   display: flex !important;
   justify-content: center !important;
   gap: 6px !important;
   margin-top: 22px !important;
   flex-wrap: wrap !important;
+  width: 100% !important;
+  clear: both !important;
+  float: none !important;
+  position: static !important; /* Override any absolute/fixed positioning */
+  overflow: visible !important;
+  order: initial !important; /* Ensure it follows normal document flow */
+  z-index: auto !important; /* Reset any z-index that might cause overlap */
+  min-height: auto !important; /* Ensure it doesn't collapse */
+  transform: none !important; /* Ensure no CSS transforms */
+  backface-visibility: visible !important; /* Ensure it's not hidden */
+}
+
+/* Make sure pagination comes after grid in document flow */
+#produk-grid + #produk-pagination {
+  margin-top: 22px !important;
+  grid-row-start: auto !important; /* Ensure grid positioning doesn't override */
+}
+
+/* Ensure produk grid has proper layout and doesn't interfere with pagination */
+.produk-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 18px !important;
+  width: 100% !important;
+  clear: both !important;
+  float: none !important;
+  order: initial !important; /* Ensure grid items follow normal flow */
+  position: static !important; /* Ensure static positioning */
+  overflow: visible !important; /* Ensure no clipping */
+  transform: none !important; /* Ensure no CSS transforms that affect layout */
+  backface-visibility: visible !important; /* Ensure it's not hidden */
+}
+
+/* Ensure rekomendasi pagination appears below the grid - override any positioning */
+#rekom-pagination {
+  display: flex !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  margin-top: 22px !important;
+  flex-wrap: wrap !important;
+  width: 100% !important;
+  clear: both !important;
+  float: none !important;
+  position: static !important; /* Override any absolute/fixed positioning */
+  overflow: visible !important;
+  order: initial !important; /* Ensure it follows normal document flow */
+  z-index: auto !important; /* Reset any z-index that might cause overlap */
+  min-height: auto !important; /* Ensure it doesn't collapse */
+  transform: none !important; /* Ensure no CSS transforms */
+  backface-visibility: visible !important; /* Ensure it's not hidden */
+}
+
+/* Ensure rekomendasi grid has proper layout and doesn't interfere with pagination */
+#rekom-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 18px !important;
+  width: 100% !important;
+  clear: both !important;
+  float: none !important;
+  order: initial !important; /* Ensure grid items follow normal flow */
+  position: static !important; /* Ensure static positioning */
+  overflow: visible !important; /* Ensure no clipping */
+  transform: none !important; /* Ensure no CSS transforms that affect layout */
+  backface-visibility: visible !important; /* Ensure it's not hidden */
+}
+
+/* Ensure populer grid also has proper layout */
+#populer-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 18px !important;
+  width: 100% !important;
+  clear: both !important;
+  float: none !important;
+  order: initial !important; /* Ensure grid items follow normal flow */
+  position: static !important; /* Ensure static positioning */
+  overflow: visible !important; /* Ensure no clipping */
+  transform: none !important; /* Ensure no CSS transforms that affect layout */
+  backface-visibility: visible !important; /* Ensure it's not hidden */
+}
+
+/* Ensure populer pagination appears below the grid - override any positioning */
+#populer-pagination {
+  display: flex !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  margin-top: 22px !important;
+  flex-wrap: wrap !important;
+  width: 100% !important;
+  clear: both !important;
+  float: none !important;
+  position: static !important; /* Override any absolute/fixed positioning */
+  overflow: visible !important;
+  order: initial !important; /* Ensure it follows normal document flow */
+  z-index: auto !important; /* Reset any z-index that might cause overlap */
+  min-height: auto !important; /* Ensure it doesn't collapse */
+  transform: none !important; /* Ensure no CSS transforms */
+  backface-visibility: visible !important; /* Ensure it's not hidden */
+}
+
+/* Additional layout isolation for populer pagination */
+#populer-pagination {
+  grid-column: 1 / -1 !important; /* Span entire width of grid if used in grid context */
+  align-self: flex-start !important; /* Align to start to prevent centering in flex */
+  position: static !important; /* Ensure it's in document flow */
+  z-index: auto !important; /* Reset z-index to avoid layering issues */
+  margin-top: 22px !important; /* Extra assurance for spacing */
+}
+
+/* Additional override for the specific pagination container to ensure it stays at the bottom */
+#produk-pagination {
+  grid-column: 1 / -1 !important; /* Span entire width of grid if used in grid context */
+  align-self: flex-start !important; /* Align to start to prevent centering in flex */
+}
+
+/* Additional override for rekomendasi pagination container to ensure it stays at the bottom */
+#rekom-pagination {
+  grid-column: 1 / -1 !important; /* Span entire width of grid if used in grid context */
+  align-self: flex-start !important; /* Align to start to prevent centering in flex */
+}
+
+/* Additional override for populer pagination container */
+#populer-grid + .produk-pagination {
+  grid-column: 1 / -1 !important; /* Span entire width of grid if used in grid context */
+  align-self: flex-start !important; /* Align to start to prevent centering in flex */
+}
+
+/* Additional layout isolation to ensure proper stacking */
+#produk-grid {
+  contain: layout style paint !important; /* Isolate the grid layout */
+  position: relative !important; /* Ensure it has proper positioning context */
+  z-index: 1 !important; /* Ensure it's in proper stacking context */
+  /* Clear any floats inside and establish new block formatting context */
+  overflow: hidden !important;
+  display: grid !important;
+}
+
+/* Additional layout isolation for rekomendasi grid */
+#rekom-grid {
+  contain: layout style paint !important; /* Isolate the grid layout */
+  position: relative !important; /* Ensure it has proper positioning context */
+  z-index: 1 !important; /* Ensure it's in proper stacking context */
+  /* Clear any floats inside and establish new block formatting context */
+  overflow: hidden !important;
+  display: grid !important;
+}
+
+/* Additional layout isolation for populer grid */
+#populer-grid {
+  contain: layout style paint !important; /* Isolate the grid layout */
+  position: relative !important; /* Ensure it has proper positioning context */
+  z-index: 1 !important; /* Ensure it's in proper stacking context */
+  /* Clear any floats inside and establish new block formatting context */
+  overflow: hidden !important;
+  display: grid !important;
+}
+
+/* Ensure pagination has higher stacking context if needed */
+#produk-pagination {
+  position: static !important; /* Ensure it's in document flow */
+  z-index: auto !important; /* Reset z-index to avoid layering issues */
+  margin-top: 22px !important; /* Extra assurance for spacing */
+}
+
+/* Ensure rekomendasi pagination has higher stacking context if needed */
+#rekom-pagination {
+  position: static !important; /* Ensure it's in document flow */
+  z-index: auto !important; /* Reset z-index to avoid layering issues */
+  margin-top: 22px !important; /* Extra assurance for spacing */
+}
+
+/* Force clear after produk-grid content */
+#produk-grid::after {
+  content: "" !important;
+  display: block !important;
+  clear: both !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Force clear after rekom-grid content */
+#rekom-grid::after {
+  content: "" !important;
+  display: block !important;
+  clear: both !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Force clear after populer-grid content */
+#populer-grid::after {
+  content: "" !important;
+  display: block !important;
+  clear: both !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Sembunyikan pagination produk utama karena tidak digunakan */
+#produk-pagination {
+  display: none !important;
 }
 
 .page-btn {

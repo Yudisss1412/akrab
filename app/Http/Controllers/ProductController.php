@@ -632,36 +632,39 @@ class ProductController extends Controller
         $formattedProducts = $products->map(function($product) {
             $product->setAttribute('average_rating', $product->averageRating);
             $product->setAttribute('review_count', $product->reviews_count);
-            
+
             $mainImage = $product->main_image;
             $imageUrl = $mainImage ? asset('storage/' . $mainImage) : asset('src/placeholder.png');
-            
+
             return [
                 'id' => $product->id,
                 'name' => $product->name,
+                'nama' => $product->name, // Using both naming conventions for compatibility
                 'description' => $product->description,
-                'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
+                'deskripsi' => $product->description, // Using both naming conventions for compatibility
+                'price' => $product->price, // Raw price for calculations
+                'harga' => $product->price, // Raw price for calculations, using both naming conventions
                 'image' => $imageUrl,
+                'gambar' => $imageUrl, // Using both naming conventions for compatibility
                 'average_rating' => round($product->averageRating, 1),
+                'rating' => round($product->averageRating, 1), // Using both naming conventions for compatibility
                 'review_count' => $product->reviews_count,
-                'category' => $product->category->name ?? 'Umum',
+                'jumlah_ulasan' => $product->reviews_count, // Using both naming conventions for compatibility
+                'kategori' => $product->category->name ?? 'Umum', // Using kategori key to match getAllProducts format
+                'category' => $product->category->name ?? 'Umum', // Using both naming conventions for compatibility
+                'subkategori' => $product->subcategory ? $product->subcategory->name : ($product->subcategory ?? 'Umum'), // Using subkategori key to match getAllProducts format
+                'subcategory' => $product->subcategory ? $product->subcategory->name : ($product->subcategory ?? 'Umum'), // Using both naming conventions for compatibility
+                'toko' => $product->seller->store_name ?? 'Toko Umum', // Using toko key to match getAllProducts format
+                'seller' => $product->seller->store_name ?? 'Toko Umum', // Using both naming conventions for compatibility
+                'specifications' => [
+                    'Kategori: ' . ($product->category->name ?? 'Umum'),
+                    'Stok: ' . $product->stock,
+                    'Berat: ' . $product->weight . 'g'
+                ], // Spesifikasi sederhana
             ];
         });
-        
-        return response()->json([
-            'success' => true,
-            'products' => $formattedProducts,
-            'total' => $total,
-            'filters_applied' => [
-                'kategori' => $kategori,
-                'min_price' => $minPrice,
-                'max_price' => $maxPrice,
-                'sort' => $sortBy,
-                'subkategori' => $subkategori,
-                'rating' => $ratings,
-                'lokasi' => $lokasi,
-            ]
-        ]);
+
+        return response()->json($formattedProducts);
     }
     
     /**

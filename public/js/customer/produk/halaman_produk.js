@@ -19,14 +19,19 @@ const grid = document.getElementById('produk-grid');
 const pagin = document.getElementById('produk-pagination');
 const inputSearch = document.getElementById('navbar-search'); // dari partial navbar
 const selectKategori = document.getElementById('filter-kategori');
+const selectSubkategori = document.getElementById('filter-subkategori');
+const inputHargaMin = document.getElementById('filter-harga-min');
+const inputHargaMax = document.getElementById('filter-harga-max');
+const selectRating = document.getElementById('filter-rating');
+const selectUrutkan = document.getElementById('filter-urutkan');
 
 const rekomGrid = document.getElementById('rekom-grid');
 const rekomPagin = document.getElementById('rekom-pagination');
 
 /* ---------- ROUTE & API ENDPOINTS ---------- */
-const API_PRODUCTS = '/produk';  // API endpoint baru untuk mengambil semua produk
-const API_SEARCH = '/produk/search';
-const API_CATEGORY = '/produk/kategori';
+const API_PRODUCTS = '/api/products/filter';  // API endpoint untuk mengambil semua produk
+const API_SEARCH = '/api/products/search';  // Endpoint untuk pencarian produk (jika ada)
+const API_CATEGORY = '/api/products/filter';  // Endpoint untuk produk berdasarkan kategori (menggunakan parameter kategori)
 const DETAIL_BASE = '/produk_detail/';
 const CART_ADD = '/cart/add';
 
@@ -65,109 +70,216 @@ function formatPrice(price) {
 
 /* ---------- IMAGE ERROR HANDLER ---------- */
 function handleImageError(img) {
+  if (!img) return;
   img.onerror = null; // Prevent infinite loop if placeholder also fails
-  
+
   // Create simple SVG as fallback
   const svgString = '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="100%" height="100%" fill="#eef6f4"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#7aa29b">Gambar tidak tersedia</text></svg>';
-  
+
   img.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(svgString);
 }
 
 /* ---------- API CALLS FOR DYNAMIC SEARCH/FILTER ---------- */
-async function searchProducts(search = '', category = 'all') {
+async function searchProducts(search = '', category = 'all', subcategory = '', minPrice = '', maxPrice = '', rating = '', sort = '') {
   try {
-    let url = search ? API_SEARCH : API_PRODUCTS;
+    let url = API_PRODUCTS; // Use '/api/products/filter' for all cases
     const params = new URLSearchParams();
-    
+
+    // Add search parameter if provided
     if (search) {
-      params.append('q', search);
-    } else {
-      // For main products API, allow category filtering
-      if (category && category !== 'all') params.append('kategori', category);
+      params.append('search', search);
     }
-    
-    if (!search && category && category !== 'all') {
-      url = API_PRODUCTS;  // Use main products API with category filter
-      params.set('kategori', category);
+
+    // Add category parameter if provided
+    if (category && category !== 'all') {
+      params.append('kategori', category);
     }
-    
+
+    // Add subcategory parameter if provided
+    if (subcategory) {
+      params.append('subkategori', subcategory);
+    }
+
+    // Add min price parameter if provided
+    if (minPrice) {
+      params.append('min_price', minPrice);
+    }
+
+    // Add max price parameter if provided
+    if (maxPrice) {
+      params.append('max_price', maxPrice);
+    }
+
+    // Add rating parameter if provided
+    if (rating) {
+      params.append('rating', rating);
+    }
+
+    // Add sort parameter if provided
+    if (sort) {
+      params.append('sort', sort);
+    }
+
     // Add cache busting parameter
     params.append('_cb', Date.now());
-    
+
     url += '?' + params.toString();
-    
+
+    // Get CSRF token from meta tag, fallback to empty if not found
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
     const response = await fetch(url, {
+      method: 'GET',
       headers: {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Pragma': 'no-cache',
-        'Expires': '0'
+        'Expires': '0',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-TOKEN': csrfToken || '',
+        'Accept': 'application/json'
       }
     });
+
+    // Check if response is OK before attempting to parse JSON
+    if (!response.ok) {
+      if (response.status === 500) {
+        console.error('Server error when requesting products from:', url);
+        throw new Error(`Server error: ${response.status}`);
+      } else if (response.status === 404) {
+        console.error('API endpoint not found:', url);
+        throw new Error(`API endpoint not found: ${response.status}`);
+      } else {
+        console.error('HTTP error when requesting products:', response.status, url);
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+    }
+
+    // Check if the response is actually JSON before parsing
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      console.error('Response is not JSON:', await response.text());
+      throw new Error('Response is not JSON');
+    }
+
     const result = await response.json();
-    
+
     // Format the data to match what the render function expects
-    const formattedProducts = Array.isArray(result) ? 
+    const formattedProducts = Array.isArray(result) ?
       result.map(product => ({
         id: product.id,
         nama: product.nama || product.name || 'Produk Tanpa Nama',
         kategori: product.kategori || product.category?.name || 'Umum',
+        subkategori: product.subkategori || product.subcategory?.name || 'Umum',
         harga: product.harga ? formatPrice(product.harga) : formatPrice(product.price || 0),
         gambar: product.gambar || product.image || product.main_image || 'src/placeholder.png',
         rating: product.rating || product.average_rating || product.averageRating || 0,
         toko: product.toko || product.seller?.name || 'Toko Umum',
         deskripsi: product.deskripsi || product.description || ''
-      })) : 
+      })) :
       [];
-    
+
     return formattedProducts;
   } catch (error) {
     console.error('Error searching products:', error);
-    showNotification('Gagal memuat produk', 'error');
     return [];
   }
 }
 
 /* ---------- LOAD ALL PRODUCTS FROM API ---------- */
-async function loadAllProducts(category = 'all') {
+async function loadAllProducts(category = 'all', subcategory = '', minPrice = '', maxPrice = '', rating = '', sort = '') {
   try {
     let url = API_PRODUCTS;
     const params = new URLSearchParams();
     if (category && category !== 'all') {
       params.append('kategori', category);
     }
-    
+
+    // Add subcategory parameter if provided
+    if (subcategory) {
+      params.append('subkategori', subcategory);
+    }
+
+    // Add min price parameter if provided
+    if (minPrice) {
+      params.append('min_price', minPrice);
+    }
+
+    // Add max price parameter if provided
+    if (maxPrice) {
+      params.append('max_price', maxPrice);
+    }
+
+    // Add rating parameter if provided
+    if (rating) {
+      params.append('rating', rating);
+    }
+
+    // Add sort parameter if provided
+    if (sort) {
+      params.append('sort', sort);
+    }
+
     // Add cache busting parameter
     params.append('_cb', Date.now());
-    
+
     url += '?' + params.toString();
-    
+
+    // Get CSRF token from meta tag, fallback to empty if not found
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
     const response = await fetch(url, {
+      method: 'GET',
       headers: {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Pragma': 'no-cache',
-        'Expires': '0'
+        'Expires': '0',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-TOKEN': csrfToken || '',
+        'Accept': 'application/json'
       }
     });
+
+    // Check if response is OK before attempting to parse JSON
+    if (!response.ok) {
+      if (response.status === 500) {
+        console.error('Server error when requesting products from:', url);
+        throw new Error(`Server error: ${response.status}`);
+      } else if (response.status === 404) {
+        console.error('API endpoint not found:', url);
+        throw new Error(`API endpoint not found: ${response.status}`);
+      } else {
+        console.error('HTTP error when requesting products:', response.status, url);
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+    }
+
+    // Check if the response is actually JSON before parsing
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      console.error('Response is not JSON:', await response.text());
+      throw new Error('Response is not JSON');
+    }
+
     const result = await response.json();
-    
+
     // Format the data to match what the render function expects
-    const formattedProducts = Array.isArray(result) ? 
+    const formattedProducts = Array.isArray(result) ?
       result.map(product => ({
         id: product.id,
         nama: product.nama || product.name || 'Produk Tanpa Nama',
         kategori: product.kategori || product.category?.name || 'Umum',
+        subkategori: product.subkategori || product.subcategory?.name || 'Umum',
         harga: product.harga ? formatPrice(product.harga) : formatPrice(product.price || 0),
         gambar: product.gambar || product.image || product.main_image || 'src/placeholder.png',
         rating: product.rating || product.average_rating || product.averageRating || 0,
         toko: product.toko || product.seller?.name || 'Toko Umum',
         deskripsi: product.deskripsi || product.description || ''
-      })) : 
+      })) :
       [];
-    
+
     return formattedProducts;
   } catch (error) {
     console.error('Error loading products:', error);
-    showNotification('Gagal memuat produk', 'error');
     return [];
   }
 }
@@ -178,18 +290,47 @@ async function loadPopularProducts() {
     // Use the popular API endpoint with cache busting
     const url = new URL('/api/products/popular', window.location.origin);
     url.searchParams.append('_cb', Date.now());
-    
+
+    // Get CSRF token from meta tag, fallback to empty if not found
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
     const response = await fetch(url, {
+      method: 'GET',
       headers: {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Pragma': 'no-cache',
-        'Expires': '0'
+        'Expires': '0',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-TOKEN': csrfToken || '',
+        'Accept': 'application/json'
       }
     });
+
+    // Check if response is OK before attempting to parse JSON
+    if (!response.ok) {
+      if (response.status === 500) {
+        console.error('Server error when requesting popular products from:', url);
+        throw new Error(`Server error: ${response.status}`);
+      } else if (response.status === 404) {
+        console.error('API endpoint not found:', url);
+        throw new Error(`API endpoint not found: ${response.status}`);
+      } else {
+        console.error('HTTP error when requesting popular products:', response.status, url);
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+    }
+
+    // Check if the response is actually JSON before parsing
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      console.error('Response is not JSON:', await response.text());
+      throw new Error('Response is not JSON');
+    }
+
     const result = await response.json();
-    
+
     // Format the data to match what the render function expects
-    const formattedProducts = Array.isArray(result) ? 
+    const formattedProducts = Array.isArray(result) ?
       result.map(product => ({
         id: product.id,
         nama: product.name || product.nama || 'Produk Tanpa Nama',
@@ -199,16 +340,16 @@ async function loadPopularProducts() {
         rating: product.average_rating || product.rating || product.averageRating || 0,
         toko: product.toko || product.seller?.name || 'Toko Umum',
         deskripsi: product.description || product.deskripsi || ''
-      })) : 
+      })) :
       [];
-    
+
     return formattedProducts;
   } catch (error) {
     console.error('Error loading popular products:', error);
-    // showNotification('Gagal memuat produk populer', 'error');
     return [];
   }
 }
+
 
 
 
@@ -216,10 +357,11 @@ async function loadPopularProducts() {
 function renderList(products = []) {
   if (!grid || !pagin) return;
 
-  // Calculate total pages based on a reasonable assumption
-  // In a real app, API should return total count
+  // Calculate total pages based on current products
   const totalPage = Math.max(1, Math.ceil(products.length / pageSize));
-  if (currentPage > totalPage) currentPage = totalPage;
+
+  // Adjust current page if it exceeds total pages
+  if (currentPage > totalPage) currentPage = Math.max(1, totalPage);
 
   const start = (currentPage - 1) * pageSize;
   const view = products.slice(start, start + pageSize);
@@ -228,7 +370,15 @@ function renderList(products = []) {
     const href = `${DETAIL_BASE}${encodeURIComponent(p.id)}`;
     const tokoHref = `/toko/${p.toko || p.seller?.name || p.seller_id || 'toko-tidak-ditemukan'}`; // Assuming there's a toko page
     const imageSrc = p.gambar || 'src/placeholder.png';
-    const altText = p.nama.replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+    const altText = (p.nama || 'Produk Tidak Bernama').toString().replace(/[&<>"']/g, function(match) {
+      return {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[match];
+    });
     return `
       <div class="produk-card" data-product-id="${p.id}">
         <img src="${imageSrc}" alt="${altText}"
@@ -255,15 +405,44 @@ function renderList(products = []) {
   renderPagination(totalPage);
 }
 
+// Render pagination buttons
+function renderPagination(totalPage) {
+  if (!pagin) return;
+
+  const btn = (label, page, disabled = false, extra = '', aria = '') =>
+    `<button class="page-btn ${extra}" data-page="${page}" ${disabled ? 'disabled' : ''} ${aria}>${label}</button>`;
+
+  const maxBtn = 5;
+  let start = Math.max(1, currentPage - Math.floor(maxBtn / 2));
+  let end = start + maxBtn - 1;
+  if (end > totalPage) { end = totalPage; start = Math.max(1, end - maxBtn + 1); }
+
+  let html = '';
+  html += btn('«', 1, currentPage === 1, '', 'aria-label="Halaman pertama"');
+  html += btn('‹', currentPage - 1, currentPage === 1, '', 'aria-label="Sebelumnya"');
+  for (let i = start; i <= end; i++) {
+    const active = i === currentPage;
+    html += btn(i, i, false, active ? 'active' : '', active ? 'aria-current="page"' : '');
+  }
+  html += btn('›', currentPage + 1, currentPage === totalPage, '', 'aria-label="Berikutnya"');
+  html += btn('»', totalPage, currentPage === totalPage, '', 'aria-label="Halaman terakhir"');
+
+  pagin.innerHTML = html;
+}
+
 function renderRekomendasi(products = [], maxItems = 8) {
   if (!rekomGrid) return;
 
-  // Limit to maxItems for rekomendasi section
-  const view = products.slice(0, maxItems);
+  // Pagination variables for rekomendasi
+  const rekomPageSize = 4; // Sesuai dengan definisi di awal
+  const totalRekomPages = Math.max(1, Math.ceil(products.length / rekomPageSize));
+  const start = (rekomPage - 1) * rekomPageSize;
+  const view = products.slice(start, start + rekomPageSize);
 
   rekomGrid.innerHTML = view.map(p => {
     const href = `${DETAIL_BASE}${encodeURIComponent(p.id)}`;
-    const tokoHref = `/toko/${p.toko || p.seller?.name || p.seller_id || 'toko-tidak-ditemukan'}`;
+    const tokoName = p.toko || p.seller?.name || 'Toko Umum';
+    const tokoHref = `/toko/${encodeURIComponent(tokoName)}`;
     const imageSrc = p.gambar || 'src/placeholder.png';
     const altText = p.nama.replace(/"/g, '&quot;').replace(/'/g, '&apos;');
     return `
@@ -288,14 +467,46 @@ function renderRekomendasi(products = [], maxItems = 8) {
         </div>
       </div>`;
   }).join('');
+
+  // Render pagination for rekomendasi
+  renderRekomendasiPagination(totalRekomPages);
+}
+
+// Fungsi untuk merender pagination rekomendasi
+function renderRekomendasiPagination(totalPage) {
+  if (!rekomPagin) return;
+
+  const btn = (label, page, disabled = false, extra = '', aria = '') =>
+    `<button class="page-btn ${extra}" data-page="${page}" ${disabled ? 'disabled' : ''} ${aria}>${label}</button>`;
+
+  const maxBtn = 5;
+  let start = Math.max(1, rekomPage - Math.floor(maxBtn / 2));
+  let end = start + maxBtn - 1;
+  if (end > totalPage) { end = totalPage; start = Math.max(1, end - maxBtn + 1); }
+
+  let html = '';
+  html += btn('«', 1, rekomPage === 1, '', 'aria-label="Halaman pertama"');
+  html += btn('‹', rekomPage - 1, rekomPage === 1, '', 'aria-label="Sebelumnya"');
+  for (let i = start; i <= end; i++) {
+    const active = i === rekomPage;
+    html += btn(i, i, false, active ? 'active' : '', active ? 'aria-current="page"' : '');
+  }
+  html += btn('›', rekomPage + 1, rekomPage === totalPage, '', 'aria-label="Berikutnya"');
+  html += btn('»', totalPage, rekomPage === totalPage, '', 'aria-label="Halaman terakhir"');
+
+  rekomPagin.innerHTML = html;
 }
 
 function renderProdukPopuler(products = [], maxItems = 8) {
   const populerGrid = document.getElementById('populer-grid');
   if (!populerGrid) return;
 
-  // Limit to maxItems for populer section
-  const view = products.slice(0, maxItems);
+  // Pagination variables for populer
+  const populerPageSize = 4; // Use same page size as rekomendasi
+  const totalPopulerPages = Math.max(1, Math.ceil(products.length / populerPageSize));
+  const currentPage = typeof window.populerPage !== 'undefined' ? window.populerPage : 1;
+  const start = (currentPage - 1) * populerPageSize;
+  const view = products.slice(start, start + populerPageSize);
 
   populerGrid.innerHTML = view.map(p => {
     const href = `${DETAIL_BASE}${encodeURIComponent(p.id)}`;
@@ -324,40 +535,59 @@ function renderProdukPopuler(products = [], maxItems = 8) {
         </div>
       </div>`;
   }).join('');
+
+  // Render pagination for populer if populer pagination element exists
+  const populerPagination = document.getElementById('populer-pagination');
+  if (populerPagination) {
+    renderPopulerPagination(totalPopulerPages, populerPagination);
+  }
 }
 
-function renderPagination(totalPage) {
-  if (!pagin) return;
+// Fungsi untuk merender pagination populer
+function renderPopulerPagination(totalPage, populerPaginElement) {
+  if (!populerPaginElement) return;
+
+  // Use populerPage variable - create it if it doesn't exist
+  if (typeof populerPage === 'undefined') {
+    window.populerPage = 1; // Use global variable
+  }
 
   const btn = (label, page, disabled = false, extra = '', aria = '') =>
     `<button class="page-btn ${extra}" data-page="${page}" ${disabled ? 'disabled' : ''} ${aria}>${label}</button>`;
 
   const maxBtn = 5;
-  let start = Math.max(1, currentPage - Math.floor(maxBtn / 2));
+  let start = Math.max(1, window.populerPage - Math.floor(maxBtn / 2));
   let end = start + maxBtn - 1;
   if (end > totalPage) { end = totalPage; start = Math.max(1, end - maxBtn + 1); }
 
   let html = '';
-  html += btn('«', 1, currentPage === 1, '', 'aria-label="Halaman pertama"');
-  html += btn('‹', currentPage - 1, currentPage === 1, '', 'aria-label="Sebelumnya"');
+  html += btn('«', 1, window.populerPage === 1, '', 'aria-label="Halaman pertama"');
+  html += btn('‹', window.populerPage - 1, window.populerPage === 1, '', 'aria-label="Sebelumnya"');
   for (let i = start; i <= end; i++) {
-    const active = i === currentPage;
+    const active = i === window.populerPage;
     html += btn(i, i, false, active ? 'active' : '', active ? 'aria-current="page"' : '');
   }
-  html += btn('›', currentPage + 1, currentPage === totalPage, '', 'aria-label="Berikutnya"');
-  html += btn('»', totalPage, currentPage === totalPage, '', 'aria-label="Halaman terakhir"');
+  html += btn('›', window.populerPage + 1, window.populerPage === totalPage, '', 'aria-label="Berikutnya"');
+  html += btn('»', totalPage, window.populerPage === totalPage, '', 'aria-label="Halaman terakhir"');
 
-  pagin.innerHTML = html;
+  populerPaginElement.innerHTML = html;
 }
+
 
 /* ---------- MAIN FUNCTION WITH DYNAMIC CONTENT ---------- */
 let currentSearch = '';
 let currentCategory = 'all';
+let currentSubcategory = '';
+let currentMinPrice = '';
+let currentMaxPrice = '';
+let currentRating = '';
+let currentSort = 'popular';
+let allProductsCache = []; // Cache untuk menyimpan semua produk saat ini
 
 // Initialize filters from URL parameters
 function initFiltersFromUrl() {
   const urlParams = new URLSearchParams(window.location.search);
-  
+
   // Initialize category filter from URL
   const categoryParam = urlParams.get('kategori');
   if (categoryParam) {
@@ -375,32 +605,97 @@ function initFiltersFromUrl() {
       }
     }
   }
+
+  // Initialize subcategory filter from URL
+  const subcategoryParam = urlParams.get('subkategori');
+  if (subcategoryParam) {
+    const subcategorySelect = document.getElementById('filter-subkategori');
+    if (subcategorySelect) {
+      subcategorySelect.value = subcategoryParam;
+      currentSubcategory = subcategoryParam;
+    }
+  }
+
+  // Initialize min price filter from URL
+  const minPriceParam = urlParams.get('min_price');
+  if (minPriceParam) {
+    const minPriceInput = document.getElementById('filter-harga-min');
+    if (minPriceInput) {
+      minPriceInput.value = minPriceParam;
+      currentMinPrice = minPriceParam;
+    }
+  }
+
+  // Initialize max price filter from URL
+  const maxPriceParam = urlParams.get('max_price');
+  if (maxPriceParam) {
+    const maxPriceInput = document.getElementById('filter-harga-max');
+    if (maxPriceInput) {
+      maxPriceInput.value = maxPriceParam;
+      currentMaxPrice = maxPriceParam;
+    }
+  }
+
+  // Initialize rating filter from URL
+  const ratingParam = urlParams.get('rating');
+  if (ratingParam) {
+    const ratingSelect = document.getElementById('filter-rating');
+    if (ratingSelect) {
+      ratingSelect.value = ratingParam;
+      currentRating = ratingParam;
+    }
+  }
+
+  // Initialize sort filter from URL
+  const sortParam = urlParams.get('sort');
+  if (sortParam) {
+    const sortSelect = document.getElementById('filter-urutkan');
+    if (sortSelect) {
+      sortSelect.value = sortParam;
+      currentSort = sortParam;
+    }
+  }
 }
 
 async function updateContent() {
   let products = [];
-  
+
   // If search or filter is applied, use search API
-  if (currentSearch || currentCategory !== 'all') {
-    products = await searchProducts(currentSearch, currentCategory);
+  if (currentSearch || currentCategory !== 'all' || currentSubcategory || currentMinPrice || currentMaxPrice || currentRating || currentSort !== 'popular') {
+    products = await searchProducts(currentSearch, currentCategory, currentSubcategory, currentMinPrice, currentMaxPrice, currentRating, currentSort);
   } else {
     // Otherwise, load all products from API to ensure we have the latest
-    products = await loadAllProducts(currentCategory);
+    products = await loadAllProducts(currentCategory, currentSubcategory, currentMinPrice, currentMaxPrice, currentRating, currentSort);
   }
-  
+
+  // Cache products for efficient pagination
+  allProductsCache = products;
+
   renderList(products);
-  
-  // For recommendations, use a subset of products
-  const recommendations = products.length > 0 ? 
-    products.slice(0, 8).sort(() => Math.random() - 0.5) : 
-    [];
-  renderRekomendasi(recommendations);
-  
+
+  // For recommendations, use a subset of products from current results
+  if (products.length > 0) {
+    const recommendations = products.slice(0, 8).sort(() => Math.random() - 0.5);
+    renderRekomendasi(recommendations);
+    // Cache recommendations for pagination
+    rekomPool = recommendations;
+  } else {
+    // If no products from current search/filter, load popular products for recommendations
+    loadPopularProducts().then(recommendationProducts => {
+      renderRekomendasi(recommendationProducts.slice(0, 8));
+      // Cache recommendations for pagination
+      rekomPool = recommendationProducts;
+    });
+  }
+
   // Load and render popular products
   loadPopularProducts().then(popularProducts => {
     renderProdukPopuler(popularProducts);
+    // Cache popular products for pagination (if populer-pagination is added)
+    window.popularPool = popularProducts;
   });
 }
+
 
 /* ---------- EVENTS ---------- */
 inputSearch?.addEventListener('input', debounce(() => {
@@ -412,7 +707,7 @@ inputSearch?.addEventListener('input', debounce(() => {
 selectKategori?.addEventListener('change', () => {
   currentCategory = selectKategori.value;
   currentPage = 1;
-  
+
   // Update URL to reflect category selection
   const url = new URL(window.location);
   if (currentCategory && currentCategory !== 'all') {
@@ -421,19 +716,151 @@ selectKategori?.addEventListener('change', () => {
     url.searchParams.delete('kategori');
   }
   window.history.replaceState({}, '', url);
-  
+
+  // Populate subcategories based on selected category
+  populateSubcategories(currentCategory);
+
   updateContent();
 });
 
-pagin?.addEventListener('click', e => {
-  const t = e.target.closest('.page-btn');
-  if (!t || t.disabled) return;
-  const to = +t.dataset.page;
-  if (to >= 1) {
-    currentPage = to;
-    updateContent(); // Re-render with current products
+// Function to populate subcategories based on selected category
+async function populateSubcategories(category) {
+  if (!selectSubkategori || !category || category === 'all') {
+    // If no category is selected or 'all' is selected, reset subcategories
+    selectSubkategori.innerHTML = '<option value="">Semua</option>';
+    currentSubcategory = '';
+    return;
   }
+
+  try {
+    // Fetch subcategories for the selected category
+    // Assuming there's an API endpoint for getting subcategories by category
+    const response = await fetch(`/api/categories/${encodeURIComponent(category)}/subcategories`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const subcategories = await response.json();
+
+    // Clear existing options
+    selectSubkategori.innerHTML = '<option value="">Semua</option>';
+
+    // Add new options
+    if (Array.isArray(subcategories) && subcategories.length > 0) {
+      subcategories.forEach(subcategory => {
+        const option = document.createElement('option');
+        option.value = subcategory.name || subcategory;
+        option.textContent = subcategory.name || subcategory;
+        selectSubkategori.appendChild(option);
+      });
+    } else {
+      // If no subcategories found, disable the subcategory filter
+      selectSubkategori.disabled = true;
+      const disabledOption = document.createElement('option');
+      disabledOption.textContent = 'Tidak ada subkategori';
+      disabledOption.disabled = true;
+      selectSubkategori.appendChild(disabledOption);
+    }
+
+    selectSubkategori.disabled = false;
+  } catch (error) {
+    console.error('Error fetching subcategories:', error);
+    // On error, reset subcategory filter but show an error option
+    selectSubkategori.innerHTML = '<option value="">Semua</option>';
+    const errorOption = document.createElement('option');
+    errorOption.textContent = 'Gagal memuat subkategori';
+    errorOption.disabled = true;
+    selectSubkategori.appendChild(errorOption);
+    selectSubkategori.disabled = true;
+  }
+}
+
+// Event listener for subcategory filter
+selectSubkategori?.addEventListener('change', () => {
+  currentSubcategory = selectSubkategori.value;
+  currentPage = 1;
+
+  // Update URL to reflect subcategory selection
+  const url = new URL(window.location);
+  if (currentSubcategory) {
+    url.searchParams.set('subkategori', currentSubcategory);
+  } else {
+    url.searchParams.delete('subkategori');
+  }
+  window.history.replaceState({}, '', url);
+
+  updateContent();
 });
+
+// Event listener for min price filter
+inputHargaMin?.addEventListener('input', () => {
+  currentMinPrice = inputHargaMin.value;
+  currentPage = 1;
+
+  // Update URL to reflect min price selection
+  const url = new URL(window.location);
+  if (currentMinPrice) {
+    url.searchParams.set('min_price', currentMinPrice);
+  } else {
+    url.searchParams.delete('min_price');
+  }
+  window.history.replaceState({}, '', url);
+
+  updateContent();
+});
+
+// Event listener for max price filter
+inputHargaMax?.addEventListener('input', () => {
+  currentMaxPrice = inputHargaMax.value;
+  currentPage = 1;
+
+  // Update URL to reflect max price selection
+  const url = new URL(window.location);
+  if (currentMaxPrice) {
+    url.searchParams.set('max_price', currentMaxPrice);
+  } else {
+    url.searchParams.delete('max_price');
+  }
+  window.history.replaceState({}, '', url);
+
+  updateContent();
+});
+
+// Event listener for rating filter
+selectRating?.addEventListener('change', () => {
+  currentRating = selectRating.value;
+  currentPage = 1;
+
+  // Update URL to reflect rating selection
+  const url = new URL(window.location);
+  if (currentRating) {
+    url.searchParams.set('rating', currentRating);
+  } else {
+    url.searchParams.delete('rating');
+  }
+  window.history.replaceState({}, '', url);
+
+  updateContent();
+});
+
+// Event listener for sort filter
+selectUrutkan?.addEventListener('change', () => {
+  currentSort = selectUrutkan.value;
+  currentPage = 1;
+
+  // Update URL to reflect sort selection
+  const url = new URL(window.location);
+  if (currentSort) {
+    url.searchParams.set('sort', currentSort);
+  } else {
+    url.searchParams.delete('sort');
+  }
+  window.history.replaceState({}, '', url);
+
+  updateContent();
+});
+
 
 /* tombol di grid utama */
 grid?.addEventListener('click', e => {
@@ -557,11 +984,68 @@ function showNotification(message, type = 'info') {
 /* tombol refresh produk */
 // Tidak ada tombol refresh karena sudah dihapus dari UI
 
+// Pagination event listener for main products
+pagin?.addEventListener('click', e => {
+  const target = e.target.closest('.page-btn');
+  if (!target || target.disabled) return;
+
+  const page = parseInt(target.dataset.page);
+  if (page && page !== currentPage) {
+    currentPage = page;
+    // Re-render products with current page
+    if (allProductsCache && allProductsCache.length > 0) {
+      renderList(allProductsCache);
+    } else {
+      updateContent(); // Re-fetch if cache is not available
+    }
+  }
+});
+
+// Pagination event listener for rekomendasi
+rekomPagin?.addEventListener('click', e => {
+  const target = e.target.closest('.page-btn');
+  if (!target || target.disabled) return;
+
+  const page = parseInt(target.dataset.page);
+  if (page && page !== rekomPage) {
+    rekomPage = page;
+    // Re-render rekomendasi products with current page
+    // We need to have the full rekom pool to paginate, so we'll need to store it
+    if (rekomPool && rekomPool.length > 0) {
+      renderRekomendasi(rekomPool);
+    } else {
+      // If no pool, we need to fetch again
+      loadPopularProducts().then(recommendationProducts => {
+        rekomPool = recommendationProducts;
+        renderRekomendasi(rekomPool);
+      });
+    }
+  }
+});
+
+// Pagination event listener for populer (if pagination element exists)
+const populerPagination = document.getElementById('populer-pagination');
+populerPagination?.addEventListener('click', e => {
+  const target = e.target.closest('.page-btn');
+  if (!target || target.disabled) return;
+
+  const page = parseInt(target.dataset.page);
+  if (page && page !== (window.populerPage || 1)) {
+    window.populerPage = page;
+    // Re-render populer products with current page
+    loadPopularProducts().then(popularProducts => {
+      // We need to have the full popular pool to paginate
+      window.popularPool = popularProducts;
+      renderProdukPopuler(popularProducts);
+    });
+  }
+});
+
 /* ---------- INIT WITH LIVE DATA ---------- */
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize filters based on URL parameters
   initFiltersFromUrl();
-  
+
   // Muat produk terbaru dari API saat halaman dimuat
   updateContent();
 });

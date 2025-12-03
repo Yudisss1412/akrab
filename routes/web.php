@@ -1006,9 +1006,6 @@ Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout'])->
 Route::middleware(['auth'])->get('/dashboard', [App\Http\Controllers\RoleDashboardController::class,
 'showRoleBasedDashboard'])->name('dashboard');
 
-// API route for filtering products
-Route::get('/api/products/filter', [App\Http\Controllers\ProductController::class, 'filter'])->name('api.products.filter');
-
 // API routes for categories
 Route::middleware(['auth', 'admin.role'])->group(function () {
     Route::post('/api/categories', [App\Http\Controllers\Api\CategoryController::class, 'store']);

@@ -140,14 +140,61 @@ class ProductController extends Controller
         }
 
         $mainImage = $product->main_image;
+
+        // Fallback kategori dan subkategori yang lebih bijak
+        $categoryName = 'Umum';
+        $subcategoryName = 'Umum';
+
+        if ($product->category && is_object($product->category)) {
+            $categoryName = $product->category->name;
+        } elseif ($product->category_id) {
+            // Jika category_id ada tapi relasi tidak ditemukan, coba ambil kategori
+            $category = Category::find($product->category_id);
+            if ($category) {
+                $categoryName = $category->name;
+            }
+        }
+
+        if ($product->subcategory && is_object($product->subcategory)) {
+            $subcategoryName = $product->subcategory->name;
+        } elseif ($product->subcategory_id) {
+            // Jika subcategory_id ada tapi relasi tidak ditemukan, coba ambil subkategori
+            $subcategory = Subcategory::find($product->subcategory_id);
+            if ($subcategory) {
+                $subcategoryName = $subcategory->name;
+            }
+        } elseif (!empty($product->subcategory) && $product->subcategory !== 'Umum') {
+            // Cek apakah produk memiliki field subcategory string yang bukan 'Umum'
+            $subcategoryName = $product->subcategory;
+        }
+
+        // Jika produk masih memiliki nama kategori/subkategori sebagai "Umum", coba ambil dari cache atau database
+        // Gunakan kategori/subkategori default acak jika produk benar-benar tidak memiliki data valid
+        static $defaultCategory = null;
+        static $defaultSubcategory = null;
+
+        if ($categoryName === 'Umum') {
+            if ($defaultCategory === null) {
+                $defaultCategory = Category::first(); // Ambil kategori pertama sebagai fallback
+            }
+            $categoryName = $defaultCategory ? $defaultCategory->name : 'Umum';
+        }
+
+        if ($subcategoryName === 'Umum') {
+            if ($defaultSubcategory === null) {
+                $defaultSubcategory = Subcategory::first(); // Ambil subkategori pertama sebagai fallback
+            }
+            $subcategoryName = $defaultSubcategory ? $defaultSubcategory->name : 'Umum';
+        }
+
         $formattedProduct = [
             'id' => $product->id,
             'nama' => $product->name,
             'name' => $product->name,
-            'kategori' => $product->category && is_object($product->category) ? $product->category->name : 'Umum',
-            'category_name' => $product->category && is_object($product->category) ? $product->category->name : 'Umum',
-            'subkategori' => $product->subcategory && is_object($product->subcategory) ? $product->subcategory->name : ($product->subcategory ?? 'Umum'),
-            'subcategory_name' => $product->subcategory && is_object($product->subcategory) ? $product->subcategory->name : ($product->subcategory ?? 'Umum'),
+            'kategori' => $categoryName,
+            'category_name' => $categoryName,
+            'subkategori' => $subcategoryName,
+            'subcategory_name' => $subcategoryName,
             'harga' => $product->price,
             'price' => $product->price, // Hanya angka untuk perhitungan, bukan teks dengan format
             'deskripsi' => $product->description,
@@ -354,6 +401,50 @@ class ProductController extends Controller
         
         // Format data produk untuk ditampilkan di halaman kategori
         $formattedProducts = $products->map(function($product) {
+            $categoryName = 'Umum';
+            $subcategoryName = 'Umum';
+
+            if ($product->category && is_object($product->category)) {
+                $categoryName = $product->category->name;
+            } elseif ($product->category_id) {
+                // Jika category_id ada tapi relasi tidak ditemukan, coba ambil kategori
+                $category = \App\Models\Category::find($product->category_id);
+                if ($category) {
+                    $categoryName = $category->name;
+                }
+            }
+
+            if ($product->subcategory && is_object($product->subcategory)) {
+                $subcategoryName = $product->subcategory->name;
+            } elseif ($product->subcategory_id) {
+                // Jika subcategory_id ada tapi relasi tidak ditemukan, coba ambil subkategori
+                $subcategory = \App\Models\Subcategory::find($product->subcategory_id);
+                if ($subcategory) {
+                    $subcategoryName = $subcategory->name;
+                }
+            } elseif (!empty($product->subcategory) && $product->subcategory !== 'Umum') {
+                // Cek apakah produk memiliki field subcategory string yang bukan 'Umum'
+                $subcategoryName = $product->subcategory;
+            }
+
+            // Jika produk masih memiliki nama kategori/subkategori sebagai "Umum", gunakan fallback
+            static $defaultCategory = null;
+            static $defaultSubcategory = null;
+
+            if ($categoryName === 'Umum') {
+                if ($defaultCategory === null) {
+                    $defaultCategory = \App\Models\Category::first(); // Ambil kategori pertama sebagai fallback
+                }
+                $categoryName = $defaultCategory ? $defaultCategory->name : 'Umum';
+            }
+
+            if ($subcategoryName === 'Umum') {
+                if ($defaultSubcategory === null) {
+                    $defaultSubcategory = \App\Models\Subcategory::first(); // Ambil subkategori pertama sebagai fallback
+                }
+                $subcategoryName = $defaultSubcategory ? $defaultSubcategory->name : 'Umum';
+            }
+
             return [
                 'id' => $product->id,
                 'name' => $product->name,
@@ -362,8 +453,8 @@ class ProductController extends Controller
                 'image' => $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder.png'),
                 'average_rating' => round($product->averageRating, 1),
                 'review_count' => $product->reviews_count,
-                'category_name' => $product->category->name ?? 'Umum',
-                'subcategory_name' => $product->subcategory ? $product->subcategory->name : ($product->subcategory ?? 'Umum'),
+                'category_name' => $categoryName,
+                'subcategory_name' => $subcategoryName,
             ];
         });
         
@@ -709,6 +800,51 @@ class ProductController extends Controller
             $mainImage = $product->main_image;
             $imageUrl = $mainImage ? asset('storage/' . $mainImage) : asset('src/placeholder.png');
 
+            // Fallback kategori dan subkategori yang lebih bijak
+            $categoryName = 'Umum';
+            $subcategoryName = 'Umum';
+
+            if ($product->category && is_object($product->category)) {
+                $categoryName = $product->category->name;
+            } elseif ($product->category_id) {
+                // Jika category_id ada tapi relasi tidak ditemukan, coba ambil kategori
+                $category = \App\Models\Category::find($product->category_id);
+                if ($category) {
+                    $categoryName = $category->name;
+                }
+            }
+
+            if ($product->subcategory && is_object($product->subcategory)) {
+                $subcategoryName = $product->subcategory->name;
+            } elseif ($product->subcategory_id) {
+                // Jika subcategory_id ada tapi relasi tidak ditemukan, coba ambil subkategori
+                $subcategory = \App\Models\Subcategory::find($product->subcategory_id);
+                if ($subcategory) {
+                    $subcategoryName = $subcategory->name;
+                }
+            } elseif (!empty($product->subcategory) && $product->subcategory !== 'Umum') {
+                // Cek apakah produk memiliki field subcategory string yang bukan 'Umum'
+                $subcategoryName = $product->subcategory;
+            }
+
+            // Jika produk masih memiliki nama kategori/subkategori sebagai "Umum", gunakan fallback
+            static $defaultCategory = null;
+            static $defaultSubcategory = null;
+
+            if ($categoryName === 'Umum') {
+                if ($defaultCategory === null) {
+                    $defaultCategory = \App\Models\Category::first(); // Ambil kategori pertama sebagai fallback
+                }
+                $categoryName = $defaultCategory ? $defaultCategory->name : 'Umum';
+            }
+
+            if ($subcategoryName === 'Umum') {
+                if ($defaultSubcategory === null) {
+                    $defaultSubcategory = \App\Models\Subcategory::first(); // Ambil subkategori pertama sebagai fallback
+                }
+                $subcategoryName = $defaultSubcategory ? $defaultSubcategory->name : 'Umum';
+            }
+
             return [
                 'id' => $product->id,
                 'name' => $product->name,
@@ -723,14 +859,14 @@ class ProductController extends Controller
                 'rating' => round($product->averageRating, 1), // Using both naming conventions for compatibility
                 'review_count' => $product->reviews_count,
                 'jumlah_ulasan' => $product->reviews_count, // Using both naming conventions for compatibility
-                'kategori' => $product->category->name ?? 'Umum', // Using kategori key to match getAllProducts format
-                'category' => $product->category->name ?? 'Umum', // Using both naming conventions for compatibility
-                'subkategori' => $product->subcategory ? $product->subcategory->name : ($product->subcategory ?? 'Umum'), // Using subkategori key to match getAllProducts format
-                'subcategory' => $product->subcategory ? $product->subcategory->name : ($product->subcategory ?? 'Umum'), // Using both naming conventions for compatibility
+                'kategori' => $categoryName, // Using kategori key to match getAllProducts format
+                'category' => $categoryName, // Using both naming conventions for compatibility
+                'subkategori' => $subcategoryName, // Using subkategori key to match getAllProducts format
+                'subcategory' => $subcategoryName, // Using both naming conventions for compatibility
                 'toko' => $product->seller->store_name ?? 'Toko Umum', // Using toko key to match getAllProducts format
                 'seller' => $product->seller->store_name ?? 'Toko Umum', // Using both naming conventions for compatibility
                 'specifications' => [
-                    'Kategori: ' . ($product->category->name ?? 'Umum'),
+                    'Kategori: ' . $categoryName,
                     'Stok: ' . $product->stock,
                     'Berat: ' . $product->weight . 'g'
                 ], // Spesifikasi sederhana

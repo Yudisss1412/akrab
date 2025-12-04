@@ -860,9 +860,28 @@ main[role="main"] {
   margin-bottom: 6px !important;
 }
 
-#rekom-grid .produk-card-stars svg, .produk-card-stars svg {
+/* Styling untuk ikon bintang agar seragam dengan halaman welcome */
+.produk-page .produk-rating svg,
+.produk-page .produk-card-stars svg,
+#rekom-grid .produk-card-stars svg,
+#populer-grid .produk-card-stars svg {
   width: 18px !important;
   height: 18px !important;
+}
+
+/* Pastikan ukuran bintang konsisten di semua bagian halaman produk */
+.produk-rating svg,
+.produk-card-stars svg {
+  width: 18px !important;
+  height: 18px !important;
+  flex-shrink: 0 !important; /* Mencegah bintang dikecilkan */
+}
+
+/* Styling tambahan untuk bintang agar seragam dengan halaman welcome */
+.produk-card-stars {
+  display: flex !important;
+  gap: 2px !important;
+  margin-bottom: 6px !important;
 }
 
 #rekom-grid .produk-rating-angka, .produk-rating-angka {

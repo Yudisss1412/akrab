@@ -90,24 +90,53 @@ body {
 
 /* Title + Filter */
 .produk-page .produk-header-row{
-  display:flex; align-items:end; justify-content:space-between;
+  display:flex; align-items:flex-end; justify-content:space-between;
   gap:16px; margin-bottom:16px; flex-wrap:wrap;
 }
 .produk-page .produk-title{
   margin:0; font-size:28px; font-weight:800; color:var(--primary-color-dark);
+  flex-shrink: 0;
 }
-.produk-page .produk-filter-right{ display:flex; align-items:center; gap:10px; flex-wrap: wrap; }
-.produk-page .produk-filter-right label{ font-weight:600; color:var(--primary-color-dark); font-size: 14px; }
+.produk-page .produk-filter-right {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 15px;
+  background: #ffffff;
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.produk-page .produk-filter-right label {
+  font-weight: 600;
+  color: var(--primary-color-dark);
+  font-size: 12px;
+  margin-bottom: 4px;
+  display: block;
+}
+
 .produk-page .produk-filter-right select,
-.produk-page .produk-filter-right input{
-  border:1.5px solid var(--border-color); border-radius:8px; padding:8px 12px;
-  background:#fff; font-size:14px;
+.produk-page .produk-filter-right input {
+  border: 1.5px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: #fff;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.produk-page .produk-filter-right select:focus,
+.produk-page .produk-filter-right input:focus {
+  border-color: var(--primary-color-dark);
 }
 
 .filter-group {
   display: flex;
   flex-direction: column;
-  min-width: 120px;
+  min-width: 130px;
 }
 
 .filter-group label {
@@ -116,6 +145,7 @@ body {
   font-size: 12px;
   margin-bottom: 4px;
   text-align: left;
+  padding: 0 2px;
 }
 
 .filter-group select,
@@ -125,11 +155,147 @@ body {
   padding: 8px 12px;
   background: #fff;
   font-size: 14px;
-  min-width: 120px;
+  min-width: 130px;
+  max-width: 150px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.filter-group select {
+  min-width: 140px;
 }
 
 .filter-group input {
-  width: 120px;
+  width: 100%;
+  padding: 8px 12px;
+}
+
+/* Responsif untuk filter */
+@media (max-width: 1200px) {
+  .filter-group {
+    min-width: 125px;
+  }
+
+  .filter-group select,
+  .filter-group input {
+    min-width: 125px;
+    max-width: 125px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .filter-group {
+    min-width: 120px;
+  }
+
+  .filter-group select,
+  .filter-group input {
+    min-width: 120px;
+    max-width: 120px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .filter-group {
+    min-width: 110px;
+  }
+
+  .filter-group select,
+  .filter-group input {
+    min-width: 110px;
+    max-width: 110px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 850px) {
+  .produk-page .produk-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .produk-page .produk-filter-right {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 15px;
+    gap: 10px;
+  }
+
+  /* Tambahkan scrollbar style untuk tampilan yang lebih rapi */
+  .produk-page .produk-filter-right::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .produk-page .produk-filter-right::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+
+  .produk-page .produk-filter-right::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+  }
+
+  .produk-page .produk-filter-right::-webkit-scrollbar-thumb:hover {
+    background: #a8d5c9;
+  }
+
+  .filter-group {
+    min-width: 130px;
+    flex-shrink: 0;
+  }
+
+  .filter-group select,
+  .filter-group input {
+    min-width: 130px;
+    max-width: 130px;
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+}
+
+@media (max-width: 650px) {
+  .filter-group {
+    min-width: 105px;
+    max-width: 120px;
+  }
+
+  .filter-group select,
+  .filter-group input {
+    min-width: 105px;
+    max-width: 120px;
+    font-size: 11px;
+    padding: 6px 8px;
+  }
+
+  .produk-page .produk-filter-right {
+    gap: 8px;
+    padding: 12px;
+  }
+}
+
+@media (max-width: 576px) {
+  .filter-group {
+    min-width: 100px;
+    max-width: 110px;
+  }
+
+  .filter-group select,
+  .filter-group input {
+    width: 100%;
+    min-width: 100px;
+    max-width: 110px;
+    font-size: 11px;
+    padding: 5px 8px;
+  }
+
+  .produk-page .produk-filter-right {
+    gap: 8px;
+    padding: 12px;
+  }
 }
 
 /* Grid Produk */
@@ -617,203 +783,9 @@ main[role="main"] {
   text-decoration: none !important;
 }
 
-/* Styles for JS-generated elements */
-.produk-page .produk-card {
-  position: relative;
-  background: var(--secondary-color);
-  border: 1px solid var(--primary-color);
-  border-radius: 16px;
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  padding: 12px;
-  transition: box-shadow .15s, border-color .15s, transform .15s;
-}
 
-.produk-page .produk-card img {
-  width: 100%;
-  height: 145px;
-  object-fit: cover;
-  border-radius: 10px;
-  background: var(--background-color);
-}
-
-.produk-page .produk-card-info {
-  padding: 8px 4px 6px;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.produk-page .produk-card-name {
-  margin: 8px 0 4px;
-  font-size: 16px;
-  font-weight: 800;
-  color: var(--primary-color-dark);
-}
-
-.produk-page .produk-card-sub {
-  font-size: 13px;
-  color: var(--grey-text-color);
-  margin-bottom: 6px;
-}
-
-.produk-page .produk-card-price {
-  font-weight: 700;
-  margin-bottom: 6px;
-  color: var(--primary-color-dark);
-}
-
-.produk-page .produk-card-stars {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin: 5px 0;
-}
-
-.produk-page .produk-card-actions {
-  margin-top: .5rem;
-  display: flex;
-  gap: .55rem;
-}
-
-.produk-page .btn-lihat,
-.produk-page .btn-add {
-  flex: 1;
-  border: none;
-  border-radius: 8px;
-  padding: .55rem .75rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background .15s, color .15s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  text-align: center;
-}
-
-.produk-page .btn-lihat {
-  background: var(--primary-color-dark);
-  color: #fff;
-}
-
-.produk-page .btn-lihat:hover {
-  background: var(--primary-color);
-  color: var(--primary-color-dark);
-}
-
-.produk-page .btn-add {
-  background: #f5fbf8;
-  color: var(--primary-color-dark);
-  border: 1px solid var(--primary-color-dark);
-}
-
-.produk-page .btn-add:hover {
-  background: var(--primary-color-dark);
-  color: #fff;
-}
-
-/* Rekomendasi card styles */
-.produk-page .rek-card {
-  background: var(--secondary-color);
-  border: 1px solid var(--primary-color);
-  border-radius: 14px;
-  box-shadow: 0 2px 12px rgba(0,0,0,.06);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  transition: box-shadow .15s, border-color .15s;
-}
-
-.produk-page .rek-card:hover {
-  box-shadow: 0 8px 22px rgba(0,110,92,.10);
-  border-color: var(--primary-color-dark);
-}
-
-.produk-page .rek-img {
-  width: 100%;
-  height: 145px;
-  object-fit: cover;
-  background: var(--background-color);
-  flex-shrink: 0;
-}
-
-.produk-page .rek-body {
-  padding: 1rem;
-  flex: 1;
-}
-
-.produk-page .rek-name {
-  font-weight: 700;
-  color: var(--primary-color-dark);
-  line-height: 1.3;
-  margin-bottom: 0.25rem;
-}
-
-.produk-page .rek-cat {
-  font-size: .9rem;
-  color: var(--grey-text-color);
-  margin-bottom: 0.25rem;
-}
-
-.produk-page .rek-price {
-  font-weight: 700;
-  color: var(--primary-color-dark);
-  margin-bottom: 0.5rem;
-}
-
-.produk-page .rek-actions {
-  margin-top: 0.5rem;
-  display: flex;
-  gap: .55rem;
-}
-
-.produk-page .rek-btn {
-  flex: 1;
-  border: none;
-  border-radius: 8px;
-  padding: .55rem .75rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background .15s, color .15s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-}
-
-.produk-page .rek-btn.primary {
-  background: var(--primary-color-dark);
-  color: #fff;
-}
-
-.produk-page .rek-btn.primary:hover {
-  background: var(--primary-color);
-  color: var(--primary-color-dark);
-}
-
-.produk-page .rek-btn.ghost {
-  background: #f5fbf8;
-  color: var(--primary-color-dark);
-  border: 1px solid var(--primary-color-dark);
-}
-
-.produk-page .rek-btn.ghost:hover {
-  background: var(--primary-color-dark);
-  color: #fff;
-}
-
-/* CSS untuk memastikan elemen produk muncul dengan benar meskipun dihasilkan oleh JS */
-#produk-grid, #rekom-grid, #populer-grid {
-  display: grid !important;
-  grid-template-columns: repeat(4, 1fr) !important;
-  gap: 18px !important;
-}
-
-/* Pastikan setiap produk card memiliki styling yang benar */
-.produk-card, .rek-card {
+/* Styling card produk untuk rekomendasi dan populer sesuai dengan cust_welcome */
+#rekom-grid .produk-card, .produk-card {
   position: relative !important;
   background: var(--secondary-color) !important;
   border: 1px solid var(--primary-color) !important;
@@ -826,55 +798,108 @@ main[role="main"] {
   transition: box-shadow .15s, border-color .15s, transform .15s !important;
 }
 
-.produk-card img, .rek-img {
+#rekom-grid .produk-card:hover {
+  box-shadow: var(--shadow-md) !important;
+  border-color: var(--primary-color-dark) !important;
+  transform: translateY(-1px) !important;
+}
+
+#rekom-grid .produk-card img, .produk-card img {
   width: 100% !important;
   height: 145px !important;
   object-fit: cover !important;
   border-radius: 10px !important;
   background: var(--background-color) !important;
+  flex-shrink: 0 !important;
 }
 
-.produk-card-info, .rek-body {
+#rekom-grid .produk-card-info, .produk-card-info {
   padding: 8px 4px 6px !important;
+  flex: 1 !important;
   display: flex !important;
   flex-direction: column !important;
-  height: 100% !important;
+  min-height: 0 !important; /* Mencegah elemen melampaui batas card */
 }
 
-.produk-card-name, .rek-name {
+#rekom-grid .produk-card-info > *, .produk-card-info > * {
+  margin-bottom: 4px !important;
+}
+
+#rekom-grid .produk-card-info > *:last-child, .produk-card-info > *:last-child {
+  margin-bottom: 0 !important;
+}
+
+#rekom-grid .produk-card-name, .produk-card-name {
   margin: 8px 0 4px !important;
   font-size: 16px !important;
   font-weight: 800 !important;
   color: var(--primary-color-dark) !important;
 }
 
-.produk-card-sub, .rek-cat {
+#rekom-grid .produk-card-sub, .produk-card-sub {
   font-size: 13px !important;
   color: var(--grey-text-color) !important;
   margin-bottom: 6px !important;
 }
 
-.produk-card-price, .rek-price {
+#rekom-grid .produk-card-toko, .produk-card-toko {
+  font-size: 13px !important;
+  color: var(--grey-text-color) !important;
+  margin-bottom: 6px !important;
+}
+
+#rekom-grid .produk-card-price, .produk-card-price {
   font-weight: 700 !important;
   margin-bottom: 6px !important;
   color: var(--primary-color-dark) !important;
 }
 
-.produk-card-stars {
+#rekom-grid .produk-card-stars, .produk-card-stars {
   display: flex !important;
-  align-items: center !important;
-  gap: 5px !important;
-  margin: 5px 0 !important;
+  gap: 2px !important;
+  margin-bottom: 6px !important;
 }
 
-.produk-card-actions, .rek-actions {
+#rekom-grid .produk-card-stars svg, .produk-card-stars svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+#rekom-grid .produk-rating-angka, .produk-rating-angka {
+  font-size: 14px !important;
+  color: var(--grey-text-color) !important;
+  margin-top: 4px !important;
+}
+
+#rekom-grid .produk-card-actions, .produk-card-actions {
   margin-top: .5rem !important;
   display: flex !important;
   gap: .55rem !important;
 }
 
-/* Tombol styling */
-.btn-lihat, .btn-add, .rek-btn {
+#rekom-grid .produk-aksi, .produk-aksi {
+  display: flex !important;
+  gap: .55rem !important;
+  padding: 10px 4px 4px !important;
+}
+
+#rekom-grid .produk-aksi a,
+#rekom-grid .produk-aksi button,
+.produk-aksi a,
+.produk-aksi button {
+  flex: 1 !important;
+  border-radius: var(--btn-radius) !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  padding: .70rem 0 !important;
+  cursor: pointer !important;
+  transition: background .15s, color .15s, border-color .15s !important;
+  text-align: center !important;
+}
+
+#rekom-grid .btn-lihat,
+#rekom-grid .btn-add,
+.btn-lihat, .btn-add {
   flex: 1 !important;
   border: none !important;
   border-radius: 8px !important;
@@ -889,23 +914,351 @@ main[role="main"] {
   text-align: center !important;
 }
 
-.btn-lihat {
+#rekom-grid .btn-lihat, .btn-lihat {
   background: var(--primary-color-dark) !important;
   color: #fff !important;
 }
 
-.btn-lihat:hover {
+#rekom-grid .btn-lihat:hover, .btn-lihat:hover {
   background: var(--primary-color) !important;
   color: var(--primary-color-dark) !important;
 }
 
-.btn-add {
+#rekom-grid .btn-add, .btn-add {
   background: #f5fbf8 !important;
   color: var(--primary-color-dark) !important;
   border: 1px solid var(--primary-color-dark) !important;
 }
 
-.btn-add:hover {
+#rekom-grid .btn-add:hover, .btn-add:hover {
+  background: var(--primary-color-dark) !important;
+  color: #fff !important;
+}
+
+/* Styling untuk populer grid */
+#populer-grid .produk-card, .produk-card {
+  position: relative !important;
+  background: var(--secondary-color) !important;
+  border: 1px solid var(--primary-color) !important;
+  border-radius: 16px !important;
+  box-shadow: var(--shadow-sm) !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 12px !important;
+  transition: box-shadow .15s, border-color .15s, transform .15s !important;
+}
+
+#populer-grid .produk-card:hover {
+  box-shadow: var(--shadow-md) !important;
+  border-color: var(--primary-color-dark) !important;
+  transform: translateY(-1px) !important;
+}
+
+#populer-grid .produk-card img, .produk-card img {
+  width: 100% !important;
+  height: 145px !important;
+  object-fit: cover !important;
+  border-radius: 10px !important;
+  background: var(--background-color) !important;
+  flex-shrink: 0 !important;
+}
+
+#populer-grid .produk-card-info, .produk-card-info {
+  padding: 8px 4px 6px !important;
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important; /* Mencegah elemen melampaui batas card */
+}
+
+#populer-grid .produk-card-info > *, .produk-card-info > * {
+  margin-bottom: 4px !important;
+}
+
+#populer-grid .produk-card-info > *:last-child, .produk-card-info > *:last-child {
+  margin-bottom: 0 !important;
+}
+
+#populer-grid .produk-card-name, .produk-card-name {
+  margin: 8px 0 4px !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  color: var(--primary-color-dark) !important;
+}
+
+#populer-grid .produk-card-sub, .produk-card-sub {
+  font-size: 13px !important;
+  color: var(--grey-text-color) !important;
+  margin-bottom: 6px !important;
+}
+
+#populer-grid .produk-card-toko, .produk-card-toko {
+  font-size: 13px !important;
+  color: var(--grey-text-color) !important;
+  margin-bottom: 6px !important;
+}
+
+#populer-grid .produk-card-price, .produk-card-price {
+  font-weight: 700 !important;
+  margin-bottom: 6px !important;
+  color: var(--primary-color-dark) !important;
+}
+
+#populer-grid .produk-card-stars, .produk-card-stars {
+  display: flex !important;
+  gap: 2px !important;
+  margin-bottom: 6px !important;
+}
+
+#populer-grid .produk-card-stars svg, .produk-card-stars svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+#populer-grid .produk-rating-angka, .produk-rating-angka {
+  font-size: 14px !important;
+  color: var(--grey-text-color) !important;
+  margin-top: 4px !important;
+}
+
+#populer-grid .produk-card-actions, .produk-card-actions {
+  margin-top: .5rem !important;
+  display: flex !important;
+  gap: .55rem !important;
+}
+
+#populer-grid .produk-aksi, .produk-aksi {
+  display: flex !important;
+  gap: .55rem !important;
+  padding: 10px 4px 4px !important;
+}
+
+#populer-grid .produk-aksi a,
+#populer-grid .produk-aksi button,
+.produk-aksi a,
+.produk-aksi button {
+  flex: 1 !important;
+  border-radius: var(--btn-radius) !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  padding: .70rem 0 !important;
+  cursor: pointer !important;
+  transition: background .15s, color .15s, border-color .15s !important;
+  text-align: center !important;
+}
+
+#populer-grid .btn-lihat,
+#populer-grid .btn-add,
+.btn-lihat, .btn-add {
+  flex: 1 !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: .55rem .75rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: background .15s, color .15s !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-decoration: none !important;
+  text-align: center !important;
+}
+
+#populer-grid .btn-lihat, .btn-lihat {
+  background: var(--primary-color-dark) !important;
+  color: #fff !important;
+}
+
+#populer-grid .btn-lihat:hover, .btn-lihat:hover {
+  background: var(--primary-color) !important;
+  color: var(--primary-color-dark) !important;
+}
+
+#populer-grid .btn-add, .btn-add {
+  background: #f5fbf8 !important;
+  color: var(--primary-color-dark) !important;
+  border: 1px solid var(--primary-color-dark) !important;
+}
+
+#populer-grid .btn-add:hover, .btn-add:hover {
+  background: var(--primary-color-dark) !important;
+  color: #fff !important;
+}
+
+/* CSS untuk memastikan elemen produk muncul dengan benar meskipun dihasilkan oleh JS */
+#produk-grid, #rekom-grid, #populer-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 18px !important;
+}
+
+/* Responsif untuk grid produk */
+@media (max-width: 1200px) {
+  #produk-grid, #rekom-grid, #populer-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  #produk-grid, #rekom-grid, #populer-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 520px) {
+  #produk-grid, #rekom-grid, #populer-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Styling card produk sesuai dengan cust_welcome */
+#produk-grid .produk-card, .produk-card {
+  position: relative !important;
+  background: var(--secondary-color) !important;
+  border: 1px solid var(--primary-color) !important;
+  border-radius: 16px !important;
+  box-shadow: var(--shadow-sm) !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 12px !important;
+  transition: box-shadow .15s, border-color .15s, transform .15s !important;
+}
+
+#produk-grid .produk-card:hover {
+  box-shadow: var(--shadow-md) !important;
+  border-color: var(--primary-color-dark) !important;
+  transform: translateY(-1px) !important;
+}
+
+#produk-grid .produk-card img, .produk-card img {
+  width: 100% !important;
+  height: 145px !important;
+  object-fit: cover !important;
+  border-radius: 10px !important;
+  background: var(--background-color) !important;
+  flex-shrink: 0 !important;
+}
+
+#produk-grid .produk-card-info, .produk-card-info {
+  padding: 8px 4px 6px !important;
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important; /* Mencegah elemen melampaui batas card */
+}
+
+#produk-grid .produk-card-info > *, .produk-card-info > * {
+  margin-bottom: 4px !important;
+}
+
+#produk-grid .produk-card-info > *:last-child, .produk-card-info > *:last-child {
+  margin-bottom: 0 !important;
+}
+
+#produk-grid .produk-card-name, .produk-card-name {
+  margin: 8px 0 4px !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  color: var(--primary-color-dark) !important;
+}
+
+#produk-grid .produk-card-sub, .produk-card-sub {
+  font-size: 13px !important;
+  color: var(--grey-text-color) !important;
+  margin-bottom: 6px !important;
+}
+
+#produk-grid .produk-card-toko, .produk-card-toko {
+  font-size: 13px !important;
+  color: var(--grey-text-color) !important;
+  margin-bottom: 6px !important;
+}
+
+#produk-grid .produk-card-price, .produk-card-price {
+  font-weight: 700 !important;
+  margin-bottom: 6px !important;
+  color: var(--primary-color-dark) !important;
+}
+
+#produk-grid .produk-card-stars, .produk-card-stars {
+  display: flex !important;
+  gap: 2px !important;
+  margin-bottom: 6px !important;
+}
+
+#produk-grid .produk-card-stars svg, .produk-card-stars svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+#produk-grid .produk-rating-angka, .produk-rating-angka {
+  font-size: 14px !important;
+  color: var(--grey-text-color) !important;
+  margin-top: 4px !important;
+}
+
+#produk-grid .produk-card-actions, .produk-card-actions {
+  margin-top: .5rem !important;
+  display: flex !important;
+  gap: .55rem !important;
+}
+
+#produk-grid .produk-aksi, .produk-aksi {
+  display: flex !important;
+  gap: .55rem !important;
+  padding: 10px 4px 4px !important;
+}
+
+#produk-grid .produk-aksi a,
+#produk-grid .produk-aksi button,
+.produk-aksi a,
+.produk-aksi button {
+  flex: 1 !important;
+  border-radius: var(--btn-radius) !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  padding: .70rem 0 !important;
+  cursor: pointer !important;
+  transition: background .15s, color .15s, border-color .15s !important;
+  text-align: center !important;
+}
+
+#produk-grid .btn-lihat,
+#produk-grid .btn-add,
+.btn-lihat, .btn-add {
+  flex: 1 !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: .55rem .75rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: background .15s, color .15s !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-decoration: none !important;
+  text-align: center !important;
+}
+
+#produk-grid .btn-lihat, .btn-lihat {
+  background: var(--primary-color-dark) !important;
+  color: #fff !important;
+}
+
+#produk-grid .btn-lihat:hover, .btn-lihat:hover {
+  background: var(--primary-color) !important;
+  color: var(--primary-color-dark) !important;
+}
+
+#produk-grid .btn-add, .btn-add {
+  background: #f5fbf8 !important;
+  color: var(--primary-color-dark) !important;
+  border: 1px solid var(--primary-color-dark) !important;
+}
+
+#produk-grid .btn-add:hover, .btn-add:hover {
   background: var(--primary-color-dark) !important;
   color: #fff !important;
 }

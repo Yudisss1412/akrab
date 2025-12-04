@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Subcategory;
 use App\Models\Seller;
 use Illuminate\Http\Request;
 
@@ -283,7 +284,7 @@ class ProductController extends Controller
     /**
      * Tampilkan halaman kategori berdasarkan nama kategori
      */
-    public function showCategoryPage($categoryName)
+    public function showCategoryPage($categoryName, Request $request)
     {
         // Mapping antara nama route dan nama kategori di database
         $categoryNameMap = [
@@ -306,10 +307,42 @@ class ProductController extends Controller
         }
         
         // Ambil produk berdasarkan kategori dengan informasi lengkap
-        $products = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images'])
+        $query = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images'])
                          ->where('category_id', $category->id)
-                         ->where('status', 'active')
-                         ->get();
+                         ->where('status', 'active');
+
+        // Filter berdasarkan subkategori jika ada di query string
+        $request = request(); // Mendapatkan request instance
+        $subkategori = $request->query('subkategori');
+        if ($subkategori) {
+            // Ambil semua subkategori sekali saja untuk efisiensi
+            $allSubcategories = Subcategory::all();
+
+            // Fungsi bantu untuk mencari nama subkategori dari slug
+            $getSubcategoryNameFromSlug = function($slug) use ($allSubcategories) {
+                foreach ($allSubcategories as $subcategory) {
+                    // Buat slug dari nama subkategori yang sebenarnya
+                    $actualSlug = strtolower(str_replace(' ', '-', trim($subcategory->name)));
+                    if ($actualSlug === $slug) {
+                        return $subcategory->name; // return the actual name as stored in DB
+                    }
+                }
+
+                // Jika tidak ditemukan, kembalikan null
+                return null;
+            };
+
+            $name = $getSubcategoryNameFromSlug($subkategori);
+            if ($name) {
+                $query->where(function($q) use ($name) {
+                    $q->whereHas('subcategory', function($relQuery) use ($name) {
+                        $relQuery->where('name', $name);
+                    })->orWhere('subcategory', $name);
+                });
+            }
+        }
+
+        $products = $query->get();
         
         // Tambahkan average rating dan review count ke setiap produk
         $products = $products->map(function($product) {
@@ -348,10 +381,14 @@ class ProductController extends Controller
         $categoryTitle = ucfirst(str_replace('-', ' ', $categoryName));
         $categoryDescription = "Temukan berbagai produk {$categoryTitle} dari UMKM lokal";
         
+        // Ambil subkategori untuk kategori ini
+        $subcategories = $category->subcategories;
+
         // Kirim data ke view base
         return view('customer.kategori.base', array_merge([
             'categoryTitle' => $categoryTitle,
             'categoryDescription' => $categoryDescription,
+            'subcategories' => $subcategories,
         ], $pageData));
     }
 
@@ -508,20 +545,56 @@ class ProductController extends Controller
                 $q->where('name', $actualCategory);
             });
         }
-        
-        // Filter berdasarkan subkategori
+        // Ambil semua subkategori sekali saja untuk efisiensi
+        $allSubcategories = Subcategory::all();
+
+        // Fungsi bantu untuk mencari nama subkategori dari slug
+        $getSubcategoryNameFromSlug = function($slug) use ($allSubcategories) {
+            foreach ($allSubcategories as $subcategory) {
+                // Buat slug dari nama subkategori yang sebenarnya
+                $actualSlug = strtolower(str_replace(' ', '-', trim($subcategory->name)));
+                if ($actualSlug === $slug) {
+                    return $subcategory->name; // return the actual name as stored in DB
+                }
+            }
+
+            // Jika tidak ditemukan, kembalikan null
+            return null;
+        };
+
+        // Filter berdasarkan subkategori - periksa menggunakan relasi subcategory (subcategory_id) dan field subcategory (string)
         $subkategori = $request->query('subkategori');
         if ($subkategori && is_array($subkategori) && count($subkategori) > 0) {
-            $query = $query->whereHas('subcategory', function($q) use ($subkategori) {
-                $q->whereIn('name', $subkategori);
+            // Mencari subkategori berdasarkan slug
+            $query = $query->where(function($q) use ($subkategori, $getSubcategoryNameFromSlug) {
+                $foundNames = [];
+                foreach ($subkategori as $slug) {
+                    $name = $getSubcategoryNameFromSlug($slug);
+                    if ($name) {
+                        $foundNames[] = $name;
+                    }
+                }
+                if (!empty($foundNames)) {
+                    // Gabungkan filter untuk relasi subcategory_id dan field subcategory string
+                    $q->where(function($subQuery) use ($foundNames) {
+                        $subQuery->whereHas('subcategory', function($relQuery) use ($foundNames) {
+                            $relQuery->whereIn('name', $foundNames);
+                        })->orWhereIn('subcategory', $foundNames);
+                    });
+                }
             });
         } elseif ($request->has('subkategori') && !empty($request->query('subkategori'))) {
             // Kondisi jika subkategori bukan array
             $singleSubkategori = $request->query('subkategori');
             if (!is_array($singleSubkategori)) {
-                $query = $query->whereHas('subcategory', function($q) use ($singleSubkategori) {
-                    $q->where('name', $singleSubkategori);
-                });
+                $name = $getSubcategoryNameFromSlug($singleSubkategori);
+                if ($name) {
+                    $query = $query->where(function($q) use ($name) {
+                        $q->whereHas('subcategory', function($relQuery) use ($name) {
+                            $relQuery->where('name', $name);
+                        })->orWhere('subcategory', $name);
+                    });
+                }
             }
         }
         

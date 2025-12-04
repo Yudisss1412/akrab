@@ -401,30 +401,15 @@
               </div>
               <div class="filter-content" id="subkategori-content">
                 <div class="filter-checkbox-group">
-                  <label class="checkbox-label">
-                    <input type="checkbox" name="subkategori[]" value="makanan"> Makanan
-                  </label>
-                  <label class="checkbox-label">
-                    <input type="checkbox" name="subkategori[]" value="minuman"> Minuman
-                  </label>
-                  <label class="checkbox-label">
-                    <input type="checkbox" name="subkategori[]" value="pakaian-pria"> Pakaian Pria
-                  </label>
-                  <label class="checkbox-label">
-                    <input type="checkbox" name="subkategori[]" value="pakaian-wanita"> Pakaian Wanita
-                  </label>
-                  <label class="checkbox-label">
-                    <input type="checkbox" name="subkategori[]" value="aksesoris"> Aksesoris
-                  </label>
-                  <label class="checkbox-label">
-                    <input type="checkbox" name="subkategori[]" value="kerajinan-logam"> Kerajinan Logam
-                  </label>
-                  <label class="checkbox-label">
-                    <input type="checkbox" name="subkategori[]" value="kerajinan-kayu"> Kerajinan Kayu
-                  </label>
-                  <label class="checkbox-label">
-                    <input type="checkbox" name="subkategori[]" value="tanaman-hias"> Tanaman Hias
-                  </label>
+                  @if(isset($subcategories) && $subcategories->count() > 0)
+                    @foreach($subcategories as $subcategory)
+                      <label class="checkbox-label">
+                        <input type="checkbox" name="subkategori[]" value="{{ \Illuminate\Support\Str::slug($subcategory->name) }}"> {{ $subcategory->name }}
+                      </label>
+                    @endforeach
+                  @else
+                    <p class="no-subcategories">Tidak ada subkategori untuk kategori ini</p>
+                  @endif
                 </div>
               </div>
             </div>

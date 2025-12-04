@@ -728,51 +728,73 @@ async function populateSubcategories(category) {
   if (!selectSubkategori || !category || category === 'all') {
     // If no category is selected or 'all' is selected, reset subcategories
     selectSubkategori.innerHTML = '<option value="">Semua</option>';
+    selectSubkategori.disabled = false;
     currentSubcategory = '';
     return;
   }
 
+  // Map the category name to match the URL format expected by the API
+  const categoryNameMap = {
+    'Kuliner': 'kuliner',
+    'Fashion': 'fashion',
+    'Kerajinan Tangan': 'kerajinan',
+    'Produk Berkebun': 'berkebun',
+    'Produk Kesehatan': 'kesehatan',
+    'Mainan': 'mainan',
+    'Hampers': 'hampers',
+  };
+
+  // Check if the category matches a known category name and map it to URL format
+  let apiCategory = category.toLowerCase();
+
+  // Look for a match in the reverse mapping
+  for (const [dbCategory, urlCategory] of Object.entries(categoryNameMap)) {
+    if (dbCategory.toLowerCase() === category.toLowerCase()) {
+      apiCategory = urlCategory;
+      break;
+    }
+  }
+
   try {
-    // Fetch subcategories for the selected category
-    // Assuming there's an API endpoint for getting subcategories by category
-    const response = await fetch(`/api/categories/${encodeURIComponent(category)}/subcategories`);
+    // Call the new API endpoint that we created to get subcategories by category name
+    const response = await fetch(`/api/subcategories/category/${encodeURIComponent(apiCategory)}`);
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      selectSubkategori.innerHTML = '<option value="">Semua</option>';
+      selectSubkategori.disabled = false;
+      return;
     }
 
-    const subcategories = await response.json();
+    const data = await response.json();
+
+    if (!data.success) {
+      selectSubkategori.innerHTML = '<option value="">Semua</option>';
+      selectSubkategori.disabled = false;
+      return;
+    }
 
     // Clear existing options
     selectSubkategori.innerHTML = '<option value="">Semua</option>';
 
-    // Add new options
-    if (Array.isArray(subcategories) && subcategories.length > 0) {
-      subcategories.forEach(subcategory => {
+    // Add new options from subcategories
+    if (data.subcategories && data.subcategories.length > 0) {
+      data.subcategories.forEach(subcategory => {
         const option = document.createElement('option');
-        option.value = subcategory.name || subcategory;
-        option.textContent = subcategory.name || subcategory;
+        // Use the slug of the subcategory name as the value
+        const slug = subcategory.name.toLowerCase().replace(/\s+/g, '-');
+        option.value = slug;
+        option.textContent = subcategory.name;
         selectSubkategori.appendChild(option);
       });
-    } else {
-      // If no subcategories found, disable the subcategory filter
-      selectSubkategori.disabled = true;
-      const disabledOption = document.createElement('option');
-      disabledOption.textContent = 'Tidak ada subkategori';
-      disabledOption.disabled = true;
-      selectSubkategori.appendChild(disabledOption);
     }
 
     selectSubkategori.disabled = false;
   } catch (error) {
-    console.error('Error fetching subcategories:', error);
-    // On error, reset subcategory filter but show an error option
+    // On error, show an empty option but don't disable the field
+    // This allows users to still use the filter if there's no subcategory data
     selectSubkategori.innerHTML = '<option value="">Semua</option>';
-    const errorOption = document.createElement('option');
-    errorOption.textContent = 'Gagal memuat subkategori';
-    errorOption.disabled = true;
-    selectSubkategori.appendChild(errorOption);
-    selectSubkategori.disabled = true;
+    selectSubkategori.disabled = false;
+    console.error('Error fetching subcategories:', error);
   }
 }
 

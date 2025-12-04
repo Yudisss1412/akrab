@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\Api\SubcategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,3 +19,6 @@ use App\Http\Controllers\ProductController;
 Route::get('/products/popular', [ProductController::class, 'popular']);
 Route::get('/products/{id}', [ProductController::class, 'apiShow']);
 Route::get('/products/filter', [ProductController::class, 'filter'])->name('api.products.filter');
+
+// Subcategory API routes
+Route::get('/subcategories/category/{categoryName}', [SubcategoryController::class, 'getSubcategoriesByCategoryName']);

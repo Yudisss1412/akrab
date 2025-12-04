@@ -21,6 +21,38 @@ class SubcategoryController extends Controller
         ]);
     }
 
+    public function getSubcategoriesByCategoryName($categoryName)
+    {
+        // Mapping antara nama route dan nama kategori di database
+        $categoryNameMap = [
+            'kuliner' => 'Kuliner',
+            'fashion' => 'Fashion',
+            'kerajinan' => 'Kerajinan Tangan',
+            'berkebun' => 'Produk Berkebun',
+            'kesehatan' => 'Produk Kesehatan',
+            'mainan' => 'Mainan',
+            'hampers' => 'Hampers',
+        ];
+
+        $categoryNameInDB = $categoryNameMap[$categoryName] ?? $categoryName;
+
+        $category = Category::where('name', $categoryNameInDB)->first();
+
+        if (!$category) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kategori tidak ditemukan'
+            ], 404);
+        }
+
+        $subcategories = $category->subcategories; // Relasi dari model Category
+
+        return response()->json([
+            'success' => true,
+            'subcategories' => $subcategories
+        ]);
+    }
+
     public function show($id)
     {
         $subcategory = Subcategory::findOrFail($id);

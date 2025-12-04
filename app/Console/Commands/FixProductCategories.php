@@ -202,6 +202,52 @@ class FixProductCategories extends Command
             $this->info("Tidak ditemukan seller di database.");
         }
 
+        // Tambahkan pengecekan tambahan untuk produk-produk yang mungkin menampilkan "Umum" di tampilan
+        // walaupun mereka memiliki category_id yang valid
+        $this->info("Memeriksa produk-produk yang mungkin menampilkan 'Umum' karena subkategori bermasalah...");
+
+        $problematicProducts = Product::where(function($query) {
+            // Produk-produk yang mungkin menampilkan "Umum"
+            $query->whereNull('subcategory_id')
+                  ->orWhere('subcategory_id', 0)
+                  ->orWhere('subcategory', 'Umum')
+                  ->orWhereNull('subcategory')
+                  ->orWhere('subcategory', '');
+        })->get();
+
+        $this->info("Menemukan {$problematicProducts->count()} produk dengan subkategori bermasalah.");
+
+        foreach ($problematicProducts as $product) {
+            // Jika produk memiliki kategori valid tapi subkategori tidak valid, perbaiki subkategori
+            if ($product->category_id) {
+                // Cari subkategori yang sesuai dengan kategori produk ini
+                $categorySubcategories = \App\Models\Subcategory::where('category_id', $product->category_id)->get();
+
+                if ($categorySubcategories->isNotEmpty()) {
+                    // Pilih subkategori acak dari kategori yang sesuai
+                    $randomSubcategory = $categorySubcategories->random();
+                    $product->subcategory_id = $randomSubcategory->id;
+                    $product->subcategory = $randomSubcategory->name;
+                    $product->save();
+
+                    $updatedCount++;
+                    $this->info("Produk ID {$product->id} ({$product->name}) diperbarui subkategori menjadi: {$randomSubcategory->name}");
+                } else {
+                    // Jika tidak ada subkategori untuk kategori ini, pilih dari semua subkategori
+                    $allSubcategories = \App\Models\Subcategory::all();
+                    if ($allSubcategories->isNotEmpty()) {
+                        $randomSubcategory = $allSubcategories->random();
+                        $product->subcategory_id = $randomSubcategory->id;
+                        $product->subcategory = $randomSubcategory->name;
+                        $product->save();
+
+                        $updatedCount++;
+                        $this->info("Produk ID {$product->id} ({$product->name}) diperbarui subkategori menjadi: {$randomSubcategory->name}");
+                    }
+                }
+            }
+        }
+
         $this->info("Proses selesai. {$updatedCount} produk telah diperbarui.");
     }
 }

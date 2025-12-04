@@ -168,23 +168,26 @@ class ProductController extends Controller
             $subcategoryName = $product->subcategory;
         }
 
-        // Jika produk masih memiliki nama kategori/subkategori sebagai "Umum", coba ambil dari cache atau database
-        // Gunakan kategori/subkategori default acak jika produk benar-benar tidak memiliki data valid
-        static $defaultCategory = null;
-        static $defaultSubcategory = null;
-
-        if ($categoryName === 'Umum') {
-            if ($defaultCategory === null) {
-                $defaultCategory = Category::first(); // Ambil kategori pertama sebagai fallback
+        // Pastikan tidak menampilkan "Umum" jika produk sebenarnya memiliki kategori valid
+        // Ambil kategori/subkategori terkait dari database jika hanya fallback ke "Umum"
+        if ($categoryName === 'Umum' && $product->category_id) {
+            $category = Category::find($product->category_id);
+            if ($category) {
+                $categoryName = $category->name;
             }
-            $categoryName = $defaultCategory ? $defaultCategory->name : 'Umum';
         }
 
-        if ($subcategoryName === 'Umum') {
-            if ($defaultSubcategory === null) {
-                $defaultSubcategory = Subcategory::first(); // Ambil subkategori pertama sebagai fallback
+        if ($subcategoryName === 'Umum' && $product->subcategory_id) {
+            $subcategory = Subcategory::find($product->subcategory_id);
+            if ($subcategory) {
+                $subcategoryName = $subcategory->name;
             }
-            $subcategoryName = $defaultSubcategory ? $defaultSubcategory->name : 'Umum';
+        }
+
+        // Jika masih "Umum" dan produk tidak memiliki ID kategori/subkategori,
+        // coba ambil dari field string subcategory
+        if ($subcategoryName === 'Umum' && !empty($product->subcategory) && $product->subcategory !== 'Umum') {
+            $subcategoryName = $product->subcategory;
         }
 
         $formattedProduct = [
@@ -427,22 +430,26 @@ class ProductController extends Controller
                 $subcategoryName = $product->subcategory;
             }
 
-            // Jika produk masih memiliki nama kategori/subkategori sebagai "Umum", gunakan fallback
-            static $defaultCategory = null;
-            static $defaultSubcategory = null;
-
-            if ($categoryName === 'Umum') {
-                if ($defaultCategory === null) {
-                    $defaultCategory = \App\Models\Category::first(); // Ambil kategori pertama sebagai fallback
+            // Pastikan tidak menampilkan "Umum" jika produk sebenarnya memiliki kategori valid
+            // Ambil kategori/subkategori terkait dari database jika hanya fallback ke "Umum"
+            if ($categoryName === 'Umum' && $product->category_id) {
+                $category = \App\Models\Category::find($product->category_id);
+                if ($category) {
+                    $categoryName = $category->name;
                 }
-                $categoryName = $defaultCategory ? $defaultCategory->name : 'Umum';
             }
 
-            if ($subcategoryName === 'Umum') {
-                if ($defaultSubcategory === null) {
-                    $defaultSubcategory = \App\Models\Subcategory::first(); // Ambil subkategori pertama sebagai fallback
+            if ($subcategoryName === 'Umum' && $product->subcategory_id) {
+                $subcategory = \App\Models\Subcategory::find($product->subcategory_id);
+                if ($subcategory) {
+                    $subcategoryName = $subcategory->name;
                 }
-                $subcategoryName = $defaultSubcategory ? $defaultSubcategory->name : 'Umum';
+            }
+
+            // Jika masih "Umum" dan produk tidak memiliki ID kategori/subkategori,
+            // coba ambil dari field string subcategory
+            if ($subcategoryName === 'Umum' && !empty($product->subcategory) && $product->subcategory !== 'Umum') {
+                $subcategoryName = $product->subcategory;
             }
 
             return [
@@ -827,22 +834,26 @@ class ProductController extends Controller
                 $subcategoryName = $product->subcategory;
             }
 
-            // Jika produk masih memiliki nama kategori/subkategori sebagai "Umum", gunakan fallback
-            static $defaultCategory = null;
-            static $defaultSubcategory = null;
-
-            if ($categoryName === 'Umum') {
-                if ($defaultCategory === null) {
-                    $defaultCategory = \App\Models\Category::first(); // Ambil kategori pertama sebagai fallback
+            // Pastikan tidak menampilkan "Umum" jika produk sebenarnya memiliki kategori valid
+            // Ambil kategori/subkategori terkait dari database jika hanya fallback ke "Umum"
+            if ($categoryName === 'Umum' && $product->category_id) {
+                $category = \App\Models\Category::find($product->category_id);
+                if ($category) {
+                    $categoryName = $category->name;
                 }
-                $categoryName = $defaultCategory ? $defaultCategory->name : 'Umum';
             }
 
-            if ($subcategoryName === 'Umum') {
-                if ($defaultSubcategory === null) {
-                    $defaultSubcategory = \App\Models\Subcategory::first(); // Ambil subkategori pertama sebagai fallback
+            if ($subcategoryName === 'Umum' && $product->subcategory_id) {
+                $subcategory = \App\Models\Subcategory::find($product->subcategory_id);
+                if ($subcategory) {
+                    $subcategoryName = $subcategory->name;
                 }
-                $subcategoryName = $defaultSubcategory ? $defaultSubcategory->name : 'Umum';
+            }
+
+            // Jika masih "Umum" dan produk tidak memiliki ID kategori/subkategori,
+            // coba ambil dari field string subcategory
+            if ($subcategoryName === 'Umum' && !empty($product->subcategory) && $product->subcategory !== 'Umum') {
+                $subcategoryName = $product->subcategory;
             }
 
             return [

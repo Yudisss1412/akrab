@@ -68,8 +68,8 @@
             </div>
 
             <div class="map-container">
-              <label for="map">Lokasi pada Peta</label>
-              <div id="map" style="height: 300px; width: 100%; border: 1px solid #ddd; border-radius: 8px;"></div>
+              <label>Lokasi pada Peta</label>
+              <div id="map"></div>
             </div>
 
             <div class="form-group field">

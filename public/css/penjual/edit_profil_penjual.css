@@ -46,6 +46,27 @@ body{margin:0;font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Helvet
 
 form{margin-top:18px}
 
+/* Map container styling */
+.map-container {
+  margin-bottom: 16px;
+}
+
+.map-container label {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 8px;
+  display: block;
+}
+
+#map {
+  height: 300px;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-top: 8px;
+}
+
 /* Form group styling - same as customer */
 .form-group{
   display:flex;flex-direction:column;margin-bottom:16px;
@@ -87,6 +108,11 @@ form{margin-top:18px}
 .form-group textarea{
   height:auto;min-height:44px;
   padding-top: 20px; /* Increased padding-top to make room for the floating label */
+}
+
+/* Specific styling for address textarea */
+#address {
+  min-height: 80px;
 }
 
 .form-group input:focus,.form-group textarea:focus,.form-group select:focus{
@@ -191,6 +217,7 @@ form{margin-top:18px}
   background:#fff;border:1px solid var(--border);border-radius:8px;
   height:28px;padding:0 8px;cursor:pointer;font-size:14px;
 }
+
 
 /* Alert container styling - same as customer */
 .form-alert-container {

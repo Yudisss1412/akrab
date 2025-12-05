@@ -7,18 +7,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&family=Inter:wght@400&display=swap" rel="stylesheet">
-    <!-- Pastikan path ke file CSS sudah benar -->
-    <link rel="stylesheet" href="{{ asset('css/auth/register.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/auth/login.css') }}">
 </head>
-<body>
+<body class="js-enabled">
     <div class="register-container">
         <div class="register-content">
-            <div class="welcome-text">
+            <div class="welcome-text is-visible">
                 <h1>Gabung & Dukung<br>UMKM Lokal</h1>
                 <p>Buat akunmu untuk mulai menjelajahi produk UMKM terbaik dari seluruh Indonesia.</p>
                 <p>Belanja langsung dari para pelaku usaha lokal dengan mudah dan aman.</p>
             </div>
-            <div class="register-form-box">
+            <div class="login-form-box register-page is-visible">
                 <h2>Silahkan Daftar</h2>
                 <form id="registerForm" method="POST" action="{{ route('register') }}" novalidate>
                     @csrf

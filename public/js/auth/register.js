@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const welcomeText = document.querySelector('.welcome-text');
-    const registerFormBox = document.querySelector('.register-form-box');
+    const registerFormBox = document.querySelector('.login-form-box.register-page');
     setTimeout(() => {
         if(welcomeText) welcomeText.classList.add('is-visible');
     }, 100);
@@ -104,9 +104,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Registration successful
                 console.log('Registration successful, showing notification and redirecting...');
                 
-                registerFormBox.style.transition = 'all 0.5s ease';
-                registerFormBox.style.opacity = '0';
-                registerFormBox.style.transform = 'scale(0.9)';
+                if(registerFormBox) {
+                    registerFormBox.style.transition = 'all 0.5s ease';
+                    registerFormBox.style.opacity = '0';
+                    registerFormBox.style.transform = 'scale(0.9)';
+                }
 
                 // Show success toast notification in the center of screen
                 const toast = document.createElement('div');

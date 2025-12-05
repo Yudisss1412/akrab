@@ -759,6 +759,12 @@ Route::get('/register', [App\Http\Controllers\AuthController::class, 'showRegist
 Route::post('/register', [App\Http\Controllers\AuthController::class, 'register']);
 Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout'])->name('logout');
 
+// Password Reset Routes
+Route::get('/password/reset', [App\Http\Controllers\ResetPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('/password/email', [App\Http\Controllers\ResetPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('/password/reset/{token}', [App\Http\Controllers\ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('/password/reset', [App\Http\Controllers\ResetPasswordController::class, 'reset'])->name('password.update');
+
 // General dashboard route that shows different content based on role
 Route::middleware(['auth'])->get('/dashboard', [App\Http\Controllers\RoleDashboardController::class,
 'showRoleBasedDashboard'])->name('dashboard');

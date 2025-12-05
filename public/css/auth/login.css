@@ -36,7 +36,8 @@ body, html {
     overflow: hidden;
 }
 
-.login-container {
+.login-container,
+.register-container {
     width: 100%;
     height: 100%;
     display: flex;
@@ -49,7 +50,8 @@ body, html {
     animation: gradientBG 15s ease infinite;
 }
 
-.login-content {
+.login-content,
+.register-content {
     position: relative;
     z-index: 2;
     width: 100%;
@@ -103,6 +105,18 @@ body, html {
     transition: all 0.5s ease;
 }
 
+.register-form-box {
+    width: 387px;
+    min-height: 516px; /* Disesuaikan untuk 4 input */
+    background-color: rgba(255, 255, 255, 0.6);
+    border-radius: 30px;
+    padding: 25px 30px;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+    transition: all 0.5s ease;
+}
+
 
 
 .login-form-box h2 {
@@ -114,8 +128,13 @@ body, html {
 }
 
 .form-group {
-    margin-bottom: 25px; 
+    margin-bottom: 25px;
     position: relative;
+}
+
+/* Sesuaikan margin untuk register form */
+.register-form-box .form-group {
+    margin-bottom: 22px;
 }
 
 .form-group label {
@@ -180,7 +199,22 @@ body, html {
     opacity: 1;
 }
 
-.login-button {
+.alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.login-button,
+.register-button {
     width: 100%;
     height: 48px;
     border: none;
@@ -191,17 +225,19 @@ body, html {
     font-size: 20px;
     color: var(--secondary-color);
     cursor: pointer;
-    margin-top: 25px; 
+    margin-top: 25px;
     transition: all 0.3s ease;
 }
 
-.login-button:hover {
+.login-button:hover,
+.register-button:hover {
     background-color: #005a4c;
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(0, 110, 92, 0.3);
 }
 
-.login-button:active {
+.login-button:active,
+.register-button:active {
     transform: translateY(0);
     box-shadow: none;
 }
@@ -210,6 +246,12 @@ body, html {
     display: flex;
     justify-content: space-between;
     margin-top: 15px;
+}
+
+/* Khusus untuk register page */
+.register-form-box .form-links {
+    text-align: center;
+    justify-content: center;
 }
 
 .form-links a {
@@ -226,8 +268,24 @@ body, html {
     opacity: 0.8;
 }
 
+/* Menyesuaikan tinggi form untuk halaman reset password yang memiliki lebih banyak input */
+.login-form-box.reset-password-form {
+    min-height: 460px; /* Disesuaikan untuk 3 input + 1 hidden input */
+}
+
+/* Menyesuaikan tinggi form untuk halaman permintaan reset password */
+.login-form-box.password-request-form {
+    min-height: 382px; /* Sama dengan form login biasa karena hanya memiliki 1 input */
+}
+
+/* Sesuaikan tampilan alert */
+.login-form-box .alert {
+    margin-bottom: 15px;
+}
+
 @media (max-width: 992px) {
-    .login-content {
+    .login-content,
+    .register-content {
         flex-direction: column;
         gap: 3rem;
         text-align: center;
@@ -241,6 +299,8 @@ body, html {
 @media (max-width: 480px) {
     .welcome-text h1 { font-size: 36px; }
     .welcome-text p { font-size: 16px; }
-    .login-form-box { width: 100%; padding: 20px; }
-    .login-form-box h2 { font-size: 32px; }
+    .login-form-box,
+    .register-form-box { width: 100%; padding: 20px; }
+    .login-form-box h2,
+    .register-form-box h2 { font-size: 32px; }
 }

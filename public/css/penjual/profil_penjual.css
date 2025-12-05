@@ -148,6 +148,28 @@ a.btn{
 }
 .info-list > div:last-child{ border-bottom:none; }
 
+/* Styling untuk peta di profil penjual */
+#seller-map {
+  height: 300px;
+  width: 100%;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  margin-top: 8px;
+  background: #f0f0f0; /* background placeholder sementara */
+}
+
+/* Memastikan elemen dd yang berisi peta memiliki tampilan yang benar */
+.info-list dd #seller-map {
+  height: 300px;
+  width: 100%;
+}
+
+/* Pastikan daftar definisi tidak memengaruhi tampilan peta */
+.info-list dd {
+  width: 100%; /* Pastikan lebar penuh */
+  overflow: hidden; /* Jika ada masalah overflow */
+}
+
 @media (max-width:600px){
   .seller-hero{ gap:.75rem; }
   .info-list > div{ flex-direction:column; align-items:flex-start; gap:.25rem; }

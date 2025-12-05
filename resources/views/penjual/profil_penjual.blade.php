@@ -59,7 +59,7 @@
         <div>
           <dt>Lokasi</dt>
           <dd>
-            <div id="seller-map" style="height: 300px; width: 100%; border: 1px solid var(--ak-border); border-radius: 8px; margin-top: 10px;"></div>
+            <div id="seller-map"></div>
           </dd>
         </div>
         <div>
@@ -118,45 +118,95 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-        // Ambil data dari server
-        const address = `{{ $user->address ?? '' }}`;
-        const lat = {{ $user->lat ? $user->lat : 'null' }};
-        const lng = {{ $user->lng ? $user->lng : 'null' }};
-
-        // Jika ada koordinat yang disimpan di database, gunakan langsung
-        if (lat && lng) {
-          const map = L.map('seller-map').setView([lat, lng], 15);
-
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          }).addTo(map);
-
-          L.marker([lat, lng]).addTo(map)
-            .bindPopup(address || 'Lokasi Penjual').openPopup();
+        // Cek apakah Leaflet telah dimuat
+        if (typeof L === 'undefined') {
+          console.error('Leaflet library not loaded');
+          const mapElement = document.getElementById('seller-map');
+          if (mapElement) {
+            mapElement.style.display = 'flex';
+            mapElement.style.alignItems = 'center';
+            mapElement.style.justifyContent = 'center';
+            mapElement.style.backgroundColor = '#f8f9fa';
+            mapElement.style.border = '1px solid #e9ecef';
+            mapElement.innerHTML = '<div style="text-align: center; color: #6c757d;"><i>Map library not loaded</i></div>';
+          }
+          return;
         }
-        // Jika tidak ada koordinat disimpan tapi ada alamat, lakukan geocoding
-        else if (address) {
-          fetch('{{ route("seller.geocode.address") }}', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
-            },
-            body: JSON.stringify({ address: address })
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              const map = L.map('seller-map').setView([data.data.lat, data.data.lng], 15);
+
+        // Ambil data dari server
+        const address = @json($user->address ?? '');
+        const lat = @json($user->lat);
+        const lng = @json($user->lng);
+
+        // Inisialisasi peta setelah DOM sepenuhnya dimuat
+        setTimeout(function() {
+          const mapElement = document.getElementById('seller-map');
+          if (!mapElement) {
+            console.error('Elemen peta tidak ditemukan');
+            return;
+          }
+
+          try {
+            // Jika ada koordinat yang disimpan di database, gunakan langsung
+            if (lat && lng) {
+              const map = L.map('seller-map').setView([lat, lng], 15);
 
               L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               }).addTo(map);
 
-              L.marker([data.data.lat, data.data.lng]).addTo(map)
-                .bindPopup(data.data.display_name).openPopup();
-            } else {
-              // Jika geocoding gagal, tampilkan peta default
+              L.marker([lat, lng]).addTo(map)
+                .bindPopup(address || 'Lokasi Penjual').openPopup();
+            }
+            // Jika tidak ada koordinat disimpan tapi ada alamat, lakukan geocoding
+            else if (address) {
+              fetch('{{ route("seller.geocode.address") }}', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                },
+                body: JSON.stringify({ address: address })
+              })
+              .then(response => response.json())
+              .then(data => {
+                if (data.success) {
+                  const map = L.map('seller-map').setView([data.data.lat, data.data.lng], 15);
+
+                  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  }).addTo(map);
+
+                  L.marker([data.data.lat, data.data.lng]).addTo(map)
+                    .bindPopup(data.data.display_name).openPopup();
+                } else {
+                  // Jika geocoding gagal, tampilkan peta default
+                  const map = L.map('seller-map').setView([-6.200000, 106.816666], 13);
+
+                  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  }).addTo(map);
+
+                  L.marker([-6.200000, 106.816666]).addTo(map)
+                    .bindPopup('Lokasi Penjual').openPopup();
+                }
+              })
+              .catch(error => {
+                console.error('Error saat mengambil koordinat:', error);
+
+                // Jika terjadi error, tampilkan peta default
+                const map = L.map('seller-map').setView([-6.200000, 106.816666], 13);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
+
+                L.marker([-6.200000, 106.816666]).addTo(map)
+                  .bindPopup('Lokasi Penjual').openPopup();
+              });
+            }
+            // Jika tidak ada alamat, tampilkan peta default
+            else {
               const map = L.map('seller-map').setView([-6.200000, 106.816666], 13);
 
               L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -166,32 +216,17 @@
               L.marker([-6.200000, 106.816666]).addTo(map)
                 .bindPopup('Lokasi Penjual').openPopup();
             }
-          })
-          .catch(error => {
-            console.error('Error saat mengambil koordinat:', error);
-
-            // Jika terjadi error, tampilkan peta default
-            const map = L.map('seller-map').setView([-6.200000, 106.816666], 13);
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-              attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-
-            L.marker([-6.200000, 106.816666]).addTo(map)
-              .bindPopup('Lokasi Penjual').openPopup();
-          });
-        }
-        // Jika tidak ada alamat, tampilkan peta default
-        else {
-          const map = L.map('seller-map').setView([-6.200000, 106.816666], 13);
-
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          }).addTo(map);
-
-          L.marker([-6.200000, 106.816666]).addTo(map)
-            .bindPopup('Lokasi Penjual').openPopup();
-        }
+          } catch (initError) {
+            console.error('Error saat menginisialisasi peta:', initError);
+            // Jika terjadi error saat inisialisasi peta, setel tampilan fallback
+            mapElement.style.display = 'flex';
+            mapElement.style.alignItems = 'center';
+            mapElement.style.justifyContent = 'center';
+            mapElement.style.backgroundColor = '#f8f9fa';
+            mapElement.style.border = '1px solid #e9ecef';
+            mapElement.innerHTML = '<div style="text-align: center; color: #6c757d;"><i>Map not available</i></div>';
+          }
+        }, 100); // Delay kecil untuk memastikan elemen sudah ada di DOM
       });
     </script>
 

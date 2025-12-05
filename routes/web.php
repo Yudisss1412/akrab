@@ -389,6 +389,8 @@ Route::middleware(['auth', 'seller.role'])->group(function () {
     Route::get('/edit_profil_penjual', [App\Http\Controllers\Seller\ProfileController::class, 'edit'])->name('edit.profil.penjual');
 
     Route::put('/profil_penjual', [App\Http\Controllers\Seller\ProfileController::class, 'update'])->name('profil.penjual.update');
+
+    Route::post('/geocode-address', [App\Http\Controllers\Seller\ProfileController::class, 'geocodeAddress'])->name('seller.geocode.address');
 });
 
 Route::get('/invoice', function () {

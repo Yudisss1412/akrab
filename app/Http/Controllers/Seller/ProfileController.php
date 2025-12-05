@@ -112,6 +112,17 @@ class ProfileController extends Controller
             'bank_account_name' => $request->input('accountHolder'),
         ];
 
+        // Jika alamat berubah, coba geocode dan simpan koordinat
+        if ($request->input('address') !== $user->address) {
+            $address = $request->input('address');
+            $coordinates = $this->getCoordinatesFromAddress($address);
+
+            if ($coordinates) {
+                $updateData['lat'] = $coordinates['lat'];
+                $updateData['lng'] = $coordinates['lng'];
+            }
+        }
+
         \Log::info('Profile update request - data to be updated', [
             'user_id' => $user->id,
             'user_current_data' => $user->toArray(),
@@ -148,6 +159,109 @@ class ProfileController extends Controller
                 'bank_name' => $user->bank_name,
                 'bank_account_number' => $user->bank_account_number,
                 'bank_account_name' => $user->bank_account_name,
+            ]
+        ]);
+    }
+
+    /**
+     * Get coordinates from address using OpenStreetMap Nominatim API
+     */
+    private function getCoordinatesFromAddress($address)
+    {
+        if (empty($address)) {
+            return null;
+        }
+
+        $encodedAddress = urlencode($address);
+        $url = "https://nominatim.openstreetmap.org/search?format=json&q={$encodedAddress}&limit=1";
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'User-Agent: EcommerceAkrab/1.0 (contact@ecommerceakrab.com)'
+        ]);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($response === false || $httpCode !== 200) {
+            \Log::error('Failed to get coordinates from Nominatim API', [
+                'address' => $address,
+                'http_code' => $httpCode
+            ]);
+            return null;
+        }
+
+        $data = json_decode($response, true);
+
+        if (empty($data) || !isset($data[0]['lat']) || !isset($data[0]['lon'])) {
+            \Log::warning('No coordinates found for address', ['address' => $address]);
+            return null;
+        }
+
+        return [
+            'lat' => (float) $data[0]['lat'],
+            'lng' => (float) $data[0]['lon']
+        ];
+    }
+
+    /**
+     * Geocode address to coordinates using OpenStreetMap Nominatim API
+     */
+    public function geocodeAddress(Request $request)
+    {
+        $request->validate([
+            'address' => 'required|string|max:255',
+        ]);
+
+        $address = $request->input('address');
+
+        // Encode the address for URL
+        $encodedAddress = urlencode($address);
+
+        // Call OpenStreetMap Nominatim API
+        $url = "https://nominatim.openstreetmap.org/search?format=json&q={$encodedAddress}&limit=1";
+
+        // Set up cURL options
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'User-Agent: EcommerceAkrab/1.0 (contact@ecommerceakrab.com)' // Nominatim requires a proper user agent
+        ]);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($response === false || $httpCode !== 200) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghubungi layanan geocoding'
+            ], 500);
+        }
+
+        $data = json_decode($response, true);
+
+        if (empty($data) || !isset($data[0]['lat']) || !isset($data[0]['lon'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Alamat tidak ditemukan'
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'lat' => (float) $data[0]['lat'],
+                'lng' => (float) $data[0]['lon'],
+                'display_name' => $data[0]['display_name']
             ]
         ]);
     }

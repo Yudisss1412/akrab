@@ -26,6 +26,8 @@ class User extends Authenticatable
         'status',
         'phone',
         'address',
+        'lat',
+        'lng',
         'shop_description',
         'bank_name',
         'bank_account_number',

@@ -7,6 +7,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ asset('css/penjual/profil_penjual.css') }}">
   <link rel="stylesheet" href="{{ asset('css/admin_penjual/style.css') }}">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body>
   @include('components.admin_penjual.header')
@@ -53,6 +55,12 @@
         <div>
           <dt>Alamat</dt>
           <dd>{{ $user->address ?? 'Alamat belum diisi' }}</dd>
+        </div>
+        <div>
+          <dt>Lokasi</dt>
+          <dd>
+            <div id="seller-map" style="height: 300px; width: 100%; border: 1px solid var(--ak-border); border-radius: 8px; margin-top: 10px;"></div>
+          </dd>
         </div>
         <div>
           <dt>Deskripsi Toko</dt>
@@ -105,6 +113,87 @@
     </div> <!-- end of main-layout -->
 
     @include('components.admin_penjual.footer')
+
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Ambil data dari server
+        const address = `{{ $user->address ?? '' }}`;
+        const lat = {{ $user->lat ? $user->lat : 'null' }};
+        const lng = {{ $user->lng ? $user->lng : 'null' }};
+
+        // Jika ada koordinat yang disimpan di database, gunakan langsung
+        if (lat && lng) {
+          const map = L.map('seller-map').setView([lat, lng], 15);
+
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          }).addTo(map);
+
+          L.marker([lat, lng]).addTo(map)
+            .bindPopup(address || 'Lokasi Penjual').openPopup();
+        }
+        // Jika tidak ada koordinat disimpan tapi ada alamat, lakukan geocoding
+        else if (address) {
+          fetch('{{ route("seller.geocode.address") }}', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+            },
+            body: JSON.stringify({ address: address })
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              const map = L.map('seller-map').setView([data.data.lat, data.data.lng], 15);
+
+              L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              }).addTo(map);
+
+              L.marker([data.data.lat, data.data.lng]).addTo(map)
+                .bindPopup(data.data.display_name).openPopup();
+            } else {
+              // Jika geocoding gagal, tampilkan peta default
+              const map = L.map('seller-map').setView([-6.200000, 106.816666], 13);
+
+              L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              }).addTo(map);
+
+              L.marker([-6.200000, 106.816666]).addTo(map)
+                .bindPopup('Lokasi Penjual').openPopup();
+            }
+          })
+          .catch(error => {
+            console.error('Error saat mengambil koordinat:', error);
+
+            // Jika terjadi error, tampilkan peta default
+            const map = L.map('seller-map').setView([-6.200000, 106.816666], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+              attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            L.marker([-6.200000, 106.816666]).addTo(map)
+              .bindPopup('Lokasi Penjual').openPopup();
+          });
+        }
+        // Jika tidak ada alamat, tampilkan peta default
+        else {
+          const map = L.map('seller-map').setView([-6.200000, 106.816666], 13);
+
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          }).addTo(map);
+
+          L.marker([-6.200000, 106.816666]).addTo(map)
+            .bindPopup('Lokasi Penjual').openPopup();
+        }
+      });
+    </script>
 
     <script src="{{ asset('js/penjual/profil_penjual.js') }}"></script>
   </body>

@@ -8,6 +8,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ asset('css/penjual/edit_profil_penjual.css') }}">
   <link rel="stylesheet" href="{{ asset('css/admin_penjual/style.css') }}">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body>
   @include('components.admin_penjual.header')
@@ -63,6 +65,11 @@
               <textarea id="address" name="address" rows="3" required placeholder=" ">{{ old('address', auth()->user()->address ?? 'Alamat belum diisi') }}</textarea>
               <label for="address">Alamat</label>
               <p class="error-message" id="address-error"></p>
+            </div>
+
+            <div class="map-container">
+              <label for="map">Lokasi pada Peta</label>
+              <div id="map" style="height: 300px; width: 100%; border: 1px solid #ddd; border-radius: 8px;"></div>
             </div>
 
             <div class="form-group field">
@@ -121,6 +128,76 @@
   </div> <!-- end of main-layout -->
 
   @include('components.admin_penjual.footer')
+
+  <!-- Leaflet JavaScript -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Inisialisasi peta
+      const map = L.map('map').setView([-6.200000, 106.816666], 13); // Koordinat Jakarta sebagai default
+
+      // Tambahkan layer peta dari OpenStreetMap
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+      // Tambahkan marker kosong sebagai default
+      let marker = L.marker([-6.200000, 106.816666]).addTo(map);
+
+      // Ambil alamat dari form
+      const addressInput = document.getElementById('address');
+
+      // Fungsi untuk memperbarui peta berdasarkan alamat
+      async function updateMapFromAddress() {
+        const address = addressInput.value.trim();
+        if (!address) return;
+
+        try {
+          // Panggil endpoint geocoding kita
+          const response = await fetch('{{ route("seller.geocode.address") }}', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ address: address })
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            // Hapus marker lama
+            map.removeLayer(marker);
+
+            // Set peta ke lokasi baru
+            map.setView([result.data.lat, result.data.lng], 15);
+
+            // Tambahkan marker baru
+            marker = L.marker([result.data.lat, result.data.lng]).addTo(map);
+
+            // Tambahkan popup dengan nama lokasi
+            marker.bindPopup(result.data.display_name).openPopup();
+          } else {
+            console.error('Geocoding gagal:', result.message);
+          }
+        } catch (error) {
+          console.error('Error saat geocoding:', error);
+        }
+      }
+
+      // Panggil fungsi update peta saat alamat berubah (dengan debounce)
+      let debounceTimer;
+      addressInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(updateMapFromAddress, 1000); // Tunggu 1 detik setelah user berhenti mengetik
+      });
+
+      // Jika ada alamat saat halaman dimuat, coba geocode
+      if (addressInput.value.trim()) {
+        setTimeout(updateMapFromAddress, 500); // Beri sedikit waktu untuk memuat data
+      }
+    });
+  </script>
 
   <script src="{{ asset('js/penjual/edit_profil_penjual.js') }}"></script>
 </body>

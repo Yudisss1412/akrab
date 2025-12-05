@@ -17,10 +17,10 @@ class SellerController extends Controller
         // Cek apakah parameter adalah numerik (ID) atau string (nama toko)
         if (is_numeric($sellerId)) {
             // Jika numerik, cari berdasarkan ID
-            $seller = Seller::find($sellerId);
+            $seller = Seller::with('user')->find($sellerId);
         } else {
             // Jika string, cari berdasarkan store_name
-            $seller = Seller::where('store_name', $sellerId)->first();
+            $seller = Seller::with('user')->where('store_name', $sellerId)->first();
         }
 
         // Jika tidak ditemukan, tampilkan error

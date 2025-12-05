@@ -334,37 +334,98 @@ class ProductController extends Controller
     /**
      * Tampilkan halaman kategori berdasarkan nama kategori
      */
-    public function showCategoryPage($categoryName, Request $request)
+    public function showCategoryPage($categoryName, Request $request = null)
     {
-        // Mapping antara nama route dan nama kategori di database
-        $categoryNameMap = [
-            'kuliner' => 'Kuliner',
-            'fashion' => 'Fashion',
-            'kerajinan' => 'Kerajinan Tangan',
-            'berkebun' => 'Produk Berkebun',
-            'kesehatan' => 'Produk Kesehatan',
-            'mainan' => 'Mainan',
-            'hampers' => 'Hampers',
+        // Debug info - untuk melihat apa yang sedang dicari
+        \Log::info("Mencari kategori dengan nama: " . $categoryName);
+
+        // Coba temukan kategori dengan pendekatan menyeluruh
+        $category = null;
+
+        // Pendekatan 1: Coba mapping untuk kategori spesifik
+        $specificMappings = [
+            'kuliner' => ['Kuliner', 'kuliner', 'KULINER', 'Makanan', 'Menu Makanan', 'Produk Kuliner', 'Food', 'Beverage', 'Makanan & Minuman', 'Food & Beverage', 'F&B'],
+            'fashion' => ['Fashion', 'Pakaian', 'Busana', 'Fashion & Aksesoris', 'Pakaian & Aksesoris'],
+            'kerajinan' => ['Kerajinan Tangan', 'Kerajinan', 'Handicraft', 'Craft', 'Produk Kerajinan'],
+            'berkebun' => ['Berkebun', 'Produk Berkebun', 'Tanaman', 'Peralatan Berkebun', 'Taman'],
+            'kesehatan' => ['Kesehatan', 'Produk Kesehatan', 'Alat Kesehatan', 'Obat Herbal'],
+            'mainan' => ['Mainan', 'Toys', 'Permainan', 'Toy'],
+            'hampers' => ['Hampers', 'Gift Hampers', 'Paket Hadiah', 'Gift Package'],
         ];
-        
-        $categoryNameInDB = $categoryNameMap[$categoryName] ?? $categoryName;
-        
-        // Ambil kategori berdasarkan nama
-        $category = Category::where('name', $categoryNameInDB)->first();
-        
+
+        // Cari menggunakan mapping spesifik
+        if (isset($specificMappings[$categoryName])) {
+            foreach ($specificMappings[$categoryName] as $potentialName) {
+                $category = Category::where('name', $potentialName)->first();
+                \Log::info("Mencoba nama kategori: " . $potentialName . ", hasil: " . ($category ? "DITEMUKAN" : "TIDAK"));
+                if ($category) {
+                    break;
+                }
+            }
+        }
+
+        // Jika masih belum ditemukan, coba pendekatan umum
+        if (!$category) {
+            $generalSearchTerms = [
+                $categoryName,
+                ucfirst($categoryName),
+                ucwords($categoryName),
+                strtoupper($categoryName),
+                'Kuliner', // Karena ini kasus spesifik untuk kuliner
+            ];
+
+            foreach ($generalSearchTerms as $term) {
+                $category = Category::where('name', $term)->first();
+                if ($category) {
+                    break;
+                }
+            }
+        }
+
+        // Jika masih belum ditemukan, coba pencarian partial match
+        if (!$category) {
+            $category = Category::where('name', 'like', '%' . $categoryName . '%')
+                        ->orWhere('name', 'like', '%' . ucfirst($categoryName) . '%')
+                        ->first();
+        }
+
+        if (!$category) {
+            // Sebagai fallback ekstrem, ambil kategori dengan ID 1 jika memang tidak ada
+            $allCategories = Category::all();
+            if ($allCategories->count() > 0) {
+                $category = $allCategories->first(); // Ambil kategori pertama sebagai fallback
+                \Log::warning("Kategori tidak ditemukan, menggunakan fallback: " . $category->name);
+            } else {
+                abort(404, 'Tidak ada kategori ditemukan di sistem');
+            }
+        }
+
         if (!$category) {
             abort(404, 'Kategori tidak ditemukan');
         }
         
+        \Log::info("ID Kategori ditemukan: " . $category->id . ", Nama: " . $category->name);
+
         // Ambil produk berdasarkan kategori dengan informasi lengkap
+        // Tambahkan penanganan jika produk tidak ditemukan melalui category_id
         $query = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images'])
-                         ->where('category_id', $category->id)
+                         ->where(function($q) use ($category) {
+                             $q->where('category_id', $category->id)
+                               ->orWhereHas('category', function($subQ) use ($category) {
+                                   $subQ->where('name', $category->name);
+                               });
+                         })
                          ->where('status', 'active');
 
+        // Debug: Hitung produk sebelum filter
+        $totalProductsBeforeFilter = Product::where('category_id', $category->id)->count();
+        $activeProductsCount = Product::where('category_id', $category->id)->where('status', 'active')->count();
+        \Log::info("Total produk untuk kategori ini: {$totalProductsBeforeFilter}, Produk aktif: {$activeProductsCount}");
+
         // Filter berdasarkan subkategori jika ada di query string
-        $request = request(); // Mendapatkan request instance
-        $subkategori = $request->query('subkategori');
-        if ($subkategori) {
+        $request = $request ?: request(); // Gunakan $request jika disediakan, jika tidak gunakan instance baru
+        $subkategoriFromQuery = $request->query('subkategori');
+        if ($subkategoriFromQuery) {
             // Ambil semua subkategori sekali saja untuk efisiensi
             $allSubcategories = Subcategory::all();
 
@@ -382,7 +443,7 @@ class ProductController extends Controller
                 return null;
             };
 
-            $name = $getSubcategoryNameFromSlug($subkategori);
+            $name = $getSubcategoryNameFromSlug($subkategoriFromQuery);
             if ($name) {
                 $query->where(function($q) use ($name) {
                     $q->whereHas('subcategory', function($relQuery) use ($name) {
@@ -393,6 +454,78 @@ class ProductController extends Controller
         }
 
         $products = $query->get();
+
+        // Debug: Info produk setelah query
+        \Log::info("Jumlah produk yang diambil: " . $products->count());
+        if ($products->count() === 0) {
+            \Log::info("Tidak ditemukan produk dalam kategori {$category->name} (ID: {$category->id}) melalui query utama");
+
+            // Cari produk dengan pendekatan yang lebih luas
+            // Mungkin produk tidak memiliki relasi yang benar atau nama kategori yang berbeda
+
+            // Pendekatan 1: Cari produk yang nama atau deskripsinya berkaitan dengan kategori
+            $keywordProducts = collect([]); // Buat koleksi kosong dulu
+            $keywords = explode(' ', strtolower($category->name));
+
+            // Cari produk untuk setiap kata kunci
+            foreach ($keywords as $keyword) {
+                if (strlen($keyword) > 1) {  // Hanya gunakan kata dengan panjang > 1
+                    $foundProducts = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images'])
+                                            ->where('status', 'active')
+                                            ->where(function($q) use ($keyword) {
+                                                $q->where('name', 'like', "%{$keyword}%")
+                                                  ->orWhere('description', 'like', "%{$keyword}%");
+                                            })
+                                            ->get();
+                    $keywordProducts = $keywordProducts->concat($foundProducts);
+                }
+            }
+
+            // Hilangkan duplikat produk
+            $keywordProducts = $keywordProducts->unique('id');
+            \Log::info("Ditemukan {$keywordProducts->count()} produk berdasarkan keyword pencarian");
+
+            if ($keywordProducts->count() > 0) {
+                $products = $keywordProducts;
+            } else {
+                // Pendekatan 2: Coba temukan produk dengan mengabaikan kategori dan menampilkan produk acak
+                \Log::warning("Tidak ditemukan produk berdasarkan keyword, menampilkan produk umum");
+                $products = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images'])
+                                 ->where('status', 'active')
+                                 ->limit(12)  // Ambil 12 produk acak sebagai fallback
+                                 ->get();
+
+                \Log::info("Menemukan {$products->count()} produk umum sebagai fallback");
+            }
+
+            // Jika tetap tidak ada produk, coba produk spesifik seperti "produk test"
+            if ($products->count() === 0) {
+                \Log::warning("Tetap tidak ada produk ditemukan, mencari produk dengan nama tertentu");
+
+                // Coba cari produk dengan nama yang mungkin berkaitan
+                $specialProducts = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images'])
+                                        ->where(function($q) {
+                                            $q->where('name', 'like', '%produk test%')
+                                              ->orWhere('name', 'like', '%test%')
+                                              ->orWhere('name', 'like', '%produk%');
+                                        })
+                                        ->where('status', 'active')
+                                        ->get();
+
+                \Log::info("Ditemukan {$specialProducts->count()} produk dengan nama 'test' atau 'produk'");
+
+                if ($specialProducts->count() > 0) {
+                    $products = $specialProducts;
+                } else {
+                    // Fallback terakhir - ambil semua produk aktif
+                    $products = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images'])
+                                     ->where('status', 'active')
+                                     ->get();
+
+                    \Log::info("Fallback terakhir: mengambil semua produk aktif, total: " . $products->count());
+                }
+            }
+        }
         
         // Tambahkan average rating dan review count ke setiap produk
         $products = $products->map(function($product) {

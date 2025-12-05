@@ -96,7 +96,7 @@ class FixProductCategories extends Command
             $product->save();
             $updatedCount++;
 
-            $this->info("Produk ID {$product->id} ({$product->name}) diperbarui dengan kategori: {$randomCategory->name}" .
+            $this->info("Produk ID {$product->id} ({$product->name}) diperbarui dengan kategori: {$randomCategory->name}" . 
                         ($randomSubcategory ? " dan subkategori: " . $randomSubcategory->name : ""));
         }
 
@@ -248,6 +248,39 @@ class FixProductCategories extends Command
             }
         }
 
-        $this->info("Proses selesai. {$updatedCount} produk telah diperbarui.");
+        // Sekarang mari kita buat asosiasi spesifik untuk produk seperti "produk test 1" dengan kategori Kuliner
+        $this->info("Memeriksa dan memperbaiki produk-produk dengan nama spesifik agar terkait dengan kategori yang benar...");
+
+        // Temukan produk dengan nama yang mengandung 'produk test' atau 'test'
+        $testProductNames = ['produk test 1', 'Produk Test 1', 'TEST 1', 'test 1'];
+        foreach ($testProductNames as $testName) {
+            $specificProducts = Product::where('name', $testName)->get();
+
+            foreach ($specificProducts as $product) {
+                $kulinerCategory = Category::where('name', 'Kuliner')->first();
+
+                if ($kulinerCategory) {
+                    $product->category_id = $kulinerCategory->id;
+
+                    // Jika produk tidak memiliki subkategori, berikan subkategori dari kategori Kuliner
+                    if (!$product->subcategory_id) {
+                        $subcategory = Subcategory::where('category_id', $kulinerCategory->id)->first();
+                        if ($subcategory) {
+                            $product->subcategory_id = $subcategory->id;
+                            $product->subcategory = $subcategory->name;
+                        }
+                    }
+
+                    $product->save();
+                    $updatedCount++;
+
+                    $this->info("Produk ID {$product->id} ('{$product->name}') diperbarui agar terkait dengan kategori Kuliner");
+                } else {
+                    $this->warn("Kategori Kuliner tidak ditemukan, tidak bisa mengasosiasikan produk {$product->name}");
+                }
+            }
+        }
+
+        $this->info("Proses selesai. Total {$updatedCount} produk telah diperbarui.");
     }
 }

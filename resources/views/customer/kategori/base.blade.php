@@ -1454,21 +1454,16 @@
               // Use the data from the DOM
               modalProduct.textContent = fallbackName.substring(0, 200);
 
-              // Add store link
-              const storeLinkLi = document.createElement('li');
-              storeLinkLi.innerHTML = '<strong>Toko:</strong> <a href="/toko/' + encodeURIComponent(fallbackStore) + '">' + fallbackStore + '</a>';
-              modalSpecs.insertBefore(storeLinkLi, modalSpecs.firstChild);
-
-              modalImg.src = productImage;
-              modalImg.alt = fallbackName.substring(0, 100);
-              modalPrice.textContent = fallbackPrice.substring(0, 50);
-              modalDesc.textContent = fallbackDesc.substring(0, 500);
-
               // Clear and rebuild specifications list
               modalSpecs.innerHTML = '';
               const storeLinkLi = document.createElement('li');
               storeLinkLi.innerHTML = '<strong>Toko:</strong> <a href="/toko/' + encodeURIComponent(fallbackStore) + '">' + fallbackStore + '</a>';
               modalSpecs.appendChild(storeLinkLi);
+
+              modalImg.src = productImage;
+              modalImg.alt = fallbackName.substring(0, 100);
+              modalPrice.textContent = fallbackPrice.substring(0, 50);
+              modalDesc.textContent = fallbackDesc.substring(0, 500);
 
               const li = document.createElement('li');
               const fallbackSpec = (productDesc || 'Spesifikasi tidak tersedia').toString().replace(/[&<>"']/g, '');

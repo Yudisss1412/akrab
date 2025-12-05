@@ -399,19 +399,41 @@ Route::get('/kategori', function () {
     return view('customer.kategori.kategori');
 })->name('kategori');
 
-Route::get('/kategori/kuliner', [App\Http\Controllers\ProductController::class, 'showCategoryPage'])->name('kategori.kuliner');
+// Route untuk masing-masing kategori yang langsung menuju controller
+Route::get('/kategori/kuliner', function () {
+    $controller = new App\Http\Controllers\ProductController();
+    return $controller->showCategoryPage('kuliner', request());
+})->name('kategori.kuliner');
 
-Route::get('/kategori/fashion', [App\Http\Controllers\ProductController::class, 'showCategoryPage'])->name('kategori.fashion');
+Route::get('/kategori/fashion', function () {
+    $controller = new App\Http\Controllers\ProductController();
+    return $controller->showCategoryPage('fashion', request());
+})->name('kategori.fashion');
 
-Route::get('/kategori/kerajinan', [App\Http\Controllers\ProductController::class, 'showCategoryPage'])->name('kategori.kerajinan');
+Route::get('/kategori/kerajinan', function () {
+    $controller = new App\Http\Controllers\ProductController();
+    return $controller->showCategoryPage('kerajinan', request());
+})->name('kategori.kerajinan');
 
-Route::get('/kategori/berkebun', [App\Http\Controllers\ProductController::class, 'showCategoryPage'])->name('kategori.berkebun');
+Route::get('/kategori/berkebun', function () {
+    $controller = new App\Http\Controllers\ProductController();
+    return $controller->showCategoryPage('berkebun', request());
+})->name('kategori.berkebun');
 
-Route::get('/kategori/kesehatan', [App\Http\Controllers\ProductController::class, 'showCategoryPage'])->name('kategori.kesehatan');
+Route::get('/kategori/kesehatan', function () {
+    $controller = new App\Http\Controllers\ProductController();
+    return $controller->showCategoryPage('kesehatan', request());
+})->name('kategori.kesehatan');
 
-Route::get('/kategori/mainan', [App\Http\Controllers\ProductController::class, 'showCategoryPage'])->name('kategori.mainan');
+Route::get('/kategori/mainan', function () {
+    $controller = new App\Http\Controllers\ProductController();
+    return $controller->showCategoryPage('mainan', request());
+})->name('kategori.mainan');
 
-Route::get('/kategori/hampers', [App\Http\Controllers\ProductController::class, 'showCategoryPage'])->name('kategori.hampers');
+Route::get('/kategori/hampers', function () {
+    $controller = new App\Http\Controllers\ProductController();
+    return $controller->showCategoryPage('hampers', request());
+})->name('kategori.hampers');
 
 Route::get('/dashboard_admin', function () {
     return view('admin.dashboard');

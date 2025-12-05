@@ -56,14 +56,22 @@ class ResetPasswordController extends Controller
     {
         $request->validate(['email' => 'required|email']);
 
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
+        try {
+            $status = Password::sendResetLink(
+                $request->only('email')
+            );
 
-        if ($status === Password::RESET_LINK_SENT) {
-            return back()->with('status', __($status));
+            if ($status === Password::RESET_LINK_SENT) {
+                return back()->with('status', __($status));
+            }
+
+            return back()->withErrors(['email' => __($status)]);
+        } catch (\Exception $e) {
+            // Log error untuk debugging
+            \Log::error('Failed to send password reset email: ' . $e->getMessage());
+
+            // Kembalikan pesan error yang lebih informatif
+            return back()->withErrors(['email' => 'Terjadi kesalahan saat mengirim email. Silakan coba beberapa saat lagi.']);
         }
-
-        return back()->withErrors(['email' => __($status)]);
     }
 }

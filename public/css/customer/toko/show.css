@@ -377,68 +377,77 @@
 }
 
 .review-card {
-  background: var(--secondary-color);
-  border: 1px solid var(--primary-color);
-  border-radius: 12px;
-  padding: 1rem;
-  box-shadow: var(--shadow-sm);
+  background: var(--secondary-color) !important;
+  border: 1px solid var(--primary-color) !important;
+  border-radius: 12px !important;
+  padding: 1rem !important;
+  box-shadow: var(--shadow-sm) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
 }
 
 .review-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.8rem;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 0.8rem !important;
 }
 
 .review-user {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
 }
 
 .user-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--primary-color);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 0.9rem;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  background: var(--primary-color) !important;
+  color: white !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
 }
 
 .user-name {
-  font-weight: 600;
-  color: var(--primary-color-dark);
+  font-weight: 600 !important;
+  color: var(--primary-color-dark) !important;
 }
 
 .review-rating .stars {
-  display: flex;
-  gap: 2px;
+  display: flex !important;
+  gap: 2px !important;
+}
+
+.review-rating .stars svg {
+  width: 18px !important;
+  height: 18px !important;
 }
 
 .review-content {
-  margin-bottom: 0.8rem;
+  margin-bottom: 0.8rem !important;
+  flex-grow: 1 !important;
 }
 
 .review-content p {
-  margin: 0;
-  color: var(--dark-text-color);
-  line-height: 1.5;
+  margin: 0 !important;
+  color: var(--dark-text-color) !important;
+  line-height: 1.5 !important;
 }
 
 .review-product {
-  font-size: 0.85rem;
-  color: var(--grey-text-color);
-  margin-bottom: 0.3rem;
+  font-size: 0.85rem !important;
+  color: var(--grey-text-color) !important;
+  margin-bottom: 0.3rem !important;
 }
 
 .review-date {
-  font-size: 0.8rem;
-  color: var(--grey-text-color);
+  font-size: 0.8rem !important;
+  color: var(--grey-text-color) !important;
 }
 
 /* Responsif */

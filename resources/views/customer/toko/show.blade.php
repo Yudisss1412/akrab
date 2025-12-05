@@ -170,12 +170,23 @@
                   </div>
                   <div class="review-rating">
                     <span class="stars">
-                      @for($i = 0; $i < 5; $i++)
-                        @if($i < $review->rating)
-                          <i class="star filled">★</i>
-                        @else
-                          <i class="star empty">☆</i>
-                        @endif
+                      @php
+                        $rating = $review->rating ?? 0;
+                        $fullStars = floor($rating);
+                        $halfStar = ($rating - $fullStars) >= 0.5 ? 1 : 0;
+                        $emptyStars = 5 - $fullStars - $halfStar;
+                      @endphp
+
+                      @for($i = 0; $i < $fullStars; $i++)
+                        <svg viewBox="0 0 47 47" xmlns="http://www.w3.org/2000/svg"><path d="M11.4076 41.1253L14.5899 27.368L3.91699 18.1149L18.017 16.891L23.5003 3.91699L28.9837 16.891L43.0837 18.1149L32.4107 27.368L35.593 41.1253L23.5003 33.8305L11.4076 41.1253Z" fill="#FFD700"/></svg>
+                      @endfor
+
+                      @if($halfStar)
+                        <svg viewBox="0 0 47 47" xmlns="http://www.w3.org/2000/svg"><path d="M29.6691 32.9982L28.0534 25.9482L33.4878 21.2482L26.3399 20.6118L23.5003 13.9535V29.2285L29.6691 32.9982ZM11.4076 41.1253L14.5899 27.368L3.91699 18.1149L18.017 16.891L23.5003 3.91699L28.9837 16.891L43.0837 18.1149L32.4107 27.368L35.593 41.1253L23.5003 33.8305L11.4076 41.1253Z" fill="#FFD700"/></svg>
+                      @endif
+
+                      @for($i = 0; $i < $emptyStars; $i++)
+                        <svg viewBox="0 0 47 47" xmlns="http://www.w3.org/2000/svg"><path d="M17.3316 32.9493L23.5003 29.2285L29.6691 32.9982L28.0535 25.9482L33.4878 21.1993L26.3399 20.6118L23.5003 13.9535L20.6607 20.5628L13.5128 21.1993L18.9472 25.9482L17.3316 32.9493ZM11.4076 41.1253L14.5899 27.368L3.91699 18.1149L18.017 16.891L23.5003 3.91699L28.9837 16.891L43.0837 18.1149L32.4107 27.368L35.593 41.1253L23.5003 33.8305L11.4076 41.1253Z" fill="#e0e0e0"/></svg>
                       @endfor
                     </span>
                   </div>

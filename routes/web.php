@@ -148,6 +148,7 @@ Route::get('/produk', [App\Http\Controllers\ProductController::class, 'getAllPro
 Route::get('/produk_detail/{id}', [App\Http\Controllers\ProductController::class, 'show'])->name('produk.detail');
 Route::get('/produk/search', [App\Http\Controllers\ProductController::class, 'search'])->name('produk.search');
 Route::get('/produk/kategori/{category}', [App\Http\Controllers\ProductController::class, 'byCategory'])->name('produk.kategori');
+Route::get('/toko/{seller}', [App\Http\Controllers\SellerController::class, 'show'])->name('toko.show');
 
 Route::get('/profil', [App\Http\Controllers\Customer\ProfileController::class, 'show'])->name('profil.pembeli');
 Route::get('/edit_profil', [App\Http\Controllers\Customer\ProfileController::class, 'edit'])->name('edit.profil');

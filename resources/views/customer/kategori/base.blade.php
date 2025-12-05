@@ -1396,7 +1396,11 @@
           modalDesc.textContent = apiProductDesc.substring(0, 500);
 
           // Specifications
-          modalSpecs.innerHTML = '';
+          // Add store name as first specification
+          const storeLi = document.createElement('li');
+          storeLi.innerHTML = '<strong>Toko:</strong> <a href="/toko/' + encodeURIComponent(produk.seller?.name || produk.seller?.store_name || produk.seller_id || 'toko-tidak-ditemukan') + '">' + (produk.seller?.name || produk.seller?.store_name || 'Toko Umum') + '</a>';
+          modalSpecs.appendChild(storeLi);
+
           (produk.specifications || produk.spesifikasi || []).forEach(spec => {
             const sanitizedSpec = spec.toString().replace(/[&<>"']/g, '');
             const li = document.createElement('li');
@@ -1436,21 +1440,36 @@
             const productImage = productCard.querySelector('.product-image')?.src;
             const productDesc = productCard.querySelector('.product-description')?.textContent;
             const productPrice = productCard.querySelector('.product-price')?.textContent;
+            const productStore = productCard.closest('.main-content') ?
+                                productCard.querySelector('.product-toko a')?.textContent ||
+                                productCard.querySelector('.toko-link')?.textContent || 'Toko Umum' : 'Toko Umum';
 
             if (productName && productImage && productPrice) {
               // Sanitize the data from DOM as fallback
               const fallbackName = productName.toString().replace(/[&<>"']/g, '');
               const fallbackPrice = productPrice.toString().replace(/[&<>"']/g, '');
               const fallbackDesc = (productDesc || 'Deskripsi produk tidak tersedia').toString().replace(/[&<>"']/g, '');
+              const fallbackStore = productStore.toString().replace(/[&<>"']/g, '');
 
               // Use the data from the DOM
               modalProduct.textContent = fallbackName.substring(0, 200);
+
+              // Add store link
+              const storeLinkLi = document.createElement('li');
+              storeLinkLi.innerHTML = '<strong>Toko:</strong> <a href="/toko/' + encodeURIComponent(fallbackStore) + '">' + fallbackStore + '</a>';
+              modalSpecs.insertBefore(storeLinkLi, modalSpecs.firstChild);
+
               modalImg.src = productImage;
               modalImg.alt = fallbackName.substring(0, 100);
               modalPrice.textContent = fallbackPrice.substring(0, 50);
               modalDesc.textContent = fallbackDesc.substring(0, 500);
 
+              // Clear and rebuild specifications list
               modalSpecs.innerHTML = '';
+              const storeLinkLi = document.createElement('li');
+              storeLinkLi.innerHTML = '<strong>Toko:</strong> <a href="/toko/' + encodeURIComponent(fallbackStore) + '">' + fallbackStore + '</a>';
+              modalSpecs.appendChild(storeLinkLi);
+
               const li = document.createElement('li');
               const fallbackSpec = (productDesc || 'Spesifikasi tidak tersedia').toString().replace(/[&<>"']/g, '');
               li.textContent = fallbackSpec.substring(0, 200);
@@ -1483,6 +1502,7 @@
           // Final fallback to dummy data if product not found at all
           const produk = {
             name: "Produk Tidak Ditemukan",
+            seller: { name: "Toko Umum" },
             image: asset('src/product_1.png'),
             price: "Rp 0",
             description: "Produk tidak ditemukan di sistem.",
@@ -1491,15 +1511,26 @@
 
           currentProduk = produk;
           const dummyName = produk.name.toString().replace(/[&<>"']/g, '');
+          const dummyStore = (produk.seller?.name || produk.seller?.store_name || 'Toko Umum').toString().replace(/[&<>"']/g, '');
           const dummyPrice = produk.price.toString().replace(/[&<>"']/g, '');
           const dummyDesc = produk.description.toString().replace(/[&<>"']/g, '');
 
           modalProduct.textContent = dummyName.substring(0, 200);
+
+          // Add store link for dummy data
+          const dummyStoreLi = document.createElement('li');
+          dummyStoreLi.innerHTML = '<strong>Toko:</strong> <a href="/toko/' + encodeURIComponent(dummyStore) + '">' + dummyStore + '</a>';
+          modalSpecs.innerHTML = '';
+          modalSpecs.appendChild(dummyStoreLi);
+
           modalImg.src = produk.image;
           modalImg.alt = dummyName.substring(0, 100);
           modalPrice.textContent = dummyPrice.substring(0, 50);
           modalDesc.textContent = dummyDesc.substring(0, 500);
-          modalSpecs.innerHTML = '';
+
+          const dummySpecLi = document.createElement('li');
+          dummySpecLi.textContent = 'Spesifikasi tidak tersedia';
+          modalSpecs.appendChild(dummySpecLi);
 
           modal.style.display = 'flex';
           document.body.style.overflow = 'hidden';

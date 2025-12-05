@@ -369,7 +369,7 @@ function renderList(products = []) {
 
   grid.innerHTML = view.map(p => {
     const href = `${DETAIL_BASE}${encodeURIComponent(p.id)}`;
-    const tokoHref = `/toko/${p.toko || p.seller?.name || p.seller_id || 'toko-tidak-ditemukan'}`; // Assuming there's a toko page
+    const tokoHref = `/toko/${encodeURIComponent(p.toko || p.seller?.store_name || p.seller?.name || p.seller_id || 'toko-tidak-ditemukan')}`; // Assuming there's a toko page
     const imageSrc = p.gambar || 'src/placeholder.png';
     const altText = (p.nama || 'Produk Tidak Bernama').toString().replace(/[&<>"']/g, function(match) {
       return {
@@ -443,7 +443,7 @@ function renderRekomendasi(products = [], maxItems = 8) {
   rekomGrid.innerHTML = view.map(p => {
     const href = `${DETAIL_BASE}${encodeURIComponent(p.id)}`;
     const tokoName = p.toko || p.seller?.name || 'Toko Umum';
-    const tokoHref = `/toko/${encodeURIComponent(tokoName)}`;
+    const tokoHref = `/toko/${encodeURIComponent(tokoName || 'toko-tidak-ditemukan')}`;
     const imageSrc = p.gambar || 'src/placeholder.png';
     const altText = p.nama.replace(/"/g, '&quot;').replace(/'/g, '&apos;');
     return `
@@ -511,7 +511,7 @@ function renderProdukPopuler(products = [], maxItems = 8) {
 
   populerGrid.innerHTML = view.map(p => {
     const href = `${DETAIL_BASE}${encodeURIComponent(p.id)}`;
-    const tokoHref = `/toko/${p.toko || p.seller?.name || p.seller_id || 'toko-tidak-ditemukan'}`;
+    const tokoHref = `/toko/${encodeURIComponent(p.toko || p.seller?.store_name || p.seller?.name || p.seller_id || 'toko-tidak-ditemukan')}`;
     const imageSrc = p.gambar || 'src/placeholder.png';
     const altText = p.nama.replace(/"/g, '&quot;').replace(/'/g, '&apos;');
     return `

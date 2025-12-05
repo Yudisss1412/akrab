@@ -771,6 +771,14 @@ class ProductController extends Controller
             }
         }
         
+        // Filter berdasarkan nama toko/seller jika disediakan
+        $sellerName = $request->query('seller_store_name');
+        if ($sellerName) {
+            $query = $query->whereHas('seller', function($q) use ($sellerName) {
+                $q->where('store_name', $sellerName);
+            });
+        }
+
         // Urutkan produk
         $sortBy = $request->query('sort', 'popular'); // default sort by popular
         switch ($sortBy) {
@@ -782,6 +790,12 @@ class ProductController extends Controller
                 break;
             case 'price-high':
                 $query = $query->orderBy('price', 'desc');
+                break;
+            case 'highest-rated':
+                $query = $query->leftJoin('reviews', 'products.id', '=', 'reviews.product_id')
+                              ->select('products.*')
+                              ->groupBy('products.id')
+                              ->orderByRaw('AVG(reviews.rating) DESC NULLS LAST');
                 break;
             case 'popular': // Ini bisa berdasarkan jumlah penjualan, rating, dll
             default:

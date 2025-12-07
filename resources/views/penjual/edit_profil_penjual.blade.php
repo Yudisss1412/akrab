@@ -25,10 +25,14 @@
               <!-- Foto bisa diklik -->
               <label for="avatarInput" class="avatar-label">
                 <div class="avatar-preview" id="avatarPreview">
-                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 10C14.2091 10 16 8.20914 16 6C16 3.79086 14.2091 2 12 2C9.79086 2 8 3.79086 8 6C8 8.20914 9.79086 10 12 10Z" stroke="#006E5C" stroke-width="1.5"/>
-                    <path d="M20 17.5C20 19.985 20 22 12 22C4 22 4 19.985 4 17.5C4 15.015 7.582 13 12 13C16.418 13 20 15.015 20 17.5Z" stroke="#006E5C" stroke-width="1.5"/>
-                  </svg>
+                  @if(auth()->user()->seller && auth()->user()->seller->profile_image)
+                    <img src="{{ asset('storage/' . auth()->user()->seller->profile_image) }}" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                  @else
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                      <path d="M12 10C14.2091 10 16 8.20914 16 6C16 3.79086 14.2091 2 12 2C9.79086 2 8 3.79086 8 6C8 8.20914 9.79086 10 12 10Z" stroke="#006E5C" stroke-width="1.5"/>
+                      <path d="M20 17.5C20 19.985 20 22 12 22C4 22 4 19.985 4 17.5C4 15.015 7.582 13 12 13C16.418 13 20 15.015 20 17.5Z" stroke="#006E5C" stroke-width="1.5"/>
+                    </svg>
+                  @endif
                 </div>
               </label>
               <input type="file" id="avatarInput" name="avatar" accept="image/*" hidden>

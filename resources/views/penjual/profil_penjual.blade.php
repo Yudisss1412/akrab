@@ -22,7 +22,11 @@
         <!-- kiri: identitas -->
         <div class="seller-identity">
           <div class="avatar" aria-hidden="true">
-            <span>{{ strtoupper(substr($seller->store_name ?? $user->name, 0, 1)) }}</span>
+            @if($seller->profile_image)
+              <img src="{{ asset('storage/' . $seller->profile_image) }}" alt="{{ $seller->store_name ?? $user->name }}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+            @else
+              <span>{{ strtoupper(substr($seller->store_name ?? $user->name, 0, 1)) }}</span>
+            @endif
             <i class="dot online"></i>
           </div>
           <div class="seller-meta">

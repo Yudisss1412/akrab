@@ -489,27 +489,32 @@
     saveBtn.textContent = 'Menyimpan...';
 
     try {
-      // Create a plain object with all form values
-      const formDataObj = {
-        shopName: shopName.value.trim(),
-        ownerName: ownerName.value.trim(),
-        email: email.value.trim(),
-        phone: phone.value.trim(),
-        address: addr.value.trim(),
-        shopDescription: shopDescription.value.trim(),
-        bankName: bankName.value.trim(),
-        accountNumber: accountNumber.value.trim(),
-        accountHolder: accountHolder.value.trim(),
-      };
+      // Create FormData object to support file upload
+      const formData = new FormData();
+      formData.append('shopName', shopName.value.trim());
+      formData.append('ownerName', ownerName.value.trim());
+      formData.append('email', email.value.trim());
+      formData.append('phone', phone.value.trim());
+      formData.append('address', addr.value.trim());
+      formData.append('shopDescription', shopDescription.value.trim());
+      formData.append('bankName', bankName.value.trim());
+      formData.append('accountNumber', accountNumber.value.trim());
+      formData.append('accountHolder', accountHolder.value.trim());
+
+      // Append avatar file if selected
+      if (avatarInput.files.length > 0) {
+        formData.append('avatar', avatarInput.files[0]);
+      }
 
       // Debug: log form data
-      console.log('Sending form data:', formDataObj);
+      console.log('Sending form data:', Object.fromEntries(formData));
+
+      formData.append('_method', 'PUT'); // Add method spoofing for Laravel
 
       const response = await fetch(form.action, {
-        method: 'PUT',
-        body: JSON.stringify(formDataObj),
+        method: 'POST', // Use POST but specify PUT via _method
+        body: formData,
         headers: {
-          'Content-Type': 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
           'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
         }

@@ -23,6 +23,7 @@ class Seller extends Model
         'bank_account_number',
         'bank_name',
         'account_holder_name',
+        'profile_image',
     ];
 
     protected $casts = [

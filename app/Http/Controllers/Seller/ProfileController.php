@@ -18,7 +18,7 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
 
-        // Ambil data seller terkait
+        // Ambil data seller terkait dengan profile_image
         $seller = Seller::where('user_id', $user->id)->first();
 
         if (!$seller) {
@@ -57,7 +57,8 @@ class ProfileController extends Controller
         \Log::info('Phone from request:', ['value' => $request->input('phone')]);
 
         // Validasi input
-        $validator = Validator::make($request->all(), [
+        // Validasi input termasuk file avatar
+        $validationRules = [
             'shopName' => 'required|string|max:50',
             'ownerName' => 'required|string|max:50',
             'email' => [
@@ -87,8 +88,18 @@ class ProfileController extends Controller
                 },
             ],
             'accountHolder' => 'required|string|max:50',
-        ], [
+        ];
+
+        // Tambahkan validasi untuk avatar jika ada file yang diunggah
+        if ($request->hasFile('avatar')) {
+            $validationRules['avatar'] = 'image|mimes:jpeg,png,jpg,gif,svg|max:2048';
+        }
+
+        $validator = Validator::make($request->all(), $validationRules, [
             'phone.regex' => 'Nomor telepon harus menggunakan format Indonesia (contoh: +6281234567890)',
+            'avatar.image' => 'File harus berupa gambar',
+            'avatar.mimes' => 'Gambar harus berupa file dengan format: jpeg, png, jpg, gif, svg',
+            'avatar.max' => 'Ukuran gambar tidak boleh lebih dari 2MB',
         ]);
 
         if ($validator->fails()) {
@@ -121,6 +132,39 @@ class ProfileController extends Controller
                 $updateData['lat'] = $coordinates['lat'];
                 $updateData['lng'] = $coordinates['lng'];
             }
+        }
+
+        // Update seller data untuk profile image
+        $seller = Seller::where('user_id', $user->id)->first();
+        if (!$seller) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data penjual tidak ditemukan'
+            ], 404);
+        }
+
+        // Jika ada file avatar yang diupload
+        if ($request->hasFile('avatar')) {
+            $avatar = $request->file('avatar');
+
+            // Validasi file
+            $request->validate([
+                'avatar' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+            ]);
+
+            // Hapus foto lama jika ada
+            if ($seller->profile_image) {
+                $oldImagePath = storage_path('app/public/' . $seller->profile_image);
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath);
+                }
+            }
+
+            // Simpan foto baru
+            $fileName = 'profile_image_' . $user->id . '_' . time() . '.' . $avatar->getClientOriginalExtension();
+            $path = $avatar->storeAs('seller_profiles', $fileName, 'public');
+            $seller->profile_image = $path;
+            $seller->save();
         }
 
         \Log::info('Profile update request - data to be updated', [
@@ -159,6 +203,7 @@ class ProfileController extends Controller
                 'bank_name' => $user->bank_name,
                 'bank_account_number' => $user->bank_account_number,
                 'bank_account_name' => $user->bank_account_name,
+                'profile_image' => $seller->profile_image ? asset('storage/' . $seller->profile_image) : null,
             ]
         ]);
     }

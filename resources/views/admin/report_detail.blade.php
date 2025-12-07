@@ -277,13 +277,6 @@
         <main class="admin-page-content">
         <div class="page-header">
           <h1>Detail Laporan Pelanggaran</h1>
-          <a href="{{ route('reports.violations') }}" class="back-btn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M19 12H5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            Kembali ke Daftar Laporan
-          </a>
         </div>
         
         <div style="display: grid; grid-template-columns: 70% 30%; gap: 1.5rem; height: 100%;">

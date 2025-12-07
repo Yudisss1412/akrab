@@ -191,11 +191,13 @@ class ReportsController extends Controller
             }
             $violation->violation_type = $violationType;
 
-            $status = $statuses[array_rand($statuses)];
+            // Use deterministic status based on ID to ensure consistency between list and detail view
             if ($filteredStatus && $filteredStatus !== '') {
-                $status = $filteredStatus; // Use the filtered status
+                $violation->status = $filteredStatus; // Use the filtered status
+            } else {
+                // Use the ID to determine status deterministically
+                $violation->status = $statuses[($i + 1) % count($statuses)];
             }
-            $violation->status = $status;
 
             // Match the description to the violation type
             switch($violationType) {
@@ -218,7 +220,8 @@ class ReportsController extends Controller
                     $violation->description = 'Lainnya - pelanggaran kebijakan platform';
                     break;
             }
-            $violation->created_at = now()->subDays(rand(0, 30))->subHours(rand(0, 24))->subMinutes(rand(0, 60));
+            // Use deterministic date/time based on index to ensure consistency across page loads
+            $violation->created_at = now()->subDays($i * 2 + 1)->subHours(($i * 3) % 24)->subMinutes(($i * 5) % 60);
             $violation->evidence = ['https://via.placeholder.com/300x200.png'];
             $violation->admin_notes = null;
             $violation->handled_by = null;
@@ -395,7 +398,12 @@ class ReportsController extends Controller
             $report->id = $id;
             $report->report_number = 'VR-2025-01-' . str_pad($id, 3, '0', STR_PAD_LEFT);
             $report->violation_type = $violationType;
-            $report->status = $statuses[array_rand($statuses)];
+            // Use deterministic status based on ID to ensure consistency between list and detail view
+            // In showFilteredDummyData, status is determined by ($i + 1) % count($statuses) where $i starts from 0
+            // When $i=0 produces ID=1, status=$statuses[(0+1)%4]=$statuses[1];
+            // when $i=1 produces ID=2, status=$statuses[(1+1)%4]=$statuses[2], etc.
+            // So for ID=$id, status should be $statuses[$id % count($statuses)]
+            $report->status = $statuses[$id % count($statuses)];
 
             // Match the description to the violation type
             switch($violationType) {
@@ -419,7 +427,8 @@ class ReportsController extends Controller
                     break;
             }
 
-            $report->created_at = now()->subDays(rand(0, 30))->subHours(rand(0, 24))->subMinutes(rand(0, 60));
+            // Use deterministic date/time based on ID to match the list view
+            $report->created_at = now()->subDays(($id-1) * 2 + 1)->subHours((($id-1) * 3) % 24)->subMinutes((($id-1) * 5) % 60);
             $report->evidence = ['https://via.placeholder.com/300x200.png'];
             $report->admin_notes = null;
             $report->handled_by = null;

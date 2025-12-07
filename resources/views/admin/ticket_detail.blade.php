@@ -526,7 +526,6 @@
             <div class="sidebar-section">
               <h3 class="sidebar-title">Aksi Tiket</h3>
               <div class="action-buttons">
-                <button class="btn-action btn-primary" onclick="sendReply()">Kirim Balasan</button>
                 <button class="btn-action" onclick="updateTicketStatus({{ $ticket->id }}, 'in_progress')">Tandai Sedang Diproses</button>
                 <button class="btn-action" onclick="updateTicketStatus({{ $ticket->id }}, 'resolved')">Tandai Selesai</button>
                 <button class="btn-action" onclick="updateTicketStatus({{ $ticket->id }}, 'closed')">Tutup Tiket</button>

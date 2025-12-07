@@ -321,6 +321,58 @@
     .btn-delete-reply:hover {
       background: #c82333;
     }
+
+    /* Notification styles - Match Bootstrap styling, centered */
+    .notification {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) translateY(20px);
+      z-index: 9999;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .notification.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) translateY(0);
+    }
+
+    .notification .alert {
+      margin-bottom: 0;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+      min-width: 300px;
+      text-align: center;
+    }
+
+    .btn-light {
+      background-color: var(--bg);
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .btn-light:hover {
+      background-color: #e2e6ea; /* Bootstrap's default hover for btn-light */
+    }
+
+    .btn-danger {
+      background-color: #dc3545;
+      border-color: #dc3545;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background-color: #c82333;
+      border-color: #bd2130;
+    }
+
+    .canned-responses {
+      margin-bottom: 1rem; /* Add space below the canned responses section */
+    }
+
+    .canned-responses + .btn-reply {
+      margin-top: 1rem; /* Add space above the reply button */
+    }
   </style>
 @endpush
 
@@ -444,7 +496,8 @@
                   <option value="3">Mohon maaf atas ketidaknyamanannya. Kami akan segera menindaklanjuti.</option>
                 </select>
               </div>
-              
+
+              <div style="margin-top: 1rem;"></div> <!-- Add spacing between dropdown and button -->
               <button class="btn-reply" onclick="sendReply()">Kirim Balasan</button>
             </div>
           </div>
@@ -589,11 +642,60 @@
       }
     }
     
+    // Function to show notification
+    function showNotification(message, type = 'success') {
+      // Remove any existing notifications
+      const existingNotification = document.querySelector('.notification');
+      if (existingNotification) {
+        existingNotification.remove();
+      }
+
+      // Map our types to Bootstrap alert types
+      let alertType = 'success';
+      if (type === 'error') {
+        alertType = 'danger';
+      } else if (type === 'warning') {
+        alertType = 'warning';
+      }
+
+      // Create notification container
+      const notification = document.createElement('div');
+      notification.className = 'notification';
+      notification.innerHTML = `
+        <div class="alert alert-${alertType} alert-dismissible fade show" role="alert">
+          ${message}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      `;
+
+      // Add to document
+      document.body.appendChild(notification);
+
+      // Trigger animation
+      setTimeout(() => {
+        notification.classList.add('show');
+      }, 10);
+
+      // Auto remove after 5 seconds to allow reading in center position
+      setTimeout(() => {
+        const alertElement = notification.querySelector('.alert');
+        if (alertElement) {
+          // Trigger Bootstrap's fade out
+          alertElement.classList.remove('show');
+          setTimeout(() => {
+            if (notification.parentNode) {
+              notification.parentNode.removeChild(notification);
+            }
+          }, 150);
+        }
+      }, 5000);
+    }
+
     // Function to send reply
     async function sendReply() {
       const replyText = document.getElementById('replyMessage').value;
       if (!replyText.trim()) {
-        alert('Silakan tulis balasan terlebih dahulu.');
+        showNotification('Silakan tulis balasan terlebih dahulu.', 'error');
         return;
       }
 
@@ -638,38 +740,59 @@
           // Scroll to the bottom
           chatContainer.scrollTop = chatContainer.scrollHeight;
 
-          // Show success message
-          alert(data.message);
+          // Show success notification
+          showNotification(data.message, 'success');
 
           // Reload messages to ensure latest reply is shown
           loadTicketMessages({{ $ticket->id }});
         } else {
-          alert('Gagal mengirim balasan: ' + (data.message || 'Terjadi kesalahan'));
+          showNotification('Gagal mengirim balasan: ' + (data.message || 'Terjadi kesalahan'), 'error');
         }
       } catch (error) {
         console.error('Error:', error);
-        alert('Terjadi kesalahan saat mengirim balasan');
+        showNotification('Terjadi kesalahan saat mengirim balasan', 'error');
       }
     }
     
     // Function to update ticket status
-    function updateTicketStatus(ticketId, newStatus) {
-      // In a real implementation, this would make an AJAX call to update the status
-      // For demo purposes, we'll just log the action
-      console.log(`Status tiket \${ticketId} diubah menjadi \${newStatus}`);
-      
-      // Update the status visually
-      const statusBadge = document.querySelector('.status-badge');
-      statusBadge.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
-      
-      // Change badge class based on status
-      statusBadge.className = 'status-badge';
-      if(newStatus === 'open' || newStatus === 'new') {
-        statusBadge.classList.add('status-new');
-      } else if(newStatus === 'in_progress' || newStatus === 'processing') {
-        statusBadge.classList.add('status-processing');
-      } else if(newStatus === 'resolved' || newStatus === 'closed' || newStatus === 'completed') {
-        statusBadge.classList.add('status-completed');
+    async function updateTicketStatus(ticketId, newStatus) {
+      try {
+        const response = await fetch(`/support/tickets/${ticketId}/update-status`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          },
+          body: JSON.stringify({
+            status: newStatus
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Update the status visually
+          const statusBadge = document.querySelector('.status-badge');
+          statusBadge.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+
+          // Change badge class based on status
+          statusBadge.className = 'status-badge';
+          if(newStatus === 'open' || newStatus === 'new') {
+            statusBadge.classList.add('status-new');
+          } else if(newStatus === 'in_progress' || newStatus === 'processing') {
+            statusBadge.classList.add('status-processing');
+          } else if(newStatus === 'resolved' || newStatus === 'closed' || newStatus === 'completed') {
+            statusBadge.classList.add('status-completed');
+          }
+
+          showNotification(data.message, 'success');
+        } else {
+          showNotification('Gagal memperbarui status: ' + (data.message || 'Terjadi kesalahan'), 'error');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        showNotification('Terjadi kesalahan saat memperbarui status', 'error');
       }
     }
     
@@ -748,35 +871,81 @@
         myField.value += myValue;
       }
     }
+    // Function to show confirmation modal
+    function showConfirmModal(message, onConfirm) {
+      // Remove any existing modal
+      const existingModal = document.getElementById('confirmModal');
+      if (existingModal) {
+        existingModal.remove();
+      }
+
+      // Create modal HTML
+      const modalHtml = `
+        <div id="confirmModal" class="modal fade show" tabindex="-1" style="display: block; padding-right: 17px; background: rgba(0,0,0,0.5);">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Konfirmasi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <p>${message}</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-light" id="cancelBtn">Batal</button>
+                <button type="button" class="btn btn-danger" id="confirmBtn">Hapus</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Add modal to document
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+      // Add event listeners
+      document.getElementById('confirmBtn').addEventListener('click', function() {
+        onConfirm();
+        document.getElementById('confirmModal').remove();
+      });
+
+      document.getElementById('cancelBtn').addEventListener('click', function() {
+        document.getElementById('confirmModal').remove();
+      });
+
+      // Also handle close button
+      document.querySelector('#confirmModal .btn-close').addEventListener('click', function() {
+        document.getElementById('confirmModal').remove();
+      });
+    }
+
     // Function to delete a ticket reply
     async function deleteReply(ticketId, replyId) {
-      if (!confirm('Apakah Anda yakin ingin menghapus balasan ini?')) {
-        return;
-      }
+      showConfirmModal('Apakah Anda yakin ingin menghapus balasan ini?', async function() {
+        try {
+          const response = await fetch(`/api/tickets/${ticketId}/replies/${replyId}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+          });
 
-      try {
-        const response = await fetch(`/api/tickets/${ticketId}/replies/${replyId}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          const data = await response.json();
+
+          if (data.success) {
+            // Reload messages to reflect the deletion
+            loadTicketMessages(ticketId);
+            showNotification(data.message, 'success');
+          } else {
+            showNotification('Gagal menghapus balasan: ' + (data.message || 'Terjadi kesalahan'), 'error');
           }
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-          // Reload messages to reflect the deletion
-          loadTicketMessages(ticketId);
-          alert(data.message);
-        } else {
-          alert('Gagal menghapus balasan: ' + (data.message || 'Terjadi kesalahan'));
+        } catch (error) {
+          console.error('Error:', error);
+          showNotification('Terjadi kesalahan saat menghapus balasan', 'error');
         }
-      } catch (error) {
-        console.error('Error:', error);
-        alert('Terjadi kesalahan saat menghapus balasan');
-      }
+      });
     }
   </script>
 @endsection

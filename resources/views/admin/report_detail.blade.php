@@ -337,7 +337,7 @@
                   <div class="info-label" style="margin-top: 0.5rem;">ID Pengguna</div>
                   <div class="info-value">USR-{{ $report->reporter->id ?? '000000' }}</div>
                 </div>
-                
+
                 <div class="info-card">
                   <div class="info-label">Penjual Terlapor</div>
                   <div class="info-value">{{ $report->violator->name ?? 'Tidak Ditemukan' }}</div>
@@ -346,7 +346,7 @@
                   <div class="info-label" style="margin-top: 0.5rem;">ID Penjual</div>
                   <div class="info-value">SLR-{{ $report->violator->id ?? '000000' }}</div>
                 </div>
-                
+
                 <div class="info-card">
                   <div class="info-label">Produk Terkait</div>
                   <div class="info-value">{{ $report->product->name ?? 'Tidak Ada Produk Terkait' }}</div>
@@ -373,8 +373,9 @@
               
               <!-- Riwayat Pelanggaran Penjual -->
               <h3 class="section-title">Riwayat Pelanggaran Penjual</h3>
+              @if($report->violator)
               @php
-                $violations = \App\Models\Models\ViolationReport::where('violator_user_id', $report->violator->id)
+                $violations = \App\Models\ViolationReport::where('violator_user_id', $report->violator->id)
                   ->where('id', '!=', $report->id) // Exclude current report
                   ->orderBy('created_at', 'desc')
                   ->limit(5)
@@ -389,7 +390,7 @@
                       <strong>{{ ucfirst(str_replace('_', ' ', $violation->violation_type)) }} - {{ $violation->product->name ?? 'Produk Tidak Ditemukan' }}</strong>
                       <div style="font-size: 0.9rem; color: var(--muted);">Dilaporkan: {{ $violation->created_at->format('d M Y') }}</div>
                     </div>
-                    <span class="status-badge 
+                    <span class="status-badge
                       @if($violation->status === 'pending') status-pending
                       @elseif($violation->status === 'investigating') status-investigating
                       @elseif($violation->status === 'resolved') status-resolved
@@ -408,18 +409,35 @@
                 <div class="info-value">Penjual ini belum pernah dilaporkan sebelumnya</div>
               </div>
               @endif
+              @else
+              <div class="info-card">
+                <div class="info-label">Tidak dapat menampilkan riwayat pelanggaran</div>
+                <div class="info-value">Tidak ada informasi penjual yang dilaporkan</div>
+              </div>
+              @endif
               
               <!-- Bukti Laporan -->
               <h3 class="section-title">Bukti Laporan</h3>
-              @if($report->evidence && is_array($report->evidence) && count($report->evidence) > 0)
+              @if($report->evidence)
+              @php
+                $evidence_array = is_array($report->evidence) ? $report->evidence : [$report->evidence];
+                $evidence_array = array_filter($evidence_array); // Filter out null/empty values
+              @endphp
+              @if(count($evidence_array) > 0)
               <div class="evidence-grid">
-                @foreach($report->evidence as $evidence)
+                @foreach($evidence_array as $evidence)
                 <div class="evidence-item">
-                  <img src="{{ asset('storage/' . $evidence) }}" alt="Bukti Gambar" class="evidence-img" onerror="this.onerror=null; this.src='{{ asset('src/placeholder_produk.png') }}';">
+                  <img src="{{ str_starts_with($evidence, 'http') ? $evidence : asset('storage/' . $evidence) }}" alt="Bukti Gambar" class="evidence-img" onerror="this.onerror=null; this.src='{{ asset('src/placeholder_produk.png') }}';">
                   <div class="evidence-desc">Bukti pelanggaran</div>
                 </div>
                 @endforeach
               </div>
+              @else
+              <div class="info-card">
+                <div class="info-label">Tidak ada bukti dilampirkan</div>
+                <div class="info-value">Pelapor tidak menyertakan bukti pelanggaran</div>
+              </div>
+              @endif
               @else
               <div class="info-card">
                 <div class="info-label">Tidak ada bukti dilampirkan</div>

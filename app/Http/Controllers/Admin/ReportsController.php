@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Models\ViolationReport;
+use App\Models\ViolationReport;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -24,18 +24,18 @@ class ReportsController extends Controller
     {
         // Get total count to determine if we should show dummy data
         $totalRecords = ViolationReport::count();
-        
+
         if ($totalRecords == 0) {
             // No records exist in database, show filtered dummy data
             return $this->showFilteredDummyData($request);
         }
-        
+
         // Records exist, apply filters and show real data
         $query = ViolationReport::with(['reporter', 'violator', 'product', 'order']);
 
         // Apply all filters
         $this->applyFilters($query, $request);
-        
+
         $reports = $query->orderBy('created_at', 'desc')->paginate(15);
         return view('admin.reports_violations', compact('reports'));
     }
@@ -47,18 +47,18 @@ class ReportsController extends Controller
     {
         // Get total count to determine if we should show dummy data
         $totalRecords = ViolationReport::count();
-        
+
         if ($totalRecords == 0) {
             // No records exist in database, show filtered dummy data
             return $this->showFilteredDummyData($request);
         }
-        
+
         // Records exist, apply filters and show real data
         $query = ViolationReport::with(['reporter', 'violator', 'product', 'order']);
 
         // Apply all filters
         $this->applyFilters($query, $request);
-        
+
         $reports = $query->orderBy('created_at', 'desc')->paginate(15);
         return view('admin.reports_violations', compact('reports'));
     }
@@ -254,7 +254,7 @@ class ReportsController extends Controller
                     $violation->product = $dummyProduct5;
                     break;
             }
-            
+
             // IMPORTANT: Don't add filtering logic to the dummy data creation
             // The dummy data should already match the selected filters
             $dummyReports->push($violation);
@@ -286,12 +286,186 @@ class ReportsController extends Controller
      */
     public function show($id)
     {
+        // First, try to find the report in the database
         $report = ViolationReport::with(['reporter', 'violator', 'product', 'order', 'handledBy'])
             ->where('id', $id)
             ->orWhere('report_number', $id)
-            ->firstOrFail();
+            ->first();
 
-        return view('admin.report_detail', compact('report'));
+        // If a real report is found, return it
+        if ($report) {
+            return view('admin.report_detail', compact('report'));
+        }
+
+        // If no real report is found, check if it's a dummy ID (1-15)
+        // This is for when dummy data is being used in the UI
+        if (is_numeric($id) && $id >= 1 && $id <= 15) {
+            // Create a dummy report object with all necessary attributes
+            $violationTypes = ['product', 'content', 'scam', 'copyright', 'other'];
+            $statuses = ['pending', 'investigating', 'resolved', 'dismissed'];
+            $violationType = $violationTypes[($id - 1) % count($violationTypes)];
+
+            // Create dummy users for reporter and violator (same pattern as in showFilteredDummyData)
+            $dummyReporter = (object) [
+                'id' => 1,
+                'name' => 'Ahmad Santoso',
+                'email' => 'ahmad.santoso@example.com'
+            ];
+
+            $dummyViolator = (object) [
+                'id' => 2,
+                'name' => 'Budi Prasetyo',
+                'email' => 'budi.prasetyo@example.com'
+            ];
+
+            $dummyUser3 = (object) [
+                'id' => 3,
+                'name' => 'Siti Rahayu',
+                'email' => 'siti.rahayu@example.com'
+            ];
+
+            $dummyUser4 = (object) [
+                'id' => 4,
+                'name' => 'Joko Widodo',
+                'email' => 'joko.widodo@example.com'
+            ];
+
+            $dummyUser5 = (object) [
+                'id' => 5,
+                'name' => 'Lina Marlina',
+                'email' => 'lina.marлина@example.com'
+            ];
+
+            // Create dummy products for each case (same pattern as in showFilteredDummyData)
+            $dummyCategory1 = (object) [
+                'name' => 'Elektronik'
+            ];
+
+            $dummyCategory2 = (object) [
+                'name' => 'Komputer & Laptop'
+            ];
+
+            $dummyCategory3 = (object) [
+                'name' => 'Pakaian'
+            ];
+
+            $dummyCategory4 = (object) [
+                'name' => 'Aksesoris'
+            ];
+
+            $dummyCategory5 = (object) [
+                'name' => 'Fashion'
+            ];
+
+            $dummyProduct1 = (object) [
+                'id' => 1,
+                'name' => 'Smartphone Xiaomi Redmi Note 12',
+                'category' => $dummyCategory1
+            ];
+
+            $dummyProduct2 = (object) [
+                'id' => 2,
+                'name' => 'Laptop Gaming ASUS ROG',
+                'category' => $dummyCategory2
+            ];
+
+            $dummyProduct3 = (object) [
+                'id' => 3,
+                'name' => 'Sepatu Sport Merk Terkenal',
+                'category' => $dummyCategory3
+            ];
+
+            $dummyProduct4 = (object) [
+                'id' => 4,
+                'name' => 'Jam Tangan Pintar',
+                'category' => $dummyCategory4
+            ];
+
+            $dummyProduct5 = (object) [
+                'id' => 5,
+                'name' => 'Kaos Oblong Premium',
+                'category' => $dummyCategory5
+            ];
+
+            $dummyOrder = null; // No order for dummy data
+            $dummyHandler = null; // No handler for dummy data
+
+            // Create and populate the dummy report
+            $report = new \App\Models\ViolationReport();
+            $report->id = $id;
+            $report->report_number = 'VR-2025-01-' . str_pad($id, 3, '0', STR_PAD_LEFT);
+            $report->violation_type = $violationType;
+            $report->status = $statuses[array_rand($statuses)];
+
+            // Match the description to the violation type
+            switch($violationType) {
+                case 'product':
+                    $report->description = 'Produk yang dijual ternyata palsu dan tidak sesuai dengan deskripsi';
+                    break;
+                case 'content':
+                    $report->description = 'Gambar produk mengandung konten tidak pantas';
+                    break;
+                case 'scam':
+                    $report->description = 'Ditemukan penipuan dalam transaksi';
+                    break;
+                case 'copyright':
+                    $report->description = 'Produk melanggar hak cipta pihak lain';
+                    break;
+                case 'other':
+                    $report->description = 'Lainnya - pelanggaran kebijakan platform';
+                    break;
+                default:
+                    $report->description = 'Lainnya - pelanggaran kebijakan platform';
+                    break;
+            }
+
+            $report->created_at = now()->subDays(rand(0, 30))->subHours(rand(0, 24))->subMinutes(rand(0, 60));
+            $report->evidence = ['https://via.placeholder.com/300x200.png'];
+            $report->admin_notes = null;
+            $report->handled_by = null;
+            $report->handled_at = null;
+            $report->resolution = null;
+            $report->fine_amount = null;
+
+            // Assign different users and products based on same pattern as in showFilteredDummyData
+            $caseIndex = ($id - 1) % 5; // This gives us 0, 1, 2, 3, 4 in rotation
+            switch ($caseIndex) {
+                case 0:
+                    $report->reporter = $dummyReporter;
+                    $report->violator = $dummyViolator;
+                    $report->product = $dummyProduct1;
+                    break;
+                case 1:
+                    $report->reporter = $dummyUser3;
+                    $report->violator = $dummyUser4;
+                    $report->product = $dummyProduct2;
+                    break;
+                case 2:
+                    $report->reporter = $dummyUser5;
+                    $report->violator = $dummyReporter;
+                    $report->product = $dummyProduct3;
+                    break;
+                case 3:
+                    $report->reporter = $dummyViolator;
+                    $report->violator = $dummyUser3;
+                    $report->product = $dummyProduct4;
+                    break;
+                case 4:
+                    $report->reporter = $dummyUser4;
+                    $report->violator = $dummyUser5;
+                    $report->product = $dummyProduct5;
+                    break;
+            }
+
+            // Attach other relationships as properties
+            $report->order = $dummyOrder;
+            $report->handledBy = $dummyHandler;
+
+            return view('admin.report_detail', compact('report'));
+        }
+
+        // If no real report and not a valid dummy ID, show 404
+        abort(404, 'Violation report not found');
     }
 
     /**

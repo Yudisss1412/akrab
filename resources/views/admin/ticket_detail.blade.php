@@ -306,6 +306,21 @@
     .rich-btn:hover {
       background: var(--bg);
     }
+
+    .btn-delete-reply {
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 0.7rem;
+      cursor: pointer;
+      margin-left: 0.5rem;
+    }
+
+    .btn-delete-reply:hover {
+      background: #c82333;
+    }
   </style>
 @endpush
 
@@ -496,55 +511,145 @@
 
   <script>
     // Load ticket messages from API when page loads
-    $(document).ready(function() {
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM loaded, loading ticket messages for ID: {{ $ticket->id }}');
       loadTicketMessages({{ $ticket->id }});
     });
-    
+
     // Function to load ticket messages
-    function loadTicketMessages(ticketId) {
-      // In a real implementation, this would load messages from the API
-      // For now, we'll just keep the original ticket message
+    async function loadTicketMessages(ticketId) {
       console.log('Loading messages for ticket ID:', ticketId);
+
+      try {
+        const response = await fetch(`/api/tickets/${ticketId}/messages`);
+        console.log('API response status:', response.status);
+
+        const data = await response.json();
+        console.log('API response data:', data);
+
+        const chatContainer = document.getElementById('chatContainer');
+        // Clear chat container
+        chatContainer.innerHTML = '';
+
+        // Add all messages from the API
+        if (data.messages && Array.isArray(data.messages)) {
+          data.messages.forEach(message => {
+            console.log('Processing message:', message);
+            const messageDiv = document.createElement('div');
+
+            // Determine message class based on the type of message
+            if (message.is_ticket_message) {
+              messageDiv.className = 'message user';
+              messageDiv.innerHTML =
+                '<div class="message-sender">' + (message.sender_name || 'User Tidak Dikenal') + ' (Pengirim Tiket)</div>' +
+                '<div class="message-text">' + message.message + '</div>' +
+                '<div class="message-time">' + message.created_at + '</div>';
+            } else if (message.is_resolution_note) {
+              messageDiv.className = 'message admin';
+              messageDiv.innerHTML =
+                '<div class="message-sender">Catatan Penyelesaian</div>' +
+                '<div class="message-text">' + message.message + '</div>' +
+                '<div class="message-time">' + message.created_at + '</div>';
+            } else {
+              // This is a reply
+              // Check if sender has admin/staff/support role
+              let isFromAdmin = false;
+              if (message.sender_role) {
+                isFromAdmin = ['admin', 'staff', 'support'].includes(message.sender_role);
+              }
+              messageDiv.className = 'message ' + (isFromAdmin ? 'admin' : 'user');
+
+              // Extract reply ID from the message ID (format: 'reply-XXX')
+              const replyId = message.id.replace('reply-', '');
+
+              // Check if current user can delete this message
+              const currentUserId = {{ Auth::id() }}; // Current logged in user ID
+              const currentUserRole = '{{ Auth::user()->role->name ?? "" }}';
+              const canDelete = (message.sender_id == currentUserId) || (['admin', 'staff', 'support'].includes(currentUserRole));
+
+              messageDiv.innerHTML =
+                '<div class="message-sender">' + message.sender_name + '</div>' +
+                '<div class="message-text">' + message.message + '</div>' +
+                '<div class="message-time">' + message.created_at +
+                (canDelete ? ' <button class="btn-delete-reply" onclick="deleteReply(' + {{ $ticket->id }} + ', ' + replyId + ')">hapus</button>' : '') +
+                '</div>';
+            }
+
+            chatContainer.appendChild(messageDiv);
+            console.log('Added message to chat container:', message.sender_name, '-', message.message);
+          });
+        } else {
+          console.error('Invalid messages data:', data);
+        }
+
+        // Scroll to the bottom
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      } catch (error) {
+        console.error('Error loading messages:', error);
+      }
     }
     
     // Function to send reply
-    function sendReply() {
+    async function sendReply() {
       const replyText = document.getElementById('replyMessage').value;
       if (!replyText.trim()) {
         alert('Silakan tulis balasan terlebih dahulu.');
         return;
       }
-      
-      // In a real implementation, this would make an AJAX call to store the reply
-      // For now, we'll just add it to the conversation view
-      const chatContainer = document.getElementById('chatContainer');
-      const now = new Date();
-      const timeString = now.toLocaleDateString('id-ID', { 
-        day: '2-digit', 
-        month: 'short', 
-        year: 'numeric' 
-      }) + ', ' + now.toLocaleTimeString('id-ID', { 
-        hour: '2-digit', 
-        minute: '2-digit' 
-      }) + ' WIB';
-      
-      const replyDiv = document.createElement('div');
-      replyDiv.className = 'message admin';
-      replyDiv.innerHTML = `
-        <div class="message-sender">Tim Bantuan AKRAB</div>
-        <div class="message-text">\${replyText}</div>
-        <div class="message-time">\${timeString}</div>
-      `;
-      
-      // Insert before the "Pesan dinamis akan dimuat" comment
-      const lastChild = chatContainer.lastChild;
-      chatContainer.insertBefore(replyDiv, lastChild.previousSibling);
-      
-      // Clear the reply textbox
-      document.getElementById('replyMessage').value = '';
-      
-      // Scroll to the bottom
-      chatContainer.scrollTop = chatContainer.scrollHeight;
+
+      console.log('Sending reply:', replyText);
+
+      try {
+        const response = await fetch(`/api/tickets/{{ $ticket->id }}/replies`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          },
+          body: JSON.stringify({
+            message: replyText,
+            is_internal_note: false  // Set to true if it's an internal note
+          })
+        });
+
+        console.log('API response status for reply:', response.status);
+
+        const data = await response.json();
+        console.log('API response data for reply:', data);
+
+        if (data.success) {
+          // Add the new reply to the chat container
+          const chatContainer = document.getElementById('chatContainer');
+
+          const replyDiv = document.createElement('div');
+          replyDiv.className = 'message admin';
+          replyDiv.innerHTML =
+            '<div class="message-sender">' + data.reply.sender_name + '</div>' +
+            '<div class="message-text">' + data.reply.message + '</div>' +
+            '<div class="message-time">' + data.reply.created_at + '</div>';
+
+          // Add to the chat container
+          chatContainer.appendChild(replyDiv);
+
+          // Clear the reply textbox
+          document.getElementById('replyMessage').value = '';
+
+          // Scroll to the bottom
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+
+          // Show success message
+          alert(data.message);
+
+          // Reload messages to ensure latest reply is shown
+          loadTicketMessages({{ $ticket->id }});
+        } else {
+          alert('Gagal mengirim balasan: ' + (data.message || 'Terjadi kesalahan'));
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Terjadi kesalahan saat mengirim balasan');
+      }
     }
     
     // Function to update ticket status
@@ -641,6 +746,36 @@
         myField.selectionEnd = startPos + myValue.length;
       } else {
         myField.value += myValue;
+      }
+    }
+    // Function to delete a ticket reply
+    async function deleteReply(ticketId, replyId) {
+      if (!confirm('Apakah Anda yakin ingin menghapus balasan ini?')) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/tickets/${ticketId}/replies/${replyId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Reload messages to reflect the deletion
+          loadTicketMessages(ticketId);
+          alert(data.message);
+        } else {
+          alert('Gagal menghapus balasan: ' + (data.message || 'Terjadi kesalahan'));
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Terjadi kesalahan saat menghapus balasan');
       }
     }
   </script>

@@ -303,11 +303,8 @@ Route::get('/api/user-reviews', [App\Http\Controllers\ReviewController::class, '
 
 // API endpoints for tickets
 Route::get('/api/tickets', [App\Http\Controllers\TicketController::class, 'apiGetTickets'])->name('api.tickets');
-Route::post('/api/tickets/{id}/replies', function ($id) {
-    // In a real implementation, this would store ticket replies
-    // For now, we return a success response
-    return response()->json(['success' => true, 'message' => 'Balasan berhasil ditambahkan']);
-})->name('api.tickets.replies');
+Route::post('/api/tickets/{id}/replies', [App\Http\Controllers\TicketController::class, 'addTicketReply'])->name('api.tickets.replies');
+Route::delete('/api/tickets/{ticketId}/replies/{replyId}', [App\Http\Controllers\TicketController::class, 'deleteTicketReply'])->name('api.tickets.replies.delete');
 Route::get('/api/staff', function () {
     // Return staff/admin users for ticket assignment
     $staff = \App\Models\User::whereHas('role', function($query) {

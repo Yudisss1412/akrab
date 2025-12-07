@@ -212,14 +212,15 @@ class TicketController extends Controller
 
     public function getTicketMessages($id)
     {
-        // Untuk sekarang, karena belum ada model pesan tiket, kita hanya kembalikan tiket asli
-        // di masa depan bisa ditambah dengan model pesan terpisah untuk komunikasi tiket
+        // Add debug logging
+        \Log::info('API getTicketMessages called for ticket ID: ' . $id);
+
         $ticket = Ticket::with('user')->findOrFail($id);
 
-        // Format data sebagai message untuk konsistensi
+        // Format tiket awal sebagai message pertama
         $messages = [
             [
-                'id' => $ticket->id,
+                'id' => 'ticket-'.$ticket->id,
                 'message' => $ticket->message,
                 'sender_id' => $ticket->user_id,
                 'sender_name' => $ticket->user->name ?? 'N/A',
@@ -228,6 +229,28 @@ class TicketController extends Controller
             ]
         ];
 
+        // Tambahkan balasan tiket
+        $replies = \App\Models\TicketReply::where('ticket_id', $id)
+            ->with(['user', 'user.role'])
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        \Log::info('Found ' . $replies->count() . ' replies for ticket ID: ' . $id);
+
+        foreach ($replies as $reply) {
+            $messages[] = [
+                'id' => 'reply-'.$reply->id,
+                'message' => $reply->message,
+                'sender_id' => $reply->user_id,
+                'sender_name' => $reply->user->name ?? 'N/A',
+                'sender_role' => $reply->user->role->name ?? 'user', // untuk menentukan tampilan (admin/customer)
+                'created_at' => $reply->created_at->format('d M Y, H:i'),
+                'is_reply' => true,
+                'is_internal_note' => $reply->is_internal_note
+            ];
+        }
+
+        // Tambahkan catatan penyelesaian jika ada
         if($ticket->resolution_notes) {
             $messages[] = [
                 'id' => 'resolution-'.$ticket->id,
@@ -239,7 +262,103 @@ class TicketController extends Controller
             ];
         }
 
+        \Log::info('Returning ' . count($messages) . ' messages for ticket ID: ' . $id);
+
         return response()->json(['messages' => $messages]);
+    }
+
+    public function addTicketReply(Request $request, $id)
+    {
+        // Add debug logging to track API calls
+        \Log::info('API addTicketReply called with ID: ' . $id . ' by user: ' . (Auth::id() ?? 'null'));
+        \Log::info('Request data: ', $request->all());
+
+        // Verify user is authenticated
+        if (!Auth::check()) {
+            \Log::warning('Unauthenticated user tried to add ticket reply');
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
+
+        $request->validate([
+            'message' => 'required|string|min:1',
+            'is_internal_note' => 'boolean'
+        ]);
+
+        $ticket = Ticket::findOrFail($id);
+
+        // Check if user has permission to reply to this ticket
+        $user = Auth::user();
+        $isAdmin = $user->role && in_array($user->role->name, ['admin', 'staff', 'support']);
+
+        if (!$isAdmin && $ticket->user_id != $user->id) {
+            \Log::warning('Unauthorized user tried to reply to ticket ' . $id . ', user: ' . $user->id);
+            return response()->json(['error' => 'Unauthorized to reply to this ticket'], 403);
+        }
+
+        // Create new ticket reply
+        $reply = \App\Models\TicketReply::create([
+            'ticket_id' => $ticket->id,
+            'user_id' => Auth::id(),
+            'message' => $request->message,
+            'is_internal_note' => $request->boolean('is_internal_note', false)
+        ]);
+
+        \Log::info('Ticket reply created successfully: ' . $reply->id);
+
+        // Update ticket status to 'in_progress' when admin replies
+        if (!$reply->is_internal_note) {
+            $ticket->update(['status' => 'in_progress']);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Balasan tiket berhasil ditambahkan',
+            'reply' => [
+                'id' => 'reply-'.$reply->id,
+                'message' => $reply->message,
+                'sender_id' => $reply->user_id,
+                'sender_name' => $reply->user->name ?? 'N/A',
+                'sender_role' => $reply->user->role->name ?? 'user',
+                'created_at' => $reply->created_at->format('d M Y, H:i'),
+                'is_reply' => true,
+                'is_internal_note' => $reply->is_internal_note
+            ]
+        ]);
+    }
+
+    public function deleteTicketReply(Request $request, $ticketId, $replyId)
+    {
+        // Add debug logging
+        \Log::info('API deleteTicketReply called for ticket ID: ' . $ticketId . ' and reply ID: ' . $replyId . ' by user: ' . (Auth::id() ?? 'null'));
+
+        // Verify user is authenticated
+        if (!Auth::check()) {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
+
+        $user = Auth::user();
+        $isAdmin = $user->role && in_array($user->role->name, ['admin', 'staff', 'support']);
+
+        // Find the ticket reply
+        $reply = \App\Models\TicketReply::findOrFail($replyId);
+
+        // Check if user is the creator of the reply or an admin
+        if ($reply->user_id !== $user->id && !$isAdmin) {
+            return response()->json(['error' => 'Unauthorized to delete this reply'], 403);
+        }
+
+        // Verify that the reply belongs to the correct ticket
+        if ($reply->ticket_id != $ticketId) {
+            return response()->json(['error' => 'Reply does not belong to this ticket'], 403);
+        }
+
+        // Delete the reply
+        $reply->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Balasan tiket berhasil dihapus'
+        ]);
     }
 
     /**

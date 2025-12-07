@@ -34,4 +34,10 @@ class Ticket extends Model
     {
         return $this->belongsTo(User::class, 'assignee_id');
     }
+
+    // Relasi ke balasan tiket
+    public function replies()
+    {
+        return $this->hasMany(TicketReply::class);
+    }
 }

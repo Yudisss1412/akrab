@@ -33,7 +33,7 @@ class ProfileController extends Controller
      */
     public function edit()
     {
-        $user = Auth::user();
+        $user = Auth::user()->load('seller'); // Load the seller relationship
         return view('penjual.edit_profil_penjual', compact('user'));
     }
 

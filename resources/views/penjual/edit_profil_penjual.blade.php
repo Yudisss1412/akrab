@@ -88,29 +88,29 @@
                 <div class="form-group field">
                   <select id="bankName" name="bankName">
                     <option value="">Pilih Bank</option>
-                    <option value="BCA" {{ old('bankName') == 'BCA' ? 'selected' : '' }}>BCA</option>
-                    <option value="BNI" {{ old('bankName') == 'BNI' ? 'selected' : '' }}>BNI</option>
-                    <option value="BRI" {{ old('bankName') == 'BRI' ? 'selected' : '' }}>BRI</option>
-                    <option value="Mandiri" {{ old('bankName') == 'Mandiri' ? 'selected' : '' }}>Mandiri</option>
-                    <option value="BTN" {{ old('bankName') == 'BTN' ? 'selected' : '' }}>BTN</option>
-                    <option value="CIMB Niaga" {{ old('bankName') == 'CIMB Niaga' ? 'selected' : '' }}>CIMB Niaga</option>
-                    <option value="Danamon" {{ old('bankName') == 'Danamon' ? 'selected' : '' }}>Danamon</option>
-                    <option value="Permata" {{ old('bankName') == 'Permata' ? 'selected' : '' }}>Permata</option>
-                    <option value="OCBC NISP" {{ old('bankName') == 'OCBC NISP' ? 'selected' : '' }}>OCBC NISP</option>
-                    <option value="Bank Central Asia" {{ old('bankName') == 'Bank Central Asia' ? 'selected' : '' }}>Bank Central Asia</option>
-                    <option value="Bank Mandiri" {{ old('bankName') == 'Bank Mandiri' ? 'selected' : '' }}>Bank Mandiri</option>
-                    <option value="Bank Rakyat Indonesia" {{ old('bankName') == 'Bank Rakyat Indonesia' ? 'selected' : '' }}>Bank Rakyat Indonesia</option>
+                    <option value="BCA" {{ old('bankName', auth()->user()->bank_name) == 'BCA' ? 'selected' : '' }}>BCA</option>
+                    <option value="BNI" {{ old('bankName', auth()->user()->bank_name) == 'BNI' ? 'selected' : '' }}>BNI</option>
+                    <option value="BRI" {{ old('bankName', auth()->user()->bank_name) == 'BRI' ? 'selected' : '' }}>BRI</option>
+                    <option value="Mandiri" {{ old('bankName', auth()->user()->bank_name) == 'Mandiri' ? 'selected' : '' }}>Mandiri</option>
+                    <option value="BTN" {{ old('bankName', auth()->user()->bank_name) == 'BTN' ? 'selected' : '' }}>BTN</option>
+                    <option value="CIMB Niaga" {{ old('bankName', auth()->user()->bank_name) == 'CIMB Niaga' ? 'selected' : '' }}>CIMB Niaga</option>
+                    <option value="Danamon" {{ old('bankName', auth()->user()->bank_name) == 'Danamon' ? 'selected' : '' }}>Danamon</option>
+                    <option value="Permata" {{ old('bankName', auth()->user()->bank_name) == 'Permata' ? 'selected' : '' }}>Permata</option>
+                    <option value="OCBC NISP" {{ old('bankName', auth()->user()->bank_name) == 'OCBC NISP' ? 'selected' : '' }}>OCBC NISP</option>
+                    <option value="Bank Central Asia" {{ old('bankName', auth()->user()->bank_name) == 'Bank Central Asia' ? 'selected' : '' }}>Bank Central Asia</option>
+                    <option value="Bank Mandiri" {{ old('bankName', auth()->user()->bank_name) == 'Bank Mandiri' ? 'selected' : '' }}>Bank Mandiri</option>
+                    <option value="Bank Rakyat Indonesia" {{ old('bankName', auth()->user()->bank_name) == 'Bank Rakyat Indonesia' ? 'selected' : '' }}>Bank Rakyat Indonesia</option>
                   </select>
                   <p class="error-message" id="bankName-error"></p>
                 </div>
-                
+
                 <div class="form-group field">
                   <input type="text" id="accountNumber" name="accountNumber" value="{{ old('accountNumber', auth()->user()->bank_account_number ?? '1234567890') }}" required placeholder=" ">
                   <label for="accountNumber">Nomor Rekening</label>
                   <p class="error-message" id="accountNumber-error"></p>
                 </div>
               </div>
-              
+
               <div class="form-group field">
                 <input type="text" id="accountHolder" name="accountHolder" value="{{ old('accountHolder', auth()->user()->bank_account_name ?? auth()->user()->name) }}" required placeholder=" ">
                 <label for="accountHolder">Atas Nama</label>

@@ -169,6 +169,12 @@ class User extends Authenticatable
         return $this->hasMany(Ticket::class, 'user_id')->where('status', 'open');
     }
 
+    // Relasi ke seller
+    public function seller()
+    {
+        return $this->hasOne(Seller::class, 'user_id');
+    }
+
     // Fungsi untuk mendapatkan tiket terbaru
     public function recentTickets($limit = 5)
     {

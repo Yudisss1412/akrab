@@ -989,22 +989,39 @@
         existingModal.remove();
       }
 
-      // Extract user ID from the user info card
+      // Extract user ID from the user info card by finding the element with 'ID User' label
       const userCard = document.querySelector('.user-info-card');
-      const userIdElement = userCard.querySelector('.info-value:nth-child(6)'); // ID User value
       let userId = '0';
 
-      if (userIdElement) {
-        // Extract the numeric ID from the format "USR-XXXXXX"
-        const userIdText = userIdElement.textContent;
-        const match = userIdText.match(/USR-(\d+)/);
-        if (match) {
-          userId = match[1];
-        } else {
-          // If the regex doesn't match, try to extract any number from the text
-          const numberMatch = userIdText.match(/\d+/);
-          if (numberMatch) {
-            userId = numberMatch[0];
+      // Find all info rows in the card
+      const infoRows = userCard.querySelectorAll('.info-row');
+
+      for (let row of infoRows) {
+        const labelElement = row.querySelector('.info-label');
+        const valueElement = row.querySelector('.info-value');
+
+        if (labelElement && valueElement) {
+          const labelText = labelElement.textContent.trim();
+          if (labelText === 'ID User:') {
+            const userIdText = valueElement.textContent;
+            console.log('Raw userIdText:', userIdText);
+
+            const match = userIdText.match(/USR-(\d+)/);
+            if (match) {
+              userId = match[1];
+              console.log('Extracted userId from match:', userId);
+              break;
+            } else {
+              // If the regex doesn't match, try to extract any number from the text
+              const numberMatch = userIdText.match(/\d+/);
+              if (numberMatch) {
+                userId = numberMatch[0];
+                console.log('Extracted userId from numberMatch:', userId);
+                break;
+              } else {
+                console.log('Could not extract user ID from:', userIdText);
+              }
+            }
           }
         }
       }
@@ -1031,6 +1048,9 @@
 
       // Add loading modal to document
       document.body.insertAdjacentHTML('beforeend', loadingModalHtml);
+
+      // Log the API URL we're trying to call
+      console.log('Fetching user profile from URL:', '/api/users/' + userId + '/profile');
 
       try {
         // Fetch user data from API

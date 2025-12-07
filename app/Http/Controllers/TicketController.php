@@ -655,12 +655,17 @@ class TicketController extends Controller
 
     public function getUserProfile($userId)
     {
+        \Log::info('getUserProfile called with userId: ' . $userId);
+
         // Find the user with related data
         $user = \App\Models\User::with('orders', 'tickets')->find($userId);
 
         if (!$user) {
+            \Log::warning('User not found with ID: ' . $userId);
             return response()->json(['error' => 'User not found'], 404);
         }
+
+        \Log::info('User found: ' . $user->name . ' (' . $user->id . ')');
 
         // Calculate additional information
         $totalOrders = $user->orders()->count();

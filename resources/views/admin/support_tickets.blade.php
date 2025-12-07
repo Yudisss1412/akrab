@@ -793,6 +793,116 @@
         const selectedPriority = select.value;
         updatePrioritySelectClass(select, selectedPriority);
       });
+
+      // Function to check for ticket status updates
+      let ticketStatusCheckInterval;
+
+      function startTicketStatusCheck() {
+        // Get all ticket IDs on the current page
+        const ticketRows = document.querySelectorAll('#ticketsTable tbody tr');
+        const ticketIds = [];
+
+        ticketRows.forEach(row => {
+          const statusSelect = row.querySelector('.status-select');
+          if (statusSelect) {
+            const ticketId = statusSelect.getAttribute('data-ticket');
+            if (ticketId) {
+              ticketIds.push({
+                id: ticketId,
+                row: row,
+                currentStatus: statusSelect.value,
+                currentPriority: row.querySelector('.priority-select').value
+              });
+            }
+          }
+        });
+
+        // Check each ticket for updates
+        ticketIds.forEach(ticket => {
+          checkTicketStatusUpdate(ticket);
+        });
+      }
+
+      async function checkTicketStatusUpdate(ticket) {
+        try {
+          const response = await fetch(`/api/tickets/${ticket.id}/status`);
+          const data = await response.json();
+
+          if (data.success) {
+            // Check if status or priority has changed
+            if (data.status !== ticket.currentStatus || data.priority !== ticket.currentPriority) {
+              // Update the status in the table
+              const statusSelect = ticket.row.querySelector('.status-select');
+              const prioritySelect = ticket.row.querySelector('.priority-select');
+
+              if (statusSelect && prioritySelect) {
+                // Update values
+                statusSelect.value = data.status;
+                prioritySelect.value = data.priority;
+
+                // Update styling
+                updateStatusSelectClass(statusSelect, data.status);
+                updatePrioritySelectClass(prioritySelect, data.priority);
+
+                console.log(`Ticket ${ticket.id} status updated to ${data.status}, priority to ${data.priority}`);
+
+                // Store new values as original for future reference
+                statusSelect.setAttribute('data-original-value', data.status);
+                prioritySelect.setAttribute('data-original-value', data.priority);
+              }
+            }
+          }
+        } catch (error) {
+          console.error(`Error checking status for ticket ${ticket.id}:`, error);
+        }
+      }
+
+      // Start checking every 10 seconds
+      ticketStatusCheckInterval = setInterval(startTicketStatusCheck, 10000);
+
+      // Also start immediately when the page loads
+      setTimeout(startTicketStatusCheck, 2000); // Delay slightly to ensure page is fully loaded
+
+      // Listen for status updates from other pages/tabs
+      window.addEventListener('storage', function(e) {
+        if (e.key === 'ticketStatusUpdate' && e.newValue) {
+          try {
+            const updateData = JSON.parse(e.newValue);
+            if (updateData.ticketId) {
+              // Find the row for this ticket and update its status/priority
+              const ticketRows = document.querySelectorAll('#ticketsTable tbody tr');
+
+              ticketRows.forEach(row => {
+                const statusSelect = row.querySelector('.status-select');
+                if (statusSelect) {
+                  const ticketId = statusSelect.getAttribute('data-ticket');
+                  if (ticketId == updateData.ticketId) { // Use == to handle string/number comparison
+                    // Update status if provided
+                    if (updateData.status && statusSelect.value !== updateData.status) {
+                      statusSelect.value = updateData.status;
+                      updateStatusSelectClass(statusSelect, updateData.status);
+                      statusSelect.setAttribute('data-original-value', updateData.status);
+                    }
+
+                    // Update priority if provided
+                    const prioritySelect = row.querySelector('.priority-select');
+                    if (updateData.priority && prioritySelect && prioritySelect.value !== updateData.priority) {
+                      prioritySelect.value = updateData.priority;
+                      updatePrioritySelectClass(prioritySelect, updateData.priority);
+                      prioritySelect.setAttribute('data-original-value', updateData.priority);
+                    }
+
+                    console.log(`Synced ticket ${ticketId} status: ${updateData.status}, priority: ${updateData.priority}`);
+                  }
+                }
+              });
+            }
+          } catch (error) {
+            console.error('Error processing ticket status update:', error);
+          }
+        }
+      });
+
     });
   </script>
 @endsection

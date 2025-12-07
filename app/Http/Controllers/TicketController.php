@@ -687,4 +687,20 @@ class TicketController extends Controller
             ]
         ]);
     }
+
+    public function getTicketStatus($id)
+    {
+        $ticket = Ticket::find($id);
+
+        if (!$ticket) {
+            return response()->json(['error' => 'Ticket not found'], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'status' => $ticket->status,
+            'priority' => $ticket->priority,
+            'updated_at' => $ticket->updated_at->toISOString()
+        ]);
+    }
 }

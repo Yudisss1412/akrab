@@ -419,13 +419,6 @@
         <main class="admin-page-content">
         <div class="page-header">
           <h1>Detail Tiket Bantuan</h1>
-          <a href="{{ route('support.tickets') }}" class="back-btn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M19 12H5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            Kembali ke Daftar Tiket
-          </a>
         </div>
 
         <div class="ticket-container">
@@ -440,14 +433,25 @@
                   @elseif($ticket->status === 'resolved') status-completed
                   @elseif($ticket->status === 'closed') status-completed
                   @else status-new @endif">
-                  {{ ucfirst(str_replace('_', ' ', $ticket->status)) }}
+                  @if($ticket->status === 'open') Terbuka
+                  @elseif($ticket->status === 'in_progress') Dalam Proses
+                  @elseif($ticket->status === 'resolved') Diselesaikan
+                  @elseif($ticket->status === 'closed') Ditutup
+                  @else Terbuka
+                  @endif
                 </div>
                 <div class="priority-badge
                   @if($ticket->priority === 'low') priority-low
                   @elseif($ticket->priority === 'medium') priority-medium
                   @elseif($ticket->priority === 'high') priority-high
-                  @else priority-high @endif">
-                  {{ ucfirst($ticket->priority) }}
+                  @elseif($ticket->priority === 'urgent') priority-high
+                  @else priority-low @endif">
+                  @if($ticket->priority === 'low') Rendah
+                  @elseif($ticket->priority === 'medium') Sedang
+                  @elseif($ticket->priority === 'high') Tinggi
+                  @elseif($ticket->priority === 'urgent') Darurat
+                  @else Rendah
+                  @endif
                 </div>
               </div>
             </div>
@@ -465,8 +469,8 @@
                 <div class="info-label">Status:</div>
                 <div class="info-value">
                   <select class="status-select" onchange="updateTicketStatus({{ $ticket->id }}, this.value)">
-                    <option value="open" {{ $ticket->status === 'open' ? 'selected' : '' }}>Dibuka</option>
-                    <option value="in_progress" {{ $ticket->status === 'in_progress' ? 'selected' : '' }}>Sedang Diproses</option>
+                    <option value="open" {{ $ticket->status === 'open' ? 'selected' : '' }}>Terbuka</option>
+                    <option value="in_progress" {{ $ticket->status === 'in_progress' ? 'selected' : '' }}>Dalam Proses</option>
                     <option value="resolved" {{ $ticket->status === 'resolved' ? 'selected' : '' }}>Diselesaikan</option>
                     <option value="closed" {{ $ticket->status === 'closed' ? 'selected' : '' }}>Ditutup</option>
                   </select>
@@ -477,7 +481,7 @@
                 <div class="info-value">
                   <select class="priority-select" onchange="updateTicketPriority({{ $ticket->id }}, this.value)">
                     <option value="low" {{ $ticket->priority === 'low' ? 'selected' : '' }}>Rendah</option>
-                    <option value="medium" {{ $ticket->priority === 'medium' ? 'selected' : '' }}>Menengah</option>
+                    <option value="medium" {{ $ticket->priority === 'medium' ? 'selected' : '' }}>Sedang</option>
                     <option value="high" {{ $ticket->priority === 'high' ? 'selected' : '' }}>Tinggi</option>
                     <option value="urgent" {{ $ticket->priority === 'urgent' ? 'selected' : '' }}>Darurat</option>
                   </select>
@@ -807,7 +811,15 @@
         if (data.success) {
           // Update the status visually
           const statusBadge = document.querySelector('.status-badge');
-          statusBadge.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+
+          // Convert to display text
+          let displayStatus = newStatus;
+          if(newStatus === 'open') displayStatus = 'Terbuka';
+          else if(newStatus === 'in_progress') displayStatus = 'Dalam Proses';
+          else if(newStatus === 'resolved') displayStatus = 'Diselesaikan';
+          else if(newStatus === 'closed') displayStatus = 'Ditutup';
+
+          statusBadge.textContent = displayStatus;
 
           // Change badge class based on status
           statusBadge.className = 'status-badge';
@@ -818,6 +830,16 @@
           } else if(newStatus === 'resolved' || newStatus === 'closed' || newStatus === 'completed') {
             statusBadge.classList.add('status-completed');
           }
+
+          // Notify other pages/tabs of the status change using localStorage
+          const statusUpdate = {
+            ticketId: ticketId,
+            status: newStatus,
+            priority: document.querySelector('.priority-select')?.value || null,
+            timestamp: Date.now()
+          };
+
+          localStorage.setItem('ticketStatusUpdate', JSON.stringify(statusUpdate));
 
           showNotification(data.message, 'success');
         } else {
@@ -830,23 +852,62 @@
     }
 
     // Function to update ticket priority
-    function updateTicketPriority(ticketId, newPriority) {
-      // In a real implementation, this would make an AJAX call to update the priority
-      // For demo purposes, we'll just log the action
-      console.log(`Prioritas tiket \${ticketId} diubah menjadi \${newPriority}`);
+    async function updateTicketPriority(ticketId, newPriority) {
+      try {
+        const response = await fetch(`/support/tickets/${ticketId}/update-status`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          },
+          body: JSON.stringify({
+            priority: newPriority
+          })
+        });
 
-      // Update the priority visually
-      const priorityBadge = document.querySelector('.priority-badge');
-      priorityBadge.textContent = newPriority.charAt(0).toUpperCase() + newPriority.slice(1);
+        const data = await response.json();
 
-      // Change badge class based on priority
-      priorityBadge.className = 'priority-badge';
-      if(newPriority === 'low') {
-        priorityBadge.classList.add('priority-low');
-      } else if(newPriority === 'medium') {
-        priorityBadge.classList.add('priority-medium');
-      } else if(newPriority === 'high' || newPriority === 'urgent') {
-        priorityBadge.classList.add('priority-high');
+        if (data.success) {
+          // Update the priority visually
+          const priorityBadge = document.querySelector('.priority-badge');
+
+          // Convert to display text
+          let displayPriority = newPriority;
+          if(newPriority === 'low') displayPriority = 'Rendah';
+          else if(newPriority === 'medium') displayPriority = 'Sedang';
+          else if(newPriority === 'high') displayPriority = 'Tinggi';
+          else if(newPriority === 'urgent') displayPriority = 'Darurat';
+
+          priorityBadge.textContent = displayPriority;
+
+          // Change badge class based on priority
+          priorityBadge.className = 'priority-badge';
+          if(newPriority === 'low') {
+            priorityBadge.classList.add('priority-low');
+          } else if(newPriority === 'medium') {
+            priorityBadge.classList.add('priority-medium');
+          } else if(newPriority === 'high' || newPriority === 'urgent') {
+            priorityBadge.classList.add('priority-high');
+          }
+
+          // Notify other pages/tabs of the priority change using localStorage
+          const priorityUpdate = {
+            ticketId: ticketId,
+            status: document.querySelector('.status-select')?.value || null,
+            priority: newPriority,
+            timestamp: Date.now()
+          };
+
+          localStorage.setItem('ticketStatusUpdate', JSON.stringify(priorityUpdate));
+
+          showNotification(data.message, 'success');
+        } else {
+          showNotification('Gagal memperbarui prioritas: ' + (data.message || 'Terjadi kesalahan'), 'error');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        showNotification('Terjadi kesalahan saat memperbarui prioritas', 'error');
       }
     }
 

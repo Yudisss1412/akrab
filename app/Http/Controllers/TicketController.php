@@ -652,4 +652,34 @@ class TicketController extends Controller
 
         return $dummyTickets->toArray();
     }
+
+    public function getUserProfile($userId)
+    {
+        // Find the user with related data
+        $user = \App\Models\User::with('orders', 'tickets')->find($userId);
+
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        // Calculate additional information
+        $totalOrders = $user->orders()->count();
+        $totalTickets = $user->tickets()->count();
+
+        return response()->json([
+            'success' => true,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone ?? '-',
+                'address' => $user->address ?? '-',
+                'created_at' => $user->created_at->format('d M Y'),
+                'last_login' => '-', // No last_login field in the users table
+                'status' => $user->status ?? 'Aktif',
+                'total_orders' => $totalOrders,
+                'total_tickets' => $totalTickets,
+            ]
+        ]);
+    }
 }

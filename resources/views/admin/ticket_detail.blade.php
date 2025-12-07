@@ -13,7 +13,7 @@
       align-items: center;
       margin-bottom: 1.5rem;
     }
-    
+
     .back-btn {
       display: inline-flex;
       align-items: center;
@@ -25,18 +25,18 @@
       color: var(--text);
       font-weight: 500;
     }
-    
+
     .back-btn:hover {
       background-color: var(--bg);
     }
-    
+
     .ticket-container {
       display: grid;
-      grid-template-columns: 70% 30%;
+      grid-template-columns: 100%;
       gap: 1.5rem;
       height: 100%;
     }
-    
+
     .main-content {
       background: white;
       border-radius: var(--ak-radius);
@@ -44,55 +44,55 @@
       box-shadow: 0 8px 20px rgba(0,0,0,.05);
       overflow: hidden;
     }
-    
+
     .ticket-header {
       padding: 1.5rem;
       border-bottom: 1px solid var(--ak-border);
       background: linear-gradient(135deg, #006E5C 0%, #a8d5c9 100%);
       color: white;
     }
-    
+
     .ticket-info {
       padding: 1.5rem;
       border-bottom: 1px solid var(--ak-border);
       background: var(--bg);
     }
-    
+
     .info-row {
       display: flex;
       margin-bottom: 0.5rem;
       flex-wrap: wrap;
     }
-    
+
     .info-label {
       font-weight: 600;
       width: 150px;
       color: var(--muted);
       flex-shrink: 0;
     }
-    
+
     .info-value {
       flex: 1;
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
-    
+
     .user-link {
       color: var(--primary);
       text-decoration: none;
     }
-    
+
     .user-link:hover {
       text-decoration: underline;
     }
-    
+
     .status-priority {
       display: flex;
       gap: 1rem;
       margin-top: 1rem;
     }
-    
+
     .status-select, .priority-select {
       padding: 0.5rem;
       border: 1px solid var(--border);
@@ -100,59 +100,59 @@
       background: white;
       font-size: 0.9rem;
     }
-    
+
     .chat-container {
       height: 400px;
       overflow-y: auto;
       padding: 1.5rem;
     }
-    
+
     .message {
       margin-bottom: 1rem;
       padding: 0.75rem;
       border-radius: 8px;
       max-width: 80%;
     }
-    
+
     .message.admin {
       background: #e0f7fa;
       margin-left: auto;
     }
-    
+
     .message.user {
       background: white;
       border: 1px solid var(--border);
       margin-right: auto;
     }
-    
+
     .message-sender {
       font-weight: 600;
       margin-bottom: 0.25rem;
     }
-    
+
     .message-time {
       font-size: 0.8rem;
       color: var(--muted);
       margin-top: 0.25rem;
     }
-    
+
     .reply-form {
       padding: 1.5rem;
       border-top: 1px solid var(--ak-border);
       background: var(--bg);
     }
-    
+
     .form-group {
       margin-bottom: 1rem;
     }
-    
+
     .form-group label {
       display: block;
       margin-bottom: 0.5rem;
       font-weight: 500;
       color: var(--text);
     }
-    
+
     textarea.form-control {
       width: 100%;
       padding: 0.75rem;
@@ -163,13 +163,13 @@
       min-height: 120px;
       resize: vertical;
     }
-    
+
     .form-control:focus {
       outline: none;
       border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(0, 110, 92, 0.1);
     }
-    
+
     .btn-reply {
       background: var(--primary);
       color: white;
@@ -181,86 +181,65 @@
       width: 100%;
       font-size: 1rem;
     }
-    
+
     .btn-reply:hover {
       background: #005a4a;
     }
-    
-    .sidebar {
+
+    .card {
       background: white;
       border-radius: var(--ak-radius);
       border: 1px solid var(--ak-border);
       box-shadow: 0 8px 20px rgba(0,0,0,.05);
-      height: fit-content;
+      margin-top: 1.5rem;
+      overflow: hidden;
     }
-    
-    .sidebar-section {
+
+    .card-header {
       padding: 1.5rem;
       border-bottom: 1px solid var(--ak-border);
+      background: var(--bg);
     }
-    
-    .sidebar-section:last-child {
-      border-bottom: none;
-    }
-    
-    .sidebar-title {
+
+    .card-title {
       font-size: 1rem;
       font-weight: 600;
       color: var(--text);
-      margin-bottom: 1rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid var(--ak-border);
+      margin: 0;
     }
-    
-    .action-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
+
+    .card-body {
+      padding: 1.5rem;
     }
-    
-    .btn-action {
-      padding: 0.75rem;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--white);
-      cursor: pointer;
-      font-weight: 500;
-      text-align: center;
-    }
-    
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
-    }
-    
+
+
     .ticket-log {
       list-style: none;
       padding: 0;
     }
-    
+
     .log-item {
       margin-bottom: 1rem;
       padding-bottom: 1rem;
       border-bottom: 1px solid var(--ak-border);
     }
-    
+
     .log-item:last-child {
       border-bottom: none;
       margin-bottom: 0;
       padding-bottom: 0;
     }
-    
+
     .log-time {
       font-size: 0.8rem;
       color: var(--muted);
       margin-bottom: 0.25rem;
     }
-    
+
     .log-message {
       font-size: 0.9rem;
     }
-    
+
     .attachment-area {
       border: 2px dashed var(--border);
       border-radius: 8px;
@@ -269,32 +248,32 @@
       margin-bottom: 1rem;
       background: var(--bg);
     }
-    
+
     .canned-responses {
       margin-top: 1rem;
     }
-    
+
     .canned-responses label {
       display: block;
       margin-bottom: 0.5rem;
       font-weight: 500;
       color: var(--text);
     }
-    
+
     .canned-responses select {
       width: 100%;
       padding: 0.5rem;
       border: 1px solid var(--border);
       border-radius: 6px;
     }
-    
+
     .rich-editor {
       display: flex;
       flex-wrap: wrap;
       gap: 0.25rem;
       margin-bottom: 0.5rem;
     }
-    
+
     .rich-btn {
       padding: 0.25rem 0.5rem;
       border: 1px solid var(--border);
@@ -302,7 +281,7 @@
       cursor: pointer;
       border-radius: 4px;
     }
-    
+
     .rich-btn:hover {
       background: var(--bg);
     }
@@ -373,6 +352,63 @@
     .canned-responses + .btn-reply {
       margin-top: 1rem; /* Add space above the reply button */
     }
+
+    .card {
+      background: white;
+      border-radius: var(--ak-radius);
+      border: 1px solid var(--ak-border);
+      box-shadow: 0 8px 20px rgba(0,0,0,.05);
+      margin-top: 1.5rem;
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--ak-border);
+      background: var(--bg);
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin: 0;
+    }
+
+    .card-body {
+      padding: 1.5rem;
+    }
+
+    .modal {
+      z-index: 1050;
+    }
+
+    .modal-content {
+      border-radius: var(--ak-radius);
+      border: 1px solid var(--ak-border);
+      box-shadow: 0 8px 20px rgba(0,0,0,.15);
+    }
+
+    .modal-header {
+      border-bottom: 1px solid var(--ak-border);
+      padding: 1.5rem;
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text);
+      margin: 0;
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+    }
+
+    .modal-footer {
+      border-top: 1px solid var(--ak-border);
+      padding: 1.5rem;
+    }
   </style>
 @endpush
 
@@ -391,14 +427,14 @@
             Kembali ke Daftar Tiket
           </a>
         </div>
-        
+
         <div class="ticket-container">
           <!-- Main Content -->
           <div class="main-content">
             <div class="ticket-header">
               <h2 style="margin: 0; font-size: 1.5rem;">{{ $ticket->subject }} - #{{ str_pad($ticket->id, 6, '0', STR_PAD_LEFT) }}</h2>
               <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
-                <div class="status-badge 
+                <div class="status-badge
                   @if($ticket->status === 'open') status-new
                   @elseif($ticket->status === 'in_progress') status-processing
                   @elseif($ticket->status === 'resolved') status-completed
@@ -406,7 +442,7 @@
                   @else status-new @endif">
                   {{ ucfirst(str_replace('_', ' ', $ticket->status)) }}
                 </div>
-                <div class="priority-badge 
+                <div class="priority-badge
                   @if($ticket->priority === 'low') priority-low
                   @elseif($ticket->priority === 'medium') priority-medium
                   @elseif($ticket->priority === 'high') priority-high
@@ -415,7 +451,7 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="ticket-info">
               <div class="info-row">
                 <div class="info-label">Tanggal Dibuat:</div>
@@ -448,7 +484,7 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="chat-container" id="chatContainer">
               <div class="message user">
                 <div class="message-sender">{{ $ticket->user->name ?? 'User Tidak Dikenal' }} (Pengirim Tiket)</div>
@@ -462,10 +498,10 @@
                 <div class="message-time">{{ $ticket->resolved_at ? $ticket->resolved_at->format('d M Y, H:i') : $ticket->updated_at->format('d M Y, H:i') }} WIB</div>
               </div>
               @endif
-              
+
               <!-- Pesan dinamis akan dimuat melalui JavaScript -->
             </div>
-            
+
             <div class="reply-form">
               <div class="rich-editor">
                 <button class="rich-btn" title="Tebal">B</button>
@@ -475,18 +511,18 @@
                 <button class="rich-btn" title="Daftar Angka">1.</button>
                 <button class="rich-btn" title="Link">🔗</button>
               </div>
-              
+
               <div class="form-group">
                 <label for="replyMessage">Balasan Publik</label>
                 <textarea id="replyMessage" class="form-control" placeholder="Tulis balasan untuk pengguna..."></textarea>
               </div>
-              
+
               <div class="attachment-area">
                 <p style="margin: 0.5rem 0;">Tarik & lepas file atau <a href="#" onclick="document.getElementById('fileInput').click(); return false;">pilih file</a></p>
                 <input type="file" id="fileInput" style="display: none;" multiple>
                 <div style="font-size: 0.8rem; color: var(--muted);">Mendukung gambar, PDF, DOC (maks. 10MB)</div>
               </div>
-              
+
               <div class="canned-responses">
                 <label for="cannedResponse">Balasan Siap Pakai</label>
                 <select id="cannedResponse">
@@ -501,58 +537,56 @@
               <button class="btn-reply" onclick="sendReply()">Kirim Balasan</button>
             </div>
           </div>
-          
-          <!-- Sidebar -->
-          <div class="sidebar">
-            <div class="sidebar-section">
-              <h3 class="sidebar-title">Informasi Pengguna</h3>
-              <div class="info-row">
-                <div class="info-label">Nama:</div>
-                <div class="info-value">{{ $ticket->user->name ?? 'N/A' }}</div>
-              </div>
-              <div class="info-row">
-                <div class="info-label">Email:</div>
-                <div class="info-value">{{ $ticket->user->email ?? 'N/A' }}</div>
-              </div>
-              <div class="info-row">
-                <div class="info-label">ID User:</div>
-                <div class="info-value">USR-{{ str_pad($ticket->user->id ?? 0, 6, '0', STR_PAD_LEFT) }}</div>
-              </div>
-              <div class="info-row" style="margin-top: 1rem;">
-                <a href="#" class="user-link">Lihat Profil Pengguna</a>
-              </div>
+        </div>
+
+        <!-- User info card -->
+        <div class="card user-info-card">
+          <div class="card-header">
+            <h3 class="card-title">Informasi Pengguna</h3>
+          </div>
+          <div class="card-body">
+            <div class="info-row">
+              <div class="info-label">Nama:</div>
+              <div class="info-value">{{ $ticket->user->name ?? 'N/A' }}</div>
             </div>
-            
-            <div class="sidebar-section">
-              <h3 class="sidebar-title">Aksi Tiket</h3>
-              <div class="action-buttons">
-                <button class="btn-action" onclick="updateTicketStatus({{ $ticket->id }}, 'in_progress')">Tandai Sedang Diproses</button>
-                <button class="btn-action" onclick="updateTicketStatus({{ $ticket->id }}, 'resolved')">Tandai Selesai</button>
-                <button class="btn-action" onclick="updateTicketStatus({{ $ticket->id }}, 'closed')">Tutup Tiket</button>
-              </div>
+            <div class="info-row">
+              <div class="info-label">Email:</div>
+              <div class="info-value">{{ $ticket->user->email ?? 'N/A' }}</div>
             </div>
-            
-            <div class="sidebar-section">
-              <h3 class="sidebar-title">Riwayat Tiket</h3>
-              <ul class="ticket-log">
-                <li class="log-item">
-                  <div class="log-time">{{ $ticket->created_at->format('d M H:i') }} WIB</div>
-                  <div class="log-message">Tiket dibuat oleh {{ $ticket->user->name ?? 'User' }}</div>
-                </li>
-                @if($ticket->assignee)
-                <li class="log-item">
-                  <div class="log-time">{{ $ticket->updated_at->format('d M H:i') }} WIB</div>
-                  <div class="log-message">Ditugaskan ke {{ $ticket->assignee->name ?? 'Staff' }}</div>
-                </li>
-                @endif
-                @if($ticket->resolution_notes)
-                <li class="log-item">
-                  <div class="log-time">{{ $ticket->resolved_at ? $ticket->resolved_at->format('d M H:i') : $ticket->updated_at->format('d M H:i') }} WIB</div>
-                  <div class="log-message">Catatan penyelesaian ditambahkan</div>
-                </li>
-                @endif
-              </ul>
+            <div class="info-row">
+              <div class="info-label">ID User:</div>
+              <div class="info-value">USR-{{ str_pad($ticket->user->id ?? 0, 6, '0', STR_PAD_LEFT) }}</div>
             </div>
+            <div class="info-row" style="margin-top: 1rem;">
+              <a href="#" class="user-link" onclick="showUserProfileModal(); return false;">Lihat Profil Pengguna</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ticket history card -->
+        <div class="card ticket-history-card">
+          <div class="card-header">
+            <h3 class="card-title">Riwayat Tiket</h3>
+          </div>
+          <div class="card-body">
+            <ul class="ticket-log">
+              <li class="log-item">
+                <div class="log-time">{{ $ticket->created_at->format('d M H:i') }} WIB</div>
+                <div class="log-message">Tiket dibuat oleh {{ $ticket->user->name ?? 'User' }}</div>
+              </li>
+              @if($ticket->assignee)
+              <li class="log-item">
+                <div class="log-time">{{ $ticket->updated_at->format('d M H:i') }} WIB</div>
+                <div class="log-message">Ditugaskan ke {{ $ticket->assignee->name ?? 'Staff' }}</div>
+              </li>
+              @endif
+              @if($ticket->resolution_notes)
+              <li class="log-item">
+                <div class="log-time">{{ $ticket->resolved_at ? $ticket->resolved_at->format('d M H:i') : $ticket->updated_at->format('d M H:i') }} WIB</div>
+                <div class="log-message">Catatan penyelesaian ditambahkan</div>
+              </li>
+              @endif
+            </ul>
           </div>
         </div>
       </main>
@@ -640,7 +674,7 @@
         console.error('Error loading messages:', error);
       }
     }
-    
+
     // Function to show notification
     function showNotification(message, type = 'success') {
       // Remove any existing notifications
@@ -752,7 +786,7 @@
         showNotification('Terjadi kesalahan saat mengirim balasan', 'error');
       }
     }
-    
+
     // Function to update ticket status
     async function updateTicketStatus(ticketId, newStatus) {
       try {
@@ -794,17 +828,17 @@
         showNotification('Terjadi kesalahan saat memperbarui status', 'error');
       }
     }
-    
+
     // Function to update ticket priority
     function updateTicketPriority(ticketId, newPriority) {
       // In a real implementation, this would make an AJAX call to update the priority
       // For demo purposes, we'll just log the action
       console.log(`Prioritas tiket \${ticketId} diubah menjadi \${newPriority}`);
-      
+
       // Update the priority visually
       const priorityBadge = document.querySelector('.priority-badge');
       priorityBadge.textContent = newPriority.charAt(0).toUpperCase() + newPriority.slice(1);
-      
+
       // Change badge class based on priority
       priorityBadge.className = 'priority-badge';
       if(newPriority === 'low') {
@@ -815,12 +849,12 @@
         priorityBadge.classList.add('priority-high');
       }
     }
-    
+
     // Function for canned responses
     document.getElementById('cannedResponse').addEventListener('change', function() {
       const selectedResponse = this.value;
       const replyText = document.getElementById('replyMessage');
-      
+
       if (selectedResponse === '1') {
         replyText.value = 'Terima kasih atas laporan Anda. Kami sedang mengecek masalahnya.';
       } else if (selectedResponse === '2') {
@@ -829,14 +863,14 @@
         replyText.value = 'Mohon maaf atas ketidaknyamanannya. Kami akan segera menindaklanjuti.';
       }
     });
-    
+
     // Function to handle rich text editor buttons (simplified)
     const richButtons = document.querySelectorAll('.rich-btn');
     richButtons.forEach(button => {
       button.addEventListener('click', function() {
         const textarea = document.getElementById('replyMessage');
         const buttonTitle = this.getAttribute('title');
-        
+
         switch(buttonTitle) {
           case 'Tebal':
             insertAtCursor(textarea, '**Teks Tebal**');
@@ -850,7 +884,7 @@
         }
       });
     });
-    
+
     // Helper function to insert text at cursor position
     function insertAtCursor(myField, myValue) {
       if (document.selection) {
@@ -862,7 +896,7 @@
         const endPos = myField.selectionEnd;
         const before = myField.value.substring(0, startPos);
         const after = myField.value.substring(endPos, myField.value.length);
-        
+
         myField.value = before + myValue + after;
         myField.selectionStart = startPos + myValue.length;
         myField.selectionEnd = startPos + myValue.length;
@@ -945,6 +979,178 @@
           showNotification('Terjadi kesalahan saat menghapus balasan', 'error');
         }
       });
+    }
+
+    // Function to show user profile modal
+    async function showUserProfileModal() {
+      // Remove any existing user profile modal
+      const existingModal = document.getElementById('userProfileModal');
+      if (existingModal) {
+        existingModal.remove();
+      }
+
+      // Extract user ID from the user info card
+      const userCard = document.querySelector('.user-info-card');
+      const userIdElement = userCard.querySelector('.info-value:nth-child(6)'); // ID User value
+      let userId = '0';
+
+      if (userIdElement) {
+        // Extract the numeric ID from the format "USR-XXXXXX"
+        const userIdText = userIdElement.textContent;
+        const match = userIdText.match(/USR-(\d+)/);
+        if (match) {
+          userId = match[1];
+        } else {
+          // If the regex doesn't match, try to extract any number from the text
+          const numberMatch = userIdText.match(/\d+/);
+          if (numberMatch) {
+            userId = numberMatch[0];
+          }
+        }
+      }
+
+      // Create loading modal first
+      const loadingModalHtml = `
+        <div id="userProfileModal" class="modal fade show" tabindex="-1" style="display: block; padding-right: 17px; background: rgba(0,0,0,0.5);">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Profil Pengguna</h5>
+                <button type="button" class="btn-close" onclick="document.getElementById('userProfileModal').remove();"></button>
+              </div>
+              <div class="modal-body" style="text-align: center; padding: 2rem;">
+                <div class="spinner-border" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+                <p style="margin-top: 1rem;">Memuat informasi pengguna...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Add loading modal to document
+      document.body.insertAdjacentHTML('beforeend', loadingModalHtml);
+
+      try {
+        // Fetch user data from API
+        const response = await fetch('/api/users/' + userId + '/profile');
+        const data = await response.json();
+
+        if (data.success) {
+          const user = data.user;
+
+          // Create modal HTML with real user data
+          const modalHtml = `
+            <div id="userProfileModal" class="modal fade show" tabindex="-1" style="display: block; padding-right: 17px; background: rgba(0,0,0,0.5);">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">Profil Pengguna</h5>
+                    <button type="button" class="btn-close" onclick="document.getElementById('userProfileModal').remove();"></button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="info-row" style="margin-bottom: 0.5rem;">
+                      <div class="info-label" style="font-weight: 600; width: 150px; color: var(--muted); flex-shrink: 0;">Nama:</div>
+                      <div class="info-value">` + user.name + `</div>
+                    </div>
+                    <div class="info-row" style="margin-bottom: 0.5rem;">
+                      <div class="info-label" style="font-weight: 600; width: 150px; color: var(--muted); flex-shrink: 0;">Email:</div>
+                      <div class="info-value">` + user.email + `</div>
+                    </div>
+                    <div class="info-row" style="margin-bottom: 0.5rem;">
+                      <div class="info-label" style="font-weight: 600; width: 150px; color: var(--muted); flex-shrink: 0;">ID User:</div>
+                      <div class="info-value">USR-` + String(user.id).padStart(6, '0') + `</div>
+                    </div>
+                    <div class="info-row" style="margin-bottom: 0.5rem;">
+                      <div class="info-label" style="font-weight: 600; width: 150px; color: var(--muted); flex-shrink: 0;">Nomor Telepon:</div>
+                      <div class="info-value">` + user.phone + `</div>
+                    </div>
+                    <div class="info-row" style="margin-bottom: 0.5rem;">
+                      <div class="info-label" style="font-weight: 600; width: 150px; color: var(--muted); flex-shrink: 0;">Alamat:</div>
+                      <div class="info-value">` + user.address + `</div>
+                    </div>
+                    <div class="info-row" style="margin-top: 1rem;">
+                      <div class="info-label" style="font-weight: 600; width: 150px; color: var(--muted); flex-shrink: 0;">Tanggal Registrasi:</div>
+                      <div class="info-value">` + user.created_at + `</div>
+                    </div>
+                    <div class="info-row" style="margin-top: 0.5rem;">
+                      <div class="info-label" style="font-weight: 600; width: 150px; color: var(--muted); flex-shrink: 0;">Terakhir Login:</div>
+                      <div class="info-value">` + user.last_login + `</div>
+                    </div>
+                    <div class="info-row" style="margin-top: 0.5rem;">
+                      <div class="info-label" style="font-weight: 600; width: 150px; color: var(--muted); flex-shrink: 0;">Status Akun:</div>
+                      <div class="info-value">` + user.status + `</div>
+                    </div>
+                    <div class="info-row" style="margin-top: 0.5rem;">
+                      <div class="info-label" style="font-weight: 600; width: 150px; color: var(--muted); flex-shrink: 0;">Jumlah Pesanan:</div>
+                      <div class="info-value">` + user.total_orders + `</div>
+                    </div>
+                    <div class="info-row" style="margin-top: 0.5rem;">
+                      <div class="info-label" style="font-weight: 600; width: 150px; color: var(--muted); flex-shrink: 0;">Jumlah Tiket:</div>
+                      <div class="info-value">` + user.total_tickets + `</div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-light" onclick="document.getElementById('userProfileModal').remove();">Tutup</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+
+          // Replace the loading modal with the populated modal
+          document.getElementById('userProfileModal').outerHTML = modalHtml;
+        } else {
+          // Handle error case
+          const errorModalHtml = `
+            <div id="userProfileModal" class="modal fade show" tabindex="-1" style="display: block; padding-right: 17px; background: rgba(0,0,0,0.5);">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">Profil Pengguna</h5>
+                    <button type="button" class="btn-close" onclick="document.getElementById('userProfileModal').remove();"></button>
+                  </div>
+                  <div class="modal-body" style="text-align: center; padding: 2rem;">
+                    <div class="alert alert-danger">Gagal memuat informasi pengguna: ` + (data.error || 'Unknown error') + `</div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-light" onclick="document.getElementById('userProfileModal').remove();">Tutup</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+
+          // Replace the loading modal with the error modal
+          document.getElementById('userProfileModal').outerHTML = errorModalHtml;
+        }
+      } catch (error) {
+        // Handle network error
+        const errorModalHtml = `
+          <div id="userProfileModal" class="modal fade show" tabindex="-1" style="display: block; padding-right: 17px; background: rgba(0,0,0,0.5);">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Profil Pengguna</h5>
+                  <button type="button" class="btn-close" onclick="document.getElementById('userProfileModal').remove();"></button>
+                </div>
+                <div class="modal-body" style="text-align: center; padding: 2rem;">
+                  <div class="alert alert-danger">Terjadi kesalahan saat memuat informasi pengguna</div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-light" onclick="document.getElementById('userProfileModal').remove();">Tutup</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Replace the loading modal with the error modal
+        document.getElementById('userProfileModal').outerHTML = errorModalHtml;
+
+        console.error('Error fetching user profile:', error);
+      }
     }
   </script>
 @endsection

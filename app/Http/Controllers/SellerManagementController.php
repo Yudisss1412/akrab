@@ -207,12 +207,22 @@ class SellerManagementController extends Controller
     {
         $seller->update(['status' => 'ditangguhkan']);
 
+        // Also update the user's status to suspended
+        if ($seller->user) {
+            $seller->user->update(['status' => 'suspended']);
+        }
+
         return redirect()->back()->with('success', 'Penjual berhasil ditangguhkan.');
     }
 
     public function activate(Seller $seller)
     {
         $seller->update(['status' => 'aktif']);
+
+        // Also update the user's status back to active
+        if ($seller->user) {
+            $seller->user->update(['status' => 'active']);
+        }
 
         return redirect()->back()->with('success', 'Penjual berhasil diaktifkan kembali.');
     }
@@ -259,11 +269,23 @@ class SellerManagementController extends Controller
 
             switch ($action) {
                 case 'suspend':
+                    // Update seller status
                     Seller::whereIn('id', $sellerIds)->update(['status' => 'ditangguhkan']);
+
+                    // Also update user status for associated sellers
+                    $userIds = Seller::whereIn('id', $sellerIds)->pluck('user_id');
+                    User::whereIn('id', $userIds)->update(['status' => 'suspended']);
+
                     $message = 'Penjual berhasil ditangguhkan.';
                     break;
                 case 'activate':
+                    // Update seller status
                     Seller::whereIn('id', $sellerIds)->update(['status' => 'aktif']);
+
+                    // Also update user status for associated sellers
+                    $userIds = Seller::whereIn('id', $sellerIds)->pluck('user_id');
+                    User::whereIn('id', $userIds)->update(['status' => 'active']);
+
                     $message = 'Penjual berhasil diaktifkan kembali.';
                     break;
                 case 'delete':

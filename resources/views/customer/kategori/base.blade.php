@@ -384,8 +384,8 @@
   <main class="kategori-page">
     <div class="container">
       <div class="page-header">
-        <h1 id="kategori-title">@yield('category-title')</h1>
-        <p id="kategori-description">@yield('category-description')</p>
+        <h1 id="kategori-title">{{ $categoryTitle }}</h1>
+        <p id="kategori-description">{{ $categoryDescription }}</p>
       </div>
 
       <div class="kategori-layout">
@@ -525,7 +525,24 @@
           </div>
 
           <div class="products-grid" id="products-container">
-            @yield('category-products')
+            @section('category-products')
+              <!-- Tampilkan produk halaman pertama secara default -->
+              @if(isset($page_1_products) && count($page_1_products) > 0)
+                @foreach($page_1_products as $product)
+                  <div class="product-card">
+                    <img class="product-image" src="{{ $product['image'] }}" alt="{{ $product['name'] }}" onerror="this.onerror=null; this.src='{{ asset('src/placeholder_produk.png') }}';">
+                    <div class="product-info">
+                      <h3 class="product-name">{{ $product['name'] }}</h3>
+                      <p class="product-description">{{ Str::limit($product['description'], 100) }}</p>
+                      <div class="product-price">{{ $product['price'] }}</div>
+                      <button class="btn btn-primary view-product" data-product-id="{{ $product['id'] }}">Pratinjau</button>
+                    </div>
+                  </div>
+                @endforeach
+              @else
+                <p class="no-products-message">Tidak ada produk dalam kategori ini.</p>
+              @endif
+            @show
           </div>
 
           <div class="produk-pagination">
@@ -1035,6 +1052,30 @@
         if (currentPage < totalPages) {
           updateActivePage(totalPages);
           renderProducts(totalPages);
+        }
+      });
+
+      // Initialize products on page load
+      // Check if products are already loaded from server, if not then load via API
+      window.addEventListener('load', function() {
+        const productsContainer = document.getElementById('products-container');
+        const initialProducts = productsContainer.querySelectorAll('.product-card');
+
+        // If no products were loaded from server, load them via API
+        if (initialProducts.length === 0) {
+          // Load the first page of products via API
+          renderProducts(1);
+        } else {
+          // Products are already loaded from server, so set the current page to 1
+          // and update the active page button to reflect page 1 as active
+          currentPage = 1;
+          updateActivePage(1);
+
+          // Update product count based on the initial products loaded from server
+          const productCountElement = document.getElementById('product-count');
+          if (productCountElement) {
+            productCountElement.textContent = 'Menampilkan ' + initialProducts.length + ' dari ' + initialProducts.length + ' produk';
+          }
         }
       });
 

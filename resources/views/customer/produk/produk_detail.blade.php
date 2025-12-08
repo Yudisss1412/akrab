@@ -484,11 +484,9 @@ function createStarsHTML($rating, $size = 20) {
               // Show success message
               showNotification(result.message, 'success');
 
-              // Update cart count in header if exists
-              const cartCount = document.querySelector('.cart-count');
-              if (cartCount) {
-                let count = parseInt(cartCount.textContent) || 0;
-                cartCount.textContent = count + 1;
+              // Update cart count in header via API
+              if (window.updateCartCount) {
+                window.updateCartCount();
               }
             } else {
               showNotification(result.message || 'Gagal menambahkan ke keranjang', 'error');

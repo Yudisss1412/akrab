@@ -973,6 +973,11 @@ async function addToCart(productId) {
 
         if (response.ok) {
             alert(result.message || 'Produk berhasil ditambahkan ke keranjang');
+
+            // Update cart count in header via API
+            if (window.updateCartCount) {
+                window.updateCartCount();
+            }
         } else {
             alert(result.message || 'Gagal menambahkan produk ke keranjang');
         }

@@ -129,4 +129,14 @@ class CartController extends Controller
             'message' => 'Keranjang berhasil dikosongkan'
         ]);
     }
+
+    public function getCartCount()
+    {
+        $totalItems = $this->cartService->getTotalItems();
+
+        return response()->json([
+            'success' => true,
+            'count' => $totalItems
+        ]);
+    }
 }

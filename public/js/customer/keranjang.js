@@ -168,9 +168,19 @@ class CartManager {
           await this.calculateTotal();
           this.updateSelectAllCheckbox();
           this.showNotification('Produk berhasil dihapus dari keranjang', 'success');
+
+          // Update cart count in header via API
+          if (window.updateCartCount) {
+            window.updateCartCount();
+          }
         } else {
           this.updateItemSubtotal(input);
           this.showNotification(result.message, 'success');
+
+          // Update cart count in header via API
+          if (window.updateCartCount) {
+            window.updateCartCount();
+          }
         }
       } else {
         this.showNotification(result.message || 'Gagal memperbarui kuantitas', 'error');
@@ -184,6 +194,11 @@ class CartManager {
       // Kembalikan jumlah ke nilai sebelumnya jika terjadi error
       input.value = input.dataset.previousValue || 1;
       this.updateItemSubtotal(input);
+
+      // Update cart count in header via API to ensure synchronization
+      if (window.updateCartCount) {
+        window.updateCartCount();
+      }
     }
   }
 
@@ -206,6 +221,11 @@ class CartManager {
         await this.calculateTotal();
         this.updateSelectAllCheckbox();
         this.showNotification(result.message, 'success');
+
+        // Update cart count in header via API
+        if (window.updateCartCount) {
+          window.updateCartCount();
+        }
       } else {
         this.showNotification(result.message || 'Gagal menghapus item', 'error');
         // If removal failed, reset back to 1
@@ -266,6 +286,11 @@ class CartManager {
           await this.calculateTotal();
           this.updateSelectAllCheckbox();
           this.showNotification(result.message, 'success');
+
+          // Update cart count in header via API
+          if (window.updateCartCount) {
+            window.updateCartCount();
+          }
         } else {
           this.showNotification(result.message || 'Gagal menghapus item', 'error');
         }

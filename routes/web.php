@@ -160,6 +160,7 @@ Route::post('/cart/add', [App\Http\Controllers\CartController::class, 'add'])->n
 Route::put('/cart/update/{id}', [App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
 Route::delete('/cart/remove/{id}', [App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
 Route::delete('/cart/clear', [App\Http\Controllers\CartController::class, 'clear'])->name('cart.clear');
+Route::get('/api/cart/count', [App\Http\Controllers\CartController::class, 'getCartCount'])->name('api.cart.count');
 
 // API routes for products
 Route::get('/api/products/popular', [App\Http\Controllers\ProductController::class, 'popular']);

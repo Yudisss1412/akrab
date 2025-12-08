@@ -432,6 +432,11 @@
 
         if (result.success) {
           showNotification(result.message || `${productName} berhasil ditambahkan ke keranjang`, 'success');
+
+          // Update cart count in header via API
+          if (window.updateCartCount) {
+            window.updateCartCount();
+          }
         } else {
           showNotification(result.message || 'Gagal menambahkan ke keranjang', 'error');
         }

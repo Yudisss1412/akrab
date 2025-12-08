@@ -205,5 +205,58 @@
 
     <script src="{{ asset('js/customer/script.js') }}"></script>
     @stack('scripts')
+
+    <script>
+      // Function to update cart count in header
+      async function updateCartCount() {
+        try {
+          const response = await fetch('/api/cart/count', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            const cartBadge = document.querySelector('.cart-badge');
+            const cartCountElement = cartBadge ? cartBadge.querySelector('.cart-count') : null;
+
+            if (data.count > 0) {
+              // If cart count element exists, update it; otherwise create it
+              if (cartCountElement) {
+                cartCountElement.textContent = data.count;
+              } else {
+                // Create cart count element if it doesn't exist
+                const newCartCount = document.createElement('span');
+                newCartCount.className = 'cart-count';
+                newCartCount.textContent = data.count;
+                if (cartBadge) {
+                  cartBadge.appendChild(newCartCount);
+                }
+              }
+            } else {
+              // Remove cart count if count is 0
+              if (cartCountElement) {
+                cartCountElement.remove();
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching cart count:', error);
+        }
+      }
+
+      // Initialize cart count on page load
+      document.addEventListener('DOMContentLoaded', function() {
+        updateCartCount();
+      });
+
+      // Expose the function globally so it can be called from other scripts
+      window.updateCartCount = updateCartCount;
+    </script>
 </body>
 </html>

@@ -448,20 +448,9 @@
                   <div class="filter-content">
                     <form id="productFilterForm" method="GET" action="{{ route('admin.produk.index') }}">
                       <div class="row g-2">
-                        <div class="col-md-3 mb-2">
+                        <div class="col-md-4 mb-2">
                           <label for="search" class="form-label">Cari Produk</label>
                           <input type="text" class="form-control" id="search" name="search" value="{{ request('search') }}" placeholder="Nama Produk atau SKU">
-                        </div>
-                        <div class="col-md-3 mb-2">
-                          <label for="seller_filter" class="form-label">Filter berdasarkan Penjual</label>
-                          <select class="form-select" id="seller_filter" name="seller_id">
-                            <option value="">Semua Penjual</option>
-                            @if(isset($sellers))
-                              @foreach($sellers as $seller)
-                                <option value="{{ $seller->id }}" {{ request('seller_id') == $seller->id ? 'selected' : '' }}>{{ $seller->store_name }}</option>
-                              @endforeach
-                            @endif
-                          </select>
                         </div>
                         <div class="col-md-2 mb-2">
                           <label for="status_filter" class="form-label">Status Produk</label>
@@ -473,7 +462,7 @@
                             <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Ditolak</option>
                           </select>
                         </div>
-                        <div class="col-md-2 mb-2">
+                        <div class="col-md-3 mb-2">
                           <label for="category_filter" class="form-label">Kategori</label>
                           <select class="form-select" id="category_filter" name="category">
                             <option value="">Semua Kategori</option>
@@ -484,7 +473,7 @@
                             @endif
                           </select>
                         </div>
-                        <div class="col-md-2 mb-2">
+                        <div class="col-md-3 mb-2">
                           <label for="subcategory_filter" class="form-label">Subkategori</label>
                           <select class="form-select" id="subcategory_filter" name="subcategory">
                             <option value="">Semua Subkategori</option>
@@ -1837,10 +1826,35 @@
         });
       }
 
-      // Simulate category click when user clicks on category in the filter panel
+      // Load subcategories dynamically when category changes
       document.getElementById('category_filter').addEventListener('change', function() {
         var categoryId = this.value;
+        var subcategoryFilter = document.getElementById('subcategory_filter');
+
+        // Clear current subcategory options except the first one
+        subcategoryFilter.innerHTML = '<option value="">Semua Subkategori</option>';
+
         if (categoryId) {
+          // Load subcategories for the selected category
+          fetch(`/api/categories/${categoryId}/subcategories`)
+            .then(response => response.json())
+            .then(data => {
+              if (data.subcategories && Array.isArray(data.subcategories)) {
+                data.subcategories.forEach(function(subcategory) {
+                  var option = document.createElement('option');
+                  option.value = subcategory.id;
+                  option.textContent = subcategory.name;
+                  if (new URLSearchParams(window.location.search).get('subcategory') == subcategory.id) {
+                    option.selected = true;
+                  }
+                  subcategoryFilter.appendChild(option);
+                });
+              }
+            })
+            .catch(error => {
+              console.error('Error loading subcategories:', error);
+            });
+
           // Simulate click on the corresponding category in the category panel
           var categoryItem = document.querySelector('#categories-tab-pane .category-list li[data-id="' + categoryId + '"]');
           if (categoryItem) {

@@ -346,6 +346,29 @@
       align-items: center;
       gap: 0.5rem;
     }
+
+    /* Notification styles - Match Bootstrap styling, centered */
+    .notification {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) translateY(20px);
+      z-index: 9999;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .notification.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) translateY(0);
+    }
+
+    .notification .alert {
+      margin-bottom: 0;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+      min-width: 300px;
+      text-align: center;
+    }
   </style>
 @endpush
 
@@ -389,11 +412,6 @@
           </div>
           
           <div class="bulk-actions">
-            <select class="bulk-select" id="bulkSelect">
-              <option value="">Pilih aksi...</option>
-              <option value="approve">Setujui yang Dipilih</option>
-              <option value="reject">Tolak yang Dipilih</option>
-            </select>
             <button class="btn-bulk btn-approve" onclick="bulkAction('approve')">Setujui yang Dipilih</button>
             <button class="btn-bulk btn-reject" onclick="bulkAction('reject')">Tolak yang Dipilih</button>
           </div>
@@ -603,12 +621,12 @@
       document.querySelectorAll('.request-check:checked').forEach(checkbox => {
         selectedRequests.push(checkbox.getAttribute('data-id'));
       });
-      
+
       if (selectedRequests.length === 0) {
-        alert('Pilih setidaknya satu permintaan terlebih dahulu.');
+        showNotification('Pilih setidaknya satu permintaan terlebih dahulu.', 'error');
         return;
       }
-      
+
       if (action === 'approve') {
         if (confirm(`Yakin ingin menyetujui ${selectedRequests.length} permintaan?`)) {
           // Send approval request to server
@@ -625,15 +643,15 @@
           .then(response => response.json())
           .then(data => {
             if(data.success) {
-              alert(`Berhasil menyetujui ${selectedRequests.length} permintaan.`);
+              showNotification(`Berhasil menyetujui ${selectedRequests.length} permintaan.`, 'success');
               window.location.reload();
             } else {
-              alert('Gagal menyetujui permintaan: ' + data.message);
+              showNotification('Gagal menyetujui permintaan: ' + data.message, 'error');
             }
           })
           .catch(error => {
             console.error('Error:', error);
-            alert('Terjadi kesalahan saat menyetujui permintaan.');
+            showNotification('Terjadi kesalahan saat menyetujui permintaan.', 'error');
           });
         }
       } else if (action === 'reject') {
@@ -657,15 +675,15 @@
         .then(response => response.json())
         .then(data => {
           if(data.success) {
-            alert(`Berhasil menyetujui permintaan ${requestId}.`);
+            showNotification(`Berhasil menyetujui permintaan ${requestId}.`, 'success');
             window.location.reload();
           } else {
-            alert('Gagal menyetujui permintaan: ' + data.message);
+            showNotification('Gagal menyetujui permintaan: ' + data.message, 'error');
           }
         })
         .catch(error => {
           console.error('Error:', error);
-          alert('Terjadi kesalahan saat menyetujui permintaan.');
+          showNotification('Terjadi kesalahan saat menyetujui permintaan.', 'error');
         });
       }
     }
@@ -709,15 +727,15 @@
         .then(response => response.json())
         .then(data => {
           if(data.success) {
-            alert(`Berhasil menolak permintaan ${currentRequestId}.`);
+            showNotification(`Berhasil menolak permintaan ${currentRequestId}.`, 'success');
             window.location.reload();
           } else {
-            alert('Gagal menolak permintaan: ' + data.message);
+            showNotification('Gagal menolak permintaan: ' + data.message, 'error');
           }
         })
         .catch(error => {
           console.error('Error:', error);
-          alert('Terjadi kesalahan saat menolak permintaan.');
+          showNotification('Terjadi kesalahan saat menolak permintaan.', 'error');
         });
       } else {
         // Bulk rejection
@@ -738,16 +756,16 @@
           .then(response => response.json())
           .then(data => {
             if(data.success) {
-              alert(`Berhasil menolak ${selectedRequests.length} permintaan.`);
+              showNotification(`Berhasil menolak ${selectedRequests.length} permintaan.`, 'success');
               localStorage.removeItem('selectedForRejection');
               window.location.reload();
             } else {
-              alert('Gagal menolak permintaan: ' + data.message);
+              showNotification('Gagal menolak permintaan: ' + data.message, 'error');
             }
           })
           .catch(error => {
             console.error('Error:', error);
-            alert('Terjadi kesalahan saat menolak permintaan.');
+            showNotification('Terjadi kesalahan saat menolak permintaan.', 'error');
           });
         }
       }
@@ -786,5 +804,55 @@
       // In a real implementation, this would trigger an AJAX request
       console.log('Status filter:', status);
     });
+
+    // Function to show notification
+    function showNotification(message, type = 'success') {
+      // Remove any existing notifications
+      const existingNotification = document.querySelector('.notification');
+      if (existingNotification) {
+        existingNotification.remove();
+      }
+
+      // Map our types to Bootstrap alert types
+      let alertType = 'success';
+      if (type === 'error') {
+        alertType = 'danger';
+      } else if (type === 'warning') {
+        alertType = 'warning';
+      } else if (type === 'info') {
+        alertType = 'info';
+      }
+
+      // Create notification container
+      const notification = document.createElement('div');
+      notification.className = 'notification';
+      notification.innerHTML =
+        '<div class="alert alert-' + alertType + ' alert-dismissible fade show" role="alert">' +
+          message +
+          '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+        '</div>';
+
+      // Add to document
+      document.body.appendChild(notification);
+
+      // Trigger animation
+      setTimeout(() => {
+        notification.classList.add('show');
+      }, 10);
+
+      // Auto remove after 5 seconds to allow reading in center position
+      setTimeout(() => {
+        const alertElement = notification.querySelector('.alert');
+        if (alertElement) {
+          // Trigger Bootstrap's fade out
+          alertElement.classList.remove('show');
+          setTimeout(() => {
+            if (notification.parentNode) {
+              notification.parentNode.removeChild(notification);
+            }
+          }, 150);
+        }
+      }, 5000);
+    }
   </script>
 @endsection

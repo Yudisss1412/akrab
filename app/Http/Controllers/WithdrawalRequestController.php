@@ -386,8 +386,11 @@ class WithdrawalRequestController extends Controller
      */
     private function showFilteredDummyRequests($request)
     {
-        // Create dummy withdrawal requests collection
+        // Create dummy withdrawal requests collection with consistent data
         $dummyRequests = collect();
+
+        // Fixed seed to make the randomization consistent across requests
+        mt_srand(12345); // Using a fixed seed to make data consistent
 
         // Get sellers from the database to use for dummy requests
         $sellers = \App\Models\Seller::with('user')->limit(10)->get();
@@ -422,13 +425,15 @@ class WithdrawalRequestController extends Controller
             $dummyRequest->id = $i + 1;
             $dummyRequest->seller = $seller;
             $dummyRequest->seller_id = $seller->id;
-            $dummyRequest->amount = $amountOptions[array_rand($amountOptions)];
-            $dummyRequest->status = $filteredStatus ?? $statuses[array_rand($statuses)];
-            $dummyRequest->created_at = now()->subDays(rand(0, 30))->subHours(rand(0, 24))->subMinutes(rand(0, 60));
-            $dummyRequest->updated_at = $dummyRequest->created_at->addHours(rand(0, 48));
+            $dummyRequest->amount = $amountOptions[mt_rand(0, count($amountOptions)-1)];
+            $dummyRequest->status = $filteredStatus ?? $statuses[mt_rand(0, count($statuses)-1)];
+            $dummyRequest->created_at = now()->subDays(mt_rand(0, 30))->subHours(mt_rand(0, 24))->subMinutes(mt_rand(0, 60));
+            $dummyRequest->updated_at = $dummyRequest->created_at->addHours(mt_rand(0, 48));
             $dummyRequest->request_date = $dummyRequest->created_at;
             $dummyRequest->processed_date = $dummyRequest->status === 'completed' ? $dummyRequest->updated_at : null;
-            $dummyRequest->bank_account = $banks[array_rand($banks)] . ' - ' . str_pad(rand(1000000, 9999999), 7, '0', STR_PAD_LEFT);
+            $bank = $banks[mt_rand(0, count($banks)-1)];
+            $accountNumber = str_pad(mt_rand(1000000, 9999999), 7, '0', STR_PAD_LEFT);
+            $dummyRequest->bank_account = $bank . ' - ' . $accountNumber;
             $dummyRequest->notes = $dummyRequest->status === 'rejected' ? 'Dokumen tidak lengkap' : null;
 
             // Apply status filter if specified
@@ -441,6 +446,9 @@ class WithdrawalRequestController extends Controller
                 $dummyRequests->push($dummyRequest);
             }
         }
+
+        // Reset the random seed to avoid affecting other parts of the application
+        mt_srand();
 
         // Create a paginator for dummy data
         $currentPage = $request->get('page', 1);

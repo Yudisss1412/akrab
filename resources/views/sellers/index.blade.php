@@ -74,7 +74,63 @@
     .filter-panel:hover {
       box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.1);
     }
-    
+
+    .custom-notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      max-width: 350px;
+    }
+
+    .custom-notification.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .custom-notification .alert {
+      margin-bottom: 0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border: none;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .custom-notification .alert .alert-content {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .custom-notification .alert .alert-icon {
+      font-size: 1.2rem;
+    }
+
+    .custom-notification .alert .alert-message {
+      flex: 1;
+    }
+
+    .confirm-danger {
+      background-color: #dc3545 !important;
+      border-color: #dc3545 !important;
+      color: white !important;
+      transition: all 0.2s ease;
+    }
+
+    .confirm-danger:hover {
+      background-color: #c82333 !important;
+      border-color: #bd2130 !important;
+      transform: translateY(-2px);
+    }
+
     .filter-header {
       padding: 1.25rem 1.5rem;
       background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
@@ -924,7 +980,7 @@
                             <a href="{{ route('sellers.edit', $seller) }}" class="btn btn-primary d-block text-center square-btn" title="Edit">
                               <i class="fas fa-edit"></i>
                             </a>
-                            <form action="{{ route('sellers.destroy', $seller) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus penjual ini?')">
+                            <form action="{{ route('sellers.destroy', $seller) }}" method="POST" class="d-inline delete-seller-form">
                               @csrf
                               @method('DELETE')
                               <button type="submit" class="btn btn-danger d-block text-center square-btn" title="Hapus">
@@ -932,16 +988,16 @@
                               </button>
                             </form>
                             @if($seller->status !== 'ditangguhkan')
-                              <form action="{{ route('sellers.suspend', $seller) }}" method="POST" class="d-inline">
+                              <form action="{{ route('sellers.suspend', $seller) }}" method="POST" class="d-inline suspend-seller-form">
                                 @csrf
-                                <button type="submit" class="btn btn-warning text-dark d-block text-center square-btn" title="Tangguhkan" onclick="return confirm('Apakah Anda yakin ingin menangguhkan penjual ini?')">
+                                <button type="submit" class="btn btn-warning text-dark d-block text-center square-btn" title="Tangguhkan">
                                   <i class="fas fa-pause"></i>
                                 </button>
                               </form>
                             @else
-                              <form action="{{ route('sellers.activate', $seller) }}" method="POST" class="d-inline">
+                              <form action="{{ route('sellers.activate', $seller) }}" method="POST" class="d-inline activate-seller-form">
                                 @csrf
-                                <button type="submit" class="btn btn-success d-block text-center square-btn" title="Aktifkan" onclick="return confirm('Apakah Anda yakin ingin mengaktifkan kembali penjual ini?')">
+                                <button type="submit" class="btn btn-success d-block text-center square-btn" title="Aktifkan">
                                   <i class="fas fa-play"></i>
                                 </button>
                               </form>
@@ -1130,17 +1186,16 @@
                               <i class="fas fa-edit"></i>
                             </a>
                             @if($buyer->status === 'suspended')
-                              <form action="{{ route('sellers.activate_user', $buyer) }}" method="POST" class="d-inline">
+                              <form action="{{ route('sellers.activate_user', $buyer) }}" method="POST" class="d-inline activate-user-form">
                                 @csrf
-                                <button type="submit" class="btn btn-success d-block text-center square-btn" title="Aktifkan Kembali Akun" onclick="return confirm('Apakah Anda yakin ingin mengaktifkan kembali pembeli ini?')">
+                                <button type="submit" class="btn btn-success d-block text-center square-btn" title="Aktifkan Kembali Akun">
                                   <i class="fas fa-play"></i>
                                 </button>
                               </form>
                             @else
-                              <form action="{{ route('sellers.suspend_user', $buyer) }}" method="POST" class="d-inline">
+                              <form action="{{ route('sellers.suspend_user', $buyer) }}" method="POST" class="d-inline suspend-user-form">
                                 @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-warning text-dark d-block text-center square-btn" title="Tangguhkan Akun" onclick="return confirm('Apakah Anda yakin ingin menangguhkan pembeli ini?')">
+                                <button type="submit" class="btn btn-warning text-dark d-block text-center square-btn" title="Tangguhkan Akun">
                                   <i class="fas fa-pause"></i>
                                 </button>
                               </form>
@@ -1463,6 +1518,126 @@
       selectAllBuyers.checked = this.checked;
     });
     
+    // Custom notification function
+    function showNotification(message, type = 'info') {
+      // Remove any existing notifications
+      const existingNotification = document.querySelector('.custom-notification');
+      if (existingNotification) {
+        existingNotification.remove();
+      }
+
+      // Determine icon based on type
+      let icon = 'ℹ️';
+      if (type === 'success') {
+        icon = '✅';
+      } else if (type === 'error') {
+        icon = '❌';
+      } else if (type === 'warning') {
+        icon = '⚠️';
+      } else if (type === 'info') {
+        icon = 'ℹ️';
+      }
+
+      // Create notification container
+      const notification = document.createElement('div');
+      notification.className = 'custom-notification';
+      notification.innerHTML =
+        '<div class="alert alert-' + (type === 'error' ? 'danger' : type) + ' alert-dismissible fade show" role="alert">' +
+          '<div class="alert-content">' +
+            '<span class="alert-icon">' + icon + '</span>' +
+            '<span class="alert-message">' + message + '</span>' +
+          '</div>' +
+          '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+        '</div>';
+
+      // Add to document
+      document.body.appendChild(notification);
+
+      // Trigger animation
+      setTimeout(() => {
+        notification.classList.add('show');
+      }, 10);
+
+      // Auto remove after 5 seconds
+      setTimeout(() => {
+        const alertElement = notification.querySelector('.alert');
+        if (alertElement) {
+          alertElement.classList.remove('show');
+          setTimeout(() => {
+            if (notification.parentNode) {
+              notification.parentNode.removeChild(notification);
+            }
+          }, 150);
+        }
+      }, 5000);
+    }
+
+    // Custom confirm function
+    function showConfirm(message, onConfirm) {
+      // Remove any existing confirm modals
+      const existingModal = document.querySelector('.custom-confirm-modal');
+      if (existingModal) {
+        existingModal.remove();
+      }
+
+      // Create modal backdrop
+      const backdrop = document.createElement('div');
+      backdrop.className = 'modal-backdrop fade';
+      backdrop.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1050;';
+
+      // Create modal container
+      const modal = document.createElement('div');
+      modal.className = 'custom-confirm-modal';
+      modal.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1051;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        padding: 1.5rem;
+        min-width: 300px;
+        max-width: 400px;
+      `;
+
+      modal.innerHTML = `
+        <div class="confirm-content">
+          <div class="confirm-message" style="margin-bottom: 1rem;">${message}</div>
+          <div class="confirm-buttons" style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+            <button class="btn btn-secondary btn-sm cancel-btn">Batal</button>
+            <button class="btn btn-danger btn-sm confirm-btn confirm-danger">Ya, Lanjutkan</button>
+          </div>
+        </div>
+      `;
+
+      // Add to document
+      document.body.appendChild(backdrop);
+      document.body.appendChild(modal);
+
+      // Add event listeners
+      const cancelBtn = modal.querySelector('.cancel-btn');
+      const confirmBtn = modal.querySelector('.confirm-btn');
+
+      const closeConfirm = () => {
+        backdrop.classList.add('fade');
+        modal.classList.add('fade');
+        setTimeout(() => {
+          if (backdrop.parentNode) backdrop.parentNode.removeChild(backdrop);
+          if (modal.parentNode) modal.parentNode.removeChild(modal);
+        }, 150);
+      };
+
+      cancelBtn.addEventListener('click', closeConfirm);
+      backdrop.addEventListener('click', closeConfirm);
+
+      confirmBtn.addEventListener('click', () => {
+        closeConfirm();
+        onConfirm();
+      });
+    }
+
     // Bulk actions for sellers
     const bulkActionForm = document.getElementById('bulkActionForm');
     if (bulkActionForm) {
@@ -1470,13 +1645,13 @@
         const selectedSellers = Array.from(sellerCheckboxes).filter(checkbox => checkbox.checked).map(checkbox => checkbox.value);
         if (selectedSellers.length === 0) {
           e.preventDefault();
-          alert('Silakan pilih setidaknya satu penjual terlebih dahulu.');
+          showNotification('Silakan pilih setidaknya satu penjual terlebih dahulu.', 'warning');
           return;
         }
         document.getElementById('sellerIdsInput').value = JSON.stringify(selectedSellers);
       });
     }
-    
+
     // Bulk actions for buyers
     const bulkActionFormBuyer = document.getElementById('bulkActionFormBuyer');
     if (bulkActionFormBuyer) {
@@ -1484,12 +1659,69 @@
         const selectedUsers = Array.from(buyerCheckboxes).filter(checkbox => checkbox.checked).map(checkbox => checkbox.value);
         if (selectedUsers.length === 0) {
           e.preventDefault();
-          alert('Silakan pilih setidaknya satu pembeli terlebih dahulu.');
+          showNotification('Silakan pilih setidaknya satu pembeli terlebih dahulu.', 'warning');
           return;
         }
         document.getElementById('userIdsInput').value = JSON.stringify(selectedUsers);
       });
     }
+
+    // Event listeners for confirmation
+    document.addEventListener('click', function(e) {
+      // Handle bulk action forms
+      if (e.target.closest('#bulkActionForm button[type="submit"]')) {
+        e.preventDefault();
+        const form = e.target.closest('#bulkActionForm');
+        showConfirm('Apakah Anda yakin ingin melakukan aksi ini pada penjual terpilih?', function() {
+          form.submit();
+        });
+      } else if (e.target.closest('#bulkActionFormBuyer button[type="submit"]')) {
+        e.preventDefault();
+        const form = e.target.closest('#bulkActionFormBuyer');
+        showConfirm('Apakah Anda yakin ingin melakukan aksi ini pada pembeli terpilih?', function() {
+          form.submit();
+        });
+      }
+    });
+
+    // Handle individual action forms
+    document.addEventListener('submit', function(e) {
+      // Handle suspend seller form
+      if (e.target.classList.contains('suspend-seller-form')) {
+        e.preventDefault();
+        showConfirm('Apakah Anda yakin ingin menangguhkan penjual ini?', function() {
+          e.target.submit();
+        });
+      }
+      // Handle activate seller form
+      else if (e.target.classList.contains('activate-seller-form')) {
+        e.preventDefault();
+        showConfirm('Apakah Anda yakin ingin mengaktifkan kembali penjual ini?', function() {
+          e.target.submit();
+        });
+      }
+      // Handle delete seller form
+      else if (e.target.classList.contains('delete-seller-form')) {
+        e.preventDefault();
+        showConfirm('Apakah Anda yakin ingin menghapus penjual ini?', function() {
+          e.target.submit();
+        });
+      }
+      // Handle suspend user form
+      else if (e.target.classList.contains('suspend-user-form')) {
+        e.preventDefault();
+        showConfirm('Apakah Anda yakin ingin menangguhkan pembeli ini?', function() {
+          e.target.submit();
+        });
+      }
+      // Handle activate user form
+      else if (e.target.classList.contains('activate-user-form')) {
+        e.preventDefault();
+        showConfirm('Apakah Anda yakin ingin mengaktifkan kembali pembeli ini?', function() {
+          e.target.submit();
+        });
+      }
+    });
   });
   
 

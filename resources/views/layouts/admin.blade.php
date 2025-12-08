@@ -12,6 +12,33 @@
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
+    <style>
+        .custom-alert {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.8rem 1rem;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .alert-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .alert-icon {
+            font-size: 1.2rem;
+        }
+
+        .alert-message {
+            flex: 1;
+        }
+    </style>
+
     @stack('styles')
 </head>
 <body class="{{ request()->routeIs('dashboard.admin') || request()->routeIs('admin.dashboard') ? 'dashboard-page' : '' }}">
@@ -35,15 +62,21 @@
         
         <!-- Success and Error Messages -->
         @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
+            <div class="alert alert-success alert-dismissible fade show custom-alert" role="alert">
+                <div class="alert-content">
+                    <span class="alert-icon">✅</span>
+                    <span class="alert-message">{{ session('success') }}</span>
+                </div>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         @endif
-        
+
         @if(session('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ session('error') }}
+            <div class="alert alert-danger alert-dismissible fade show custom-alert" role="alert">
+                <div class="alert-content">
+                    <span class="alert-icon">❌</span>
+                    <span class="alert-message">{{ session('error') }}</span>
+                </div>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         @endif

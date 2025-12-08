@@ -180,81 +180,45 @@
               <h2 id="logTitle" class="card-title">Log Personal</h2>
             </div>
             <div class="admin-orders-viewport">
-              <article class="admin-order-card" data-order-id="LOG-001">
-                <div class="order-head">
-                  <div class="shop-name">Anda</div>
-                  <div class="order-meta">
-                    <span>Tanggal:
-                      <time datetime="2025-09-05">05 Sep 2025</time>
-                    </span>
-                    • <span>Status: <strong>Berhasil</strong></span>
-                  </div>
-                </div>
-
-                <div class="order-items">
-                  <div class="order-item">
-                    <div class="item-body">
-                      <div class="item-row">
-                        <div class="item-name">Menyetujui penarikan dana</div>
-                      </div>
-                      <div class="item-desc scrollable">
-                        Anda menyetujui penarikan dana untuk Toko Aneka Roti.
+              @if($activityLogs->count() > 0)
+                @foreach($activityLogs as $log)
+                  <article class="admin-order-card" data-order-id="LOG-{{ $log->id }}">
+                    <div class="order-head">
+                      <div class="shop-name">Anda</div>
+                      <div class="order-meta">
+                        <span>Tanggal:
+                          <time datetime="{{ $log->created_at->format('Y-m-d') }}">{{ $log->created_at->format('d M Y') }}</time>
+                        </span>
+                        • <span>Status: <strong>{{ ucfirst($log->status) }}</strong></span>
                       </div>
                     </div>
-                  </div>
-                </div>
-              </article>
-              
-              <article class="admin-order-card" data-order-id="LOG-002">
-                <div class="order-head">
-                  <div class="shop-name">Anda</div>
-                  <div class="order-meta">
-                    <span>Tanggal:
-                      <time datetime="2025-09-04">04 Sep 2025</time>
-                    </span>
-                    • <span>Status: <strong>Selesai</strong></span>
-                  </div>
-                </div>
 
-                <div class="order-items">
-                  <div class="order-item">
-                    <div class="item-body">
-                      <div class="item-row">
-                        <div class="item-name">Menangguhkan akun pembeli</div>
-                      </div>
-                      <div class="item-desc scrollable">
-                        Anda menangguhkan akun pembeli Jerome Bell.
+                    <div class="order-items">
+                      <div class="order-item">
+                        <div class="item-body">
+                          <div class="item-row">
+                            <div class="item-name">{{ $log->activity }}</div>
+                          </div>
+                          <div class="item-desc scrollable">
+                            {{ $log->description }}
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  </article>
+                @endforeach
+              @else
+                <div class="empty-state">
+                  <p>Tidak ada aktivitas tercatat</p>
                 </div>
-              </article>
-              
-              <article class="admin-order-card" data-order-id="LOG-003">
-                <div class="order-head">
-                  <div class="shop-name">Anda</div>
-                  <div class="order-meta">
-                    <span>Tanggal:
-                      <time datetime="2025-09-03">03 Sep 2025</time>
-                    </span>
-                    • <span>Status: <strong>Selesai</strong></span>
-                  </div>
-                </div>
-
-                <div class="order-items">
-                  <div class="order-item">
-                    <div class="item-body">
-                      <div class="item-row">
-                        <div class="item-name">Mengubah pengaturan komisi</div>
-                      </div>
-                      <div class="item-desc scrollable">
-                        Anda mengubah pengaturan komisi platform.
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </article>
+              @endif
             </div>
+
+            @if($activityLogs->hasPages())
+              <div class="pagination">
+                {{ $activityLogs->links() }}
+              </div>
+            @endif
           </section>
         </main>
       </div>

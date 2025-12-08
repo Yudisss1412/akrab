@@ -25,6 +25,29 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials)) {
+            // Check if user account is suspended
+            $user = Auth::user();
+            if ($user->status === 'suspended') {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                // Check if it's an AJAX request
+                if ($request->expectsJson() || $request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Akun Anda telah ditangguhkan. Silakan hubungi administrator.',
+                        'errors' => [
+                            'email' => ['Akun Anda telah ditangguhkan. Silakan hubungi administrator.']
+                        ]
+                    ], 422);
+                }
+
+                return back()->withErrors([
+                    'email' => 'Akun Anda telah ditangguhkan. Silakan hubungi administrator.',
+                ])->onlyInput('email');
+            }
+
             $request->session()->regenerate();
 
             // Check if it's an AJAX request

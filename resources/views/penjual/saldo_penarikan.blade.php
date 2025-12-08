@@ -216,21 +216,44 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.25rem;
       margin-top: 1.5rem;
+      padding: 0.5rem 0;
     }
-    
+
     .pagination a, .pagination span {
       display: inline-block;
-      padding: 0.5rem 0.75rem;
-      border-radius: var(--ak-radius);
+      padding: 0.25rem 0.5rem;
+      border: none;
+      border-radius: 4px;
       text-decoration: none;
       font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      min-width: 32px;
+      text-align: center;
+      color: var(--ak-text);
     }
-    
+
+    .pagination a:hover {
+      background-color: #f0fdfa;
+      color: var(--ak-primary);
+    }
+
     .pagination .active {
       background: var(--ak-primary);
-      color: white;
+      color: white !important;
+      box-shadow: 0 2px 4px rgba(0, 110, 92, 0.3);
+    }
+
+    .pagination .disabled {
+      color: #9ca3af;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .pagination a:first-child, .pagination a:last-child {
+      padding: 0.25rem 0.625rem;
     }
     
     /* Modal */

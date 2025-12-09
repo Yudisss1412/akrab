@@ -9,6 +9,224 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Responsive adjustments for various screen sizes */
+
+        /* Tablet adjustments */
+        @media (max-width: 768px) {
+            .header {
+                padding: 0 1rem;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .logo img {
+                height: 40px;
+                width: 40px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hamburger-menu {
+                display: block;
+                margin-left: auto;
+            }
+
+            .auth-buttons {
+                width: 100%;
+                display: flex;
+                justify-content: center;
+                margin-top: 1rem;
+                gap: 1rem;
+            }
+
+            .main-section {
+                padding: 2rem 1rem;
+            }
+
+            .intro-content {
+                flex-direction: column;
+                gap: 2rem;
+                text-align: center;
+            }
+
+            .hero-text {
+                padding-right: 0;
+            }
+
+            .cta-buttons {
+                justify-content: center;
+            }
+
+            .product-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .tentang-container {
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            .tentang-left, .tentang-right {
+                width: 100%;
+            }
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 480px) {
+            .header {
+                padding: 0.5rem;
+            }
+
+            .logo img {
+                height: 35px;
+                width: 35px;
+            }
+
+            .intro-content {
+                padding: 0 1rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .hero-text p {
+                font-size: 1rem;
+            }
+
+            .cta-button {
+                padding: 0.8rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .section-header h2 {
+                font-size: 1.8rem;
+            }
+
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tentang-headline {
+                font-size: 1.8rem;
+            }
+
+            .social-icons-background {
+                width: 130px;
+                height: 30px;
+                padding: 0 8px;
+            }
+
+            .social-icon svg {
+                width: 18px;
+                height: 18px;
+            }
+        }
+
+        /* Small mobile adjustments */
+        @media (max-width: 360px) {
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            .section-header h2 {
+                font-size: 1.6rem;
+            }
+
+            .product-card img {
+                width: 100%;
+                height: auto;
+            }
+        }
+
+        /* Mobile menu default state */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 78px;
+            left: 0;
+            right: 0;
+            background: white;
+            z-index: 999;
+            padding: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .mobile-nav a {
+            display: block;
+            padding: 0.75rem;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #333;
+            border: 1px solid #e9ecef;
+        }
+
+        .mobile-auth-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .mobile-auth-buttons a {
+            flex: 1;
+            text-align: center;
+        }
+
+        .hamburger-menu {
+            display: none;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 30px;
+            height: 30px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .hamburger-line {
+            width: 100%;
+            height: 3px;
+            background: #006E5C;
+            border-radius: 10px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        /* Adjusted classes based on actual HTML structure */
+        .tentang-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .tentang-left, .tentang-right {
+            width: 100%;
+        }
+
+        /* Desktop styles */
+        @media (min-width: 769px) {
+            .mobile-nav {
+                display: none;
+            }
+
+            .hamburger-menu {
+                display: none;
+            }
+
+            /* Show desktop navigation on larger screens */
+            .nav-links {
+                display: flex;
+            }
+        }
+    </style>
 </head>
 <body>
     
@@ -175,6 +393,102 @@
         </div>
     </div>
 
+    <script>
+        // Mobile menu functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburgerBtn = document.getElementById('hamburger-btn');
+            const mobileNav = document.getElementById('mobile-nav');
+            const body = document.body;
+
+            if (hamburgerBtn && mobileNav) {
+                hamburgerBtn.addEventListener('click', function() {
+                    // Toggle mobile nav visibility
+                    const isHidden = mobileNav.classList.contains('hidden') || mobileNav.style.display === 'none';
+
+                    if (isHidden) {
+                        mobileNav.style.display = 'flex';
+                        hamburgerBtn.classList.add('active');
+                        // Prevent body scroll when menu is open
+                        body.style.overflow = 'hidden';
+                    } else {
+                        mobileNav.style.display = 'none';
+                        hamburgerBtn.classList.remove('active');
+                        // Restore body scroll
+                        body.style.overflow = 'auto';
+                    }
+                });
+
+                // Close menu when clicking outside
+                document.addEventListener('click', function(event) {
+                    const isClickInsideHeader = hamburgerBtn.contains(event.target);
+                    const isClickInsideNav = mobileNav.contains(event.target);
+
+                    if (!isClickInsideHeader && !isClickInsideNav && mobileNav.style.display === 'flex') {
+                        mobileNav.style.display = 'none';
+                        hamburgerBtn.classList.remove('active');
+                        body.style.overflow = 'auto';
+                    }
+                });
+
+                // Close mobile menu when window is resized to desktop size
+                window.addEventListener('resize', function() {
+                    if (window.innerWidth >= 769) {
+                        mobileNav.style.display = 'none';
+                        hamburgerBtn.classList.remove('active');
+                        body.style.overflow = 'auto';
+                    }
+                });
+            }
+
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    const href = this.getAttribute('href');
+                    if (href === '#') return;
+
+                    e.preventDefault();
+
+                    const target = document.querySelector(href);
+                    if (target) {
+                        const offsetTop = target.offsetTop - 100; // Adjust for header height
+
+                        window.scrollTo({
+                            top: offsetTop,
+                            behavior: 'smooth'
+                        });
+
+                        // Close mobile menu if open
+                        mobileNav.style.display = 'none';
+                        hamburgerBtn.classList.remove('active');
+                        body.style.overflow = 'auto';
+                    }
+                });
+            });
+        });
+
+        // Animation on scroll functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const animateOnScrollElements = document.querySelectorAll('.animate-on-scroll');
+
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            animateOnScrollElements.forEach(element => {
+                observer.observe(element);
+            });
+        });
+    </script>
     <script src="js/script.js"></script>
 </body>
 </html>

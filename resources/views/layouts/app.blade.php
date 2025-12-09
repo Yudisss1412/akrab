@@ -204,8 +204,8 @@
     </div>
 
     <script src="{{ asset('js/customer/helpers/csrfHelper.js') }}"></script>
-    <script src="{{ asset('js/customer/script.js') }}"></script>
     @stack('scripts')
+    <script src="{{ asset('js/customer/script.js') }}"></script>
 
     <script>
       // Function to update cart count in header
@@ -248,6 +248,7 @@
           }
         } catch (error) {
           console.error('Error fetching cart count:', error);
+          // Tidak menampilkan error ke pengguna karena ini hanya fungsi update count
         }
       }
 

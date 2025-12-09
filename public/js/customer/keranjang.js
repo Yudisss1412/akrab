@@ -384,36 +384,41 @@ class CartManager {
   }
 
   showNotification(message, type = 'info') {
-    // Buat elemen notifikasi
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.textContent = message;
-    
-    // Gaya dasar untuk notifikasi
-    Object.assign(notification.style, {
-      position: 'fixed',
-      top: '20px',
-      right: '20px',
-      padding: '12px 20px',
-      borderRadius: '6px',
-      color: '#fff',
-      backgroundColor: type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : '#007bff',
-      zIndex: '9999',
-      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-      fontSize: '14px',
-      maxWidth: '400px',
-      wordWrap: 'break-word'
-    });
-    
-    // Tambahkan ke body
-    document.body.appendChild(notification);
-    
-    // Hapus notifikasi setelah 3 detik
-    setTimeout(() => {
-      if (notification.parentNode) {
-        notification.parentNode.removeChild(notification);
-      }
-    }, 3000);
+    // Gunakan fungsi global showToast dari script utama untuk konsistensi UX
+    if (typeof showToast === 'function') {
+      showToast(message, type);
+    } else {
+      // Fallback jika fungsi global tidak tersedia
+      const notification = document.createElement('div');
+      notification.className = `notification notification-${type}`;
+      notification.textContent = message;
+
+      // Gaya dasar untuk notifikasi
+      Object.assign(notification.style, {
+        position: 'fixed',
+        top: '20px',
+        right: '20px',
+        padding: '12px 20px',
+        borderRadius: '6px',
+        color: '#fff',
+        backgroundColor: type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : '#007bff',
+        zIndex: '9999',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+        fontSize: '14px',
+        maxWidth: '400px',
+        wordWrap: 'break-word'
+      });
+
+      // Tambahkan ke body
+      document.body.appendChild(notification);
+
+      // Hapus notifikasi setelah 3 detik
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.parentNode.removeChild(notification);
+        }
+      }, 3000);
+    }
   }
 }
 

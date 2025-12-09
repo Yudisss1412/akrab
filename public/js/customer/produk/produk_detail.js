@@ -239,34 +239,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ---------- CTA (with API) ---------- */
   const btnAdd = document.querySelector('.btn-add-cart');
-  const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-  
+
   btnAdd && btnAdd.addEventListener('click', async () => {
     // Ambil ID produk dari elemen data
     const productTitle = document.getElementById('pdTitle');
     const productId = productTitle?.dataset.productId;
-    
+
     if (!productId) {
       showNotification('Produk tidak ditemukan', 'error');
       return;
     }
-    
+
     // Ambil kuantitas dari input kuantitas
     const qtyInput = document.querySelector('.qty-input');
     const quantity = parseInt(qtyInput?.value) || 1;
-    
+
     try {
-      const response = await fetch('/cart/add', {
+      const response = await fetchWithCsrf('/cart/add', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': csrfToken
-        },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           product_id: productId,
           quantity: quantity
         })
       });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
 
       const result = await response.json();
 
@@ -276,8 +275,8 @@ document.addEventListener('DOMContentLoaded', () => {
         showNotification(result.message || 'Gagal menambahkan ke keranjang', 'error');
       }
     } catch (error) {
+      // Error sudah ditangani di fetchWithCsrf
       console.error('Error adding to cart:', error);
-      showNotification('Terjadi kesalahan saat menambahkan ke keranjang', 'error');
     }
   });
   

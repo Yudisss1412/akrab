@@ -27,41 +27,48 @@ class CartService
             
             // Format data agar konsisten dengan format session (array)
             return $cartItems->map(function ($item) {
+                $product = $item->product; // Relasi product sudah dimuat dengan with()
+                $productVariant = $item->productVariant; // Relasi productVariant
+
                 return [
                     'id' => $item->id,
                     'product_id' => $item->product_id,
                     'product_variant_id' => $item->product_variant_id,
                     'quantity' => $item->quantity,
-                    'product' => $item->product,  // Relasi product sudah dimuat dengan with()
-                    'product_variant' => $item->productVariant,  // Relasi productVariant
-                    'subtotal' => ($item->product->price + ($item->productVariant->additional_price ?? 0)) * $item->quantity
+                    'product' => $product,
+                    'product_variant' => $productVariant,
+                    'subtotal' => ($product->price + ($productVariant ? $productVariant->additional_price : 0)) * $item->quantity
                 ];
             });
         } else {
             // Jika pengguna tidak login, ambil dari session
-            $cartItems = collect(Session::get($this->sessionKey, []));
-            
-            // Tambahkan informasi produk ke masing-masing item
-            $cartItems = $cartItems->map(function ($item) {
+            $rawCartItems = Session::get($this->sessionKey, []);
+            $indexedCartItems = collect([]);
+
+            // Tambahkan informasi produk ke masing-masing item dan tetapkan ID yang konsisten
+            foreach ($rawCartItems as $index => $item) {
                 $product = Product::find($item['product_id']);
                 $productVariant = null;
-                
-                if ($item['product_variant_id']) {
+
+                if (isset($item['product_variant_id']) && $item['product_variant_id']) {
                     $productVariant = ProductVariant::find($item['product_variant_id']);
                 }
-                
-                $item['product'] = $product;
-                $item['product_variant'] = $productVariant;
-                
-                // Hitung subtotal
-                $basePrice = $product ? $product->price : 0;
-                $variantPrice = $productVariant ? $productVariant->additional_price : 0;
-                $item['subtotal'] = ($basePrice + $variantPrice) * $item['quantity'];
-                
-                return $item;
-            });
-            
-            return $cartItems;
+
+                // Tambahkan ID array index sebagai referensi untuk session
+                $processedItem = [
+                    'id' => $index, // Ini akan digunakan sebagai referensi untuk update/remove
+                    'product_id' => $item['product_id'],
+                    'product_variant_id' => $item['product_variant_id'] ?? null,
+                    'quantity' => $item['quantity'],
+                    'product' => $product,
+                    'product_variant' => $productVariant,
+                    'subtotal' => (($product ? $product->price : 0) + ($productVariant ? $productVariant->additional_price : 0)) * $item['quantity']
+                ];
+
+                $indexedCartItems->push($processedItem);
+            }
+
+            return $indexedCartItems;
         }
     }
 
@@ -113,9 +120,9 @@ class CartService
             }
             
             Session::put($this->sessionKey, $cart);
-            
-            // Return format yang mirip dengan model Carts
-            return (object)[
+
+            // Return format array yang konsisten
+            return [
                 'id' => count($cart) - 1, // Gunakan index sebagai ID untuk session
                 'product_id' => $productId,
                 'product_variant_id' => $productVariantId,
@@ -128,7 +135,7 @@ class CartService
 
     /**
      * Memperbarui kuantitas item di keranjang
-     * 
+     *
      * @param mixed $itemId
      * @param int $quantity
      * @return bool
@@ -140,22 +147,23 @@ class CartService
             $cartItem = Carts::where('id', $itemId)
                 ->where('user_id', Auth::id())
                 ->first();
-                
+
             if (!$cartItem) {
                 return false;
             }
-            
+
             if ($quantity > 0) {
                 $cartItem->update(['quantity' => $quantity]);
             } else {
                 $cartItem->delete();
             }
-            
+
             return true;
         } else {
             // Jika pengguna tidak login, update di session
             $cart = Session::get($this->sessionKey, []);
-            
+
+            // itemId sekarang selalu berupa index array untuk session items
             if (isset($cart[$itemId])) {
                 if ($quantity > 0) {
                     $cart[$itemId]['quantity'] = min(99, max(1, $quantity));
@@ -164,11 +172,11 @@ class CartService
                     // Re-index array
                     $cart = array_values($cart);
                 }
-                
+
                 Session::put($this->sessionKey, $cart);
                 return true;
             }
-            
+
             return false;
         }
     }
@@ -186,17 +194,18 @@ class CartService
             $cartItem = Carts::where('id', $itemId)
                 ->where('user_id', Auth::id())
                 ->first();
-                
+
             if (!$cartItem) {
                 return false;
             }
-            
+
             $cartItem->delete();
             return true;
         } else {
             // Jika pengguna tidak login, hapus dari session
             $cart = Session::get($this->sessionKey, []);
-            
+
+            // itemId sekarang selalu berupa index array untuk session items
             if (isset($cart[$itemId])) {
                 unset($cart[$itemId]);
                 // Re-index array
@@ -204,7 +213,7 @@ class CartService
                 Session::put($this->sessionKey, $cart);
                 return true;
             }
-            
+
             return false;
         }
     }
@@ -235,13 +244,18 @@ class CartService
     {
         $cartItems = $this->getCartItems();
         $subtotal = 0;
-        
+
         foreach ($cartItems as $item) {
-            $basePrice = $item['product'] ? $item['product']->price : 0;
-            $variantPrice = $item['product_variant'] ? $item['product_variant']->additional_price : 0;
-            $subtotal += ($basePrice + $variantPrice) * $item['quantity'];
+            // Akses konsisten berdasarkan format yang dihasilkan getCartItems()
+            $product = $item['product'] ?? null;
+            $productVariant = $item['product_variant'] ?? null;
+            $quantity = $item['quantity'] ?? 0;
+
+            $basePrice = $product ? $product->price : 0;
+            $variantPrice = $productVariant ? $productVariant->additional_price : 0;
+            $subtotal += ($basePrice + $variantPrice) * $quantity;
         }
-        
+
         return $subtotal;
     }
 
@@ -253,6 +267,8 @@ class CartService
     public function getTotalItems()
     {
         $cartItems = $this->getCartItems();
-        return $cartItems->sum('quantity');
+        return $cartItems->sum(function ($item) {
+            return $item['quantity'];
+        });
     }
 }

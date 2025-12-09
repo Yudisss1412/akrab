@@ -203,6 +203,7 @@
         @yield('footer')
     </div>
 
+    <script src="{{ asset('js/customer/helpers/csrfHelper.js') }}"></script>
     <script src="{{ asset('js/customer/script.js') }}"></script>
     @stack('scripts')
 

@@ -29,10 +29,10 @@ class CartController extends Controller
         // Hitung total berat produk di keranjang
         $totalWeight = 0;
         foreach ($cartItems as $item) {
-            $product = $item['product'] ?? $item->product;
+            $product = $item['product'] ?? null;
             if ($product) {
                 $weightPerUnit = $product->weight ?? 0;
-                $quantity = $item['quantity'] ?? $item->quantity;
+                $quantity = $item['quantity'];
                 $totalWeight += $weightPerUnit * $quantity;
             }
         }
@@ -93,7 +93,7 @@ class CartController extends Controller
         // Ambil ulang item yang diperbarui untuk ditampilkan
         $cartItems = $this->cartService->getCartItems();
         $updatedItem = $cartItems->firstWhere(function ($item) use ($id) {
-            return $item['id'] == $id;
+            return ($item['id'] ?? $item->id) == $id;
         });
 
         return response()->json([

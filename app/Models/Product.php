@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Product extends Model
 {
@@ -35,6 +36,72 @@ class Product extends Model
         'sku',
     ];
 
+    /**
+     * Boot the model and set up event listeners
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($product) {
+            if (empty($product->sku)) {
+                $product->sku = $product->generateUniqueSku();
+            }
+        });
+
+        static::updating(function ($product) {
+            // Jika SKU diubah atau ingin digenerate ulang, pastikan tetap unik
+            if (!empty($product->sku)) {
+                $existing = self::where('sku', $product->sku)
+                                ->where('id', '!=', $product->id)
+                                ->first();
+                if ($existing) {
+                    $product->sku = $product->generateUniqueSku();
+                }
+            } elseif (empty($product->sku)) {
+                // Jika SKU kosong saat update, generate yang baru
+                $product->sku = $product->generateUniqueSku();
+            }
+        });
+    }
+
+    /**
+     * Generate unique SKU for the product
+     */
+    private function generateUniqueSku()
+    {
+        $baseSku = $this->generateBaseSku();
+
+        // Cek apakah SKU sudah ada di database, jika ya tambahkan angka
+        $counter = 1;
+        $sku = $baseSku;
+
+        while (self::where('sku', $sku)->exists()) {
+            $sku = $baseSku . '-' . $counter;
+            $counter++;
+        }
+
+        return $sku;
+    }
+
+    /**
+     * Generate base SKU format
+     */
+    private function generateBaseSku()
+    {
+        // Ambil 3 huruf pertama dari nama produk (dikonversi ke uppercase)
+        $namePart = Str::upper(Str::substr(Str::slug($this->name, ''), 0, 3));
+
+        // Ambil ID penjual untuk identifikasi unik
+        $sellerId = $this->seller_id ? str_pad($this->seller_id, 3, '0', STR_PAD_LEFT) : '001';
+
+        // Tambahkan timestamp untuk variasi (ambil 4 digit terakhir dari timestamp)
+        $timestamp = substr(time(), -4);
+
+        // Format: [3HURUF][SELLERID][TIMESTAMP]
+        return $namePart . $sellerId . $timestamp;
+    }
+
     protected $casts = [
         'specifications' => 'array',
         'features' => 'array',
@@ -54,7 +121,7 @@ class Product extends Model
     {
         return $this->belongsTo(Subcategory::class, 'subcategory_id');
     }
-    
+
     // Relasi ke penjual
     public function seller()
     {
@@ -116,7 +183,7 @@ class Product extends Model
     {
         return $this->hasMany(Review::class);
     }
-    
+
     // Relasi ke ulasan yang disetujui
     public function approvedReviews()
     {
@@ -165,7 +232,7 @@ class Product extends Model
                    })
                    ->first();
     }
-    
+
     // Method untuk mendapatkan gambar utama dari product_images
     public function getMainImageAttribute()
     {

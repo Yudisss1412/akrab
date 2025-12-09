@@ -175,6 +175,7 @@ class CartManager {
           }
         } else {
           this.updateItemSubtotal(input);
+          await this.calculateTotal(); // Pastikan total di ringkasan juga diperbarui
           this.showNotification(result.message, 'success');
 
           // Update cart count in header via API
@@ -187,6 +188,7 @@ class CartManager {
         // Kembalikan jumlah ke nilai sebelumnya jika gagal
         input.value = input.dataset.previousValue || 1;
         this.updateItemSubtotal(input);
+        await this.calculateTotal(); // Pastikan total di ringkasan juga diperbarui
       }
     } catch (error) {
       console.error('Error updating item quantity:', error);
@@ -194,7 +196,7 @@ class CartManager {
       // Kembalikan jumlah ke nilai sebelumnya jika terjadi error
       input.value = input.dataset.previousValue || 1;
       this.updateItemSubtotal(input);
-
+      await this.calculateTotal(); // Pastikan total di ringkasan juga diperbarui
       // Update cart count in header via API to ensure synchronization
       if (window.updateCartCount) {
         window.updateCartCount();
@@ -256,8 +258,8 @@ class CartManager {
     // Simpan nilai kuantitas sebelumnya
     input.dataset.previousValue = input.value;
 
+    // Ambil harga dari teks yang ditampilkan, bersihkan dari format
     const priceText = row.querySelector('.price-col').textContent;
-    // Ambil angka dari string harga (misal: "Rp 45.000" -> 45000)
     const price = parseInt(priceText.replace(/[^0-9]/g, ''));
     const quantity = parseInt(input.value);
     const subtotal = price * quantity;
@@ -309,7 +311,9 @@ class CartManager {
       const checkbox = row.querySelector('.item-check');
       if (checkbox && checkbox.checked) {
         const subtotalText = row.querySelector('.subtotal-col').textContent;
-        const itemSubtotal = parseInt(subtotalText.replace(/[^0-9]/g, ''));
+        // Hapus "Rp" dan semua titik (ribuan), lalu ganti koma desimal menjadi titik
+        const cleanedText = subtotalText.replace('Rp', '').replace(/\./g, '').replace(',', '.').trim();
+        const itemSubtotal = parseFloat(cleanedText) || 0;
         subtotal += itemSubtotal;
 
         itemCount++;

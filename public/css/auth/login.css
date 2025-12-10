@@ -283,24 +283,65 @@ body, html {
     margin-bottom: 15px;
 }
 
+/* Tablet dan Mobile: Single Centered Card */
 @media (max-width: 992px) {
-    .login-content,
-    .register-content {
+    .login-content {
         flex-direction: column;
-        gap: 3rem;
         text-align: center;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
     }
+
     .welcome-text {
-        flex-basis: auto;
-        padding-right: 0;
+        display: none; /* Sembunyikan bagian kiri (teks/branding) */
+    }
+
+    .login-form-box {
+        width: 100% !important;
+        max-width: 400px; /* Maksimum lebar card agar tidak terlalu lebar */
+        padding: 30px !important;
+        margin: 0 1rem; /* Tambahkan margin kiri-kanan */
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        backdrop-filter: blur(20px); /* Menjaga efek glassmorphism tetap ada */
+    }
+
+    .login-form-box h2 {
+        font-size: 28px !important;
+        margin-bottom: 25px !important;
+    }
+
+    .form-group input {
+        padding-top: 14px !important;
     }
 }
 
+/* Mobile kecil */
 @media (max-width: 480px) {
-    .welcome-text h1 { font-size: 36px; }
-    .welcome-text p { font-size: 16px; }
-    .login-form-box,
-    .register-form-box { width: 100%; padding: 20px; }
-    .login-form-box h2,
-    .register-form-box h2 { font-size: 32px; }
+    .login-form-box {
+        padding: 24px !important;
+        margin: 0 1rem; /* Pastikan margin tetap ada */
+    }
+
+    .login-form-box h2 {
+        font-size: 24px !important;
+    }
+
+    .welcome-text h1 {
+        font-size: 32px !important;
+    }
+
+    .welcome-text p {
+        font-size: 14px !important;
+    }
+
+    .login-button,
+    .register-button {
+        height: 44px !important;
+        font-size: 18px !important;
+    }
+
+    .form-group input {
+        height: 46px !important;
+    }
 }

@@ -647,6 +647,229 @@ function createStarsHTML($rating) {
         align-items: center !important;
       }
     }
+
+    /* === RESPONSIF TAMBAHAN UNTUK SEMUA PERANGKAT === */
+
+    /* Small tablet */
+    @media (max-width: 992px) {
+      .popular-products-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 1.2rem !important;
+      }
+
+      .category-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 1.2rem !important;
+      }
+
+      .welcome-page {
+        padding: 1.5rem 1.2rem 60px !important;
+      }
+    }
+
+    /* Large mobile */
+    @media (max-width: 768px) {
+      .popular-products-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 1rem !important;
+      }
+
+      .category-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 1rem !important;
+      }
+
+      .produk-populer-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.8rem !important;
+      }
+
+      .produk-search-container {
+        flex-direction: column !important;
+        gap: 0.75rem !important;
+      }
+
+      .search-bar {
+        width: 100% !important;
+        min-width: auto !important;
+      }
+
+      .filter-group {
+        width: 100% !important;
+      }
+
+      .filter-group select, .filter-group input {
+        width: 100% !important;
+        min-width: auto !important;
+      }
+
+      .btn-lihat-semua {
+        align-self: flex-start !important;
+        width: auto !important;
+      }
+
+      .produk-card {
+        margin-bottom: 1.2rem !important;
+      }
+
+      .produk-card img {
+        height: 120px !important;
+      }
+
+      .produk-card-content {
+        padding: 0.75rem !important;
+      }
+
+      .produk-card-name {
+        font-size: 0.95rem !important;
+      }
+
+      .produk-card-price {
+        font-size: 0.95rem !important;
+      }
+
+      .produk-card-actions {
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+      }
+
+      .produk-card-actions .btn-lihat,
+      .produk-card-actions .btn-add {
+        width: 100% !important;
+        margin: 0 !important;
+      }
+
+      .section-header h2 {
+        font-size: 1.4rem !important;
+      }
+
+      .section-header p {
+        font-size: 0.9rem !important;
+      }
+    }
+
+    /* Mobile small */
+    @media (max-width: 480px) {
+      .popular-products-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1.5rem !important;
+      }
+
+      .category-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 1rem !important;
+      }
+
+      .welcome-banner h2 {
+        font-size: 1.4rem !important;
+      }
+
+      .welcome-banner p {
+        font-size: 0.9rem !important;
+      }
+
+      .produk-populer-header h3,
+      .section-header h2 {
+        font-size: 1.3rem !important;
+      }
+
+      .produk-card img {
+        height: 100px !important;
+      }
+
+      .produk-card-name {
+        font-size: 0.9rem !important;
+      }
+
+      .produk-card-sub,
+      .produk-card-price {
+        font-size: 0.85rem !important;
+      }
+
+      .btn-lihat,
+      .btn-add {
+        padding: 0.6rem 0.8rem !important;
+        font-size: 0.85rem !important;
+      }
+
+      .toko-link {
+        font-size: 0.8rem !important;
+      }
+
+      .produk-card-stars svg {
+        width: 16px !important;
+        height: 16px !important;
+      }
+    }
+
+    /* Very small mobile */
+    @media (max-width: 360px) {
+      .produk-card img {
+        height: 90px !important;
+      }
+
+      .produk-card-name {
+        font-size: 0.85rem !important;
+      }
+
+      .produk-card-price {
+        font-size: 0.85rem !important;
+      }
+
+      .produk-card-actions .btn-lihat,
+      .produk-card-actions .btn-add {
+        padding: 0.5rem 0.6rem !important;
+        font-size: 0.8rem !important;
+      }
+
+      .welcome-page {
+        padding: 1.2rem 1rem 50px !important;
+      }
+
+      .produk-populer-header h3,
+      .section-header h2 {
+        font-size: 1.2rem !important;
+      }
+    }
+
+    /* Touch target optimization */
+    @media (hover: none) and (pointer: coarse) {
+      .produk-card-actions .btn-lihat,
+      .produk-card-actions .btn-add {
+        min-height: 44px !important;
+        min-width: 44px !important;
+      }
+
+      .produk-card {
+        min-height: 200px !important;
+      }
+    }
+
+    /* Focus management untuk accessibility */
+    .produk-card:focus-within {
+      outline: 2px solid var(--primary-color-dark) !important;
+      outline-offset: 2px !important;
+    }
+
+    button:focus,
+    input:focus,
+    select:focus,
+    a:focus {
+      outline: 2px solid var(--primary-color-dark) !important;
+      outline-offset: 2px !important;
+    }
+
+    /* Prevent horizontal scroll on small devices */
+    body {
+      overflow-x: hidden !important;
+    }
+
+    .produk-card,
+    .category-card {
+      min-width: 0 !important;
+    }
+  }
 </style>
 
 <main class="welcome-page">
@@ -1008,6 +1231,105 @@ document.getElementById('modal-lihatdetail-btn').addEventListener('click', funct
 // Prevent modal from closing when clicking on content
 document.querySelector('.modal-content-new').addEventListener('click', function(e) {
     e.stopPropagation();
+});
+
+// Mobile-specific enhancements
+document.addEventListener('DOMContentLoaded', function() {
+    // Menambahkan fungsi untuk mengelola menu mobile
+    const hamburgerMenu = document.querySelector('.hamburger-menu');
+    const mobileNav = document.querySelector('.mobile-nav');
+
+    if (hamburgerMenu && mobileNav) {
+        hamburgerMenu.addEventListener('click', function() {
+            // Toggle mobile navigation
+            mobileNav.classList.toggle('active');
+            hamburgerMenu.classList.toggle('active');
+
+            // Prevent background scrolling when menu is open
+            if (mobileNav.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const isClickInsideHamburger = hamburgerMenu.contains(event.target);
+            const isClickInsideMobileNav = mobileNav.contains(event.target);
+
+            if (!isClickInsideHamburger && !isClickInsideMobileNav && mobileNav.classList.contains('active')) {
+                mobileNav.classList.remove('active');
+                hamburgerMenu.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Close mobile menu on window resize to desktop size
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                mobileNav.classList.remove('active');
+                hamburgerMenu.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+    }
+
+    // Fungsi untuk animasi fade-in pada scroll
+    const animateOnScrollElements = document.querySelectorAll('.animate-on-scroll');
+
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-visible');
+            }
+        });
+    }, observerOptions);
+
+    animateOnScrollElements.forEach(element => {
+        observer.observe(element);
+    });
+
+    // Touch event optimizations
+    const touchElements = document.querySelectorAll('button, .produk-card, .category-card, a');
+
+    touchElements.forEach(element => {
+        element.addEventListener('touchstart', function() {
+            this.classList.add('touch-active');
+        });
+
+        element.addEventListener('touchend', function() {
+            this.classList.remove('touch-active');
+            // Remove class after a short delay to prevent flickering
+            setTimeout(() => {
+                this.classList.remove('touch-active');
+            }, 200);
+        });
+
+        // Cleanup class on touch cancel or mouse event
+        element.addEventListener('touchcancel', function() {
+            this.classList.remove('touch-active');
+        });
+
+        element.addEventListener('mouseleave', function() {
+            this.classList.remove('touch-active');
+        });
+    });
+
+    // Prevent double tap zoom on touch devices
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function (event) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+            event.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, false);
 });
 </script>
 <script src="{{ asset('js/customer/cust_welcome.js') }}?v=22"></script>

@@ -283,48 +283,135 @@ body, html {
     margin-bottom: 15px;
 }
 
-/* Tablet dan Mobile: Single Centered Card */
-@media (max-width: 992px) {
-    .login-content {
+/* Style untuk logo mobile */
+.mobile-logo {
+    display: none; /* Secara default disembunyikan */
+    text-align: center;
+    margin-bottom: 20px; /* Tambahkan margin bawah untuk jarak dengan card */
+}
+
+.mobile-logo img {
+    height: 50px; /* Sesuaikan ukuran logo mobile */
+    width: auto;
+    max-width: 100%;
+}
+
+/* Mobile-first approach for register form */
+/* Mobile kecil (sampai 767px) */
+@media (max-width: 767px) {
+    .mobile-logo {
+        display: block; /* Tampilkan logo mobile di mobile */
+        margin-bottom: 30px; /* Tambahkan jarak lebih banyak antara logo dan card */
+    }
+
+    .mobile-logo img {
+        height: 54px; /* Sedikit lebih besar untuk visibilitas di mobile */
+    }
+
+    .register-content {
         flex-direction: column;
         text-align: center;
         align-items: center;
-        justify-content: center;
+        /* Gunakan justify-content: flex-start untuk membuat card bisa discroll */
+        justify-content: flex-start;
         padding: 1rem;
+        /* Tambahkan padding di bawah agar ada ruang saat scroll */
+        padding-bottom: 60px;
     }
 
     .welcome-text {
         display: none; /* Sembunyikan bagian kiri (teks/branding) */
     }
 
-    .login-form-box {
+    .login-form-box.register-page {
         width: 100% !important;
         max-width: 400px; /* Maksimum lebar card agar tidak terlalu lebar */
-        padding: 30px !important;
-        margin: 0 1rem; /* Tambahkan margin kiri-kanan */
+        padding: 24px !important; /* Sesuaikan padding dengan ukuran mobile */
+        margin: 40px 1rem; /* Tambahkan margin atas dan bawah 40px seperti yang diminta */
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
         backdrop-filter: blur(20px); /* Menjaga efek glassmorphism tetap ada */
     }
 
-    .login-form-box h2 {
-        font-size: 28px !important;
-        margin-bottom: 25px !important;
+    /* Pastikan semua input memiliki tinggi minimal 44px */
+    .login-form-box.register-page .form-group input {
+        height: 48px !important; /* Sedikit lebih tinggi dari 44px untuk penyesuaian */
+        min-height: 44px;
+        padding-top: 14px !important;
+        font-size: 16px; /* Menjaga keterbacaan di layar kecil */
+    }
+
+    .login-form-box.register-page h2 {
+        font-size: 24px !important;
+        margin-bottom: 20px !important;
     }
 
     .form-group input {
         padding-top: 14px !important;
+    }
+
+    /* Pastikan tombol register juga memiliki tinggi minimal */
+    .register-button {
+        height: 48px !important;
+        min-height: 44px;
+        font-size: 16px !important;
+    }
+}
+
+/* Tablet (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .mobile-logo {
+        display: block; /* Tampilkan logo mobile di tablet */
+        margin-bottom: 30px; /* Tambahkan jarak antara logo dan card */
+    }
+
+    .mobile-logo img {
+        height: 54px; /* Gunakan ukuran yang sama dengan mobile */
+    }
+
+    .register-content {
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 2rem 1rem;
+        padding-bottom: 80px; /* Tambahkan padding bawah untuk scrolling */
+    }
+
+    .welcome-text {
+        display: none; /* Sembunyikan bagian kiri (teks/branding) */
+    }
+
+    .login-form-box.register-page {
+        width: 100% !important;
+        max-width: 500px !important; /* Gunakan max-width 500px seperti yang diminta */
+        padding: 30px !important;
+        margin: 40px 1rem; /* Tambahkan margin atas dan bawah 40px */
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Pastikan input tetap memiliki tinggi minimal */
+    .login-form-box.register-page .form-group input {
+        height: 48px !important;
+        min-height: 44px;
+        padding-top: 14px !important;
+        font-size: 16px;
+    }
+
+    .register-button {
+        height: 48px !important;
+        min-height: 44px;
     }
 }
 
 /* Mobile kecil */
 @media (max-width: 480px) {
     .login-form-box {
-        padding: 24px !important;
-        margin: 0 1rem; /* Pastikan margin tetap ada */
+        padding: 20px !important;
+        margin: 40px 0.8rem !important; /* Sesuaikan margin untuk layar kecil */
     }
 
     .login-form-box h2 {
-        font-size: 24px !important;
+        font-size: 22px !important;
     }
 
     .welcome-text h1 {
@@ -337,11 +424,62 @@ body, html {
 
     .login-button,
     .register-button {
-        height: 44px !important;
-        font-size: 18px !important;
+        height: 46px !important;
+        font-size: 16px !important;
     }
 
     .form-group input {
         height: 46px !important;
+    }
+}
+
+/* Desktop (> 1024px) - Pertahankan layout Split-Screen untuk Register */
+@media (min-width: 1025px) {
+    .mobile-logo {
+        display: none !important; /* Sembunyikan logo mobile di desktop */
+    }
+
+    .register-content {
+        flex-direction: row !important;
+        text-align: left !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 0 5% !important;
+    }
+
+    .welcome-text {
+        display: block !important;
+        flex-basis: 50% !important;
+        color: var(--primary-color-dark) !important;
+        padding-right: 2rem !important;
+    }
+
+    .welcome-text h1 {
+        font-size: 3rem !important;
+        margin-bottom: 1rem !important;
+    }
+
+    .welcome-text p {
+        font-size: 1.1rem !important;
+        line-height: 1.6 !important;
+    }
+
+    .login-form-box.register-page {
+        width: 387px !important;
+        padding: 25px 30px !important;
+        margin: 0 !important;
+        backdrop-filter: blur(15px) !important;
+    }
+
+    .login-form-box.register-page .form-group input {
+        height: 48px !important;
+        min-height: auto;
+        padding-top: 14px !important;
+        font-size: 15px !important;
+    }
+
+    .register-button {
+        height: 48px !important;
+        font-size: 20px !important;
     }
 }

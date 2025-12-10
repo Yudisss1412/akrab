@@ -1,0 +1,642 @@
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+:root {
+    --primary-color: #006E5C;
+    --secondary-color: #FFFFFF;
+    --dark-text-color: #333;
+    --error-color: #D32F2F;
+    --light-gray-color: #F5F5F5;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html {
+    height: 100%;
+    font-family: 'Poppins', sans-serif;
+    background-color: #eef3f2;
+    /* Untuk mobile, izinkan overflow agar bisa discroll */
+}
+
+@media (min-width: 768px) {
+    body, html {
+        overflow: hidden; /* Hanya di desktop, hindari scrolling global */
+    }
+}
+
+@media (max-width: 767px) {
+    body, html {
+        overflow: auto; /* Izinkan scrolling di mobile */
+    }
+}
+
+/* Mobile logo styling */
+.mobile-logo {
+    display: none; /* Secara default disembunyikan */
+    text-align: center;
+    margin-bottom: 20px; /* Tambahkan margin bawah untuk jarak dengan card */
+}
+
+.mobile-logo img {
+    height: 50px; /* Sesuaikan ukuran logo mobile */
+    width: auto;
+    max-width: 100%;
+}
+
+/* Register-specific container - menggunakan min-height: 100dvh dan menghindari centering vertikal */
+.register-container {
+    width: 100%;
+    min-height: 100dvh;  /* Enable scrolling */
+    display: flex;
+    align-items: flex-start;  /* STOP Forced Vertical Centering */
+    justify-content: flex-start;  /* Enable natural flow from top */
+    padding: 2rem;
+    position: relative;
+    background: linear-gradient(45deg, #d4e9e2, #a8d5c9, #eef3f2);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+}
+
+.register-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 1440px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 5%;
+}
+
+/* Mobile-specific fixes for register - enhanced scrolling and spacing */
+@media (max-width: 767px) {
+    .mobile-logo {
+        display: block !important; /* Tampilkan logo mobile di mobile */
+        margin-bottom: 30px !important; /* Tambahkan jarak lebih banyak antara logo dan card */
+    }
+
+    .mobile-logo img {
+        height: 54px !important; /* Sedikit lebih besar untuk visibilitas di mobile */
+    }
+
+    .register-container {
+        min-height: 100dvh !important;  /* Gunakan dynamic viewport height */
+        height: auto !important;  /* Hindari fixed height */
+        overflow-y: auto !important;  /* Aktifkan scrolling */
+        align-items: flex-start;  /* STOP Forced Vertical Centering */
+        justify-content: flex-start;  /* Enable natural flow from top */
+        padding: 1rem;
+    }
+
+    .register-content {
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;  /* Card flows from top */
+        padding-top: 20px !important;  /* Reduce top spacing as requested */
+        padding-bottom: 80px !important;  /* Maintain bottom spacing to allow comfortable scrolling */
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .register-container .login-form-box.register-page {
+        width: 90% !important;  /* Fix horizontal stretch */
+        max-width: 450px !important;  /* Maximum width */
+        margin: 20px auto !important;  /* Center horizontally */
+        padding: 24px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        min-height: auto !important;  /* Allow card to adapt to content */
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        backdrop-filter: blur(20px);
+    }
+
+    /* Ensure form elements maintain proper spacing */
+    .register-container .login-form-box.register-page .form-group {
+        margin-bottom: 20px !important;
+    }
+
+    .register-container .register-button {
+        height: 44px !important;
+        min-height: 44px;
+    }
+}
+
+/* Tablet fixes for register */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .register-container {
+        align-items: flex-start;
+        justify-content: flex-start;
+        padding: 1rem;
+    }
+
+    .register-content {
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding-top: 60px;
+        padding-bottom: 60px;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .register-container .login-form-box.register-page {
+        width: 90% !important;
+        max-width: 450px !important;
+        margin: 20px auto !important;
+        padding: 24px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        min-height: auto !important;
+    }
+}
+
+/* Tablet fixes for register */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .register-container {
+        align-items: flex-start;
+        justify-content: flex-start;
+        padding: 1rem;
+    }
+
+    .register-content {
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding-top: 60px;
+        padding-bottom: 60px;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .register-container .login-form-box.register-page {
+        width: 90% !important;
+        max-width: 450px !important;
+        margin: 20px auto !important;
+        padding: 24px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        min-height: auto !important;
+    }
+}
+
+/* Desktop styles - keeps original centered layout */
+@media (min-width: 1025px) {
+    .register-container {
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    .register-content {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 5%;
+    }
+
+    .login-form-box.register-page {
+        width: 387px !important;
+        margin: 0 !important;
+        padding: 25px 30px !important;
+    }
+}
+
+.welcome-text, .login-form-box {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.welcome-text {
+    flex-basis: 50%;
+    color: var(--primary-color);
+    padding-right: 2rem;
+}
+
+.welcome-text h1 {
+    font-weight: 700;
+    font-size: 48px;
+    line-height: 1.2;
+    margin-bottom: 20px;
+}
+
+.welcome-text p {
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 1.6;
+    max-width: 626px;
+}
+
+.login-form-box {
+    width: 387px;
+    min-height: 382px; /* Disesuaikan untuk 2 input */
+    background-color: rgba(255, 255, 255, 0.6);
+    border-radius: 30px;
+    padding: 25px 30px;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+    transition: all 0.5s ease;
+}
+
+.register-form-box {
+    width: 387px;
+    min-height: 516px; /* Disesuaikan untuk 4 input */
+    background-color: rgba(255, 255, 255, 0.6);
+    border-radius: 30px;
+    padding: 25px 30px;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+    transition: all 0.5s ease;
+}
+
+
+
+.login-form-box h2 {
+    font-weight: 500;
+    font-size: 40px;
+    color: var(--dark-text-color);
+    text-align: center;
+    margin-bottom: 30px; 
+}
+
+.form-group {
+    margin-bottom: 25px;
+    position: relative;
+}
+
+/* Sesuaikan margin untuk register form */
+.register-form-box .form-group {
+    margin-bottom: 22px;
+}
+
+.form-group label {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    font-size: 15px;
+    color: #666;
+    position: absolute;
+    pointer-events: none;
+    left: 20px;
+    top: 13px;
+    transition: all 0.2s ease;
+}
+
+.form-group input {
+    width: 100%;
+    height: 48px;
+    border: 1px solid transparent;
+    border-radius: 30px;
+    background-color: var(--light-gray-color);
+    padding: 0 20px;
+    padding-top: 14px;
+    font-size: 15px;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.form-group input:focus + label,
+.form-group input:not(:placeholder-shown) + label {
+    top: 5px;
+    left: 20px;
+    font-size: 11px;
+    color: var(--primary-color);
+}
+
+.form-group input.invalid {
+    border-color: var(--error-color);
+}
+
+.form-group input.invalid + label {
+    color: var(--error-color);
+}
+
+.error-message {
+    color: var(--error-color);
+    font-size: 12px;
+    font-family: 'Inter', sans-serif;
+    padding-left: 15px;
+    padding-top: 5px;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+.error-message.visible {
+    max-height: 20px;
+    opacity: 1;
+}
+
+.alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.login-button,
+.register-button {
+    width: 100%;
+    height: 48px;
+    border: none;
+    border-radius: 30px;
+    background-color: var(--primary-color);
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 20px;
+    color: var(--secondary-color);
+    cursor: pointer;
+    margin-top: 25px;
+    transition: all 0.3s ease;
+}
+
+.login-button:hover,
+.register-button:hover {
+    background-color: #005a4c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 110, 92, 0.3);
+}
+
+.login-button:active,
+.register-button:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+.form-links {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+/* Khusus untuk register page */
+.register-form-box .form-links {
+    text-align: center;
+    justify-content: center;
+}
+
+.form-links a {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: opacity 0.3s;
+}
+
+.form-links a:hover {
+    text-decoration: underline;
+    opacity: 0.8;
+}
+
+/* Menyesuaikan tinggi form untuk halaman reset password yang memiliki lebih banyak input */
+.login-form-box.reset-password-form {
+    min-height: 460px; /* Disesuaikan untuk 3 input + 1 hidden input */
+}
+
+/* Menyesuaikan tinggi form untuk halaman permintaan reset password */
+.login-form-box.password-request-form {
+    min-height: 382px; /* Sama dengan form login biasa karena hanya memiliki 1 input */
+}
+
+/* Sesuaikan tampilan alert */
+.login-form-box .alert {
+    margin-bottom: 15px;
+}
+
+/* Style untuk logo mobile */
+.mobile-logo {
+    display: none; /* Secara default disembunyikan */
+    text-align: center;
+    margin-bottom: 20px; /* Tambahkan margin bawah untuk jarak dengan card */
+}
+
+.mobile-logo img {
+    height: 50px; /* Sesuaikan ukuran logo mobile */
+    width: auto;
+    max-width: 100%;
+}
+
+/* Mobile-first approach for register form */
+/* Mobile kecil (sampai 767px) */
+@media (max-width: 767px) {
+    .mobile-logo {
+        display: block; /* Tampilkan logo mobile di mobile */
+        margin-bottom: 30px; /* Tambahkan jarak lebih banyak antara logo dan card */
+    }
+
+    .mobile-logo img {
+        height: 54px; /* Sedikit lebih besar untuk visibilitas di mobile */
+    }
+
+    .register-content {
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+        /* Gunakan justify-content: flex-start untuk membuat card bisa discroll */
+        justify-content: flex-start;
+        padding: 1rem;
+        /* Tambahkan padding di bawah agar ada ruang saat scroll */
+        padding-bottom: 60px;
+    }
+
+    .welcome-text {
+        display: none; /* Sembunyikan bagian kiri (teks/branding) */
+    }
+
+    .login-form-box.register-page {
+        width: 100% !important;
+        max-width: 400px; /* Maksimum lebar card agar tidak terlalu lebar */
+        padding: 24px !important; /* Sesuaikan padding dengan ukuran mobile */
+        margin: 40px 1rem; /* Tambahkan margin atas dan bawah 40px seperti yang diminta */
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        backdrop-filter: blur(20px); /* Menjaga efek glassmorphism tetap ada */
+    }
+
+    /* Pastikan semua input memiliki tinggi minimal 44px */
+    .login-form-box.register-page .form-group input {
+        height: 48px !important; /* Sedikit lebih tinggi dari 44px untuk penyesuaian */
+        min-height: 44px;
+        padding-top: 14px !important;
+        font-size: 16px; /* Menjaga keterbacaan di layar kecil */
+    }
+
+    .login-form-box.register-page h2 {
+        font-size: 24px !important;
+        margin-bottom: 20px !important;
+    }
+
+    .form-group input {
+        padding-top: 14px !important;
+    }
+
+    /* Pastikan tombol register juga memiliki tinggi minimal */
+    .register-button {
+        height: 48px !important;
+        min-height: 44px;
+        font-size: 16px !important;
+    }
+}
+
+/* Tablet (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .mobile-logo {
+        display: block; /* Tampilkan logo mobile di tablet */
+        margin-bottom: 30px; /* Tambahkan jarak antara logo dan card */
+    }
+
+    .mobile-logo img {
+        height: 54px; /* Gunakan ukuran yang sama dengan mobile */
+    }
+
+    .register-content {
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 2rem 1rem;
+        padding-bottom: 80px; /* Tambahkan padding bawah untuk scrolling */
+    }
+
+    .welcome-text {
+        display: none; /* Sembunyikan bagian kiri (teks/branding) */
+    }
+
+    .login-form-box.register-page {
+        width: 100% !important;
+        max-width: 500px !important; /* Gunakan max-width 500px seperti yang diminta */
+        padding: 30px !important;
+        margin: 40px 1rem; /* Tambahkan margin atas dan bawah 40px */
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Pastikan input tetap memiliki tinggi minimal */
+    .login-form-box.register-page .form-group input {
+        height: 48px !important;
+        min-height: 44px;
+        padding-top: 14px !important;
+        font-size: 16px;
+    }
+
+    .register-button {
+        height: 48px !important;
+        min-height: 44px;
+    }
+}
+
+/* Mobile kecil */
+@media (max-width: 480px) {
+    .login-form-box {
+        padding: 20px !important;
+        margin: 40px 0.8rem !important; /* Sesuaikan margin untuk layar kecil */
+    }
+
+    .login-form-box h2 {
+        font-size: 22px !important;
+    }
+
+    .welcome-text h1 {
+        font-size: 32px !important;
+    }
+
+    .welcome-text p {
+        font-size: 14px !important;
+    }
+
+    .login-button,
+    .register-button {
+        height: 46px !important;
+        font-size: 16px !important;
+    }
+
+    .form-group input {
+        height: 46px !important;
+    }
+}
+
+/* Desktop (> 1024px) - Pertahankan layout Split-Screen untuk Register */
+@media (min-width: 1025px) {
+    .mobile-logo {
+        display: none !important; /* Sembunyikan logo mobile di desktop */
+    }
+
+    .register-content {
+        flex-direction: row !important;
+        text-align: left !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 0 5% !important;
+    }
+
+    .welcome-text {
+        display: block !important;
+        flex-basis: 50% !important;
+        color: var(--primary-color-dark) !important;
+        padding-right: 2rem !important;
+    }
+
+    .welcome-text h1 {
+        font-size: 3rem !important;
+        margin-bottom: 1rem !important;
+    }
+
+    .welcome-text p {
+        font-size: 1.1rem !important;
+        line-height: 1.6 !important;
+    }
+
+    .login-form-box.register-page {
+        width: 387px !important;
+        padding: 25px 30px !important;
+        margin: 0 !important;
+        backdrop-filter: blur(15px) !important;
+    }
+
+    .login-form-box.register-page .form-group input {
+        height: 48px !important;
+        min-height: auto;
+        padding-top: 14px !important;
+        font-size: 15px !important;
+    }
+
+    .register-button {
+        height: 48px !important;
+        font-size: 20px !important;
+    }
+}

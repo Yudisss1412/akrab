@@ -27,7 +27,7 @@
         <div class="cart-products">
           <!-- Kartu Produk -->
           <div class="products-card">
-            <!-- Tabel Produk -->
+            <!-- Tabel Produk - Desktop Version -->
             <table class="cart-table">
               <thead>
                 <tr>
@@ -38,7 +38,6 @@
                   <th class="price-col">Harga Satuan</th>
                   <th class="qty-col">Jumlah</th>
                   <th class="subtotal-col">Subtotal</th>
-                  <th class="action-col">Aksi</th>
                 </tr>
               </thead>
               <tbody>
@@ -50,8 +49,13 @@
                     </div>
                   </td>
                   <td class="product-col" data-label="Produk">
-                    <div class="product-thumb">
-                      <img src="{{ ($item['product'] ?? $item->product)->main_image ? asset('storage/' . ($item['product'] ?? $item->product)->main_image) : asset('src/placeholder.png') }}" alt="{{ ($item['product'] ?? $item->product)->name }}">
+                    <div class="product-thumb-container">
+                      <div class="product-thumb">
+                        <img src="{{ ($item['product'] ?? $item->product)->main_image ? asset('storage/' . ($item['product'] ?? $item->product)->main_image) : asset('src/placeholder.png') }}" alt="{{ ($item['product'] ?? $item->product)->name }}">
+                      </div>
+                      <button class="delete-btn-float" data-item-id="{{ $item['id'] ?? $item->id }}">
+                        <i class="bi bi-trash"></i>
+                      </button>
                     </div>
                     <div class="product-info">
                       <h3 class="product-name">{{ ($item['product'] ?? $item->product)->name }}</h3>
@@ -75,24 +79,57 @@
                     <button class="qty-btn plus" data-item-id="{{ $item['id'] ?? $item->id }}">+</button>
                   </td>
                   <td class="subtotal-col" data-label="Subtotal">Rp {{ number_format($totalPrice * ($item['quantity'] ?? $item->quantity), 0, ',', '.') }}</td>
-                  <td class="action-col" data-label="Aksi">
-                    <button class="delete-btn" data-item-id="{{ $item['id'] ?? $item->id }}">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                  </td>
                 </tr>
                 @empty
                 <tr>
-                  <td colspan="6" class="text-center">
+                  <td colspan="5" class="text-center">
                     <p>Keranjang Anda kosong. <a href="{{ url()->previous() ?: route('cust.welcome') }}">Lanjutkan belanja</a></p>
                   </td>
                 </tr>
                 @endforelse
               </tbody>
             </table>
+
+            <!-- Mobile Product Cards - Mobile Version -->
+            <div class="mobile-products-list">
+              @forelse($cartItems as $item)
+              <div class="product-item-card" data-item-id="{{ $item['id'] ?? $item->id }}">
+                <div class="product-item-thumb-container">
+                  <div class="product-item-thumb">
+                    <img src="{{ ($item['product'] ?? $item->product)->main_image ? asset('storage/' . ($item['product'] ?? $item->product)->main_image) : asset('src/placeholder.png') }}" alt="{{ ($item['product'] ?? $item->product)->name }}">
+                  </div>
+                  <button class="delete-btn-mobile" data-item-id="{{ $item['id'] ?? $item->id }}">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+                <div class="product-item-details">
+                  <h3 class="product-item-name">{{ ($item['product'] ?? $item->product)->name }}</h3>
+                  <div class="product-item-price">
+                    @php
+                      $basePrice = ($item['product'] ?? $item->product)->price;
+                      $variantPrice = ($item['product_variant'] ?? $item->productVariant ?? null) ? ($item['product_variant'] ?? $item->productVariant)->additional_price : 0;
+                      $itemPrice = $basePrice + $variantPrice;
+                    @endphp
+                    Rp {{ number_format($itemPrice, 0, ',', '.') }}
+                  </div>
+                  <div class="product-item-qty">
+                    <div class="qty-controls">
+                      <button class="qty-btn minus" data-item-id="{{ $item['id'] ?? $item->id }}">-</button>
+                      <input type="number" class="qty-input" value="{{ $item['quantity'] ?? $item->quantity }}" min="0" max="99" data-item-id="{{ $item['id'] ?? $item->id }}">
+                      <button class="qty-btn plus" data-item-id="{{ $item['id'] ?? $item->id }}">+</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              @empty
+              <div class="text-center">
+                <p>Keranjang Anda kosong. <a href="{{ url()->previous() ?: route('cust.welcome') }}">Lanjutkan belanja</a></p>
+              </div>
+              @endforelse
+            </div>
           </div>
         </div>
-        
+
         <!-- Kolom Kanan: Ringkasan Belanja -->
         <div class="cart-summary">
           <div class="summary-card">
@@ -125,6 +162,14 @@
             </a>
           </div>
         </div>
+      </div>
+
+      <!-- Sticky Checkout Bar for Mobile -->
+      <div class="sticky-checkout-bar">
+        <div class="checkout-total">Total: Rp <span id="mobile-cartTotal">{{ number_format($cartTotal, 0, ',', '.') }}</span></div>
+        <a href="{{ route('checkout') }}" class="checkout-btn-mobile">
+          Checkout
+        </a>
       </div>
     </div>
   </main>

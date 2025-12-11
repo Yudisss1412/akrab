@@ -95,7 +95,6 @@ function createStarsHTML($rating, $size = 20) {
           <button class="btn btn-lihat" data-product-id="{{ $produk['id'] }}">Beli Sekarang</button>
         </div>
 
-        <!-- Link ke halaman wishlist -->
       </div>
     </div>
 
@@ -455,17 +454,17 @@ function createStarsHTML($rating, $size = 20) {
       }
       
       // Add to cart functionality
-      const addToCartBtn = document.querySelector('.btn-add-cart');
+      const addToCartBtn = document.querySelector('.btn-add');
       if (addToCartBtn) {
         addToCartBtn.addEventListener('click', async function() {
           const productId = this.getAttribute('data-product-id');
-          
+
           try {
             // Show loading state
             const originalText = this.innerHTML;
             this.innerHTML = '<span>Mengirim...</span>';
             this.disabled = true;
-            
+
             const response = await fetch('/cart/add', {
               method: 'POST',
               headers: {
@@ -477,9 +476,9 @@ function createStarsHTML($rating, $size = 20) {
                 quantity: 1
               })
             });
-            
+
             const result = await response.json();
-            
+
             if (result.success) {
               // Show success message
               showNotification(result.message, 'success');
@@ -501,19 +500,19 @@ function createStarsHTML($rating, $size = 20) {
           }
         });
       }
-      
+
       // Buy now functionality
-      const buyNowBtn = document.querySelector('.btn-buy-now');
+      const buyNowBtn = document.querySelector('.btn-lihat');
       if (buyNowBtn) {
         buyNowBtn.addEventListener('click', async function() {
           const productId = this.getAttribute('data-product-id');
-          
+
           try {
             // Show loading state
             const originalText = this.textContent;
             this.textContent = 'Memproses...';
             this.disabled = true;
-            
+
             // First, add the product to cart (temporarily)
             const addToCartResponse = await fetch('/cart/add', {
               method: 'POST',
@@ -526,9 +525,9 @@ function createStarsHTML($rating, $size = 20) {
                 quantity: 1
               })
             });
-            
+
             const addToCartResult = await addToCartResponse.json();
-            
+
             if (addToCartResult.success) {
               // Redirect to checkout page
               window.location.href = '/keranjang';

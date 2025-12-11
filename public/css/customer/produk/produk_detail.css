@@ -77,26 +77,36 @@
 
 /* Footer consistent with other pages */
 .footer{
-  min-height:40px;
   background:var(--secondary-color);
   color:var(--primary-color-dark);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:1rem 2rem;
-  width:100%;
   border-top:1px solid var(--border-color);
-  box-sizing:border-box;
-  position:static;
-  left:0;
-  bottom:0;
+  width:100%;
+  position: static;
   z-index:100;
+  font-size: 12px;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
 }
+.footer .footer__inner.footer-3col{
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 1rem 2rem;
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto minmax(0,1fr);
+  align-items: center;
+  gap: 1rem;
+}
+.footer-left{ justify-self: start; display:inline-flex; align-items:center; gap: 1rem; }
+.footer-center{ justify-self: center; text-align:center; }
+.footer-right{ justify-self: end; display:flex; align-items:center; }
 
-.footer-copyright,.footer-privacy a{
+/* Link kebijakan */
+.footer-privacy a{
   color:var(--primary-color-dark);
-  font-size:12px;
+  text-decoration: none;
+  font-size: 12px;
 }
+.footer-privacy a:hover{ text-decoration: underline; }
 
 .social-icons-background{
   width:140px;
@@ -263,6 +273,9 @@
   border-radius:var(--radius);
   padding:18px;
   margin-top:12px;
+  max-height: 300px; /* Default max height for desktop */
+  overflow-y: auto; /* Enable vertical scrolling */
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
 }
 .desc-box p{
   margin:.1rem 0 .6rem;
@@ -274,10 +287,36 @@
   margin:0;
   padding-left:18px;
   color:var(--text-secondary);
+  max-height: 300px; /* Default max height for desktop */
+  overflow-y: auto; /* Enable vertical scrolling */
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
 }
 .spec-list li{
   margin:.25rem 0;
   font-size:0.95rem;
+}
+
+/* Custom scrollbar styling */
+.desc-box::-webkit-scrollbar,
+.spec-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.desc-box::-webkit-scrollbar-track,
+.spec-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.desc-box::-webkit-scrollbar-thumb,
+.spec-list::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+.desc-box::-webkit-scrollbar-thumb:hover,
+.spec-list::-webkit-scrollbar-thumb:hover {
+  background: #a8d5c9;
 }
 
 /* CTA */
@@ -341,8 +380,9 @@
 .review-box{
   margin-top:24px;
   padding-top: 24px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--border-color);
 }
+
 .reviews-head{
   display:flex;
   justify-content:space-between;
@@ -503,34 +543,258 @@
   background:transparent
 }
 
-/* responsif: tile sedikit mengecil di HP */
-@media (max-width:480px){
-  .review-card {
-    width:280px;  /* Ukuran lebar card di mobile */
-    min-width:280px;  /* Ukuran lebar minimal di mobile */
-    max-width:280px;  /* Ukuran lebar maksimal di mobile */
-    height:180px;  /* Ukuran tinggi card di mobile */
-  }
-
-  .rev-text {
-    -webkit-line-clamp:3;  /* Di mobile, tampilkan 3 baris */
+/* MOBILE (< 768px): Layout card dengan susunan vertikal (image di atas, detail di bawah) */
+@media (max-width: 768px) {
+  .pd-wrap {
+    max-width: 95% !important;
+    margin: 0 auto !important;
+    padding: 1.8rem 1.2rem 70px !important; /* Beri padding konsisten */
+    background: var(--background-color) !important; /* Kembalikan background */
+    display: block !important;
   }
 
   .pd-top {
-    grid-template-columns: 1fr;
-    gap: 16px;
+    display: flex !important;
+    flex-direction: column !important; /* Ganti ke susunan vertikal */
+    gap: 20px !important;
+    margin-top: 0 !important;
   }
+
+  /* Card styling kembali ke tampilan card tradisional */
   .card {
-    padding: 16px;
+    background: var(--secondary-color) !important;
+    border: 1px solid var(--primary-color) !important; /* Kembalikan border */
+    border-radius: 16px !important; /* Kembalikan border radius */
+    box-shadow: var(--shadow-sm) !important;
+    padding: 18px !important; /* Kembalikan padding yang proporsional */
+    transition: box-shadow .15s, border-color .15s, transform .15s !important;
+    width: 100% !important; /* Pastikan card mengisi lebar layar */
   }
-  .pd-title {
-    font-size: 1.4rem;
+
+  /* Gallery card di mobile */
+  .gallery-card {
+    width: 100% !important;
+    padding: 16px !important;
   }
+
+  /* Info card di mobile */
+  .info-card {
+    width: 100% !important;
+    padding: 18px !important;
+  }
+
+  /* Gambar produk harus mengambil lebar penuh dari card */
+  .gallery-card .main-img-wrap {
+    width: 100% !important;
+  }
+
+  .gallery-card .main-img {
+    width: 100% !important;
+    height: auto !important; /* Gambar mengikuti proporsi aslinya */
+    max-height: 300px !important; /* Maksimum tinggi gambar */
+    object-fit: contain !important; /* Gambar tetap proporsional */
+  }
+
+  /* Atur tata letak thumbnail */
+  .gallery-card .thumbs {
+    display: flex !important;
+    gap: 10px !important;
+    margin-top: 12px !important;
+    justify-content: flex-start !important;
+    overflow-x: auto !important; /* Tambahkan scroll horizontal untuk thumbnail */
+    padding-bottom: 5px !important;
+  }
+
+  .gallery-card .thumb {
+    min-width: 60px !important; /* Lebar tetap untuk thumbnail */
+    height: 60px !important;
+    object-fit: cover !important;
+  }
+
+  /* Perbesar ukuran harga di mobile */
   .price {
-    font-size: 1.5rem;
+    font-weight: 800 !important;
+    font-size: 1.8rem !important;
+    color: var(--primary-color-dark) !important;
+    margin: 8px 0 12px !important;
   }
-  .back-btn {
-    padding: 0.6rem 1rem;
-    font-size: 0.85rem;
+
+  /* Atur detail produk */
+  .desc-box {
+    margin-top: 15px !important;
+    padding: 15px !important;
+    max-height: 150px !important; /* Batasi tinggi maksimal untuk mobile */
+    overflow-y: auto !important; /* Aktifkan scrolling vertikal */
+    -webkit-overflow-scrolling: touch !important; /* Untuk scrolling halus di iOS */
+  }
+
+  .desc-box p {
+    margin: .1rem 0 .6rem !important;
+    color: var(--text-secondary) !important;
+    line-height: 1.6 !important;
+    font-size: 1rem !important;
+  }
+
+  /* Scrollable specifications list */
+  .spec-list {
+    max-height: 150px !important; /* Batasi tinggi maksimal untuk mobile */
+    overflow-y: auto !important; /* Aktifkan scrolling vertikal */
+    -webkit-overflow-scrolling: touch !important; /* Untuk scrolling halus di iOS */
+    margin: 0 !important;
+    padding-left: 18px !important;
+    color: var(--text-secondary) !important;
+  }
+
+  /* Tombol aksi tetap di dalam card */
+  .cta-row {
+    display: flex !important;
+    flex-direction: row !important; /* Side-by-side layout */
+    gap: 12px !important;
+    margin-top: 18px !important;
+  }
+
+  .btn-add-cart,
+  .btn-buy-now {
+    flex: 1 !important; /* Kedua tombol mengisi ruang secara merata */
+    min-height: 44px !important; /* Minimum tinggi tombol untuk tap target */
+    padding: 0.8rem 0 !important;
+    font-size: 1rem !important;
+    border-radius: 8px !important;
+  }
+
+  /* Reviews section - fix layout to prevent overlap */
+  .review-box {
+    margin-top: 40px !important; /* Ensure clear spacing below product card */
+    padding-top: 24px !important;
+    border-top: 1px solid var(--border-color) !important;
+  }
+
+  /* Review header styling */
+  .reviews-head {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-bottom: 15px !important;
+  }
+
+  .section-title {
+    font-size: 16px !important;
+    font-weight: bold !important;
+    margin: 0 !important;
+  }
+
+  .see-all {
+    font-size: 14px !important;
+    color: var(--primary-color) !important;
+  }
+
+  /* Kembalikan ke tampilan scroll normal untuk review */
+  .review-scroller {
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory !important;
+    gap: 12px !important;
+  }
+
+  .review-row {
+    display: flex !important;
+    gap: 14px !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory !important;
+    padding: 6px 4px 10px !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* Hilangkan fixed bottom bar */
+  .fixed-bottom-bar {
+    display: none !important;
+  }
+
+  /* Hilangkan padding bawah ekstra karena tidak lagi menggunakan fixed bar */
+  .main-content {
+    padding-bottom: 70px !important; /* Kembalikan ke padding normal */
+  }
+}
+
+/* Mobile S (hingga 480px) - sesuaikan ukuran untuk layar kecil */
+@media (max-width: 480px) {
+  .review-card {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: none !important;
+    height: auto !important;
+  }
+
+  .rev-text {
+    -webkit-line-clamp: 3; /* Di mobile, tampilkan 3 baris */
+  }
+
+  .pd-title {
+    font-size: 1.4rem !important;
+  }
+
+  .price {
+    font-size: 1.7rem !important;
+  }
+
+  .fixed-bottom-bar {
+    padding: 10px 12px !important;
+    gap: 6px !important;
+  }
+
+  .fixed-bottom-bar .btn {
+    padding: 0.8rem 0 !important;
+    font-size: 15px !important;
+  }
+
+  /* Footer mobile responsive */
+  .footer .footer__inner.footer-3col {
+    flex-direction: column;
+    gap: 0.8rem;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .footer-left, .footer-center, .footer-right {
+    justify-self: center;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 360px) {
+  .pd-title {
+    font-size: 1.3rem !important;
+  }
+
+  .price {
+    font-size: 1.6rem !important;
+  }
+
+  .fixed-bottom-bar .btn {
+    padding: 0.7rem 0 !important;
+    font-size: 14px !important;
+  }
+
+  /* Footer mobile responsive */
+  .footer .footer__inner.footer-3col {
+    padding: 0.8rem;
+  }
+}
+
+/* Mobile responsive for footer across all mobile sizes */
+@media (max-width: 768px) {
+  .footer .footer__inner.footer-3col {
+    flex-direction: column;
+    gap: 0.8rem;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .footer-left, .footer-center, .footer-right {
+    justify-self: center;
+    width: 100%;
+    display: flex;
+    justify-content: center;
   }
 }

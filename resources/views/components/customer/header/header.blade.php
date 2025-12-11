@@ -30,6 +30,25 @@
     line-height: 1;
   }
 
+  /* Badge untuk sidebar - gunakan styling yang berbeda untuk posisi yang benar */
+  .sidebar .cart-count, .sidebar .ticket-count {
+    position: relative;
+    background-color: #dc3545;
+    color: white;
+    border-radius: 50%;
+    min-width: 18px; /* Lebar minimum agar angka bisa muat */
+    height: 18px;
+    font-size: 10px;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    line-height: 1;
+    margin-left: auto; /* Dorong badge ke sebelah kanan */
+    flex-shrink: 0; /* Pastikan badge tidak diresize */
+  }
+
   .cart-badge, .ticket-badge {
     position: relative;
     display: inline-block;
@@ -394,5 +413,69 @@
         body.style.overflow = 'auto';
       });
     });
+
+    // Update badge counts function - untuk menangani notifikasi secara dinamis
+    async function updateBadgeCounts() {
+      try {
+        // Ambil jumlah cart dari API
+        const cartResponse = await fetch('/api/cart/count');
+        const cartData = await cartResponse.json();
+        const cartCount = cartData.count || 0;
+
+        // Ambil jumlah ticket dari route API - kita coba akses langsung dari route
+        const ticketResponse = await fetch('/api/tickets/open-count');
+        const ticketData = await ticketResponse.json();
+        const ticketCount = ticketData.count || 0;
+
+        const totalNotifications = cartCount + ticketCount;
+
+        // Update the badge element
+        const hamburgerBadge = document.getElementById('hamburger-badge');
+        if (hamburgerBadge) {
+          hamburgerBadge.textContent = totalNotifications > 0 ? totalNotifications : '';
+
+          // Update data attributes
+          hamburgerBadge.setAttribute('data-cart-count', cartCount);
+          hamburgerBadge.setAttribute('data-ticket-count', ticketCount);
+
+          // Show/hide badge based on count
+          if (totalNotifications > 0) {
+            hamburgerBadge.style.display = 'flex';
+            hamburgerBadge.style.backgroundColor = '#dc3545'; // Merah untuk notifikasi
+            // Ubah kelas jika diperlukan
+            hamburgerBadge.className = 'hamburger-badge';
+          } else {
+            hamburgerBadge.textContent = '';
+            hamburgerBadge.className = 'hamburger-badge-empty';
+          }
+        }
+      } catch (error) {
+        console.log('Could not update notification counts:', error);
+        // Jika gagal ambil dari API, coba ambil dari data yang sudah disisipkan di HTML saat render
+        const hamburgerBadge = document.getElementById('hamburger-badge');
+        if (hamburgerBadge) {
+          // Data mungkin sudah disisipkan saat render
+          const cartCount = parseInt(hamburgerBadge.getAttribute('data-cart-count')) || 0;
+          const ticketCount = parseInt(hamburgerBadge.getAttribute('data-ticket-count')) || 0;
+          const totalNotifications = cartCount + ticketCount;
+
+          hamburgerBadge.textContent = totalNotifications > 0 ? totalNotifications : '';
+          if (totalNotifications > 0) {
+            hamburgerBadge.className = 'hamburger-badge';
+          } else {
+            hamburgerBadge.className = 'hamburger-badge-empty';
+          }
+        }
+      }
+    }
+
+    // Update badge counts saat DOM dimuat
+    updateBadgeCounts();
+
+    // Update badge counts secara periodik (setiap 30 detik)
+    setInterval(updateBadgeCounts, 30000);
+
+    // Expose function untuk update badge counts dari luar (misalnya ketika user menambah barang ke keranjang)
+    window.updateBadgeCounts = updateBadgeCounts;
   });
 </script>

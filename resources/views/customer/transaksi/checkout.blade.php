@@ -29,6 +29,10 @@
             <span class="step-label">Pembayaran</span>
           </div>
         </div>
+        <!-- Mobile Step Indicator -->
+        <div class="mobile-step-indicator">
+          <span>Langkah 1 dari 3: Alamat</span>
+        </div>
       </div>
 
       <form id="checkoutForm" action="{{ route('checkout.process') }}" method="POST">
@@ -76,7 +80,7 @@
               <div class="alamat-card" id="alamatCard">
                 <div class="alamat-content">
                   <div class="primary-badge">Utama</div>
-                  <h3 id="alamatNama">{{ $user->name ?? 'Nama Pengguna' }}</h3>
+                  <h3 id="alamatNama">{{ $user->name ?? '' }}</h3>
                   <div id="alamatDetail">
                     @if($user)
                       @php
@@ -88,22 +92,24 @@
                         }
 
                         // Tambahkan kecamatan jika ada dan berbeda dari full_address
-                        if($user->district && !str_contains($user->full_address, $user->district)) {
+                        if($user->district && !str_contains(strtolower($user->full_address ?? ''), strtolower($user->district))) {
                             $alamatParts[] = $user->district;
                         }
 
                         // Tambahkan kota jika ada dan berbeda dari full_address
-                        if($user->city && !str_contains($user->full_address, $user->city)) {
+                        if($user->city && !str_contains(strtolower($user->full_address ?? ''), strtolower($user->city))) {
                             $alamatParts[] = $user->city;
                         }
 
                         // Tambahkan provinsi jika ada dan berbeda dari full_address
-                        if($user->province && !str_contains($user->full_address, $user->province)) {
+                        if($user->province && !str_contains(strtolower($user->full_address ?? ''), strtolower($user->province))) {
                             $alamatParts[] = $user->province;
                         }
 
                         // Hapus elemen duplikat dan kosong dari array
-                        $uniqueAlamatParts = array_unique(array_filter($alamatParts));
+                        $uniqueAlamatParts = array_unique(array_filter($alamatParts, function($part) {
+                            return !empty(trim($part));
+                        }));
                       @endphp
 
                       @if(count($uniqueAlamatParts) > 0)
@@ -118,7 +124,7 @@
                       <span class="alamat-line">User tidak ditemukan</span>
                     @endif
                   </div>
-                  <p class="alamat-phone" id="alamatPhone">{{ $user->phone ?? 'Nomor telepon tidak tersedia' }}</p>
+                  <p class="alamat-phone" id="alamatPhone">{{ $user->phone ?? '' }}</p>
                 </div>
               </div>
 
@@ -126,7 +132,7 @@
               <div class="alamat-form" id="alamatFormSection" style="display: none;">
                 <div class="form-group field">
                   <input type="text" id="recipient_name" name="recipient_name"
-                         value="{{ old('recipient_name', $user->name ?? 'Nama Pengguna') }}" required placeholder=" " />
+                         value="{{ old('recipient_name', $user->name ?? '') }}" required placeholder=" " />
                   <label for="recipient_name">Nama Penerima</label>
                 </div>
 
@@ -138,30 +144,30 @@
 
                 <div class="form-group field">
                   <input type="text" id="province" name="province"
-                         value="{{ old('province', $user->province ?? 'Jawa Barat') }}" required placeholder=" " />
+                         value="{{ old('province', $user->province ?? '') }}" required placeholder=" " />
                   <label for="province">Provinsi</label>
                 </div>
 
                 <div class="form-group field">
                   <input type="text" id="city" name="city"
-                         value="{{ old('city', $user->city ?? 'Kota Bandung') }}" required placeholder=" " />
+                         value="{{ old('city', $user->city ?? '') }}" required placeholder=" " />
                   <label for="city">Kota/Kabupaten</label>
                 </div>
 
                 <div class="form-group field">
                   <input type="text" id="district" name="district"
-                         value="{{ old('district', $user->district ?? 'Lembursitu') }}" required placeholder=" " />
+                         value="{{ old('district', $user->district ?? '') }}" required placeholder=" " />
                   <label for="district">Kecamatan</label>
                 </div>
 
                 <div class="form-group field">
                   <input type="text" id="ward" name="ward"
-                         value="{{ old('ward', $user->ward ?? 'Sukajadi') }}" required placeholder=" " />
+                         value="{{ old('ward', $user->ward ?? '') }}" required placeholder=" " />
                   <label for="ward">Kelurahan</label>
                 </div>
 
                 <div class="form-group field">
-                  <textarea id="full_address" name="full_address" rows="3" required placeholder=" ">{{ old('full_address', $user->full_address ?? $user->address ?? 'Jl. Merdeka No. 123') }}</textarea>
+                  <textarea id="full_address" name="full_address" rows="3" required placeholder=" ">{{ old('full_address', $user->full_address ?? $user->address ?? '') }}</textarea>
                   <label for="full_address">Alamat Lengkap</label>
                 </div>
               </div>
@@ -177,9 +183,9 @@
                 @if($cartItems->count() > 0)
                   @foreach($cartItems as $item)
                     <div class="produk-item">
-                      <img src="{{ asset(($item['product'] ?? $item->product)->main_image ?? 'src/default-product.png') }}" alt="{{ ($item['product'] ?? $item->product)->name ?? 'Product' }}" />
+                      <img src="{{ asset(($item['product'] ?? $item->product)->main_image ?? 'src/default-product.png') }}" alt="{{ ($item['product'] ?? $item->product)->name ?? '' }}" />
                       <div class="item-info">
-                        <h4>{{ ($item['product'] ?? $item->product)->name ?? 'Produk tidak ditemukan' }}</h4>
+                        <h4>{{ ($item['product'] ?? $item->product)->name ?? '' }}</h4>
                         <p>{{ $item['quantity'] ?? $item->quantity }} x Rp {{ number_format(($item['product'] ?? $item->product)->price ?? 0, 2, ',', '.') }}</p>
                       </div>
                       <div class="item-harga">Rp {{ number_format((($item['product'] ?? $item->product)->price ?? 0) * ($item['quantity'] ?? $item->quantity), 2, ',', '.') }}</div>
@@ -213,15 +219,19 @@
             <section class="ringkasan-belanja">
               <div class="section-header">
                 <h3>Ringkasan Belanja</h3>
+                <button type="button" class="btn-ghost" id="toggleRingkasan">
+                  <span class="toggle-text">Lihat Rincian</span>
+                  <i class="bi bi-chevron-down chevron-icon"></i>
+                </button>
               </div>
 
-              <div class="ringkasan-content">
+              <div class="ringkasan-content" id="ringkasanDetails">
                 @if($cartItems->count() > 0)
                   @foreach($cartItems as $item)
                     <div class="produk-preview">
-                      <img src="{{ asset(($item['product'] ?? $item->product)->main_image ?? 'src/default-product.png') }}" alt="{{ ($item['product'] ?? $item->product)->name ?? 'Product' }}" />
+                      <img src="{{ asset(($item['product'] ?? $item->product)->main_image ?? 'src/default-product.png') }}" alt="{{ ($item['product'] ?? $item->product)->name ?? '' }}" />
                       <div class="produk-info">
-                        <h4>{{ ($item['product'] ?? $item->product)->name ?? 'Produk tidak ditemukan' }}</h4>
+                        <h4>{{ ($item['product'] ?? $item->product)->name ?? '' }}</h4>
                         <p class="produk-harga">Rp {{ number_format(($item['product'] ?? $item->product)->price ?? 0, 2, ',', '.') }}</p>
                       </div>
                       <span class="produk-qty">x{{ $item['quantity'] ?? $item->quantity }}</span>
@@ -246,6 +256,14 @@
           </div>
         </div>
       </form>
+
+      <!-- Sticky Bottom Action Bar -->
+      <div class="sticky-action-bar">
+        <div class="total-tagihan">Rp {{ number_format($subTotal, 2, ',', '.') }}</div>
+        <button type="submit" form="checkoutForm" class="btn btn-primary btn-proses-pesanan">
+          Proses Pesanan
+        </button>
+      </div>
     </div>
   </main>
 @endsection
@@ -313,9 +331,9 @@
 
             // Simpan alamat hanya di sisi klien (tidak dikirim ke server)
             // Karena sistem kita hanya untuk sementara di sesi checkout ini
-            document.getElementById('alamatNama').textContent = recipientName;
-            document.getElementById('alamatDetail').innerHTML = fullAddress.replace(/,/g, '<br>');
-            document.getElementById('alamatPhone').textContent = phone;
+            document.getElementById('alamatNama').textContent = recipientName || 'Nama tidak tersedia';
+            document.getElementById('alamatDetail').innerHTML = fullAddress ? fullAddress.replace(/,/g, '<br>') : 'Alamat tidak lengkap';
+            document.getElementById('alamatPhone').textContent = phone || 'Nomor telepon tidak tersedia';
 
             // Kembali ke tampilan card
             alamatCard.style.display = 'block';
@@ -387,10 +405,32 @@
           prosesPesananBtn.disabled = false;
         }
       @endif
+
+      // Toggle ringkasan belanja section
+      const toggleBtn = document.getElementById('toggleRingkasan');
+      const ringkasanDetails = document.getElementById('ringkasanDetails');
+      const toggleText = toggleBtn.querySelector('.toggle-text');
+      const chevronIcon = toggleBtn.querySelector('.chevron-icon');
+
+      if (toggleBtn && ringkasanDetails) {
+        toggleBtn.addEventListener('click', function() {
+          ringkasanDetails.classList.toggle('show');
+
+          if (ringkasanDetails.classList.contains('show')) {
+            ringkasanDetails.style.display = 'block';
+            toggleText.textContent = 'Sembunyikan Rincian';
+            chevronIcon.classList.add('rotated');
+          } else {
+            ringkasanDetails.style.display = 'none';
+            toggleText.textContent = 'Lihat Rincian';
+            chevronIcon.classList.remove('rotated');
+          }
+        });
+      }
     });
   </script>
 @endpush
 
 @section('footer')
   @include('components.customer.footer.footer')
-@endsection"{{-- Debug: Tampilkan data alamat user --}}" 
+@endsection 

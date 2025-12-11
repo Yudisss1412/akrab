@@ -177,6 +177,7 @@ section h2 {
   transition: all 0.3s ease;
   margin-bottom: 1.5rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: visible; /* Ensure content is visible */
 }
 
 .alamat-card:hover {
@@ -186,7 +187,7 @@ section h2 {
 
 .alamat-content {
   position: relative;
-  padding: 0.5rem 3.5rem 0.5rem 0.5rem; /* padding untuk badge di kanan */
+  padding: 0.5rem 2.5rem 0.5rem 0.5rem; /* Reduced padding to accommodate edit button */
 }
 
 .primary-badge {
@@ -259,6 +260,10 @@ section h2 {
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 2px 8px rgba(0, 110, 92, 0.3);
+  z-index: 2; /* Ensure button stays above other elements */
+  min-width: 36px; /* Ensure consistent width */
+  min-height: 36px;
+  box-sizing: border-box;
 }
 
 .btn-edit:hover {
@@ -829,49 +834,226 @@ section h2 {
   .container {
     padding: 16px;
   }
-  
+
   .checkout-content {
     grid-template-columns: 1fr;
     gap: 20px;
   }
-  
+
   .page-header h1 {
     font-size: 20px;
   }
-  
+
+  /* Responsive Stepper */
   .progress-steps {
     margin-bottom: 30px;
   }
-  
+
+  .progress-steps::before {
+    top: 16px;
+  }
+
+  .progress-steps .step {
+    flex: 0 0 auto;
+  }
+
+  .progress-steps .step-label {
+    font-size: 12px;
+  }
+
+  .progress-steps .step-number {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  /* Section adjustments */
   section {
     padding: 20px;
+    margin-bottom: 20px;
   }
-  
+
+  /* Make address card full width - fix overflow issue */
+  .alamat-card {
+    width: 100% !important;
+    max-width: 100vw !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    box-sizing: border-box !important;
+    position: relative; /* Ensure edit button stays within boundaries */
+    overflow: visible; /* Allow the edit button to be visible */
+  }
+
+  .alamat-form {
+    width: 100% !important;
+    max-width: 100vw !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    box-sizing: border-box !important;
+  }
+
+  .order-items {
+    gap: 15px;
+  }
+
   .order-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
-  
+
   .item-image {
     width: 100%;
     height: auto;
     max-height: 120px;
   }
-  
+
+
   .modal-content {
     width: 95%;
     margin: 10px;
   }
-  
+
   .form-actions {
     flex-direction: column;
   }
-  
+
   .btn {
     width: 100%;
   }
+
+  /* Hide desktop stepper */
+  .progress-steps {
+    display: none;
+  }
+
+  /* Mobile Step Indicator */
+  .mobile-step-indicator {
+    display: block;
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 600;
+    color: var(--primary-color-dark);
+    font-size: 16px;
+    padding: 10px;
+    background: rgba(168, 213, 201, 0.2);
+    border-radius: 8px;
+    border: 1px solid var(--primary-color);
+  }
+
+  /* Make alamat section full width */
+  .alamat-section {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    border-radius: 0;
+  }
 }
+
+/* Collapsible Order Summary */
+.ringkasan-content:not(#ringkasanDetails) {
+  display: block;
+}
+
+#ringkasanDetails {
+  display: none; /* Initially hidden on mobile */
+  margin-top: 15px;
+}
+
+#ringkasanDetails.show {
+  display: block;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border-color);
+  position: relative;
+}
+
+#toggleRingkasan {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--primary-color-dark);
+  font-size: 14px;
+}
+
+#toggleRingkasan .chevron-icon {
+  transition: transform 0.3s ease;
+}
+
+#toggleRingkasan .chevron-icon.rotated {
+  transform: rotate(180deg);
+}
+
+/* Sticky Bottom Action Bar */
+.sticky-action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: white;
+  box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+  z-index: 999;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-top: 1px solid var(--border-color);
+}
+
+.sticky-action-bar .total-tagihan {
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--primary-color-dark);
+}
+
+.sticky-action-bar .btn-proses-pesanan {
+  background: var(--primary-color-dark);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  min-width: 160px;
+  text-align: center;
+}
+
+.sticky-action-bar .btn-proses-pesanan:hover {
+  background: #005a4a;
+}
+
+/* Add padding to main container to account for sticky bar */
+@media (max-width: 768px) {
+  .checkout-content {
+    padding-bottom: 140px !important;
+  }
+
+  /* Hide original checkout button on mobile */
+  .btn-checkout {
+    display: none !important;
+  }
+}
+
+
+
 
 /* Error state for form controls */
 .form-group.has-error .form-control {

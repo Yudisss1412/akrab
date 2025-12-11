@@ -117,7 +117,16 @@ class CartManager {
   async incrementQuantity(button) {
     const input = button.previousElementSibling;
     let value = parseInt(input.value) || 0;
-    input.value = value + 1;
+
+    // Increment value
+    value = value + 1;
+
+    // Validate maximum value (e.g., 99)
+    if (value > 99) {
+      value = 99;
+    }
+
+    input.value = value;
     await this.updateItemQuantity(input);
     await this.calculateTotal();
   }
@@ -125,10 +134,19 @@ class CartManager {
   async decrementQuantity(button) {
     const input = button.nextElementSibling;
     let value = parseInt(input.value) || 1;
-    input.value = value - 1;
-    
+
+    // Calculate next value
+    let newValue = value - 1;
+
+    // Validate that the new value is not negative
+    if (newValue < 0) {
+      newValue = 0;
+    }
+
+    input.value = newValue;
+
     // If quantity reaches 0, remove the item from cart
-    if (input.value <= 0) {
+    if (newValue <= 0) {
       const row = input.closest('tr');
       if (row) {
         await this.removeItemFromCart(row);
@@ -199,52 +217,51 @@ class CartManager {
     const itemId = row.dataset.itemId;
     const quantity = parseInt(input.value);
 
+    // Pastikan quantity valid
+    if (isNaN(quantity) || quantity < 0) {
+      this.showNotification('Jumlah tidak valid', 'error');
+      input.value = input.dataset.previousValue || 1;
+      return;
+    }
+
     try {
-      const response = await fetchWithCsrf(`/cart/update/${itemId}`, {
-        method: 'PUT',
-        body: JSON.stringify({ quantity: quantity })
+      // Simpan nilai sebelum untuk rollback jika gagal
+      const previousValue = input.dataset.previousValue || 1;
+      input.dataset.previousValue = quantity;
+
+      const response = await fetchWithCsrf(`/cart/update/${itemId}`, {  // Correct endpoint: /cart/update/{id}
+        method: 'PUT',  // Use PUT method as defined in route
+        body: JSON.stringify({ quantity: quantity })  // Send only quantity in body, ID is in URL
       });
 
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error('Network response was not ok: ' + response.status);
       }
 
       const result = await response.json();
 
       if (result.success) {
-        // If quantity is 0, remove the row from the UI
-        if (quantity <= 0) {
-          row.remove();
-          await this.calculateTotal();
-          this.updateSelectAllCheckbox();
-          this.showNotification('Produk berhasil dihapus dari keranjang', 'success');
+        // Update subtotal di UI
+        this.updateItemSubtotal(input);
+        await this.calculateTotal(); // Pastikan total di ringkasan juga diperbarui
+        this.showNotification(result.message || 'Kuantitas berhasil diperbarui', 'success');
 
-          // Update cart count in header via API
-          if (window.updateCartCount) {
-            window.updateCartCount();
-          }
-        } else {
-          this.updateItemSubtotal(input);
-          await this.calculateTotal(); // Pastikan total di ringkasan juga diperbarui
-          this.showNotification(result.message, 'success');
-
-          // Update cart count in header via API
-          if (window.updateCartCount) {
-            window.updateCartCount();
-          }
+        // Update cart count in header via API
+        if (window.updateCartCount) {
+          window.updateCartCount();
         }
       } else {
         this.showNotification(result.message || 'Gagal memperbarui kuantitas', 'error');
         // Kembalikan jumlah ke nilai sebelumnya jika gagal
-        input.value = input.dataset.previousValue || 1;
+        input.value = previousValue;
         this.updateItemSubtotal(input);
         await this.calculateTotal(); // Pastikan total di ringkasan juga diperbarui
       }
     } catch (error) {
       console.error('Error updating item quantity:', error);
-      this.showNotification('Terjadi kesalahan saat memperbarui kuantitas', 'error');
+      this.showNotification('Terjadi kesalahan saat memperbarui kuantitas: ' + error.message, 'error');
       // Kembalikan jumlah ke nilai sebelumnya jika terjadi error
-      input.value = input.dataset.previousValue || 1;
+      input.value = previousValue;
       this.updateItemSubtotal(input);
       await this.calculateTotal(); // Pastikan total di ringkasan juga diperbarui
       // Update cart count in header via API to ensure synchronization
@@ -383,43 +400,7 @@ class CartManager {
     }).format(angka);
   }
 
-  showNotification(message, type = 'info') {
-    // Gunakan fungsi global showToast dari script utama untuk konsistensi UX
-    if (typeof showToast === 'function') {
-      showToast(message, type);
-    } else {
-      // Fallback jika fungsi global tidak tersedia
-      const notification = document.createElement('div');
-      notification.className = `notification notification-${type}`;
-      notification.textContent = message;
 
-      // Gaya dasar untuk notifikasi
-      Object.assign(notification.style, {
-        position: 'fixed',
-        top: '20px',
-        right: '20px',
-        padding: '12px 20px',
-        borderRadius: '6px',
-        color: '#fff',
-        backgroundColor: type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : '#007bff',
-        zIndex: '9999',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-        fontSize: '14px',
-        maxWidth: '400px',
-        wordWrap: 'break-word'
-      });
-
-      // Tambahkan ke body
-      document.body.appendChild(notification);
-
-      // Hapus notifikasi setelah 3 detik
-      setTimeout(() => {
-        if (notification.parentNode) {
-          notification.parentNode.removeChild(notification);
-        }
-      }, 3000);
-    }
-  }
 }
 
 // Inisialisasi CartManager ketika DOM siap

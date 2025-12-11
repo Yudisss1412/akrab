@@ -765,10 +765,6 @@ body {
     display: block !important;
   }
 
-  /* Sembunyikan filter desktop secara default */
-  .produk-page .produk-filter-right {
-    display: none !important;
-  }
 
   /* Atur layout header untuk mobile */
   .produk-header-row {
@@ -788,10 +784,6 @@ body {
     flex-shrink: 0 !important;
   }
 
-  /* Sembunyikan filter secara default di mobile */
-  .produk-page .produk-filter-right {
-    display: none;
-  }
 
   /* Atur layout header untuk mobile */
   .produk-header-row {
@@ -873,7 +865,7 @@ body {
     align-items: flex-start !important;
     gap: 16px !important;
     margin-bottom: 16px !important;
-    flex-wrap: nowrap !important;
+    flex-wrap: wrap !important;  /* Ganti ke wrap agar filter bisa terlihat */
   }
 
   .produk-header-row .mobile-filter-toggle {
@@ -882,6 +874,54 @@ body {
 
   .produk-filter-container {
     display: none !important;
+  }
+
+  /* Di desktop, tampilkan filter secara normal (tidak disembunyikan) */
+  .produk-page .produk-filter-right {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    flex-wrap: wrap !important;
+    padding: 15px !important;
+    background: #ffffff !important;
+    border: 1.5px solid var(--border-color) !important;
+    border-radius: 12px !important;
+    box-shadow: var(--shadow-sm) !important;
+    max-width: 100% !important;
+    overflow-x: visible !important;
+  }
+}
+
+/* Di mobile, sembunyikan filter desktop dan tampilkan button toggle */
+@media (max-width: 768px) {
+  .produk-page .produk-filter-right {
+    display: none !important; /* Sembunyikan filter desktop di mobile */
+  }
+
+  /* Tampilkan tombol toggle filter di mobile */
+  .mobile-filter-toggle {
+    display: inline-flex !important;
+  }
+}
+
+/* Di desktop, pastikan filter ditampilkan kembali */
+@media (min-width: 769px) {
+  .mobile-filter-toggle {
+    display: none !important;
+  }
+
+  .produk-page .produk-filter-right {
+    display: flex !important; /* Kembalikan tampilan filter di desktop */
+    align-items: flex-start !important;
+    gap: 12px !important;
+    flex-wrap: wrap !important;
+    padding: 15px !important;
+    background: #ffffff !important;
+    border: 1.5px solid var(--border-color) !important;
+    border-radius: 12px !important;
+    box-shadow: var(--shadow-sm) !important;
+    max-width: 100% !important;
+    overflow-x: visible !important;
   }
 }
 
@@ -3365,5 +3405,35 @@ main[role="main"] {
   .produk-card {
     height: auto !important;
     min-height: 320px !important;
+  }
+}
+
+/* DESKTOP FIX: Pastikan struktur header dan filter kembali normal di desktop */
+@media (min-width: 769px) {
+  .produk-page .produk-header-row {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 16px !important;
+    margin-bottom: 16px !important;
+    flex-wrap: nowrap !important; /* Pastikan tidak wrap di desktop */
+  }
+
+  .produk-page .produk-filter-right {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    flex-wrap: wrap !important;
+    padding: 15px !important;
+    background: #ffffff !important;
+    border: 1.5px solid var(--border-color) !important;
+    border-radius: 12px !important;
+    box-shadow: var(--shadow-sm) !important;
+    max-width: 100% !important;
+    overflow-x: visible !important;
+  }
+
+  .mobile-filter-toggle {
+    display: none !important;
   }
 }

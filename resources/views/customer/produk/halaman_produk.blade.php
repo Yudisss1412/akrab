@@ -15,6 +15,14 @@
   <main class="produk-page" role="main">
     <div class="produk-header-row">
       <h1 class="produk-title" id="produk-heading">Daftar Produk</h1>
+      <!-- Button Filter yang hanya tampil di mobile -->
+      <button class="mobile-filter-toggle" id="mobile-filter-btn" aria-expanded="false">
+        Filter & Urutkan
+      </button>
+    </div>
+
+    <!-- Container untuk filter - disembunyikan di mobile -->
+    <div class="produk-filter-container" id="mobile-filter-container">
       <div aria-label="Filter produk" class="produk-filter-right" role="region">
         <div class="filter-group">
           <label for="filter-kategori">Kategori</label>
@@ -104,6 +112,34 @@
   <script>
     // Pastikan script produk pakai input navbar (ID sama seperti di cust_welcome)
     window.__AKRAB_SEARCH_INPUT_ID__ = 'navbar-search';
+
+    // Fungsi untuk toggle filter di mobile
+    document.addEventListener('DOMContentLoaded', function() {
+      const filterToggleBtn = document.getElementById('mobile-filter-btn');
+      const filterContainer = document.getElementById('mobile-filter-container');
+
+      if (filterToggleBtn && filterContainer) {
+        // Set initial arrow direction
+        filterToggleBtn.innerHTML = 'Filter & Urutkan 🔽';
+
+        filterToggleBtn.addEventListener('click', function() {
+          const isExpanded = filterToggleBtn.getAttribute('aria-expanded') === 'true';
+
+          // Toggle show/hide filter container
+          filterContainer.classList.toggle('show', !isExpanded);
+
+          // Update aria-expanded attribute
+          filterToggleBtn.setAttribute('aria-expanded', !isExpanded);
+
+          // Update arrow icon based on state
+          if (isExpanded) {
+            filterToggleBtn.innerHTML = 'Filter & Urutkan 🔽';  // Arrow down when collapsed
+          } else {
+            filterToggleBtn.innerHTML = 'Filter & Urutkan 🔼';  // Arrow up when expanded
+          }
+        });
+      }
+    });
   </script>
 @endsection
 

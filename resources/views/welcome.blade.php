@@ -584,9 +584,11 @@
         }
 
         /* Memastikan link Kebijakan Privasi tetap hijau di semua kondisi */
+        .footer-privacy a,
         .footer-privacy a:link,
         .footer-privacy a:visited,
-        .footer-privacy a:active {
+        .footer-privacy a:active,
+        .footer-privacy a:focus {
             color: var(--primary-color-dark) !important;
             text-decoration: none !important;
         }

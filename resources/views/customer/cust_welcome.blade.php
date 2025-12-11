@@ -559,20 +559,141 @@ function createStarsHTML($rating) {
       }
     }
 
-    @media (max-width: 640px) {
-      .popular-products-grid {
-        grid-template-columns: 1fr;
+    /* Perbaikan untuk header dan layout mobile - fixing misalignment dan card width issues */
+    @media (max-width: 767px) {
+      /* Perbaikan untuk header container agar tidak overflow */
+      .header {
+        flex-direction: row !important; /* GANTI dari column ke row untuk tata letak horizontal */
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 0.8rem 1rem !important;
+        height: 78px !important; /* Tetapkan tinggi tetap */
       }
-      
-      .category-grid {
-        grid-template-columns: repeat(2, 1fr);
+
+      .header-left {
+        order: 0 !important; /* Logo di sebelah kiri */
+        width: auto !important;
+        display: flex !important;
+        align-items: center !important;
+        margin-right: 10px !important; /* Jarak ke search bar */
       }
-      
+
+      .header-center {
+        order: 1 !important; /* Search bar di tengah */
+        width: 100% !important;
+        margin: 0 10px !important; /* Jarak antar elemen */
+        flex-grow: 1 !important; /* Biar mengisi ruang kosong */
+      }
+
+      .hamburger-menu {
+        order: 2 !important; /* Hamburger menu di sebelah kanan */
+        display: flex !important;
+      }
+
+      .header-right {
+        display: none !important; /* HIDDEN ICONS - Sembunyikan ikon lama karena berpindah ke sidebar */
+      }
+
+      .logo {
+        height: 40px !important;
+        width: auto !important;
+      }
+
+      /* Perbaikan untuk search bar dan ikon di dalamnya */
       .search-bar {
-        min-width: 0;
-        max-width: 100%;
+        width: 100% !important;
+        min-width: 0 !important; /* Biarkan shrink jika perlu */
+        margin: 0 10px !important; /* Jarak dari sisi */
+        position: relative; /* Untuk posisi ikon */
       }
-      
+
+      .search-bar input {
+        width: 100% !important;
+        padding-left: 40px !important; /* Beri jarak untuk ikon pencarian */
+      }
+
+      .search-icon {
+        position: absolute !important;
+        left: 1rem !important; /* Sesuaikan posisi ikon */
+        top: 50% !important;
+        transform: translateY(-50%) !important; /* Ikuti posisi tengah vertikal */
+        z-index: 1 !important; /* Pastikan ikon tetap terlihat */
+      }
+
+      /* Perbaikan untuk produk list - ubah ke horizontal scroll dengan width tetap untuk layar kecil */
+      .popular-products-grid {
+        display: flex !important;
+        flex-direction: row !important;
+        overflow-x: auto !important; /* Aktifkan scrolling horizontal */
+        overflow-y: hidden !important;
+        gap: 0.8rem !important;
+        padding: 0.5rem 0.5rem 1.2rem 0.5rem !important;
+        margin-bottom: 2.8rem !important;
+        scroll-snap-type: x mandatory !important; /* Aktifkan snapping horizontal */
+        scrollbar-width: none !important; /* Sembunyikan scrollbar di Firefox */
+        min-height: 240px; /* Tambahkan tinggi minimum untuk kontainer */
+        padding-right: 20px !important; /* Tambahkan padding kanan agar card terakhir tidak menyentuh sisi kanan */
+      }
+
+      /* Sembunyikan scrollbar untuk Chrome/Safari/Edge */
+      .popular-products-grid::-webkit-scrollbar {
+        display: none !important;
+      }
+
+      /* Perbaikan ukuran card produk untuk tidak terpotong di layar kecil - menggunakan lebar tetap */
+      .produk-card {
+        padding: 10px !important;
+        margin-bottom: 0 !important;
+        min-width: 260px !important; /* Gunakan lebar tetap untuk layar 320px */
+        width: 260px !important; /* Gunakan lebar tetap untuk layar 320px */
+        flex: 0 0 260px !important; /* Mencegah card dari resize */
+        scroll-snap-align: start !important; /* Aktifkan snapping untuk masing-masing card */
+        margin-right: 15px !important; /* Tambahkan jarak antar card */
+      }
+
+      .produk-card:last-child {
+        margin-right: 0 !important; /* Hilangkan margin kanan untuk card terakhir */
+      }
+
+      .produk-card img {
+        height: 140px !important;
+        width: 100% !important;
+        object-fit: cover !important;
+      }
+
+      .produk-card .produk-name {
+        font-size: 14px !important;
+        margin: 4px 0 3px !important;
+        white-space: nowrap !important; /* Prevent text wrapping if needed */
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+
+      .produk-card .produk-harga {
+        font-size: 14px !important;
+        margin-bottom: 6px !important;
+      }
+
+      /* Tombol dalam card: tetap side-by-side tapi sesuaikan lebar */
+      .produk-card .produk-aksi {
+        flex-direction: row !important;
+        gap: 0.4rem !important;
+        padding: 0.6rem 0 0 !important;
+        flex-wrap: nowrap !important; /* Prevent button wrapping */
+      }
+
+      .produk-card .produk-aksi .btn-lihat,
+      .produk-card .produk-aksi .btn-add {
+        flex: 1 1 auto !important;
+        margin: 0 !important;
+        padding: 0.5rem 0 !important;
+        font-size: 12px !important;
+        min-height: 36px !important;
+        word-break: keep-all !important; /* Prevent text breaking in buttons */
+      }
+    }
+
+    @media (max-width: 640px) {
       .produk-populer-header,
       .section-header,
       .produk-populer-titlebar {
@@ -580,14 +701,14 @@ function createStarsHTML($rating) {
         align-items: flex-start;
         gap: 0.6rem;
       }
-      
+
       /* Footer stack rapi di mobile */
       .footer .footer__inner.footer-3col {
         grid-template-columns: 1fr;
         row-gap: 0.75rem;
         text-align: center;
       }
-      
+
       .footer-left,
       .footer-center,
       .footer-right {

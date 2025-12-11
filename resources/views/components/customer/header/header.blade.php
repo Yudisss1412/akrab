@@ -6,12 +6,12 @@
     box-shadow: none !important;
     padding: 0 !important;
   }
-  
+
   .ticket-badge {
     position: relative;
     display: inline-block;
   }
-  
+
   .ticket-count, .cart-count {
     position: absolute;
     top: -5px;
@@ -34,6 +34,193 @@
     position: relative;
     display: inline-block;
   }
+
+  /* Mobile Hamburger Menu */
+  .hamburger-menu {
+    display: none;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 30px;
+    height: 30px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    box-sizing: border-box;
+    position: relative;
+  }
+
+  .hamburger-line {
+    width: 100%;
+    height: 3px;
+    background: #006E5C;
+    border-radius: 10px;
+    transition: all 0.3s;
+    position: relative;
+  }
+
+  /* Mobile sidebar */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 80%;
+    max-width: 300px;
+    height: 100vh;
+    background: white;
+    z-index: 9999;
+    transition: right 0.3s ease;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+  }
+
+  .sidebar.active {
+    right: 0;
+  }
+
+  .sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #333;
+  }
+
+  .sidebar-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    flex: 1;
+  }
+
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.8rem;
+    text-decoration: none !important;
+    color: #006E5C !important;
+    border-radius: 8px;
+    transition: background 0.2s;
+  }
+
+  .sidebar-link:hover {
+    background: #f0f0f0;
+  }
+
+  .sidebar-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Header styling - gunakan flexbox untuk semua ukuran layar */
+  .header {
+    background: var(--secondary-color);
+    border-bottom: 1px solid var(--border-color);
+    height: 78px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2.5rem;
+    z-index: 1001;
+    position: sticky;
+    top: 0;
+  }
+
+  /* Badge counter for hamburger menu */
+  .hamburger-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #dc3545;
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    line-height: 1;
+  }
+
+  /* Mobile layout adjustments */
+  @media (max-width: 767px) {
+    .header {
+      padding: 0.8rem 1rem !important;
+    }
+
+    .hamburger-menu {
+      display: flex !important; /* Show hamburger menu on mobile */
+    }
+
+    /* HIDE desktop icons completely on mobile */
+    .header-right {
+      display: none !important;
+    }
+
+    .header-left {
+      display: flex !important;
+      align-items: center !important;
+    }
+
+    .header-center {
+      flex-grow: 1 !important; /* CRUCIAL: Force search bar to expand and fill available space */
+      margin-left: 10px !important; /* Add margin to prevent touching other elements */
+      margin-right: 10px !important; /* Add margin to prevent touching other elements */
+    }
+
+    .search-bar {
+      width: 100% !important;
+    }
+
+    .logo {
+      width: 40px !important; /* Fixed width for logo */
+      height: auto !important;
+    }
+  }
+
+  /* Mobile single-row layout - urutan: [Logo] - [Search Bar] - [Hamburger] */
+  @media (max-width: 767px) {
+    .header {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+    }
+
+    .header-left {
+      order: 0 !important; /* Logo di kiri */
+      display: flex !important;
+      align-items: center !important;
+    }
+
+    .header-center {
+      order: 1 !important; /* Search bar di tengah */
+      flex-grow: 1 !important;
+      margin-left: 10px !important;
+      margin-right: 10px !important;
+    }
+
+    .hamburger-menu {
+      order: 2 !important; /* Hamburger di kanan */
+    }
+
+    /* header-right tidak perlu diurutkan karena disembunyikan */
+  }
 </style>
 
 <!-- Header khusus pelanggan untuk halaman utama -->
@@ -41,7 +228,7 @@
   <div class="header-left">
     <img class="logo" src="{{ asset('src/Logo_UMKM.png') }}" alt="AKRAB Logo" />
   </div>
-  
+
   <div class="header-center">
     <div class="search-bar">
       <div class="search-icon">
@@ -52,7 +239,24 @@
       <input type="text" id="navbar-search" placeholder="Cari di Akrab...">
     </div>
   </div>
-  
+
+  <!-- Mobile Hamburger Menu -->
+  <button class="hamburger-menu" id="hamburger-btn" aria-label="Buka menu">
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+    <!-- Badge counter - total dari keranjang + tiket -->
+    @php
+        $cartService = app(\App\Services\CartService::class);
+        $cartCount = $cartService->getTotalItems();
+        $ticketCount = auth()->user() ? auth()->user()->openTickets()->count() : 0;
+        $totalNotifications = $cartCount + $ticketCount;
+    @endphp
+    @if($totalNotifications > 0)
+      <span class="hamburger-badge">{{ $totalNotifications }}</span>
+    @endif
+  </button>
+
   <div class="header-right">
     <!-- Cart with Count Badge -->
     <a href="{{ route('keranjang') }}" class="cart-badge" aria-label="Keranjang Belanja">
@@ -69,7 +273,7 @@
         <span class="cart-count">{{ $cartCount }}</span>
       @endif
     </a>
-    
+
     <!-- Ticket Notification -->
     <a href="{{ route('customer.tickets') }}" class="ticket-badge" aria-label="Tiket Bantuan">
       <div class="ticket-ico">
@@ -88,7 +292,7 @@
         <span class="ticket-count">{{ $openTicketCount }}</span>
       @endif
     </a>
-    
+
     <a href="{{ route('profil.pembeli') }}" class="profile-ico" aria-label="Profil Pembeli">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M12 10C14.2091 10 16 8.20914 16 6C16 3.79086 14.2091 2 12 2C9.79086 2 8 3.79086 8 6C8 8.20914 9.79086 10 12 10Z" stroke="#006E5C" stroke-width="1.5"/>
@@ -97,3 +301,98 @@
     </a>
   </div>
 </header>
+
+<!-- Mobile Sidebar Menu -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h3>Menu</h3>
+    <button class="close-btn" id="close-sidebar" aria-label="Tutup menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+    <!-- Cart with Count Badge -->
+    <a href="{{ route('keranjang') }}" class="sidebar-link">
+      <div class="sidebar-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17 18C17.5304 18 18.0391 18.2107 18.4142 18.5858C18.7893 18.9609 19 19.4696 19 20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22C16.4696 22 15.9609 21.7893 15.5858 21.4142C15.2107 21.0391 15 20.5304 15 20C15 18.89 15.89 18 17 18ZM1 2H4.27L5.21 4H20C20.2652 4 20.5196 4.10536 20.7071 4.29289C21.0534 4.6383 21.0534 5.2017 20.7071 5.5472L17.3 11.97C16.96 12.58 16.3 13 15.55 13H8.1L7.2 14.63L7.17 14.75C7.17 14.8163 7.19634 14.8799 7.24322 14.9268C7.29011 14.9737 7.3537 15 7.42 15H19V17H7C6.46957 17 5.96086 16.7893 5.58579 16.4142C5.21071 16.0391 5 15.5304 5 15C5 14.65 5.09 14.32 5.24 14.04L6.6 11.59L3 4H1V2ZM7 18C7.53043 18 8.03914 18.2107 8.41421 18.5858C8.78929 18.9609 9 19.4696 9 20C9 20.5304 8.78929 21.0391 8.41421 21.4142C8.03914 21.7893 7.53043 22 7 22C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20C5 18.89 5.89 18 7 18ZM16 11L18.78 6H6.14L8.5 11H16Z" fill="#006E5C"/>
+        </svg>
+      </div>
+      <span>Keranjang</span>
+      @php
+          $cartService = app(\App\Services\CartService::class);
+          $cartCount = $cartService->getTotalItems();
+      @endphp
+      @if($cartCount > 0)
+        <span class="cart-count" style="margin-left: auto;">{{ $cartCount }}</span>
+      @endif
+    </a>
+
+    <!-- Ticket Notification -->
+    <a href="{{ route('customer.tickets') }}" class="sidebar-link">
+      <div class="sidebar-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="#006E5C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M14 2V8H20" stroke="#006E5C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 13H8" stroke="#006E5C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 17H8" stroke="#006E5C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 9H9H8" stroke="#006E5C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span>Tiket Bantuan</span>
+      @php
+          $openTicketCount = auth()->user() ? auth()->user()->openTickets()->count() : 0;
+      @endphp
+      @if($openTicketCount > 0)
+        <span class="ticket-count" style="margin-left: auto;">{{ $openTicketCount }}</span>
+      @endif
+    </a>
+
+    <!-- Profile Link -->
+    <a href="{{ route('profil.pembeli') }}" class="sidebar-link">
+      <div class="sidebar-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 10C14.2091 10 16 8.20914 16 6C16 3.79086 14.2091 2 12 2C9.79086 2 8 3.79086 8 6C8 8.20914 9.79086 10 12 10Z" stroke="#006E5C" stroke-width="1.5"/>
+        <path d="M20 17.5C20 19.985 20 22 12 22C4 22 4 19.985 4 17.5C4 15.015 7.582 13 12 13C16.418 13 20 15.015 20 17.5Z" stroke="#006E5C" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <span>Profil</span>
+    </a>
+  </div>
+</div>
+
+<script>
+  // Mobile sidebar functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const sidebar = document.getElementById('sidebar');
+    const closeBtn = document.getElementById('close-sidebar');
+    const body = document.body;
+
+    hamburgerBtn.addEventListener('click', function() {
+      sidebar.classList.add('active');
+      body.style.overflow = 'hidden'; // Prevent background scrolling
+    });
+
+    closeBtn.addEventListener('click', function() {
+      sidebar.classList.remove('active');
+      body.style.overflow = 'auto'; // Re-enable scrolling
+    });
+
+    // Close sidebar when clicking outside
+    document.addEventListener('click', function(event) {
+      if (!sidebar.contains(event.target) &&
+          !hamburgerBtn.contains(event.target) &&
+          sidebar.classList.contains('active')) {
+        sidebar.classList.remove('active');
+        body.style.overflow = 'auto';
+      }
+    });
+
+    // Close sidebar when navigating to a different page/link
+    document.querySelectorAll('.sidebar-link').forEach(link => {
+      link.addEventListener('click', function() {
+        sidebar.classList.remove('active');
+        body.style.overflow = 'auto';
+      });
+    });
+  });
+</script>

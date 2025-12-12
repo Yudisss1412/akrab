@@ -494,26 +494,6 @@ section h2 {
   background: #005a4a;
 }
 
-.btn-secondary {
-  width: 100%;
-  padding: 16px;
-  background: white;
-  color: var(--primary-color-dark);
-  border: 2px solid var(--primary-color-dark);
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
-  display: inline-block;
-  text-align: center;
-}
-
-.btn-secondary:hover {
-  background: var(--primary-color);
-  color: var(--primary-color-dark);
-}
 
 /* Mobile Step Indicator - match checkout page style */
 .mobile-step-indicator {
@@ -536,7 +516,7 @@ section h2 {
   justify-content: center;
 }
 
-.cod-order-history-btn-container .btn {
+.cod-order-history-btn-container .btn-primary {
   width: 100%;
 }
 
@@ -546,7 +526,7 @@ section h2 {
     margin-top: 15px;
   }
 
-  .cod-order-history-btn-container .btn {
+  .cod-order-history-btn-container .btn-primary {
     padding: 12px !important;
   }
 }

@@ -119,7 +119,7 @@
 
           <!-- Button Lihat Riwayat Pesanan -->
           <div class="cod-order-history-btn-container">
-            <a href="/customer/riwayat-pesanan" class="btn btn-secondary">
+            <a href="/customer/riwayat-pesanan" class="btn btn-primary">
               Lihat Riwayat Pesanan
             </a>
           </div>

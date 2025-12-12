@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Cookie;
 
 class CartService
 {
@@ -261,7 +262,7 @@ class CartService
 
     /**
      * Menghitung jumlah total item di keranjang
-     * 
+     *
      * @return int
      */
     public function getTotalItems()
@@ -270,5 +271,100 @@ class CartService
         return $cartItems->sum(function ($item) {
             return $item['quantity'];
         });
+    }
+
+    /**
+     * Mendapatkan data keranjang dalam format JSON untuk disimpan di localStorage
+     *
+     * @return string
+     */
+    public function getCartForLocalStorage()
+    {
+        $cartItems = $this->getCartItems();
+
+        $localStorageItems = [];
+        foreach ($cartItems as $item) {
+            $localStorageItems[] = [
+                'product_id' => $item['product_id'],
+                'product_variant_id' => $item['product_variant_id'] ?? null,
+                'quantity' => $item['quantity'],
+            ];
+        }
+
+        return json_encode($localStorageItems);
+    }
+
+    /**
+     * Menyimpan data keranjang dari localStorage ke session saat pengguna tidak login
+     *
+     * @param string $cartData
+     * @return void
+     */
+    public function saveCartFromLocalStorage($cartData)
+    {
+        if (!Auth::check()) {
+            // Hanya proses jika pengguna tidak login
+            $items = json_decode($cartData, true);
+
+            if (is_array($items)) {
+                $cart = Session::get($this->sessionKey, []);
+
+                foreach ($items as $item) {
+                    if (isset($item['product_id'])) {
+                        $existingKey = null;
+
+                        // Cek apakah item sudah ada
+                        foreach ($cart as $key => $cartItem) {
+                            if ($cartItem['product_id'] == $item['product_id'] &&
+                                $cartItem['product_variant_id'] == ($item['product_variant_id'] ?? null)) {
+                                $existingKey = $key;
+                                break;
+                            }
+                        }
+
+                        if ($existingKey !== null) {
+                            // Update kuantitas
+                            $cart[$existingKey]['quantity'] = $item['quantity'];
+                        } else {
+                            // Tambahkan item baru
+                            $cart[] = [
+                                'product_id' => $item['product_id'],
+                                'product_variant_id' => $item['product_variant_id'] ?? null,
+                                'quantity' => $item['quantity'],
+                            ];
+                        }
+                    }
+                }
+
+                Session::put($this->sessionKey, $cart);
+            }
+        }
+    }
+
+    /**
+     * Sinkronisasi keranjang dari localStorage ke database saat pengguna login
+     */
+    public function syncCartWithDatabase()
+    {
+        if (Auth::check()) {
+            // Dapatkan keranjang dari localStorage (jika ada)
+            $localStorageCart = request()->cookie('cart_localstorage');
+
+            if ($localStorageCart) {
+                $items = json_decode($localStorageCart, true);
+
+                if (is_array($items)) {
+                    foreach ($items as $item) {
+                        if (isset($item['product_id'])) {
+                            // Gabungkan item dari localStorage ke database
+                            $this->addItem($item['product_id'], $item['quantity'], $item['product_variant_id'] ?? null);
+                        }
+                    }
+                }
+            }
+
+            // Hapus cookie setelah disinkronkan
+            Cookie::queue(Cookie::forget('cart_localstorage'));
+        }
     }
 }

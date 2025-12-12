@@ -161,6 +161,7 @@ Route::put('/cart/update/{id}', [App\Http\Controllers\CartController::class, 'up
 Route::delete('/cart/remove/{id}', [App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
 Route::delete('/cart/clear', [App\Http\Controllers\CartController::class, 'clear'])->name('cart.clear');
 Route::get('/api/cart/count', [App\Http\Controllers\CartController::class, 'getCartCount'])->name('api.cart.count');
+Route::post('/api/cart/sync', [App\Http\Controllers\CartController::class, 'syncCart'])->name('api.cart.sync');
 
 // API routes for products
 Route::get('/api/products/popular', [App\Http\Controllers\ProductController::class, 'popular']);

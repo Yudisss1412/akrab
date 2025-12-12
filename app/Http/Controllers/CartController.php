@@ -139,4 +139,27 @@ class CartController extends Controller
             'count' => $totalItems
         ]);
     }
+
+    public function syncCart(Request $request)
+    {
+        $request->validate([
+            'cart_data' => 'required|string'
+        ]);
+
+        try {
+            // Simpan data keranjang dari localStorage ke session
+            $this->cartService->saveCartFromLocalStorage($request->cart_data);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Keranjang berhasil disinkronkan',
+                'merged' => true
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menyinkronkan keranjang: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

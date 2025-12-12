@@ -745,3 +745,26 @@ section h2 {
     padding-bottom: 100px !important;
   }
 }
+
+/* COD Actions Section */
+.cod-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.cod-actions .btn {
+  width: 100% !important;
+}
+
+/* Mobile responsiveness for COD actions */
+@media (max-width: 768px) {
+  .cod-actions {
+    margin-top: 15px;
+  }
+
+  .cod-actions .btn {
+    padding: 12px !important;
+  }
+}

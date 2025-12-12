@@ -180,15 +180,15 @@
               </div>
 
               <div class="ringkasan-content">
-                @if($cartItems->count() > 0)
+                @if(isset($cartItems) && $cartItems->count() > 0)
                   @foreach($cartItems as $item)
                     <div class="produk-item">
                       <img src="{{ asset(($item['product'] ?? $item->product)->main_image ?? 'src/default-product.png') }}" alt="{{ ($item['product'] ?? $item->product)->name ?? '' }}" />
                       <div class="item-info">
                         <h4>{{ ($item['product'] ?? $item->product)->name ?? '' }}</h4>
-                        <p>{{ $item['quantity'] ?? $item->quantity }} x Rp {{ number_format(($item['product'] ?? $item->product)->price ?? 0, 2, ',', '.') }}</p>
+                        <p>{{ $item['quantity'] ?? $item->quantity }} x Rp {{ number_format(($item['product'] ?? $item->product)->price ?? 0, 0, ',', '.') }}</p>
                       </div>
-                      <div class="item-harga">Rp {{ number_format((($item['product'] ?? $item->product)->price ?? 0) * ($item['quantity'] ?? $item->quantity), 2, ',', '.') }}</div>
+                      <div class="item-harga">Rp {{ number_format((($item['product'] ?? $item->product)->price ?? 0) * ($item['quantity'] ?? $item->quantity), 0, ',', '.') }}</div>
                     </div>
                   @endforeach
                 @else
@@ -198,16 +198,16 @@
                 <div class="biaya-detail">
                   <div class="detail-row">
                     <span>Subtotal</span>
-                    <span>Rp {{ number_format($subTotal, 2, ',', '.') }}</span>
+                    <span>Rp {{ number_format($subTotal, 0, ',', '.') }}</span>
                   </div>
                   <!-- Sembunyikan biaya pengiriman sampai pengguna memilih metode pengiriman -->
                   <div class="detail-row" style="display: none;">
                     <span>Biaya Pengiriman</span>
-                    <span id="shippingCost">Rp {{ number_format($shippingCost, 2, ',', '.') }}</span>
+                    <span id="shippingCost">Rp {{ number_format($shippingCost, 0, ',', '.') }}</span>
                   </div>
                   <div class="detail-row total">
                     <span>Total</span>
-                    <span id="totalHarga">Rp {{ number_format($subTotal, 2, ',', '.') }}</span>
+                    <span id="totalHarga">Rp {{ number_format($subTotal, 0, ',', '.') }}</span>
                   </div>
                 </div>
               </div>
@@ -226,13 +226,23 @@
               </div>
 
               <div class="ringkasan-content" id="ringkasanDetails">
-                @if($cartItems->count() > 0)
+                {{-- Debug info - uncomment to see variable details --}}
+                {{--
+                @php
+                echo "<!-- cartItems type: " . gettype($cartItems) . " -->";
+                if(isset($cartItems)) {
+                  echo "<!-- cartItems count: " . ($cartItems ? $cartItems->count() : 'NULL') . " -->";
+                  echo "<!-- subTotal: " . ($subTotal ?? 'NULL') . " -->";
+                }
+                @endphp
+                --}}
+                @if(isset($cartItems) && $cartItems->count() > 0)
                   @foreach($cartItems as $item)
                     <div class="produk-preview">
                       <img src="{{ asset(($item['product'] ?? $item->product)->main_image ?? 'src/default-product.png') }}" alt="{{ ($item['product'] ?? $item->product)->name ?? '' }}" />
                       <div class="produk-info">
                         <h4>{{ ($item['product'] ?? $item->product)->name ?? '' }}</h4>
-                        <p class="produk-harga">Rp {{ number_format(($item['product'] ?? $item->product)->price ?? 0, 2, ',', '.') }}</p>
+                        <p class="produk-harga">Rp {{ number_format(($item['product'] ?? $item->product)->price ?? 0, 0, ',', '.') }}</p>
                       </div>
                       <span class="produk-qty">x{{ $item['quantity'] ?? $item->quantity }}</span>
                     </div>
@@ -245,7 +255,7 @@
               <div class="total-section">
                 <div class="total-row">
                   <span>Total Belanja</span>
-                  <span>Rp {{ number_format($subTotal, 2, ',', '.') }}</span>
+                  <span>Rp {{ number_format($subTotal, 0, ',', '.') }}</span>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-checkout" id="prosesPesananBtn">
@@ -259,7 +269,7 @@
 
       <!-- Sticky Bottom Action Bar -->
       <div class="sticky-action-bar">
-        <div class="total-tagihan">Rp {{ number_format($subTotal, 2, ',', '.') }}</div>
+        <div class="total-tagihan">Rp {{ number_format($subTotal, 0, ',', '.') }}</div>
         <button type="submit" form="checkoutForm" class="btn btn-primary btn-proses-pesanan">
           Proses Pesanan
         </button>

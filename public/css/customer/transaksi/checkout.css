@@ -1002,6 +1002,7 @@ section h2 {
 
 /* Sticky Bottom Action Bar */
 .sticky-action-bar {
+  display: none; /* Hidden on desktop */
   position: fixed;
   bottom: 0;
   left: 0;
@@ -1042,6 +1043,10 @@ section h2 {
 
 /* Add padding to main container to account for sticky bar */
 @media (max-width: 768px) {
+  .sticky-action-bar {
+    display: flex !important; /* Show on mobile */
+  }
+
   .checkout-content {
     padding-bottom: 140px !important;
   }

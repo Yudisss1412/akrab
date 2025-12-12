@@ -494,6 +494,27 @@ section h2 {
   background: #005a4a;
 }
 
+.btn-secondary {
+  width: 100%;
+  padding: 16px;
+  background: white;
+  color: var(--primary-color-dark);
+  border: 2px solid var(--primary-color-dark);
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-secondary:hover {
+  background: var(--primary-color);
+  color: var(--primary-color-dark);
+}
+
 /* Mobile Step Indicator - match checkout page style */
 .mobile-step-indicator {
   display: none; /* Initially hidden on desktop */
@@ -506,6 +527,28 @@ section h2 {
   background: rgba(168, 213, 201, 0.2);
   border-radius: 8px;
   border: 1px solid var(--primary-color);
+}
+
+/* COD Order History Button Container */
+.cod-order-history-btn-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.cod-order-history-btn-container .btn {
+  width: 100%;
+}
+
+/* Mobile responsiveness for COD order history button container */
+@media (max-width: 768px) {
+  .cod-order-history-btn-container {
+    margin-top: 15px;
+  }
+
+  .cod-order-history-btn-container .btn {
+    padding: 12px !important;
+  }
 }
 
 /* Responsive */

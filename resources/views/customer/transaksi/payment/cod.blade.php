@@ -115,13 +115,14 @@
               <li>Pastikan barang dalam kondisi baik sebelum melakukan pembayaran</li>
               <li>Apabila terdapat kerusakan pada barang, Anda berhak menolak penerimaan</li>
             </ul>
-
-            <div class="cod-actions">
-              <a href="/customer/riwayat-pesanan" class="btn btn-primary">
-                Lihat Riwayat Pesanan
-              </a>
-            </div>
           </section>
+
+          <!-- Button Lihat Riwayat Pesanan -->
+          <div class="cod-order-history-btn-container">
+            <a href="/customer/riwayat-pesanan" class="btn btn-secondary">
+              Lihat Riwayat Pesanan
+            </a>
+          </div>
         </div>
 
         <div class="sidebar">

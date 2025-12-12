@@ -31,112 +31,138 @@
         </div>
       </div>
 
-      <div class="pengiriman-content">
-        <div class="main-content">
-          <!-- Alamat Pengiriman -->
-          <section>
-            <h2>Alamat Pengiriman</h2>
-            @if(isset($order) && $order)
-              <div class="shipping-info">
-                <div class="info-row">
-                  <span class="label">Nama Penerima</span>
-                  <span class="value">{{ $order->shipping_address->recipient_name }}</span>
-                </div>
-                <div class="info-row">
-                  <span class="label">Alamat Lengkap</span>
-                  <span class="value">{{ $order->shipping_address->full_address }}</span>
-                </div>
-                <div class="info-row">
-                  <span class="label">Kontak</span>
-                  <span class="value">{{ $order->shipping_address->phone }}</span>
-                </div>
-              </div>
-            @else
-              <p>Informasi pengiriman tidak ditemukan.</p>
-            @endif
-          </section>
+      <div class="shipping-layout">
+        <!-- LEFT COLUMN: Main Content (~65%) -->
+        <div class="main-column">
 
-          <!-- Metode Pengiriman -->
-          <section>
-            <h2>Metode Pengiriman</h2>
-            <div class="shipping-options">
-              <div class="shipping-option @if(isset($order) && $order->shipping_courier == 'reguler') selected @endif" data-shipping-method="reguler" data-shipping-cost="15000">
-                <div class="option-header">
-                  <div class="option-info">
-                    <h3>Reguler</h3>
-                    <p>3-5 hari kerja</p>
-                  </div>
-                  <div class="option-price">Rp15.000</div>
-                </div>
-                <p class="option-description">Layanan pengiriman reguler dengan asuransi barang.</p>
+          <!-- Shipping Address Card -->
+          <div class="alamat-section">
+            <section class="alamat-card">
+              <div class="alamat-header">
+                <h2>Alamat Pengiriman</h2>
               </div>
 
-              <div class="shipping-option @if(isset($order) && $order->shipping_courier == 'express') selected @endif" data-shipping-method="express" data-shipping-cost="25000">
-                <div class="option-header">
-                  <div class="option-info">
-                    <h3>Kilat</h3>
-                    <p>1-2 hari kerja</p>
+              <div class="alamat-content">
+                @if(isset($order) && $order && $order->shipping_address)
+                  <div class="shipping-info">
+                    <div class="info-row">
+                      <span class="label">Nama Penerima</span>
+                      <span class="value">{{ $order->shipping_address->recipient_name }}</span>
+                    </div>
+                    <div class="info-row">
+                      <span class="label">Alamat Lengkap</span>
+                      <span class="value">{{ $order->shipping_address->full_address }}</span>
+                    </div>
+                    <div class="info-row">
+                      <span class="label">Kontak</span>
+                      <span class="value">{{ $order->shipping_address->phone }}</span>
+                    </div>
                   </div>
-                  <div class="option-price">Rp25.000</div>
-                </div>
-                <p class="option-description">Layanan pengiriman cepat dengan prioritas pengemasan.</p>
+                @else
+                  <p>Alamat pengiriman tidak ditemukan.</p>
+                @endif
+              </div>
+            </section>
+          </div>
+
+          <!-- Shipping Methods Card -->
+          <div class="shipping-method-section">
+            <section class="shipping-method-card">
+              <div class="shipping-method-header">
+                <h2>Metode Pengiriman</h2>
               </div>
 
-              <div class="shipping-option" data-shipping-method="same_day" data-shipping-cost="50000">
-                <div class="option-header">
-                  <div class="option-info">
-                    <h3>Same Day</h3>
-                    <p>Hari ini juga</p>
+              <div class="shipping-method-content">
+                <div class="shipping-options">
+                  <div class="shipping-option @if(isset($order) && $order->shipping_courier == 'reguler') selected @endif" data-shipping-method="reguler" data-shipping-cost="15000">
+                    <div class="option-header">
+                      <div class="option-info">
+                        <h3>Reguler</h3>
+                        <p>3-5 hari kerja</p>
+                      </div>
+                      <div class="option-price">Rp15.000</div>
+                    </div>
+                    <p class="option-description">Layanan pengiriman reguler dengan asuransi barang.</p>
                   </div>
-                  <div class="option-price">Rp50.000</div>
+
+                  <div class="shipping-option @if(isset($order) && $order->shipping_courier == 'express') selected @endif" data-shipping-method="express" data-shipping-cost="25000">
+                    <div class="option-header">
+                      <div class="option-info">
+                        <h3>Kilat</h3>
+                        <p>1-2 hari kerja</p>
+                      </div>
+                      <div class="option-price">Rp25.000</div>
+                    </div>
+                    <p class="option-description">Layanan pengiriman cepat dengan prioritas pengemasan.</p>
+                  </div>
+
+                  <div class="shipping-option" data-shipping-method="same_day" data-shipping-cost="50000">
+                    <div class="option-header">
+                      <div class="option-info">
+                        <h3>Same Day</h3>
+                        <p>Hari ini juga</p>
+                      </div>
+                      <div class="option-price">Rp50.000</div>
+                    </div>
+                    <p class="option-description">Pengiriman dalam hari yang sama dengan kurir khusus.</p>
+                  </div>
                 </div>
-                <p class="option-description">Pengiriman dalam hari yang sama dengan kurir khusus.</p>
               </div>
-            </div>
-          </section>
+            </section>
+          </div>
         </div>
 
-        <div class="sidebar">
-          <!-- Ringkasan Pembayaran -->
-          <section class="payment-summary">
-            <h2>Ringkasan Pembayaran</h2>
-            @if(isset($order) && $order)
-              <div class="summary-details">
-                @if($order->items->count() > 0)
-                  <div class="summary-row">
-                    <span>Subtotal ({{ $order->items->sum('quantity') }} produk)</span>
-                    <span class="subtotal-amount">Rp {{ number_format($order->sub_total, 0, ',', '.') }}</span>
-                  </div>
-                @endif
-                <div class="summary-row">
-                  <span>Ongkos Kirim</span>
-                  <span class="shipping-cost-amount">Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}</span>
-                </div>
-                <div class="summary-row">
-                  <span>Asuransi Pengiriman</span>
-                  <span>Rp {{ number_format(1500, 0, ',', '.') }}</span>
-                </div>
-                <div class="summary-row discount">
-                  <span>Diskon</span>
-                  <span>-Rp {{ number_format(0, 0, ',', '.') }}</span>
-                </div>
-                <div class="summary-divider"></div>
-                <div class="summary-row total">
-                  <span>Total</span>
-                  <span class="total-amount">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
-                </div>
-              </div>
-            @else
-              <p>Data pesanan tidak ditemukan.</p>
-            @endif
+        <!-- RIGHT COLUMN: Payment Summary Sidebar (~35%) -->
+        <div class="sidebar-right">
+          <!-- Payment Summary Card -->
+            @php
+                // Ensure we have a consistent $order variable regardless of how the controller sent data
+                $order = $order ?? $latestOrder ?? null;
+            @endphp
 
-            <button class="btn btn-primary btn-lanjut-pembayaran">
-              Lanjut ke Pembayaran
-            </button>
-          </section>
+            <section class="payment-summary-card">
+              <h2>Ringkasan Pembayaran</h2>
+              @if(isset($order) && $order)
+                <div class="summary-details">
+                  @if($order->items->count() > 0)
+                    <div class="summary-row">
+                      <span>Subtotal ({{ $order->items->sum('quantity') }} produk)</span>
+                      <span class="subtotal-amount">Rp {{ number_format($order->sub_total, 0, ',', '.') }}</span>
+                    </div>
+                  @endif
+                  <div class="summary-row">
+                    <span>Ongkos Kirim</span>
+                    <span class="shipping-cost-amount">Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}</span>
+                  </div>
+                  <div class="summary-row">
+                    <span>Asuransi Pengiriman</span>
+                    <span>Rp {{ number_format(1500, 0, ',', '.') }}</span>
+                  </div>
+                  <div class="summary-row discount">
+                    <span>Diskon</span>
+                    <span>-Rp {{ number_format(0, 0, ',', '.') }}</span>
+                  </div>
+                  <div class="summary-divider"></div>
+                  <div class="summary-row total">
+                    <span>Total</span>
+                    <span class="total-amount">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
+                  </div>
+                </div>
+
+                <a href="{{ route('cust.pembayaran') }}" class="btn btn-primary btn-lanjut-pembayaran">
+                  Lanjut ke Pembayaran
+                </a>
+              @else
+                <p class="no-order-message">Data pesanan tidak ditemukan.</p>
+                <a href="{{ route('cust.keranjang') }}" class="btn btn-secondary">
+                  Kembali ke Keranjang
+                </a>
+              @endif
+            </section>
+          </div>
         </div>
       </div>
-      
+
       <!-- Review Section - only show if order is delivered -->
       @if(isset($order) && $order && $order->status === 'delivered')
       <div class="review-section">
@@ -168,6 +194,7 @@
       </div>
       @endif
     </div>
+
   </main>
 @endsection
 
@@ -194,17 +221,23 @@
 
       // Function to update shipping summary via AJAX
       function updateShippingSummary(shippingMethod, shippingCost) {
+        // Define order number from PHP
+        @php
+          $actualOrder = $order ?? $latestOrder ?? null;
+        @endphp
+        const orderNumber = @json($actualOrder ? $actualOrder->order_number : null);
+
         if (!orderNumber) {
           console.error('Order number not found');
           return;
         }
-        
+
         // Show loading indicator
         const totalAmountElement = document.querySelector('.total-amount');
         if (totalAmountElement) {
           totalAmountElement.innerHTML = 'Memperbarui...';
         }
-        
+
         // Send AJAX request to update shipping method
         fetch('{{ route("cust.pengiriman.update") }}', {
           method: 'POST',

@@ -108,33 +108,103 @@ body {
   color: var(--gray-500);
 }
 
-/* Pengiriman Content */
-.pengiriman-content {
+/* Responsive Grid Layout for Shipping Page */
+.shipping-layout {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 30px;
+  margin-top: 20px;
+  align-items: start;
 }
 
-/* Main Content & Sidebar */
-.main-content,
-.sidebar {
+/* Main Content Left */
+.main-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Sidebar Right */
+.sidebar-right {
+  position: relative;
+}
+
+/* Desktop Layout (>= 1024px) - Sidebar becomes sticky */
+@media (min-width: 1024px) {
+  .shipping-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    align-items: start;
+  }
+
+  .sidebar-right {
+    position: sticky;
+    top: 100px; /* Adjust according to your header height */
+  }
+}
+
+/* Mobile Layout (< 1024px) - Sidebar moves to bottom */
+@media (max-width: 1023px) {
+  .shipping-layout {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+/* Payment Summary Card (used in sidebar) */
+.payment-summary-card {
   background: white;
   border: 1px solid var(--border-color);
-  border-radius: var(--radius);
+  border-radius: 16px;
   padding: 24px;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-md);
+  width: 100%;
 }
 
-section {
-  margin-bottom: 24px;
-}
-
-section h2 {
+.payment-summary-card h2 {
+  margin: 0 0 20px 0;
   font-size: 18px;
   font-weight: 700;
-  margin: 0 0 20px 0;
   color: var(--text);
+  text-align: center;
 }
+
+.payment-summary-card .summary-details {
+  margin-bottom: 20px;
+}
+
+.payment-summary-card .summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 14px;
+}
+
+.payment-summary-card .summary-row.discount {
+  color: var(--success);
+}
+
+.payment-summary-card .summary-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 12px 0;
+}
+
+.payment-summary-card .summary-row.total {
+  font-weight: 700;
+  font-size: 16px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 16px;
+  margin-top: 8px;
+}
+
+.payment-summary-card .total-amount {
+  color: var(--primary-color-dark);
+  font-size: 18px;
+}
+
+
 
 /* Shipping Address Summary */
 .shipping-info {
@@ -314,6 +384,440 @@ section h2 {
 .btn-outline:hover {
   background: var(--gray-100);
   border-color: var(--primary-color);
+}
+
+/* Individual Address Card - Completely standalone */
+.alamat-section {
+  margin-bottom: 24px;
+}
+
+.alamat-card {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  width: 100%;
+  margin: 0 auto;
+  display: block;
+}
+
+.alamat-header {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.alamat-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary-color-dark);
+}
+
+.alamat-content .shipping-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Individual Shipping Methods Card - Completely standalone */
+.shipping-method-section {
+  margin-bottom: 24px;
+}
+
+.shipping-method-card {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  width: 100%;
+  margin: 0 auto;
+  display: block;
+}
+
+.shipping-method-header {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.shipping-method-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary-color-dark);
+}
+
+.shipping-method-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Sidebar payment summary section (mobile fallback) */
+.payment-summary-sidebar {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  width: 100%;
+  margin: 24px 0 0 0;
+  display: block;
+}
+
+.payment-summary-sidebar h2 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary-color-dark);
+}
+
+/* Full-width Payment Summary Card - Completely independent at bottom */
+.full-width-payment-summary {
+  width: 100%;
+  padding: 0 20px 100px; /* Added bottom padding to account for sticky bar */
+  box-sizing: border-box;
+  margin: 24px 0 0 0; /* Added top margin for separation */
+}
+
+.payment-summary-card {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  display: block;
+}
+
+.shipping-option {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.shipping-option:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 12px rgba(0, 110, 92, 0.1);
+}
+
+.shipping-option.selected {
+  border-color: var(--primary-color-dark);
+  background: rgba(168, 213, 201, 0.1);
+}
+
+.shipping-option.selected::after {
+  content: '✓';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: var(--primary-color-dark);
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.option-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.option-info h3 {
+  margin: 0 0 4px 0;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.option-info p {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.option-price {
+  font-weight: 700;
+  color: var(--primary-color-dark);
+  font-size: 16px;
+  white-space: nowrap;
+  margin-left: 10px;
+}
+
+.option-description {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Mobile responsive adjustment */
+@media (max-width: 768px) {
+  .alamat-section,
+  .shipping-method-section {
+    margin-left: -20px;
+    margin-right: -20px;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .alamat-card,
+  .shipping-method-card {
+    margin-left: 0;
+    margin-right: 0;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+}
+
+/* Sidebar Payment Summary Card (mobile fallback) */
+.payment-summary-sidebar {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  width: 100%;
+}
+
+.payment-summary-sidebar h2 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary-color-dark);
+}
+
+.summary-details {
+  margin-bottom: 20px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 14px;
+}
+
+.summary-row.discount {
+  color: var(--success);
+}
+
+.summary-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 12px 0;
+}
+
+.summary-row.total {
+  font-weight: 700;
+  font-size: 16px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 16px;
+  margin-top: 8px;
+}
+
+.total-amount {
+  color: var(--primary-color-dark);
+  font-size: 18px;
+}
+
+/* Full-width Payment Summary Card */
+.full-width-payment-summary {
+  width: 100%;
+  padding: 0 20px 20px;
+  box-sizing: border-box;
+}
+
+.payment-summary-card {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+  max-width: 1200px;
+  margin: 20px auto;
+  width: 100%;
+}
+
+.payment-summary-content h3 {
+  margin: 0 0 20px 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary-color-dark);
+  text-align: center;
+}
+
+.summary-details-full {
+  margin-bottom: 20px;
+}
+
+.summary-details-full .summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 14px;
+}
+
+.summary-details-full .summary-row.discount {
+  color: var(--success);
+}
+
+.summary-details-full .summary-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 12px 0;
+}
+
+.summary-details-full .summary-row.total {
+  font-weight: 700;
+  font-size: 16px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 16px;
+  margin-top: 8px;
+}
+
+.total-amount {
+  color: var(--primary-color-dark);
+  font-size: 18px;
+}
+
+.btn-checkout-full {
+  width: 100%;
+  padding: 16px;
+  background: var(--primary-color-dark);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  text-decoration: none;
+  text-align: center;
+  display: inline-block;
+}
+
+.btn-checkout-full:hover {
+  background: #005a4a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 110, 92, 0.3);
+}
+
+/* Mobile responsive adjustment for grid */
+@media (max-width: 768px) {
+  .address-payment-grid {
+    grid-template-columns: 1fr; /* Stack the cards vertically on mobile */
+    gap: 16px;
+  }
+
+  .full-width-payment-summary {
+    padding: 0 16px 80px; /* Add bottom padding for mobile to account for fixed footer */
+  }
+}
+
+.address-column {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+
+.payment-column {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+
+/* Inline Payment Summary Card */
+.payment-summary-inline {
+  margin-top: 0; /* Remove top margin since it's in the grid layout */
+}
+
+.summary-card {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  width: 100%;
+}
+
+.summary-card h3 {
+  margin: 0 0 16px 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary-color-dark);
+}
+
+.summary-content {
+  margin-bottom: 16px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 0.95rem;
+}
+
+.summary-row.discount {
+  color: var(--success);
+}
+
+.summary-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 12px 0;
+}
+
+.summary-row.total {
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding-top: 12px;
+  margin-top: 8px;
+  border-top: 1px solid var(--border-color);
+}
+
+.total-amount {
+  color: var(--primary-color-dark);
+  font-size: 1.2rem;
+}
+
+.btn-lanjut-pembayaran-inline {
+  width: 100%;
+  padding: 14px;
+  background: var(--primary-color-dark);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  text-decoration: none;
+  text-align: center;
+  display: block;
+}
+
+.btn-lanjut-pembayaran-inline:hover {
+  background: #005a4a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 110, 92, 0.3);
 }
 
 /* Review Section */

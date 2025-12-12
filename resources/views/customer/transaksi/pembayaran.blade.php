@@ -16,11 +16,11 @@
       <div class="page-header">
         <h1>Pembayaran</h1>
         <div class="progress-steps">
-          <div class="step">
+          <div class="step active">
             <span class="step-number">1</span>
             <span class="step-label">Alamat</span>
           </div>
-          <div class="step">
+          <div class="step active">
             <span class="step-number">2</span>
             <span class="step-label">Pengiriman</span>
           </div>
@@ -28,6 +28,10 @@
             <span class="step-number">3</span>
             <span class="step-label">Pembayaran</span>
           </div>
+        </div>
+        <!-- Mobile Step Indicator -->
+        <div class="mobile-step-indicator">
+          <span>Pembayaran • Langkah 3 dari 3</span>
         </div>
       </div>
 

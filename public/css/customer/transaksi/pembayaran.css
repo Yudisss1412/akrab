@@ -492,41 +492,64 @@ section h2 {
   background: #005a4a;
 }
 
+/* Mobile Step Indicator - match checkout page style */
+.mobile-step-indicator {
+  display: none; /* Initially hidden on desktop */
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: 600;
+  color: var(--primary-color-dark);
+  font-size: 16px;
+  padding: 10px;
+  background: rgba(168, 213, 201, 0.2);
+  border-radius: 8px;
+  border: 1px solid var(--primary-color);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .container {
     padding: 16px;
   }
-  
+
   .pembayaran-content {
     grid-template-columns: 1fr;
     gap: 20px;
   }
-  
+
   .page-header h1 {
     font-size: 20px;
   }
-  
+
   .progress-steps {
     margin-bottom: 30px;
   }
-  
+
+  /* Show mobile step indicator and hide desktop stepper */
+  .progress-steps {
+    display: none;
+  }
+
+  .mobile-step-indicator {
+    display: block;
+  }
+
   section {
     padding: 20px;
   }
-  
+
   .order-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
-  
+
   .item-image {
     width: 100%;
     height: auto;
     max-height: 120px;
   }
-  
+
   .info-row .value {
     max-width: 50%;
   }

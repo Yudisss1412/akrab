@@ -31,7 +31,7 @@
         </div>
         <!-- Mobile Step Indicator -->
         <div class="mobile-step-indicator">
-          <span>Langkah 1 dari 3: Alamat</span>
+          <span>Alamat • Langkah 1 dari 3</span>
         </div>
       </div>
 

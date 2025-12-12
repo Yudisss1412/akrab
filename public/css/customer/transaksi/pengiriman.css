@@ -633,67 +633,342 @@ body {
   font-size: 18px;
 }
 
-/* Full-width Payment Summary Card */
-.full-width-payment-summary {
-  width: 100%;
-  padding: 0 20px 20px;
+/* New Stepper Layout for Shipping */
+.pengiriman-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 30px;
+}
+
+.pengiriman-left {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.pengiriman-right {
+  position: relative;
+}
+
+/* Desktop Layout (>= 1024px) - Sidebar becomes sticky */
+@media (min-width: 1024px) {
+  .pengiriman-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    align-items: start;
+  }
+
+  .pengiriman-right {
+    position: sticky;
+    top: 100px; /* Adjust according to your header height */
+  }
+}
+
+/* Mobile Layout (< 1024px) - Sidebar moves to bottom */
+@media (max-width: 1023px) {
+  .pengiriman-content {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+/* Section Header */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border-color);
+  position: relative;
+}
+
+.section-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-color-dark);
+}
+
+.section-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary-color-dark);
+}
+
+/* Edit Button */
+.btn-edit {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: var(--primary-color-dark);
+  color: white;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 110, 92, 0.3);
+  z-index: 2; /* Ensure button stays above other elements */
+  min-width: 36px; /* Ensure consistent width */
+  min-height: 36px;
   box-sizing: border-box;
 }
 
-.payment-summary-card {
-  background: white;
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: var(--shadow);
-  max-width: 1200px;
-  margin: 20px auto;
-  width: 100%;
+.btn-edit:hover {
+  background: #005a4a;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 110, 92, 0.4);
 }
 
-.payment-summary-content h3 {
-  margin: 0 0 20px 0;
-  font-size: 1.2rem;
+/* Alamat Card */
+.alamat-card {
+  background: white;
+  border: 2px solid var(--gray-200);
+  border-radius: 16px;
+  padding: 1.5rem;
+  position: relative;
+  transition: all 0.3s ease;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: visible; /* Ensure content is visible */
+}
+
+.alamat-card:hover {
+  border-color: var(--primary-color-dark);
+  box-shadow: 0 6px 20px rgba(0, 110, 92, 0.15);
+}
+
+.alamat-content {
+  position: relative;
+  padding: 0.5rem 2.5rem 0.5rem 0.5rem; /* Reduced padding to accommodate edit button */
+}
+
+.primary-badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: var(--primary-color-dark);
+  color: white;
+  padding: 0.25rem 0.6rem;
+  border-radius: 16px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  z-index: 1;
+}
+
+.alamat-content h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.4;
+  word-break: break-word; /* Mencegah teks keluar dari container */
+}
+
+.alamat-content p {
+  margin: 0.25rem 0;
+  font-size: 0.95rem;
+  color: #444;
+  line-height: 1.4;
+  word-break: break-word; /* Mencegah teks keluar dari container */
+}
+
+.alamat-content p:last-child {
+  margin-bottom: 0;
+}
+
+.alamat-phone {
+  font-weight: 600;
+  color: var(--primary-color-dark);
+  margin-top: 0.25rem !important;
+  word-break: break-all; /* Untuk nomor telepon yang panjang */
+}
+
+/* Styling untuk masing-masing baris alamat */
+.alamat-line {
+  display: inline-block;
+  font-size: 0.95rem;
+  color: #444;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+#alamatDetail {
+  margin: 0.25rem 0;
+}
+
+/* Alamat Form */
+.alamat-form {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 6px 20px rgba(0, 110, 92, 0.12);
+  position: relative;
+  overflow: hidden;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.alamat-form::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-color), #00897b);
+}
+
+.alamat-form .form-group {
+  margin-bottom: 1.75rem;
+  position: relative;
+}
+
+.alamat-form .form-group::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 5px;
+  bottom: 5px;
+  width: 3px;
+  background: linear-gradient(to bottom, var(--primary-color), #00897b);
+  border-radius: 2px;
+  opacity: 0.4;
+}
+
+.alamat-form .form-group label {
+  display: block;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--primary-color-dark);
+  position: relative;
+  padding-left: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.alamat-form .form-control {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: #f9fafb;
+  position: relative;
+}
+
+.alamat-form .form-control:focus {
+  outline: none;
+  background-color: white;
+  border-color: var(--primary-color-dark);
+  box-shadow: 0 0 0 4px rgba(0, 110, 92, 0.15);
+  transform: translateY(-1px);
+}
+
+.alamat-form textarea.form-control {
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.5;
+  padding-top: 0.8rem;
+  padding-bottom: 0.8rem;
+}
+
+.alamat-form .form-control:hover {
+  background-color: white;
+  border-color: #d1d5db;
+}
+
+.alamat-form .form-control::placeholder {
+  color: #9ca3af;
+  font-style: italic;
+  opacity: 0.7;
+}
+
+.alamat-form select.form-control {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 1rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 3rem;
+}
+
+/* Produk Preview */
+.produk-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.produk-preview:last-child {
+  border-bottom: none;
+}
+
+.produk-preview img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+}
+
+.produk-info {
+  flex: 1;
+}
+
+.produk-info h4 {
+  margin: 0 0 4px 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.produk-harga {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.produk-qty {
   font-weight: 700;
   color: var(--primary-color-dark);
-  text-align: center;
+  font-size: 15px;
 }
 
-.summary-details-full {
-  margin-bottom: 20px;
+.total-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 2px solid var(--border-color);
 }
 
-.summary-details-full .summary-row {
+.total-row {
   display: flex;
   justify-content: space-between;
   padding: 8px 0;
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 600;
 }
 
-.summary-details-full .summary-row.discount {
-  color: var(--success);
-}
-
-.summary-details-full .summary-divider {
-  height: 1px;
-  background: var(--border-color);
-  margin: 12px 0;
-}
-
-.summary-details-full .summary-row.total {
-  font-weight: 700;
-  font-size: 16px;
-  border-top: 1px solid var(--border-color);
-  padding-top: 16px;
-  margin-top: 8px;
-}
-
-.total-amount {
-  color: var(--primary-color-dark);
-  font-size: 18px;
-}
-
-.btn-checkout-full {
+.total-section .btn-lanjut-pembayaran {
   width: 100%;
   padding: 16px;
   background: var(--primary-color-dark);
@@ -706,13 +981,81 @@ body {
   transition: background 0.2s ease;
   text-decoration: none;
   text-align: center;
-  display: inline-block;
+  display: block;
+  margin-top: 16px;
 }
 
-.btn-checkout-full:hover {
+.total-section .btn-lanjut-pembayaran:hover {
   background: #005a4a;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 110, 92, 0.3);
+}
+
+/* Toggle button for summary */
+#toggleRingkasan {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--primary-color-dark);
+  font-size: 14px;
+}
+
+#toggleRingkasan .chevron-icon {
+  transition: transform 0.3s ease;
+}
+
+#toggleRingkasan .chevron-icon.rotated {
+  transform: rotate(180deg);
+}
+
+#ringkasanDetails {
+  display: none; /* Initially hidden on mobile */
+  margin-top: 15px;
+}
+
+#ringkasanDetails.show {
+  display: block;
+}
+
+/* Sticky action bar */
+.sticky-action-bar {
+  display: none; /* Hidden on desktop */
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: white;
+  border-top: 1px solid var(--border-color);
+  padding: 12px 20px;
+  z-index: 1000;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sticky-action-bar .total-tagihan {
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--primary-color-dark);
+}
+
+.sticky-action-bar .btn-proses-pesanan {
+  padding: 12px 24px;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  .sticky-action-bar {
+    display: flex;
+  }
+
+  .container {
+    padding-bottom: 100px; /* Add padding to account for sticky bar */
+  }
 }
 
 /* Mobile responsive adjustment for grid */
@@ -887,32 +1230,88 @@ body {
   color: #666;
 }
 
+/* Mobile Step Indicator - match checkout page style */
+.mobile-step-indicator {
+  display: none; /* Initially hidden on desktop */
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: 600;
+  color: var(--primary-color-dark);
+  font-size: 16px;
+  padding: 10px;
+  background: rgba(168, 213, 201, 0.2);
+  border-radius: 8px;
+  border: 1px solid var(--primary-color);
+}
+
 /* Responsive */
-@media (max-width: 992px) {
+@media (max-width: 768px) {
   .pengiriman-content {
     grid-template-columns: 1fr;
     gap: 20px;
   }
-  
-  .page-header {
-    padding: 20px;
+
+  .alamat-section,
+  .pengiriman-section {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    border-radius: 0;
   }
-  
-  .main-content,
-  .sidebar {
-    padding: 20px;
+
+  .alamat-card {
+    width: 100% !important;
+    max-width: 100vw !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    box-sizing: border-box !important;
+    position: relative; /* Ensure edit button stays within boundaries */
+    overflow: visible; /* Allow the edit button to be visible */
   }
-  
-  .products-to-review {
-    gap: 12px;
+
+  .alamat-form {
+    width: 100% !important;
+    max-width: 100vw !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    box-sizing: border-box !important;
   }
-  
-  .product-review-card {
+
+  /* Show mobile step indicator and hide desktop stepper */
+  .progress-steps {
+    display: none;
+  }
+
+  .mobile-step-indicator {
+    display: block;
+  }
+
+  .section-header {
     flex-direction: column;
     align-items: flex-start;
+    gap: 10px;
   }
-  
-  .product-info {
-    width: 100%;
+
+  #toggleRingkasan {
+    align-self: flex-end;
+    margin-top: -1rem;
+  }
+}
+
+/* Hide desktop stepper on mobile, show mobile indicator */
+@media (max-width: 768px) {
+  .progress-steps {
+    display: none;
+  }
+
+  .mobile-step-indicator {
+    display: block;
   }
 }

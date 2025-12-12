@@ -154,12 +154,13 @@ body {
 
 /* Payment Summary Card (used in sidebar) */
 .payment-summary-card {
-  background: white;
+  background: white !important;
   border: 1px solid var(--border-color);
   border-radius: 16px;
   padding: 24px;
   box-shadow: var(--shadow-md);
   width: 100%;
+  backdrop-filter: none; /* Ensure no transparency effects */
 }
 
 .payment-summary-card h2 {
@@ -256,7 +257,8 @@ body {
 
 .shipping-option.selected {
   border-color: var(--primary-color-dark);
-  background: rgba(168, 213, 201, 0.1);
+  background: white !important;
+  box-shadow: 0 0 0 2px var(--primary-color) !important;
 }
 
 .shipping-option.selected::after {
@@ -423,11 +425,19 @@ body {
 
 /* Individual Shipping Methods Card - Completely standalone */
 .shipping-method-section {
-  margin-bottom: 24px;
+  background: white !important;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+  width: 100%;
+  margin: 24px 0 0 0;
+  display: block;
+  backdrop-filter: none; /* Ensure no transparency effects */
 }
 
 .shipping-method-card {
-  background: white;
+  background: white !important;
   border: 1px solid var(--border-color);
   border-radius: 16px;
   padding: 20px;
@@ -435,6 +445,7 @@ body {
   width: 100%;
   margin: 0 auto;
   display: block;
+  backdrop-filter: none; /* Ensure no transparency effects */
 }
 
 .shipping-method-header {
@@ -458,7 +469,7 @@ body {
 
 /* Sidebar payment summary section (mobile fallback) */
 .payment-summary-sidebar {
-  background: white;
+  background: white !important;
   border: 1px solid var(--border-color);
   border-radius: 16px;
   padding: 20px;
@@ -466,6 +477,7 @@ body {
   width: 100%;
   margin: 24px 0 0 0;
   display: block;
+  backdrop-filter: none; /* Ensure no transparency effects */
 }
 
 .payment-summary-sidebar h2 {
@@ -484,7 +496,7 @@ body {
 }
 
 .payment-summary-card {
-  background: white;
+  background: white !important;
   border: 1px solid var(--border-color);
   border-radius: 16px;
   padding: 24px;
@@ -493,6 +505,7 @@ body {
   margin: 0 auto;
   width: 100%;
   display: block;
+  backdrop-filter: none; /* Ensure no transparency effects */
 }
 
 .shipping-option {
@@ -511,7 +524,8 @@ body {
 
 .shipping-option.selected {
   border-color: var(--primary-color-dark);
-  background: rgba(168, 213, 201, 0.1);
+  background: white !important;
+  box-shadow: 0 0 0 2px var(--primary-color) !important;
 }
 
 .shipping-option.selected::after {
@@ -698,6 +712,62 @@ body {
   color: var(--primary-color-dark);
 }
 
+/* Alamat Section */
+.alamat-section {
+  background: white !important;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+  width: 100%;
+  margin-bottom: 24px;
+  backdrop-filter: none; /* Ensure no transparency effects */
+}
+
+.alamat-section h2 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary-color-dark);
+}
+
+/* Pengiriman Section */
+.pengiriman-section {
+  background: white !important;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+  width: 100%;
+  margin-bottom: 24px;
+  backdrop-filter: none; /* Ensure no transparency effects */
+}
+
+.pengiriman-section h2 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary-color-dark);
+}
+
+/* Ringkasan Belanja Section */
+.ringkasan-belanja {
+  background: white !important;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+  width: 100%;
+  backdrop-filter: none; /* Ensure no transparency effects */
+}
+
+.ringkasan-belanja h3 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary-color-dark);
+}
+
 /* Edit Button */
 .btn-edit {
   position: absolute;
@@ -729,7 +799,7 @@ body {
 
 /* Alamat Card */
 .alamat-card {
-  background: white;
+  background: white !important;
   border: 2px solid var(--gray-200);
   border-radius: 16px;
   padding: 1.5rem;
@@ -738,6 +808,7 @@ body {
   margin-bottom: 1.5rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   overflow: visible; /* Ensure content is visible */
+  backdrop-filter: none; /* Ensure no transparency effects */
 }
 
 .alamat-card:hover {
@@ -806,7 +877,7 @@ body {
 
 /* Alamat Form */
 .alamat-form {
-  background: white;
+  background: white !important;
   border-radius: 16px;
   padding: 2rem;
   margin-bottom: 1.5rem;
@@ -815,6 +886,7 @@ body {
   position: relative;
   overflow: hidden;
   animation: fadeIn 0.4s ease-out;
+  backdrop-filter: none; /* Ensure no transparency effects */
 }
 
 @keyframes fadeIn {
@@ -1332,4 +1404,18 @@ body {
   .mobile-step-indicator {
     display: block;
   }
+}
+
+/* Final override to ensure no transparency in important elements */
+.payment-summary-card,
+.shipping-method-card,
+.alamat-card,
+.alamat-form,
+.payment-summary-sidebar,
+.alamat-section,
+.pengiriman-section,
+.ringkasan-belanja,
+.shipping-method-section {
+  background: white !important;
+  backdrop-filter: none !important;
 }

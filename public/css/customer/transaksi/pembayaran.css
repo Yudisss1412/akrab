@@ -14,6 +14,7 @@
   --gray-500: #adb5bd;
   --radius: 12px;
   --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 6px 16px rgba(0, 0, 0, 0.1);
 }
 
 * {
@@ -122,6 +123,7 @@ body {
 .payment-summary-column {
   width: 100%;
   position: relative;
+  min-width: 0; /* Fix flexbox issue */
 }
 
 /* Payment Summary Card */
@@ -547,11 +549,150 @@ section h2 {
   .item-image {
     width: 100%;
     height: auto;
+    max-width: 120px;
     max-height: 120px;
   }
 
+  .info-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .info-row .label {
+    text-align: left;
+  }
+
   .info-row .value {
-    max-width: 50%;
+    text-align: left;
+    max-width: 100%;
+  }
+
+  .order-item {
+    gap: 16px;
+  }
+
+  .item-details {
+    width: 100%;
+  }
+
+  .item-total {
+    align-self: flex-end;
+  }
+
+  .shipping-info {
+    gap: 12px;
+  }
+
+  .summary-row {
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+  }
+
+  .summary-row.total {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .payment-options {
+    gap: 12px;
+  }
+
+  .payment-option {
+    padding: 12px;
+  }
+
+  .option-header {
+    gap: 12px;
+  }
+
+  .option-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .option-text h3 {
+    font-size: 15px;
+  }
+
+  .option-text p {
+    font-size: 12px;
+  }
+
+  .payment-summary-card {
+    padding: 20px;
+  }
+}
+
+/* Extra small devices (phones, 480px and down) */
+@media (max-width: 480px) {
+  .page-header h1 {
+    font-size: 18px;
+  }
+
+  .container {
+    padding: 12px;
+  }
+
+  section h2 {
+    font-size: 16px;
+  }
+
+  .item-name {
+    font-size: 14px;
+  }
+
+  .btn-proses-pembayaran {
+    padding: 14px;
+    font-size: 15px;
+  }
+
+  .summary-row {
+    font-size: 13px;
+  }
+
+  .total-amount {
+    font-size: 16px;
+  }
+
+  .progress-steps .step-label {
+    font-size: 12px;
+  }
+
+  .progress-steps .step-number {
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+  }
+
+  .order-item {
+    gap: 12px;
+  }
+
+  .item-image {
+    max-width: 80px;
+    max-height: 80px;
+  }
+}
+
+/* Tablet devices (between 768px and 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .pembayaran-content {
+    grid-template-columns: 60% 40%;
+    gap: 24px;
+  }
+
+  .item-image {
+    width: 50px;
+    height: 50px;
+  }
+
+  .summary-row {
+    font-size: 13px;
+  }
+
+  .payment-option {
+    padding: 14px;
   }
 }
 

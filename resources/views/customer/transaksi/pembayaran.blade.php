@@ -212,10 +212,10 @@
           // Disable button to prevent double submission
           payBtn.disabled = true;
           payBtn.innerHTML = 'Memproses...';
-          
+
           // Get selected payment method
           const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
-          
+
           // Prepare the data to send
           const formData = new FormData();
           formData.append('payment_method', selectedMethod);
@@ -223,7 +223,7 @@
             formData.append('order_number', '{{ $order->order_number }}');
           @endif
           formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
-          
+
           // Make AJAX request to process payment
           fetch('{{ route("payment.process") }}', {
             method: 'POST',
@@ -277,6 +277,24 @@
 
       // Call on resize
       window.addEventListener('resize', showStickyCheckoutBar);
+
+      // Add responsive utility for better mobile experience
+      function adjustLayoutForMobile() {
+        const container = document.querySelector('.pembayaran-content');
+        if (window.innerWidth < 768) {
+          // On mobile, adjust layout if needed
+          container.style.alignItems = 'stretch';
+        } else {
+          // Reset for desktop
+          container.style.alignItems = '';
+        }
+      }
+
+      // Call initial layout adjustment
+      adjustLayoutForMobile();
+
+      // Listen for resize events to adjust layout
+      window.addEventListener('resize', adjustLayoutForMobile);
     });
   </script>
 @endpush

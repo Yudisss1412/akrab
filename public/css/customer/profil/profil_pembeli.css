@@ -209,14 +209,19 @@ body{
   overflow-x: auto; /* Ensure content doesn't break layout if there are wide tables */
 }
 
-/* Profile Card styling */
-.profile-card {
-  grid-column: 1; /* For desktop, this will be part of sidebar */
-}
+/* For desktop: when sidebar container is created by JS */
+@media (min-width: 981px) {
+  .profile-layout {
+    grid-template-columns: 30% 70%;
+  }
 
-/* Navigation menu styling */
-.profile-navigation {
-  grid-column: 1; /* For desktop, this will be part of sidebar */
+  .sidebar-profile-container {
+    grid-column: 1;
+  }
+
+  .main-content {
+    grid-column: 2;
+  }
 }
 
 /* Navigation styling - highlighted active state */

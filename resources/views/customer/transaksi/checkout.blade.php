@@ -192,7 +192,7 @@
                     </div>
                   @endforeach
                 @else
-                  <p>Keranjang Anda kosong.</p>
+                  <!-- Tidak tampilkan apapun jika keranjang kosong di ringkasan pesanan -->
                 @endif
 
                 <div class="biaya-detail">
@@ -248,7 +248,9 @@
                     </div>
                   @endforeach
                 @else
-                  <p>Keranjang Anda kosong.</p>
+                  <div class="empty-cart-message">
+                    <p>Tidak ada produk dalam keranjang Anda saat ini.</p>
+                  </div>
                 @endif
               </div>
 

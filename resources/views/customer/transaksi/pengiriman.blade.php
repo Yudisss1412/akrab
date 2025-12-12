@@ -181,7 +181,9 @@
                   </div>
                 @endforeach
               @else
-                <p>Keranjang Anda kosong.</p>
+                <div class="empty-cart-message">
+                  <p>Tidak ada produk dalam keranjang Anda saat ini.</p>
+                </div>
               @endif
             </div>
 

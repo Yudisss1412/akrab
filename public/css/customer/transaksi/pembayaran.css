@@ -106,8 +106,113 @@ body {
 /* Pembayaran Content */
 .pembayaran-content {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 65% 35%; /* Left column: 65%, Right column: 35% */
   gap: 30px;
+}
+
+/* Main Content Left */
+.main-content-left {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+/* Payment Summary Right Column */
+.payment-summary-column {
+  width: 100%;
+  position: relative;
+}
+
+/* Payment Summary Card */
+.payment-summary {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow);
+  position: relative;
+  z-index: 10; /* Make sure it's above other elements */
+  display: block; /* Ensure block display to prevent any layout issues */
+  width: 100%; /* Ensure full width in its container */
+}
+
+.payment-summary-card h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 20px 0;
+  color: var(--text);
+  text-align: center;
+}
+
+/* Payment Summary Card Specific Styles */
+.payment-summary-card {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow-lg);
+  margin-bottom: 0;
+}
+
+.payment-summary-card h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 20px 0;
+  color: var(--text);
+  text-align: center;
+}
+
+.payment-summary-card .summary-details {
+  margin-bottom: 20px;
+}
+
+.payment-summary-card .summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 14px;
+}
+
+.payment-summary-card .summary-row.discount {
+  color: var(--success);
+}
+
+.payment-summary-card .summary-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 12px 0;
+}
+
+.payment-summary-card .summary-row.total {
+  font-weight: 700;
+  font-size: 16px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 16px;
+  margin-top: 8px;
+}
+
+.payment-summary-card .total-amount {
+  color: var(--primary-color-dark);
+  font-size: 18px;
+}
+
+.payment-summary-card .btn-proses-pembayaran {
+  width: 100%;
+  padding: 16px;
+  background: var(--primary-color-dark);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.payment-summary-card .btn-proses-pembayaran:hover {
+  background: #005a4a;
 }
 
 /* Sections */
@@ -424,5 +529,50 @@ section h2 {
   
   .info-row .value {
     max-width: 50%;
+  }
+}
+
+/* Sticky Bottom Action Bar */
+.sticky-checkout-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: white;
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+  padding: 16px 20px;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--border-color);
+}
+
+.checkout-total-mobile {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--primary-color-dark);
+}
+
+.btn-checkout-mobile {
+  background: var(--primary-color-dark);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-checkout-mobile:hover {
+  background: #005a4a;
+}
+
+/* Add padding to main container to account for sticky bar */
+@media (max-width: 768px) {
+  .pembayaran-page {
+    padding-bottom: 100px !important;
   }
 }

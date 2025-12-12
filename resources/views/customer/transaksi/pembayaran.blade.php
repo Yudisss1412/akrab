@@ -32,7 +32,7 @@
       </div>
 
       <div class="pembayaran-content">
-        <div class="main-content">
+        <div class="main-content-left">
           <!-- Ringkasan Pesanan -->
           <section class="order-summary">
             <h2>Ringkasan Pesanan</h2>
@@ -147,9 +147,9 @@
           </section>
         </div>
 
-        <div class="sidebar">
+        <div class="payment-summary-column">
           <!-- Ringkasan Pembayaran -->
-          <section class="payment-summary">
+          <section class="payment-summary-card">
             <h2>Ringkasan Pembayaran</h2>
             <div class="summary-details">
               @if(isset($order) && $order)
@@ -167,7 +167,7 @@
                 </div>
                 <div class="summary-row discount">
                   <span>Diskon</span>
-                  <span>-Rp0</span>
+                  <span>-Rp{{ number_format(0, 0, ',', '.') }}</span>
                 </div>
                 <div class="summary-divider"></div>
                 <div class="summary-row total">
@@ -179,8 +179,8 @@
               @endif
             </div>
 
-            <button class="btn btn-primary btn-bayar-sekarang">
-              Bayar Sekarang
+            <button class="btn btn-primary btn-proses-pembayaran">
+              Proses Pembayaran
             </button>
           </section>
         </div>
@@ -201,8 +201,8 @@
         });
       });
 
-      // Bayar sekarang button
-      const payBtn = document.querySelector('.btn-bayar-sekarang');
+      // Proses pembayaran button
+      const payBtn = document.querySelector('.btn-proses-pembayaran');
       if (payBtn) {
         payBtn.addEventListener('click', function() {
           // Disable button to prevent double submission
@@ -240,7 +240,7 @@
               alert(data.message || 'Terjadi kesalahan saat memproses pembayaran.');
               // Re-enable the button
               payBtn.disabled = false;
-              payBtn.innerHTML = 'Bayar Sekarang';
+              payBtn.innerHTML = 'Proses Pembayaran';
             }
           })
           .catch(error => {
@@ -248,10 +248,31 @@
             alert('Terjadi kesalahan saat memproses pembayaran. Silakan coba lagi.');
             // Re-enable the button
             payBtn.disabled = false;
-            payBtn.innerHTML = 'Bayar Sekarang';
+            payBtn.innerHTML = 'Proses Pembayaran';
           });
         });
       }
+
+      // Show sticky checkout bar on mobile
+      function showStickyCheckoutBar() {
+        const stickyBar = document.querySelector('.sticky-checkout-bar');
+        if (stickyBar) {
+          // Get window width
+          if (window.innerWidth < 768) {
+            // Show the sticky bar
+            stickyBar.style.display = 'flex';
+          } else {
+            // Hide the sticky bar on desktop
+            stickyBar.style.display = 'none';
+          }
+        }
+      }
+
+      // Call on load
+      showStickyCheckoutBar();
+
+      // Call on resize
+      window.addEventListener('resize', showStickyCheckoutBar);
     });
   </script>
 @endpush

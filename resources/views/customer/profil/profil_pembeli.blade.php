@@ -23,83 +23,80 @@
   @endphp
 
   <div class="profile-layout">
-    <!-- LEFT COLUMN (Sidebar Profil & Navigasi) -->
-    <div class="sidebar-profile">
-      <!-- PROFILE SECTION -->
-      <div class="profile-card card">
-        <div class="profile-header">
-          <div class="profile-avatar">
-            <img src="{{ asset('src/profil_pembeli.png') }}" alt="Profil Pembeli">
-          </div>
-          <div class="profile-info">
-            <h2>{{ auth()->user() ? auth()->user() ? auth()->user()->name : "Guest" : 'Guest' }}</h2>
-            <p class="member-since">Member sejak {{ auth()->user() ? auth()->user()->created_at->year : date("Y") }}</p>
-          </div>
-          <a href="{{ route('edit.profil') }}" class="btn btn-primary">Edit Profil</a>
+    <!-- PROFILE CARD (for mobile stacking) -->
+    <div class="profile-card card">
+      <div class="profile-header">
+        <div class="profile-avatar">
+          <img src="{{ asset('src/profil_pembeli.png') }}" alt="Profil Pembeli">
         </div>
-        
-        <!-- Profile Details -->
-        <div class="profile-details">
-          <div class="detail-item">
-            <label>Email</label>
-            <span>{{ auth()->user() ? auth()->user() ? auth()->user()->email : "Email belum tersedia" : 'Email belum tersedia' }}</span>
-          </div>
-          <div class="detail-item">
-            <label>Telepon</label>
-            <span>{{ auth()->user() ? (auth()->user()->phone ?? '+62 812 3456 7890') : '+62 812 3456 7890' }}</span>
-          </div>
-          <div class="detail-item">
-            <label>Provinsi</label>
-            <span>{{ auth()->user() ? (auth()->user()->province ?? 'Belum diisi') : 'Belum diisi' }}</span>
-          </div>
-          <div class="detail-item">
-            <label>Kota/Kabupaten</label>
-            <span>{{ auth()->user() ? (auth()->user()->city ?? 'Belum diisi') : 'Belum diisi' }}</span>
-          </div>
-          <div class="detail-item">
-            <label>Kecamatan</label>
-            <span>{{ auth()->user() ? (auth()->user()->district ?? 'Belum diisi') : 'Belum diisi' }}</span>
-          </div>
-          <div class="detail-item">
-            <label>Kelurahan</label>
-            <span>{{ auth()->user() ? (auth()->user()->ward ?? 'Belum diisi') : 'Belum diisi' }}</span>
-          </div>
-          <div class="detail-item">
-            <label>Alamat Lengkap</label>
-            <span>{{ auth()->user() ? (auth()->user()->full_address ?? auth()->user()->address ?? 'Alamat belum diisi') : 'Alamat belum diisi' }}</span>
-          </div>
+        <div class="profile-info">
+          <h2>{{ auth()->user() ? auth()->user() ? auth()->user()->name : "Guest" : 'Guest' }}</h2>
+          <p class="member-since">Member sejak {{ auth()->user() ? auth()->user()->created_at->year : date("Y") }}</p>
+        </div>
+        <a href="{{ route('edit.profil') }}" class="btn btn-primary">Edit Profil</a>
+      </div>
+
+      <!-- Profile Details - Only show on desktop, hidden on mobile -->
+      <div class="profile-details mobile-hidden">
+        <div class="detail-item">
+          <label>Email</label>
+          <span>{{ auth()->user() ? auth()->user() ? auth()->user()->email : "Email belum tersedia" : 'Email belum tersedia' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Telepon</label>
+          <span>{{ auth()->user() ? (auth()->user()->phone ?? '+62 812 3456 7890') : '+62 812 3456 7890' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Provinsi</label>
+          <span>{{ auth()->user() ? (auth()->user()->province ?? 'Belum diisi') : 'Belum diisi' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Kota/Kabupaten</label>
+          <span>{{ auth()->user() ? (auth()->user()->city ?? 'Belum diisi') : 'Belum diisi' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Kecamatan</label>
+          <span>{{ auth()->user() ? (auth()->user()->district ?? 'Belum diisi') : 'Belum diisi' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Kelurahan</label>
+          <span>{{ auth()->user() ? (auth()->user()->ward ?? 'Belum diisi') : 'Belum diisi' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Alamat Lengkap</label>
+          <span>{{ auth()->user() ? (auth()->user()->full_address ?? auth()->user()->address ?? 'Alamat belum diisi') : 'Alamat belum diisi' }}</span>
         </div>
       </div>
-      
-      <!-- NAVIGATION MENU -->
-      <nav class="profile-navigation card">
-        <a href="#" class="nav-item active" data-target="order-history">
-          <i class="bi bi-bag-check"></i>
-          <span>Riwayat Pesanan</span>
-        </a>
-        <a href="#" class="nav-item" data-target="wishlist-section">
-          <i class="bi bi-heart"></i>
-          <span>Wishlist</span>
-        </a>
-        <a href="#" class="nav-item" data-target="review-history">
-          <i class="bi bi-chat-left-text"></i>
-          <span>Ulasan Saya</span>
-        </a>
-        <a href="{{ route('customer.tickets') }}" class="nav-item">
-          <i class="bi bi-ticket-detailed"></i>
-          <span>Tiket Bantuan</span>
-        </a>
-        <a href="#" class="nav-item" data-target="account-settings">
-          <i class="bi bi-gear"></i>
-          <span>Pengaturan Akun</span>
-        </a>
-        <a href="#" class="nav-item js-logout" id="logoutBtn" data-target="logout">
-          <i class="bi bi-box-arrow-right"></i>
-          <span>Keluar</span>
-        </a>
-      </nav>
     </div>
-    
+
+    <!-- NAVIGATION MENU (for mobile stacking) -->
+    <nav class="profile-navigation card mobile-horizontal-scroll">
+      <a href="#" class="nav-item active" data-target="order-history">
+        <i class="bi bi-bag-check"></i>
+        <span>Riwayat Pesanan</span>
+      </a>
+      <a href="#" class="nav-item" data-target="wishlist-section">
+        <i class="bi bi-heart"></i>
+        <span>Wishlist</span>
+      </a>
+      <a href="#" class="nav-item" data-target="review-history">
+        <i class="bi bi-chat-left-text"></i>
+        <span>Ulasan Saya</span>
+      </a>
+      <a href="{{ route('customer.tickets') }}" class="nav-item">
+        <i class="bi bi-ticket-detailed"></i>
+        <span>Tiket Bantuan</span>
+      </a>
+      <a href="#" class="nav-item" data-target="account-settings">
+        <i class="bi bi-gear"></i>
+        <span>Pengaturan Akun</span>
+      </a>
+      <a href="#" class="nav-item js-logout" id="logoutBtn">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Keluar</span>
+      </a>
+    </nav>
+
     <!-- RIGHT COLUMN (Main Content) -->
     <div class="main-content">
       <!-- MY WISHLIST -->
@@ -108,7 +105,7 @@
           <h3>Wishlist Saya</h3>
           <a href="{{ route('halaman_wishlist') }}" class="view-all">Lihat Semua</a>
         </div>
-        
+
         <div id="wishlistGrid" role="list" aria-live="polite">
           <!-- Wishlist items will be filled by JavaScript -->
         </div>
@@ -125,11 +122,11 @@
           <h3>Riwayat Pesanan</h3>
           <a href="{{ route('customer.order.history') }}" class="view-all">Lihat Semua</a>
         </div>
-        
+
         <div id="ordersLoading" class="loading-state">
           <p>Memuat pesanan...</p>
         </div>
-        
+
         <div id="ordersList" class="order-list">
           <!-- Orders will be loaded here dynamically -->
         </div>
@@ -141,44 +138,44 @@
           <h3>Ulasan Saya</h3>
           <a href="{{ route('halaman_ulasan') }}" class="view-all">Lihat Semua</a>
         </div>
-        
+
         <div id="reviewsLoading" class="loading-state">
           <p>Memuat ulasan...</p>
         </div>
-        
+
         <div id="reviewsList" class="review-list">
           <!-- Reviews will be loaded here dynamically -->
         </div>
       </section>
-      
+
       <!-- ACCOUNT SETTINGS (New Content) -->
       <section id="account-settings" class="account-settings card hidden-content">
         <div class="section-header">
           <h3>Pengaturan Akun</h3>
         </div>
-        
+
         <div class="settings-content">
           <!-- Keamanan Akun -->
           <div class="settings-card card">
             <h4>Keamanan Akun</h4>
-            
+
             <div class="settings-item">
               <div class="settings-label">Kata Sandi</div>
               <button class="btn btn-outline" id="changePasswordBtn">Ubah</button>
             </div>
-            
 
-            
+
+
             <div class="settings-item">
               <div class="settings-label">Sesi Login Aktif</div>
               <button class="btn btn-outline" id="activeSessionBtn">Lihat & Kelola</button>
             </div>
           </div>
-          
+
           <!-- Preferensi Notifikasi -->
           <div class="settings-card card">
             <h4>Preferensi Notifikasi</h4>
-            
+
             <div class="notification-setting">
               <label class="switch">
                 <input type="checkbox" checked>
@@ -186,7 +183,7 @@
               </label>
               <span class="setting-label">Notifikasi Status Pesanan</span>
             </div>
-            
+
             <div class="notification-setting">
               <label class="switch">
                 <input type="checkbox" checked>
@@ -194,7 +191,7 @@
               </label>
               <span class="setting-label">Promo & Penawaran Spesial</span>
             </div>
-            
+
             <div class="notification-setting">
               <label class="switch">
                 <input type="checkbox">
@@ -202,19 +199,19 @@
               </label>
               <span class="setting-label">Newsletter Mingguan</span>
             </div>
-            
+
             <button class="btn btn-primary" style="margin-top: 1rem;">Simpan Preferensi</button>
           </div>
-          
+
           <!-- Privasi & Data -->
           <div class="settings-card card">
             <h4>Privasi & Data</h4>
-            
+
             <div class="settings-item">
               <div class="settings-label">Unduh salinan data Anda</div>
               <button class="btn btn-outline">Minta Unduhan</button>
             </div>
-            
+
             <div class="settings-item">
               <div class="settings-label">Nonaktifkan Akun Anda</div>
               <button class="btn btn-outline" id="deactivateAccountBtn">Nonaktifkan Akun</button>
@@ -222,7 +219,7 @@
           </div>
         </div>
       </section>
-      
+
       <!-- Modal Ubah Kata Sandi -->
       <div id="changePasswordModal" class="modal">
         <div class="modal-content">
@@ -252,7 +249,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Modal Konfirmasi Nonaktifkan Akun -->
       <div id="deactivateAccountModal" class="modal">
         <div class="modal-content">
@@ -261,8 +258,8 @@
             <span class="close" id="closeDeactivateAccountModal">&times;</span>
           </div>
           <div class="modal-body">
-            <p> Akun Anda akan disembunyikan dari publik dan Anda akan otomatis logout. 
-            Anda bisa mengaktifkan kembali akun Anda kapan saja dengan cara login ulang. 
+            <p> Akun Anda akan disembunyikan dari publik dan Anda akan otomatis logout.
+            Anda bisa mengaktifkan kembali akun Anda kapan saja dengan cara login ulang.
             Lanjutkan?</p>
           </div>
           <div class="modal-footer">
@@ -271,7 +268,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Modal Konfirmasi Keluar -->
       <div id="logoutModal" class="modal">
         <div class="modal-content">
@@ -823,11 +820,80 @@
       }
     }
     
-    // Fetch reviews when DOM is loaded
+    // Tab functionality for profile navigation
     document.addEventListener('DOMContentLoaded', function() {
       fetchUserReviews();
       fetchUserOrders();  // Add this to fetch orders as well
       fetchWishlist(); // Tambahkan pemanggilan fetchWishlist
+
+      // Handle navigation tab clicks
+      const navItems = document.querySelectorAll('.profile-navigation .nav-item');
+      navItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+          e.preventDefault();
+
+          // Remove active class from all nav items
+          navItems.forEach(nav => nav.classList.remove('active'));
+
+          // Add active class to clicked item
+          this.classList.add('active');
+
+          // Get target section
+          const target = this.getAttribute('data-target');
+
+          // Hide all sections
+          document.querySelectorAll('.main-content section').forEach(section => {
+            section.classList.remove('active-content');
+            section.classList.add('hidden-content');
+          });
+
+          // Show target section
+          if (target) {
+            const targetSection = document.getElementById(target);
+            if (targetSection) {
+              targetSection.classList.remove('hidden-content');
+              targetSection.classList.add('active-content');
+            }
+          }
+        });
+      });
+
+      // Set default active section (Riwayat Pesanan) and hide all others
+      document.querySelectorAll('.main-content section').forEach(section => {
+        section.classList.remove('active-content');
+        section.classList.add('hidden-content');
+      });
+
+      const defaultSection = document.getElementById('order-history');
+      if (defaultSection) {
+        defaultSection.classList.remove('hidden-content');
+        defaultSection.classList.add('active-content');
+      }
+
+      // Handle logout button separately
+      const logoutBtn = document.querySelector('.js-logout');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          document.getElementById('logoutModal').classList.add('show');
+        });
+      }
+
+      // Final check to ensure only active section is shown when page loads
+      setTimeout(() => {
+        // Hide all sections first
+        document.querySelectorAll('.main-content section').forEach(section => {
+          section.classList.add('hidden-content');
+          section.classList.remove('active-content');
+        });
+
+        // Then show only the default section
+        const defaultSection = document.getElementById('order-history');
+        if (defaultSection) {
+          defaultSection.classList.remove('hidden-content');
+          defaultSection.classList.add('active-content');
+        }
+      }, 100); // Small delay to make sure all DOM is loaded
     });
     
     // ====== Modal Sesi Login Aktif ======

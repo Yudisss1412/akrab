@@ -110,12 +110,15 @@
       border: 1px solid var(--ak-border);
       align-items: center;
       justify-content: flex-start;
+      flex-wrap: wrap;
+      overflow: visible; /* Memastikan tidak ada overflow yang tersembunyi */
     }
 
     .search-box {
       flex: 1;
       min-width: 250px;
       position: relative;
+      width: 100%; /* Memastikan lebar penuh */
     }
 
     .search-box input {
@@ -124,6 +127,7 @@
       border: 1px solid var(--ak-border);
       border-radius: var(--ak-radius);
       font-size: 0.875rem;
+      box-sizing: border-box; /* Memastikan padding dihitung dalam lebar */
     }
 
     .search-box svg {
@@ -140,6 +144,7 @@
       min-width: 200px;
       width: 200px;
       flex-shrink: 0;
+      width: 100%; /* Untuk mobile, akan diatur ulang */
     }
 
     .date-filter select {
@@ -149,6 +154,7 @@
       border-radius: var(--ak-radius);
       font-size: 0.875rem;
       background-color: var(--ak-white);
+      box-sizing: border-box; /* Memastikan padding dihitung dalam lebar */
     }
     
     /* Sales Cards */
@@ -333,18 +339,110 @@
     /* Responsive */
     @media (max-width: 768px) {
       .control-bar {
-        flex-direction: row;
-        align-items: center;
-        flex-wrap: wrap;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+        padding: 0.8rem;
       }
 
       .search-box {
-        min-width: 150px;
-        flex: 1;
+        min-width: 100%;
+        width: 100%;
+        flex: none;
+        order: 2;
       }
 
       .date-filter {
-        min-width: 130px;
+        min-width: 100%;
+        width: 100%;
+        order: 1;
+      }
+
+      /* Memastikan form tidak melebihi lebar layar */
+      #filterForm {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .search-box input {
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .date-filter select {
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .sales-stats {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      }
+
+      .sale-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+
+      .sale-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+
+      .action-buttons {
+        width: 100%;
+        justify-content: flex-end;
+      }
+    }
+
+    /* Responsive untuk layar sangat kecil */
+    @media (max-width: 480px) {
+      body {
+        padding: 0;
+      }
+
+      .content-wrapper {
+        padding: 0 0.75rem;
+      }
+
+      .page-header {
+        padding: 1rem;
+      }
+
+      .page-header h1 {
+        font-size: 1.25rem;
+      }
+
+      .control-bar {
+        padding: 0.75rem;
+      }
+
+      .stat-card {
+        padding: 1rem;
+      }
+
+      .stat-value {
+        font-size: 1.5rem;
+      }
+
+      .sale-card {
+        margin-bottom: 1rem;
+      }
+
+      .sale-header,
+      .sale-content,
+      .sale-footer {
+        padding: 0.75rem;
+      }
+
+      .search-box input {
+        padding: 0.5rem 0.5rem 0.5rem 2rem;
+      }
+
+      .date-filter select {
+        padding: 0.5rem;
       }
     }
   </style>

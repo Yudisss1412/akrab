@@ -44,18 +44,11 @@
 <body class="{{ request()->routeIs('dashboard.admin') || request()->routeIs('admin.dashboard') ? 'dashboard-page' : '' }}">
     <div class="container-fluid">
         @if(!(request()->routeIs('dashboard.admin') || request()->routeIs('admin.dashboard')))
-        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+        <nav class="navbar navbar-expand navbar-light bg-light mb-4">
             <div class="container-fluid">
                 <a class="navbar-brand" href="javascript:history.back()" title="Kembali ke halaman sebelumnya">
                     <i class="fas fa-arrow-left me-2"></i>UMKM AKRAB Admin
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav">
-                    </ul>
-                </div>
             </div>
         </nav>
         @endif

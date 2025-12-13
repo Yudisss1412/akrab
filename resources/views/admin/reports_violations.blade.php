@@ -310,6 +310,85 @@
       -webkit-appearance: none;
       -moz-appearance: textfield;
     }
+    /* CSS untuk ukuran modal di mobile dan tablet */
+    @media (max-width: 768px) {
+      .modal-dialog {
+        margin: 0.5rem;
+        max-width: calc(100% - 1rem);
+      }
+
+      .modal-content {
+        border-radius: 12px;
+      }
+
+      .modal-body {
+        padding: 1rem;
+      }
+
+      /* Penyesuaian untuk tabel di mobile */
+      .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      table {
+        min-width: 600px; /* Membuat tabel bisa di-scroll horizontal */
+      }
+
+      /* Penyesuaian ukuran elemen di mobile */
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+
+      .btn {
+        font-size: 0.875rem;
+      }
+
+      .active-filters-info {
+        flex: 1;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+
+      th, td {
+        padding: 0.5rem;
+        font-size: 0.85rem;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .modal-dialog {
+        margin: 0.25rem;
+        max-width: calc(100% - 0.5rem);
+      }
+
+      .modal-body {
+        padding: 0.75rem;
+      }
+
+      th, td {
+        padding: 0.4rem;
+        font-size: 0.8rem;
+      }
+    }
+
+    /* Penyesuaian posisi modal agar lebih ke atas di mobile */
+    @media (max-width: 768px) {
+      .modal-dialog {
+        margin: 1rem auto 0; /* Memberikan margin atas dan menghilangkan margin bawah */
+        max-height: 85vh; /* Membatasi tinggi maksimal modal */
+      }
+    }
+
+    /* Penyesuaian untuk tampilan tablet */
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .modal-dialog {
+        max-width: 700px;
+        margin: 2rem auto;
+      }
+    }
   </style>
 @endpush
 
@@ -324,49 +403,93 @@
         </div>
 
         <div class="filters">
-          <form id="filterForm" method="GET" action="{{ route('reports.violations.filter') }}">
-            <div class="d-flex flex-wrap align-items-end gap-3">
-              <div class="filter-group">
-                <label for="searchFilter">Cari</label>
-                <input type="text" name="search" id="searchFilter" placeholder="Cari di Akrab..." value="{{ request('search', '') }}">
-              </div>
-
-              <div class="filter-group">
-                <label for="startDateFilter">Tanggal Awal</label>
-                <input type="date" name="start_date" id="startDateFilter" value="{{ request('start_date', '') }}">
-              </div>
-
-              <div class="filter-group">
-                <label for="endDateFilter">Tanggal Akhir</label>
-                <input type="date" name="end_date" id="endDateFilter" value="{{ request('end_date', '') }}">
-              </div>
-
-              <div class="filter-group">
-                <label for="violationTypeFilter">Jenis Pelanggaran</label>
-                <select name="violation_type" id="violationTypeFilter">
-                  <option value="">Semua Jenis</option>
-                  <option value="product" {{ request('violation_type') === 'product' ? 'selected' : '' }}>Produk Palsu</option>
-                  <option value="content" {{ request('violation_type') === 'content' ? 'selected' : '' }}>Konten Tidak Pantas</option>
-                  <option value="scam" {{ request('violation_type') === 'scam' ? 'selected' : '' }}>Penipuan</option>
-                  <option value="copyright" {{ request('violation_type') === 'copyright' ? 'selected' : '' }}>Pelanggaran Hak Cipta</option>
-                  <option value="other" {{ request('violation_type') === 'other' ? 'selected' : '' }}>Lainnya</option>
-                </select>
-              </div>
-
-              <div class="filter-group">
-                <label for="statusFilter">Status</label>
-                <select name="status" id="statusFilter">
-                  <option value="">Semua Status</option>
-                  <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
-                  <option value="investigating" {{ request('status') === 'investigating' ? 'selected' : '' }}>Sedang Ditinjau</option>
-                  <option value="resolved" {{ request('status') === 'resolved' ? 'selected' : '' }}>Diselesaikan</option>
-                  <option value="dismissed" {{ request('status') === 'dismissed' ? 'selected' : '' }}>Ditolak</option>
-                </select>
-              </div>
-
-
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="active-filters-info">
+              @if(request('search') || request('start_date') || request('end_date') || request('violation_type') || request('status'))
+                <small class="text-muted">
+                  Filter aktif:
+                  @if(request('search')) <span class="badge bg-primary">Cari: {{ request('search') }}</span> @endif
+                  @if(request('start_date')) <span class="badge bg-primary">Tgl Awal: {{ request('start_date') }}</span> @endif
+                  @if(request('end_date')) <span class="badge bg-primary">Tgl Akhir: {{ request('end_date') }}</span> @endif
+                  @if(request('violation_type'))
+                    @php
+                      $violationTypes = ['product' => 'Produk Palsu', 'content' => 'Konten Tidak Pantas', 'scam' => 'Penipuan', 'copyright' => 'Hak Cipta', 'other' => 'Lainnya'];
+                    @endphp
+                    <span class="badge bg-primary">Jenis: {{ $violationTypes[request('violation_type')] ?? request('violation_type') }}</span>
+                  @endif
+                  @if(request('status'))
+                    @php
+                      $statusTypes = ['pending' => 'Pending', 'investigating' => 'Ditinjau', 'resolved' => 'Diselesaikan', 'dismissed' => 'Ditolak'];
+                    @endphp
+                    <span class="badge bg-primary">Status: {{ $statusTypes[request('status')] ?? request('status') }}</span>
+                  @endif
+                </small>
+              @endif
             </div>
-          </form>
+            <button class="btn btn-outline-primary btn-sm" id="toggleFilterBtn" type="button" data-bs-toggle="modal" data-bs-target="#filterModal">
+              <i class="fas fa-filter"></i> Filter
+            </button>
+          </div>
+
+          <!-- Modal untuk filter -->
+          <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable modal-sm"> <!-- Menghilangkan modal-dialog-centered agar posisi lebih atas -->
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="filterModalLabel">Filter Laporan Pelanggaran</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <form id="filterForm" method="GET" action="{{ route('reports.violations.filter') }}">
+                    <div class="row g-2"> <!-- Mengurangi gap antar elemen -->
+                      <div class="col-12 mb-2">
+                        <label for="searchFilter" class="form-label small">Cari</label>
+                        <input type="text" name="search" id="searchFilter" class="form-control form-control-sm" placeholder="Cari di Akrab..." value="{{ request('search', '') }}">
+                      </div>
+
+                      <div class="col-12 mb-2">
+                        <label for="startDateFilter" class="form-label small">Tanggal Awal</label>
+                        <input type="date" name="start_date" id="startDateFilter" class="form-control form-control-sm" value="{{ request('start_date', '') }}">
+                      </div>
+
+                      <div class="col-12 mb-2">
+                        <label for="endDateFilter" class="form-label small">Tanggal Akhir</label>
+                        <input type="date" name="end_date" id="endDateFilter" class="form-control form-control-sm" value="{{ request('end_date', '') }}">
+                      </div>
+
+                      <div class="col-12 mb-2">
+                        <label for="violationTypeFilter" class="form-label small">Jenis Pelanggaran</label>
+                        <select name="violation_type" id="violationTypeFilter" class="form-select form-select-sm">
+                          <option value="">Semua Jenis</option>
+                          <option value="product" {{ request('violation_type') === 'product' ? 'selected' : '' }}>Produk Palsu</option>
+                          <option value="content" {{ request('violation_type') === 'content' ? 'selected' : '' }}>Konten Tidak Pantas</option>
+                          <option value="scam" {{ request('violation_type') === 'scam' ? 'selected' : '' }}>Penipuan</option>
+                          <option value="copyright" {{ request('violation_type') === 'copyright' ? 'selected' : '' }}>Pelanggaran Hak Cipta</option>
+                          <option value="other" {{ request('violation_type') === 'other' ? 'selected' : '' }}>Lainnya</option>
+                        </select>
+                      </div>
+
+                      <div class="col-12 mb-2">
+                        <label for="statusFilter" class="form-label small">Status</label>
+                        <select name="status" id="statusFilter" class="form-select form-select-sm">
+                          <option value="">Semua Status</option>
+                          <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
+                          <option value="investigating" {{ request('status') === 'investigating' ? 'selected' : '' }}>Sedang Ditinjau</option>
+                          <option value="resolved" {{ request('status') === 'resolved' ? 'selected' : '' }}>Diselesaikan</option>
+                          <option value="dismissed" {{ request('status') === 'dismissed' ? 'selected' : '' }}>Ditolak</option>
+                        </select>
+                      </div>
+
+                      <div class="col-12">
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Terapkan Filter</button>
+                        <a href="{{ route('reports.violations') }}" class="btn btn-outline-secondary btn-sm w-100 mt-1">Hapus Filter</a>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="table-container">
@@ -522,52 +645,6 @@
           link.href = linkUrl.toString();
         });
       }
-      
-      // Add event listeners to filter elements for automatic filtering
-      const searchFilter = document.getElementById('searchFilter');
-      const startDateFilter = document.getElementById('startDateFilter');
-      const endDateFilter = document.getElementById('endDateFilter');
-      const violationTypeFilter = document.getElementById('violationTypeFilter');
-      const statusFilter = document.getElementById('statusFilter');
-      
-      // Function to submit the form automatically
-      function submitFilterForm() {
-        document.getElementById('filterForm').submit();
-      }
-      
-      // Add event listeners to trigger filtering
-      if (searchFilter) {
-        searchFilter.addEventListener('input', debounce(submitFilterForm, 500)); // 500ms delay to avoid excessive requests
-      }
-      
-      if (startDateFilter) {
-        startDateFilter.addEventListener('change', submitFilterForm);
-      }
-      
-      if (endDateFilter) {
-        endDateFilter.addEventListener('change', submitFilterForm);
-      }
-      
-      if (violationTypeFilter) {
-        violationTypeFilter.addEventListener('change', submitFilterForm);
-      }
-      
-      if (statusFilter) {
-        statusFilter.addEventListener('change', submitFilterForm);
-      }
     });
-    
-    // Debounce function to limit the rate at which a function is called
-    function debounce(func, wait) {
-      let timeout;
-      return function executedFunction(...args) {
-        const later = () => {
-          clearTimeout(timeout);
-          func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-      };
-    }
   </script>
 @endsection

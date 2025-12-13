@@ -469,6 +469,55 @@
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .control-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+      }
+
+      .control-bar-left {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .search {
+        width: 100%;
+        order: 3; /* Place search at the end */
+      }
+
+      .search input {
+        width: 100%;
+      }
+
+      .table-card {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .table {
+        min-width: 600px;
+      }
+
+      .pagination {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .pagination-nav {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        justify-content: flex-start;
+        padding: 0.5rem 0;
+        margin: 0 auto;
+      }
+
+      .pagination-btn {
+        min-width: 32px;
+      }
+    }
   </style>
   <script>
     // Modal functionality

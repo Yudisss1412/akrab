@@ -120,13 +120,13 @@
       border: 1px solid var(--ak-border);
       flex-wrap: wrap;
     }
-    
+
     .search-box {
       flex: 1;
-      min-width: 250px;
+      min-width: 200px;
       position: relative;
     }
-    
+
     .search-box input {
       width: 100%;
       padding: 0.5rem 0.75rem 0.5rem 2.5rem;
@@ -134,7 +134,7 @@
       border-radius: var(--ak-radius);
       font-size: 0.875rem;
     }
-    
+
     .search-box svg {
       position: absolute;
       left: 0.75rem;
@@ -144,12 +144,13 @@
       height: 18px;
       color: var(--ak-muted);
     }
-    
+
     .date-filter, .bulk-action {
-      width: 200px;
+      min-width: 150px;
+      flex: 1;
     }
-    
-    .date-filter select, 
+
+    .date-filter select,
     .bulk-action select {
       width: 100%;
       padding: 0.5rem 0.75rem;
@@ -320,18 +321,23 @@
       justify-content: space-between;
       align-items: center;
       margin-top: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
     }
-    
+
     .pagination-info {
       color: var(--ak-muted);
       font-size: 0.875rem;
+      flex: 1;
     }
-    
+
     .pagination-nav {
       display: flex;
       gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
     }
-    
+
     .pagination-btn {
       width: 32px;
       height: 32px;
@@ -345,13 +351,13 @@
       cursor: pointer;
       transition: all 0.2s ease;
     }
-    
+
     .pagination-btn:hover {
       background: var(--ak-primary);
       color: white;
       border-color: var(--ak-primary);
     }
-    
+
     .pagination-btn.active {
       background: var(--ak-primary);
       color: white;
@@ -363,17 +369,40 @@
       .control-bar {
         flex-direction: column;
       }
-      
+
       .date-filter, .bulk-action {
         width: 100%;
       }
-      
+
       .tab-nav {
         justify-content: flex-start;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
       }
-      
+
       .tab-item {
         min-width: 120px;
+        flex: 0 0 auto;
+      }
+
+      .search-box {
+        min-width: auto;
+      }
+
+      .pagination {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .pagination-nav {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 0.5rem 0;
+        justify-content: flex-start;
+      }
+
+      .pagination-btn {
+        min-width: 32px;
       }
     }
   </style>

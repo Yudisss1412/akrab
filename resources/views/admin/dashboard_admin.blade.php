@@ -188,8 +188,137 @@
       padding: 4px 8px;
       font-size: 0.8rem;
     }
-    
-    
+
+
+    /* Responsive widget styles */
+    @media (max-width: 768px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr; /* Mengubah dari grid auto-fit ke single column untuk mobile */
+        gap: 1rem;
+        padding: 0.5rem;
+      }
+
+      .widget {
+        margin: 0.5rem 0;
+        box-shadow: 0 4px 12px rgba(0,0,0,.08);
+      }
+
+      .widget-header {
+        padding: 0.75rem;
+      }
+
+      .widget-content {
+        padding: 0.75rem;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+      }
+
+      .stat-card {
+        padding: 0.5rem;
+        margin: 0.25rem 0;
+      }
+
+      .stat-value {
+        font-size: 1rem;
+      }
+
+      .stat-label {
+        font-size: 0.7rem;
+      }
+
+      .metric-card {
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .metric-title {
+        font-size: 0.8rem;
+        margin-bottom: 0.1rem;
+      }
+
+      .metric-value {
+        font-size: 1rem;
+      }
+
+      .shortcut-grid {
+        grid-template-columns: 1fr; /* Single column for shortcuts on mobile */
+        gap: 0.5rem;
+      }
+
+      .shortcut-btn {
+        padding: 0.5rem;
+        font-size: 0.9rem;
+      }
+
+      .main-layout,
+      .content-wrapper,
+      .admin-page-content {
+        padding: 0.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .dashboard-grid {
+        gap: 0.75rem;
+        padding: 0.25rem;
+      }
+
+      .widget-header {
+        padding: 0.5rem;
+      }
+
+      .widget-content {
+        padding: 0.5rem;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr); /* Dua kolom untuk stat card di layar sangat kecil */
+        gap: 0.25rem;
+      }
+
+      .stat-value {
+        font-size: 0.9rem;
+      }
+
+      .stat-label {
+        font-size: 0.65rem;
+      }
+
+      .metric-title {
+        font-size: 0.75rem;
+      }
+
+      .metric-value {
+        font-size: 0.9rem;
+      }
+
+      .time-filter select {
+        font-size: 0.7rem;
+        padding: 2px 4px;
+      }
+    }
+
+    /* CSS untuk memastikan layout tidak mengganggu navbar dan footer */
+    .main-layout {
+      width: 100%;
+      margin: 0;
+    }
+
+    .content-wrapper {
+      width: 100%;
+      margin: 0;
+      padding: 1rem;
+    }
+
+    .admin-page-content {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
   </style>
 @endpush
 

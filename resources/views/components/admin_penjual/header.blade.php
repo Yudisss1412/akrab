@@ -1,3 +1,43 @@
+<style>
+  /* CSS untuk memastikan navbar dan footer full width */
+  .ak-navbar {
+    width: 100%;
+    position: relative;
+  }
+
+  .ak-navbar__inner {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1rem;
+  }
+
+  .ak-footer {
+    width: 100%;
+    position: relative;
+  }
+
+  .ak-footer__inner {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 1rem;
+  }
+
+  /* Penyesuaian mobile */
+  @media (max-width: 768px) {
+    .ak-navbar__inner {
+      padding: 0 0.75rem;
+    }
+
+    .ak-footer__inner {
+      padding: 0 0.75rem;
+    }
+  }
+</style>
+
 <header class="ak-navbar">
   <div class="ak-navbar__inner">
     <a href="{{ route('cust.welcome') }}" aria-label="Ke beranda">

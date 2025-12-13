@@ -879,54 +879,7 @@
         });
       }
 
-      // Structure adjustment for desktop vs mobile
-      function adjustLayoutForDesktop() {
-        // Check if we're on desktop (using media query)
-        const isDesktop = window.matchMedia('(min-width: 981px)').matches;
 
-        if (isDesktop) {
-          // For desktop: wrap profile card and navigation in a sidebar container
-          const profileCard = document.querySelector('.profile-card');
-          const profileNavigation = document.querySelector('.profile-navigation');
-          const mainContent = document.querySelector('.main-content');
-
-          if (profileCard && profileNavigation && mainContent) {
-            // Create a container for sidebar items
-            let sidebarContainer = document.querySelector('.sidebar-profile-container');
-            if (!sidebarContainer) {
-              sidebarContainer = document.createElement('div');
-              sidebarContainer.className = 'sidebar-profile-container';
-              sidebarContainer.style.display = 'flex';
-              sidebarContainer.style.flexDirection = 'column';
-              sidebarContainer.style.gap = 'var(--gap-md)';
-            }
-
-            // Move profile card and navigation to sidebar container
-            if (!profileCard.parentElement.classList.contains('sidebar-profile-container')) {
-              sidebarContainer.appendChild(profileCard);
-              sidebarContainer.appendChild(profileNavigation);
-              document.querySelector('.profile-layout').insertBefore(sidebarContainer, mainContent);
-            }
-          }
-        } else {
-          // For mobile: ensure elements are in correct stacking order
-          const profileLayout = document.querySelector('.profile-layout');
-          const profileCard = document.querySelector('.profile-card');
-          const profileNavigation = document.querySelector('.profile-navigation');
-          const mainContent = document.querySelector('.main-content');
-
-          if (profileCard && profileNavigation && mainContent) {
-            // Ensure correct order: profile card -> navigation -> main content
-            profileLayout.appendChild(profileCard); // Move to end if not in right order
-            profileLayout.appendChild(profileNavigation); // Move to end if not in right order
-            profileLayout.appendChild(mainContent); // Main content at the end
-          }
-        }
-      }
-
-      // Run layout adjustment when page loads and on resize
-      document.addEventListener('DOMContentLoaded', adjustLayoutForDesktop);
-      window.addEventListener('resize', adjustLayoutForDesktop);
 
       // Final check to ensure only active section is shown when page loads
       setTimeout(() => {

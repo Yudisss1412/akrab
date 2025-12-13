@@ -209,18 +209,35 @@ body{
   overflow-x: auto; /* Ensure content doesn't break layout if there are wide tables */
 }
 
-/* For desktop: when sidebar container is created by JS */
+/* For desktop: arrange elements in two columns using CSS Grid */
 @media (min-width: 981px) {
   .profile-layout {
+    display: grid;
     grid-template-columns: 30% 70%;
+    gap: var(--gap-lg);
+    width: 100%;
   }
 
-  .sidebar-profile-container {
+  .profile-card {
     grid-column: 1;
+    grid-row: 1;
+    width: 100%;
+  }
+
+  .profile-navigation {
+    grid-column: 1;
+    grid-row: 2;
+    width: 100%;
   }
 
   .main-content {
     grid-column: 2;
+    grid-row: 1 / span 2; /* Span both rows to align with sidebar items */
+  }
+
+  /* Ensure proper stacking context */
+  .profile-card, .profile-navigation, .main-content {
+    width: 100%;
   }
 }
 

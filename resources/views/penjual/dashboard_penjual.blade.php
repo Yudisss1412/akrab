@@ -19,11 +19,11 @@
       --ak-radius: 12px;
       --ak-space: 16px;
     }
-    
+
     * {
       box-sizing: border-box;
     }
-    
+
     body {
       font-family: 'Poppins', sans-serif;
       margin: 0;
@@ -34,20 +34,20 @@
       display: flex;
       flex-direction: column;
     }
-    
+
     .main-layout {
       flex: 1;
       display: flex;
       flex-direction: column;
     }
-    
+
     .content-wrapper {
       flex: 1;
       display: flex;
       flex-direction: column;
       padding: 0 1.5rem;
     }
-    
+
     /* Welcome Banner */
     .welcome-banner {
       background: var(--ak-white);
@@ -57,14 +57,20 @@
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
       border: 1px solid var(--ak-border);
     }
-    
+
     .welcome-banner h1 {
       margin: 0;
       font-size: 1.5rem;
       font-weight: 600;
       color: var(--ak-primary);
     }
-    
+
+    @media (max-width: 768px) {
+      .welcome-banner h1 {
+        font-size: 1.25rem;
+      }
+    }
+
     /* Stats Cards */
     .stats-grid {
       display: grid;
@@ -72,13 +78,13 @@
       gap: 1rem;
       margin-bottom: 1.5rem;
     }
-    
+
     @media (min-width: 1024px) {
       .stats-grid {
         grid-template-columns: repeat(4, 1fr);
       }
     }
-    
+
     .stat-card {
       background: var(--ak-white);
       border-radius: var(--ak-radius);
@@ -91,11 +97,11 @@
       border: 1px solid var(--ak-border);
       transition: transform 0.2s ease;
     }
-    
+
     .stat-card:hover {
       transform: translateY(-2px);
     }
-    
+
     .stat-icon {
       width: 48px;
       height: 48px;
@@ -106,27 +112,27 @@
       justify-content: center;
       margin-bottom: 0.75rem;
     }
-    
+
     .stat-icon svg {
       width: 24px;
       height: 24px;
       stroke: var(--ak-primary);
       fill: none;
     }
-    
+
     .stat-title {
       font-size: 0.875rem;
       color: var(--ak-muted);
       margin: 0 0 0.25rem 0;
     }
-    
+
     .stat-value {
       font-size: 1.5rem;
       font-weight: 700;
       color: var(--ak-text);
       margin: 0;
     }
-    
+
     /* Main Content Layout */
     .main-content {
       display: grid;
@@ -134,13 +140,13 @@
       gap: 1.5rem;
       margin-bottom: 1.5rem;
     }
-    
+
     @media (min-width: 1024px) {
       .main-content {
         grid-template-columns: 2fr 1fr;
       }
     }
-    
+
     .card {
       background: var(--ak-white);
       border-radius: var(--ak-radius);
@@ -149,7 +155,24 @@
       border: 1px solid var(--ak-border);
       margin-bottom: 1.5rem;
     }
-    
+
+    /* Card ordering for mobile */
+    @media (max-width: 768px) {
+      .main-content {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .left-column, .right-column {
+        display: contents;
+      }
+
+      .card-urgent-tasks { order: 1; }
+      .card-quick-links { order: 2; }
+      .card-recent-activity { order: 3; }
+      .card-announcements { order: 4; }
+    }
+
     .card h2 {
       margin-top: 0;
       margin-bottom: 1rem;
@@ -160,21 +183,21 @@
       align-items: center;
       gap: 0.5rem;
     }
-    
+
     .card h2 svg {
       width: 20px;
       height: 20px;
       stroke: var(--ak-primary);
       fill: none;
     }
-    
+
     /* Action Items */
     .action-list {
       list-style: none;
       padding: 0;
       margin: 0;
     }
-    
+
     .action-item {
       display: flex;
       justify-content: space-between;
@@ -182,11 +205,11 @@
       padding: 0.75rem 0;
       border-bottom: 1px solid var(--ak-border);
     }
-    
+
     .action-item:last-child {
       border-bottom: none;
     }
-    
+
     .action-link {
       text-decoration: none;
       color: var(--ak-text);
@@ -196,18 +219,18 @@
       gap: 0.5rem;
       transition: color 0.2s ease;
     }
-    
+
     .action-link:hover {
       color: var(--ak-primary);
     }
-    
+
     .action-link svg {
       width: 16px;
       height: 16px;
       stroke: var(--ak-primary);
       fill: none;
     }
-    
+
     .action-count {
       background: var(--ak-primary);
       color: white;
@@ -220,25 +243,25 @@
       font-size: 0.75rem;
       font-weight: 600;
     }
-    
+
     /* Recent Activity */
     .activity-list {
       list-style: none;
       padding: 0;
       margin: 0;
     }
-    
+
     .activity-item {
       display: flex;
       align-items: flex-start;
       padding: 0.75rem 0;
       border-bottom: 1px solid var(--ak-border);
     }
-    
+
     .activity-item:last-child {
       border-bottom: none;
     }
-    
+
     .activity-icon {
       width: 32px;
       height: 32px;
@@ -250,30 +273,30 @@
       margin-right: 0.75rem;
       flex-shrink: 0;
     }
-    
+
     .activity-icon svg {
       width: 16px;
       height: 16px;
       stroke: var(--ak-primary);
       fill: none;
     }
-    
+
     .activity-content {
       flex: 1;
     }
-    
+
     .activity-text {
       margin: 0;
       color: var(--ak-text);
       line-height: 1.4;
     }
-    
+
     .activity-time {
       font-size: 0.75rem;
       color: var(--ak-muted);
       margin-top: 0.25rem;
     }
-    
+
     /* Announcements */
     .announcement {
       background: rgba(0, 110, 92, 0.05);
@@ -282,27 +305,27 @@
       margin-bottom: 1rem;
       border-radius: 0 var(--ak-radius) var(--ak-radius) 0;
     }
-    
+
     .announcement-title {
       margin: 0 0 0.5rem 0;
       font-weight: 600;
       color: var(--ak-primary);
     }
-    
+
     .announcement-text {
       margin: 0;
       color: var(--ak-text);
       font-size: 0.875rem;
       line-height: 1.4;
     }
-    
+
     /* Quick Links */
     .quick-links {
       list-style: none;
       padding: 0;
       margin: 0;
     }
-    
+
     .quick-link {
       display: block;
       padding: 0.75rem;
@@ -316,16 +339,16 @@
       align-items: center;
       gap: 0.75rem;
     }
-    
+
     .quick-link:last-child {
       margin-bottom: 0;
     }
-    
+
     .quick-link:hover {
       background: var(--ak-primary);
       color: white;
     }
-    
+
     .quick-link svg {
       width: 18px;
       height: 18px;
@@ -333,11 +356,11 @@
       fill: none;
       flex-shrink: 0;
     }
-    
+
     .quick-link:hover svg {
       stroke: white;
     }
-    
+
     .link-text {
       font-weight: 500;
     }
@@ -405,7 +428,7 @@
           <!-- Left Column -->
           <div class="left-column">
             <!-- Urgent Tasks Card -->
-            <section class="card">
+            <section class="card card-urgent-tasks">
               <h2>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -449,7 +472,7 @@
             </section>
 
             <!-- Recent Activity Card -->
-            <section class="card">
+            <section class="card card-recent-activity">
               <h2>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -517,7 +540,7 @@
           <!-- Right Column -->
           <div class="right-column">
             <!-- Announcements Card -->
-            <section class="card">
+            <section class="card card-announcements">
               <h2>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -536,7 +559,7 @@
             </section>
 
             <!-- Quick Links Card -->
-            <section class="card">
+            <section class="card card-quick-links">
               <h2>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path fill-rule="evenodd" clip-rule="evenodd" d="M15.75 2.25H21C21.1989 2.25 21.3897 2.32902 21.5303 2.46967C21.671 2.61032 21.75 2.80109 21.75 3V8.25C21.75 8.44891 21.671 8.63968 21.5303 8.78033C21.3897 8.92098 21.1989 9 21 9C20.8011 9 20.6103 8.92098 20.4697 8.78033C20.329 8.63968 20.25 8.44891 20.25 8.25V4.81L8.03 17.03C7.88782 17.1625 7.69978 17.2346 7.50548 17.2312C7.31118 17.2277 7.12579 17.149 6.98838 17.0116C6.85097 16.8742 6.77225 16.6888 6.76883 16.4945C6.7654 16.3002 6.83752 16.1122 6.97 15.97L19.19 3.75H15.75C15.5511 3.75 15.3603 3.67098 15.2197 3.53033C15.079 3.38968 15 3.19891 15 3C15 2.80109 15.079 2.61032 15.2197 2.46967C15.3603 2.32902 15.5511 2.25 15.75 2.25ZM5.25 6.75C4.85218 6.75 4.47064 6.90804 4.18934 7.18934C3.90804 7.47064 3.75 7.85218 3.75 8.25V18.75C3.75 19.1478 3.90804 19.5294 4.18934 19.8107C4.47064 20.092 4.85218 20.25 5.25 20.25H15.75C16.1478 20.25 16.5294 20.092 16.8107 19.8107C17.092 19.5294 17.25 19.1478 17.25 18.75V10.5C17.25 10.3011 17.329 10.1103 17.4697 9.96967C17.6103 9.82902 17.8011 9.75 18 9.75C18.1989 9.75 18.3897 9.82902 18.5303 9.96967C18.671 10.1103 18.75 10.3011 18.75 10.5V18.75C18.75 19.5456 18.4339 20.3087 17.8713 20.8713C17.3087 21.4339 16.5456 21.75 15.75 21.75H5.25C4.45435 21.75 3.69129 21.4339 3.12868 20.8713C2.56607 20.3087 2.25 19.5456 2.25 18.75V8.25C2.25 7.45435 2.56607 6.69129 3.12868 6.12868C3.69129 5.56607 4.45435 5.25 5.25 5.25H13.5C13.6989 5.25 13.8897 5.32902 14.0303 5.46967C14.171 5.61032 14.25 5.80109 14.25 6C14.25 6.19891 14.171 6.38968 14.0303 6.53033C13.8897 6.67098 13.6989 6.75 13.5 6.75H5.25Z" fill="currentColor"/>
@@ -597,7 +620,7 @@
   </div>
 
   @include('components.admin_penjual.footer')
-  
+
   <script>
     // Ambil jumlah tugas mendesak secara dinamis
     function fetchUrgentTasks() {

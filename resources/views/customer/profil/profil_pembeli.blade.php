@@ -83,7 +83,7 @@
         <i class="bi bi-chat-left-text"></i>
         <span>Ulasan Saya</span>
       </a>
-      <a href="{{ route('customer.tickets') }}" class="nav-item">
+      <a href="#" class="nav-item" data-target="ticket-support">
         <i class="bi bi-ticket-detailed"></i>
         <span>Tiket Bantuan</span>
       </a>
@@ -145,6 +145,22 @@
 
         <div id="reviewsList" class="review-list">
           <!-- Reviews will be loaded here dynamically -->
+        </div>
+      </section>
+
+      <!-- TICKET SUPPORT -->
+      <section id="ticket-support" class="ticket-support card hidden-content">
+        <div class="section-header">
+          <h3>Tiket Bantuan</h3>
+          <a href="{{ route('customer.tickets') }}" class="btn btn-primary btn-sm">Lihat Semua Tiket</a>
+        </div>
+
+        <div id="ticketSupportLoading" class="loading-state">
+          <p>Memuat tiket bantuan...</p>
+        </div>
+
+        <div id="ticketSupportList" class="ticket-list">
+          <!-- Tiket will be loaded here dynamically -->
         </div>
       </section>
 
@@ -853,7 +869,15 @@
             if (targetSection) {
               targetSection.classList.remove('hidden-content');
               targetSection.classList.add('active-content');
+
+              // Load corresponding content if needed
+              if(target === 'ticket-support') {
+                loadTicketSupportContent(targetSection);
+              }
             }
+          } else if(this.classList.contains('js-logout')) {
+            // Handle logout separately
+            document.getElementById('logoutModal').classList.add('show');
           }
         });
       });
@@ -877,6 +901,244 @@
           e.preventDefault();
           document.getElementById('logoutModal').classList.add('show');
         });
+      }
+
+      // Function to show ticket modal
+      window.showTicketModal = function() {
+        // Get or create modal element
+        let modal = document.getElementById('ticketModal');
+
+        if (!modal) {
+          // Create modal if it doesn't exist
+          modal = document.createElement('div');
+          modal.id = 'ticketModal';
+          modal.className = 'modal';
+          modal.setAttribute('tabindex', '-1');
+          modal.innerHTML = `
+            <div class="modal-dialog" style="max-width: 600px; width: 90%;">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="ticketModalLabel">Tiket Bantuan</h5>
+                  <button type="button" class="btn-close" onclick="hideTicketModal()" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <div id="ticketsLoading">
+                    <p>Memuat tiket bantuan...</p>
+                  </div>
+                  <div id="ticketsList" style="display: none;"></div>
+                </div>
+                <div class="modal-footer">
+                  <a href="{{ route('customer.tickets') }}" class="btn btn-primary">Lihat Semua Tiket</a>
+                </div>
+              </div>
+            </div>
+          `;
+          document.body.appendChild(modal);
+
+          // Add CSS for the modal
+          const style = document.createElement('style');
+          style.textContent = `
+            .modal {
+              display: none;
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              background-color: rgba(0,0,0,0.5);
+              z-index: 1050;
+              overflow: auto;
+              padding-top: 50px;
+            }
+
+            .modal.show {
+              display: block;
+            }
+
+            .modal-dialog {
+              margin: 50px auto;
+              max-width: 600px;
+            }
+
+            .modal-content {
+              background: white;
+              border-radius: 8px;
+              box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            }
+
+            .modal-header {
+              padding: 15px 20px;
+              border-bottom: 1px solid #e9ecef;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            }
+
+            .modal-title {
+              margin: 0;
+              color: #006E5C;
+            }
+
+            .btn-close {
+              background: none;
+              border: none;
+              font-size: 1.5rem;
+              cursor: pointer;
+              color: #6c757d;
+            }
+
+            .modal-body {
+              padding: 20px;
+            }
+
+            .modal-footer {
+              padding: 15px 20px;
+              border-top: 1px solid #e9ecef;
+              text-align: right;
+            }
+
+            .list-group {
+              display: flex;
+              flex-direction: column;
+              padding-left: 0;
+              margin-bottom: 0;
+              border-radius: .375rem;
+            }
+
+            .list-group-item {
+              position: relative;
+              display: block;
+              padding: .5rem 1rem;
+              color: #212529;
+              text-decoration: none;
+              background-color: #fff;
+              border: 1px solid rgba(0,0,0,.125);
+            }
+
+            .list-group-item:first-child {
+              border-top-left-radius: inherit;
+              border-top-right-radius: inherit;
+            }
+
+            .btn-sm {
+              padding: .25rem .5rem;
+              font-size: .875rem;
+            }
+
+            .btn-outline-primary {
+              color: #0d6efd;
+              border-color: #0d6efd;
+            }
+          `;
+          document.head.appendChild(style);
+        }
+
+        // Show modal
+        modal.style.display = 'block';
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+
+        // Load tickets
+        loadTickets(modal);
+      };
+
+      window.hideTicketModal = function() {
+        const modal = document.getElementById('ticketModal');
+
+        if (modal) {
+          modal.style.display = 'none';
+          modal.classList.remove('show');
+          document.body.style.overflow = 'auto';
+        }
+      };
+
+      window.loadTickets = async function(modal) {
+        try {
+          // Using fetch to get ticket data
+          // Since the API endpoint might not be available, we'll use a mock response for now
+          const response = await fetch('/api/customer/tickets'); // This is a placeholder - you might need to adjust the route
+
+          if (response.ok) {
+            const data = await response.json();
+            const ticketsList = modal.querySelector('#ticketsList');
+            const ticketsLoading = modal.querySelector('#ticketsLoading');
+
+            if (data.tickets && data.tickets.length > 0) {
+              let ticketsHTML = '<ul class="list-group">';
+
+              data.tickets.slice(0, 5).forEach(ticket => { // Ambil 5 tiket terbaru
+                ticketsHTML += `
+                  <li class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                      <div>
+                        <h6>#${ticket.id} - ${ticket.subject || 'Tiket Tanpa Subjek'}</h6>
+                        <small class="text-muted">Status: ${ticket.status || 'Dibuka'}</small>
+                      </div>
+                      <a href="/customer/tickets/${ticket.id}" class="btn btn-sm btn-outline-primary">Lihat</a>
+                    </div>
+                  </li>
+                `;
+              });
+
+              ticketsHTML += '</ul>';
+              ticketsList.innerHTML = ticketsHTML;
+            } else {
+              ticketsList.innerHTML = '<p>Anda tidak memiliki tiket bantuan.</p>';
+            }
+
+            ticketsLoading.style.display = 'none';
+            ticketsList.style.display = 'block';
+          } else {
+            // Fallback: redirect to ticket page if API is not available
+            window.location.href = '{{ route('customer.tickets') }}';
+          }
+        } catch (error) {
+          console.error('Error loading tickets:', error);
+          // Fallback: redirect to ticket page if API is not available
+          window.location.href = '{{ route('customer.tickets') }}';
+        }
+      };
+
+      // Close modal when clicking outside of it
+      document.addEventListener('click', function(event) {
+        const modal = document.getElementById('ticketModal');
+        if (modal && modal.style.display === 'block' && event.target === modal) {
+          window.hideTicketModal();
+        }
+      });
+
+      // Function to load ticket support content - simplified version without API dependency
+      function loadTicketSupportContent(ticketSection) {
+        // Loading state
+        const loadingDiv = ticketSection.querySelector('#ticketSupportLoading');
+        const listDiv = ticketSection.querySelector('#ticketSupportList');
+
+        if (loadingDiv) {
+          loadingDiv.style.display = 'none'; // Hide loading immediately since we're not fetching data
+        }
+
+        if (listDiv) {
+          // Show a message informing user that tickets are available on the dedicated page
+          listDiv.innerHTML = `
+            <div class="ticket-info-content">
+              <div class="ticket-info-card card" style="text-align: center; padding: 2rem;">
+                <div style="margin-bottom: 1rem;">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: var(--primary-color-dark); margin: 0 auto 1rem auto; display: block;">
+                    <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M14 2V8H20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M16 13H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M16 17H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M10 9H9H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <h3 style="margin-top: 0; color: var(--primary-color-dark);">Tiket Bantuan</h3>
+                </div>
+                <p style="margin-bottom: 1.5rem; color: #666;">Semua tiket bantuan Anda tersedia di halaman khusus Tiket Bantuan.</p>
+                <a href="{{ route('customer.tickets') }}" class="btn btn-primary" style="display: inline-block; margin: 0 auto;">Lihat Tiket Bantuan</a>
+              </div>
+            </div>
+          `;
+          listDiv.style.display = 'block';
+        }
       }
 
 

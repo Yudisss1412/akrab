@@ -1327,10 +1327,101 @@ a.btn{
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .session-actions {
     margin-left: 0;
     margin-top: 0.75rem;
     align-self: flex-end;
   }
+}
+
+/* Ticket Support Card styling */
+.ticket-card.card {
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,.04);
+  transition: all 0.3s ease;
+}
+
+.ticket-card.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+}
+
+.ticket-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.ticket-id {
+  font-weight: 700;
+  color: var(--primary-color-dark);
+  font-size: 1rem;
+}
+
+.ticket-status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.status-open, .status-pending {
+  background-color: #e6f4ea;
+  color: #0a7e3a;
+}
+
+.status-closed, .status-resolved {
+  background-color: #f0f9ff;
+  color: #006e5c;
+}
+
+.status-process, .status-in-progress {
+  background-color: #fff8e1;
+  color: #f57c00;
+}
+
+.ticket-subject h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary-color-dark);
+}
+
+.ticket-content {
+  margin: 0.75rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.ticket-content p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.ticket-meta {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+}
+
+.ticket-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.85rem;
 }

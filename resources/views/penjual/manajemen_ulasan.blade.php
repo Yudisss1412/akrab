@@ -373,6 +373,114 @@
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
       border: 1px solid var(--ak-border);
     }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .page-header h1 {
+        font-size: 1.25rem;
+      }
+
+      /* Stats Grid - horizontal scroll layout */
+      .stats-grid {
+        display: flex;
+        overflow-x: auto;
+        gap: 1rem;
+        padding-bottom: 1rem;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .stat-card {
+        flex: 0 0 auto; /* Don't grow or shrink, maintain natural width */
+        min-width: 200px; /* Ensure minimum width so content is readable */
+        width: auto; /* Allow natural width */
+      }
+
+      .filter-row {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .filter-group {
+        min-width: auto;
+        width: 100%;
+      }
+
+      .filter-control {
+        width: 100%;
+        min-height: 44px; /* Ensure adequate touch target size */
+      }
+
+      .review-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+
+      .review-rating {
+        align-self: flex-start;
+      }
+
+      .review-product {
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .product-image {
+        width: 60px !important;
+        height: 60px !important;
+        min-width: 60px;
+        min-height: 60px;
+      }
+
+      .reply-btn {
+        width: 100%;
+        justify-content: center;
+        margin-top: 0.5rem;
+        min-height: 44px; /* Ensure adequate touch target size */
+      }
+
+      .reply-form {
+        width: 100%;
+      }
+
+      .reply-actions {
+        flex-direction: column;
+      }
+
+      .reply-actions button {
+        width: 100%;
+        margin-bottom: 0.5rem;
+      }
+
+      .reply-actions button:last-child {
+        margin-bottom: 0;
+      }
+
+      .star-breakdown {
+        width: 100%;
+      }
+
+      .star-row {
+        flex-direction: row;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .star-progress {
+        flex: 1;
+        min-width: 80px;
+      }
+
+      .pagination {
+        flex-wrap: wrap;
+        gap: 0.25rem;
+      }
+
+      .pagination a, .pagination span {
+        padding: 0.5rem;
+        font-size: 0.75rem;
+      }
+    }
   </style>
 </head>
 <body>

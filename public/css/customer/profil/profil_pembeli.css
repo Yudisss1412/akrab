@@ -296,14 +296,16 @@ body{
   .main-content .order-history,
   .main-content .wishlist-section,
   .main-content .review-history,
-  .main-content .account-settings {
+  .main-content .account-settings,
+  .main-content .ticket-support {
     display: none !important;
   }
 
   .main-content .order-history.active-content,
   .main-content .wishlist-section.active-content,
   .main-content .review-history.active-content,
-  .main-content .account-settings.active-content {
+  .main-content .account-settings.active-content,
+  .main-content .ticket-support.active-content {
     display: block !important;
   }
 }

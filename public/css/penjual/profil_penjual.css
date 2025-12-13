@@ -268,6 +268,171 @@ a.btn{
 .modal-title{ margin:0 0 6px; font-size:18px; font-weight:700; }
 .modal-sub{ margin:0 0 14px; color: var(--text-muted); font-size:13px; }
 
+/* Responsive modal card untuk mobile - tata letak disesuaikan */
+@media (max-width: 768px) {
+  .modal-card {
+    width: 95%;
+    max-height: 90vh;
+    margin: 0 auto;
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  .modal {
+    padding: 8px;
+  }
+
+  /* Penyesuaian isi modal card untuk tampilan mobile */
+  .modal-title {
+    font-size: 16px;
+    margin: 0 0 4px;
+  }
+
+  .modal-sub {
+    font-size: 12px;
+    margin: 0 0 10px;
+  }
+
+  .dl {
+    grid-template-columns: 80px 1fr; /* Mengurangi lebar kolom kiri karena teks lebih banyak di kanan */
+    gap: 5px 8px;
+    font-size: 12px;
+  }
+
+  .table-mini {
+    margin: 6px 0;
+  }
+
+  .table-mini td {
+    padding: 6px;
+    font-size: 12px;
+  }
+
+  /* Menyesuaikan badge untuk mobile */
+  .badge {
+    padding: 3px 6px;
+    font-size: 11px;
+  }
+
+  .modal-actions {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .modal-close {
+    right: 8px;
+    top: 8px;
+    font-size: 18px;
+  }
+
+  .reply-composer {
+    padding: .5rem;
+    margin: .4rem .6rem .6rem;
+  }
+
+  .reply-composer__top {
+    margin-bottom: .4rem;
+  }
+
+  .reply-composer textarea {
+    min-height: 60px;
+    padding: .4rem;
+    font-size: 13px;
+  }
+
+  .reply-composer__bar {
+    margin-top: .4rem;
+  }
+
+  .seller-reply {
+    margin: .4rem .6rem 0;
+    padding: .4rem .6rem;
+  }
+
+  .seller-reply__meta {
+    font-size: .75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-card {
+    width: 100%;
+    max-height: 95vh;
+    margin: 0;
+    padding: 8px;
+    border-radius: 12px;
+  }
+
+  .modal {
+    padding: 4px;
+  }
+
+  /* Penyesuaian lebih lanjut untuk layar sangat kecil */
+  .modal-title {
+    font-size: 15px;
+    margin: 0 0 3px;
+  }
+
+  .modal-sub {
+    font-size: 11px;
+    margin: 0 0 6px;
+  }
+
+  .dl {
+    grid-template-columns: 60px 1fr; /* Lebih mengurangi lebar kolom kiri untuk layar sangat kecil */
+    gap: 4px 6px;
+    font-size: 11px;
+  }
+
+  .table-mini {
+    margin: 4px 0;
+  }
+
+  .table-mini td {
+    padding: 4px;
+    font-size: 11px;
+  }
+
+  .table-mini .thumb {
+    width: 36px;
+    height: 36px;
+  }
+
+  /* Menyesuaikan badge untuk layar sangat kecil */
+  .badge {
+    padding: 2px 5px;
+    font-size: 10px;
+  }
+
+  .modal-actions {
+    margin-top: 6px;
+    padding-top: 6px;
+  }
+
+  .modal-close {
+    right: 6px;
+    top: 6px;
+    font-size: 16px;
+  }
+
+  .reply-composer {
+    padding: .4rem;
+    margin: .3rem .4rem .4rem;
+  }
+
+  .reply-composer textarea {
+    min-height: 50px;
+    padding: .3rem;
+    font-size: 12px;
+  }
+
+  .seller-reply {
+    margin: .3rem .4rem 0;
+    padding: .3rem .4rem;
+  }
+}
+
 /* Badge status (opsional, gunakan class tambahan: .badge--done/--ship/--proc/--fail) */
 .badge{
   display:inline-flex; align-items:center; gap:6px;

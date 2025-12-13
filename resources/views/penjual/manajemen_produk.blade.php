@@ -479,13 +479,26 @@
       }
 
       .control-bar-left {
+        display: flex;
         flex-direction: column;
         gap: 1rem;
+        align-items: center; /* Center align items */
+      }
+
+      .btn-primary {
+        align-self: center; /* Center align the button */
+      }
+
+      .form-control {
+        width: 100% !important;
+        max-width: 300px; /* Limit width but allow to shrink */
+        min-width: 0;
       }
 
       .search {
         width: 100%;
-        order: 3; /* Place search at the end */
+        max-width: 300px; /* Match search to form control width */
+        align-self: center;
       }
 
       .search input {
@@ -498,7 +511,14 @@
       }
 
       .table {
-        min-width: 600px;
+        min-width: 650px;
+        width: 100%;
+      }
+
+      /* Improve table cell readability on mobile */
+      .table th,
+      .table td {
+        white-space: nowrap;
       }
 
       .pagination {

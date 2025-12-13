@@ -152,7 +152,7 @@
       <section id="ticket-support" class="ticket-support card hidden-content">
         <div class="section-header">
           <h3>Tiket Bantuan</h3>
-          <a href="{{ route('customer.tickets') }}" class="btn btn-primary btn-sm">Lihat Semua Tiket</a>
+          <a href="{{ route('customer.tickets') }}" class="view-all">Lihat Semua Tiket</a>
         </div>
 
         <div id="ticketSupportLoading" class="loading-state">
@@ -1133,7 +1133,6 @@
                   <h3 style="margin-top: 0; color: var(--primary-color-dark);">Tiket Bantuan</h3>
                 </div>
                 <p style="margin-bottom: 1.5rem; color: #666;">Semua tiket bantuan Anda tersedia di halaman khusus Tiket Bantuan.</p>
-                <a href="{{ route('customer.tickets') }}" class="btn btn-primary" style="display: inline-block; margin: 0 auto;">Lihat Tiket Bantuan</a>
               </div>
             </div>
           `;

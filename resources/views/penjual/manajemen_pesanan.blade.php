@@ -121,9 +121,17 @@
       flex-wrap: wrap;
     }
 
+    .control-bar form {
+      display: flex;
+      gap: 1rem;
+      width: 100%;
+      min-width: 0; /* Allow flex items to shrink below content size */
+      flex-wrap: wrap;
+    }
+
     .search-box {
       flex: 1;
-      min-width: 200px;
+      min-width: 150px;
       position: relative;
     }
 
@@ -133,6 +141,7 @@
       border: 1px solid var(--ak-border);
       border-radius: var(--ak-radius);
       font-size: 0.875rem;
+      min-width: 0; /* Allow input to shrink */
     }
 
     .search-box svg {
@@ -146,8 +155,9 @@
     }
 
     .date-filter, .bulk-action {
-      min-width: 150px;
+      min-width: 140px;
       flex: 1;
+      min-width: 0; /* Allow flex items to shrink below content size */
     }
 
     .date-filter select,
@@ -158,6 +168,7 @@
       border-radius: var(--ak-radius);
       font-size: 0.875rem;
       background-color: var(--ak-white);
+      min-width: 0; /* Allow select to shrink */
     }
     
     /* Order Cards */
@@ -387,6 +398,7 @@
 
       .search-box {
         min-width: auto;
+        width: 100%;
       }
 
       .pagination {
@@ -403,6 +415,12 @@
 
       .pagination-btn {
         min-width: 32px;
+      }
+
+      /* Ensure any remaining overflow is handled with horizontal scrolling */
+      .control-bar {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
       }
     }
   </style>

@@ -209,30 +209,41 @@ body{
   overflow-x: auto; /* Ensure content doesn't break layout if there are wide tables */
 }
 
-/* For desktop: arrange elements in two columns using CSS Grid */
+/* For desktop: arrange elements in two columns using CSS Grid - limited height for content */
 @media (min-width: 981px) {
   .profile-layout {
     display: grid;
     grid-template-columns: 30% 70%;
-    gap: var(--gap-lg);
+    grid-template-rows: auto auto;
+    gap: var(--gap-md); /* Reduced gap */
     width: 100%;
   }
 
   .profile-card {
     grid-column: 1;
     grid-row: 1;
-    width: 100%;
+    margin-bottom: 0; /* Remove extra margins */
   }
 
   .profile-navigation {
     grid-column: 1;
     grid-row: 2;
-    width: 100%;
+    margin-top: 0; /* Remove extra margins */
   }
 
   .main-content {
     grid-column: 2;
-    grid-row: 1 / span 2; /* Span both rows to align with sidebar items */
+    grid-row: 1; /* Only in row 1, same as profile card */
+    margin: 0; /* Remove any extra margins */
+    height: auto; /* Allow to adjust to content */
+    overflow-y: auto; /* Enable vertical scrolling if content overflows */
+    max-height: 80vh; /* Reasonable max height to allow scrolling */
+    overflow-x: hidden; /* Keep horizontal overflow hidden */
+  }
+
+  /* To align visually without span, set main content to start from same row as profile-card */
+  .profile-card, .main-content {
+    align-self: start; /* Align both to start of their grid area */
   }
 
   /* Ensure proper stacking context */

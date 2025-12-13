@@ -9,6 +9,41 @@
   <link rel="stylesheet" href="{{ asset('css/admin_penjual/style.css') }}">
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    /* Footer positioning fix for mobile */
+    @media (max-width: 768px) {
+      html, body {
+        height: 100%;
+        min-height: 100vh;
+        display: flex !important;
+        flex-direction: column !important;
+      }
+
+      .main-layout {
+        flex: 1 0 auto !important;
+        min-height: 0;
+      }
+
+      .content-wrapper {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        min-height: 0;
+      }
+
+      .admin-page-content {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        min-height: 0;
+      }
+
+      /* Ensure footer stays at the bottom */
+      .ak-footer {
+        margin-top: auto !important;
+      }
+    }
+  </style>
 </head>
 <body>
   @include('components.admin_penjual.header')

@@ -335,6 +335,116 @@
       gap: 0.75rem;
       margin-top: 1.5rem;
     }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .content-wrapper {
+        padding: 0 1rem;
+      }
+
+      .page-header,
+      .saldo-card,
+      .card {
+        padding: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .saldo-amount {
+        font-size: 2rem;
+      }
+
+      .tab-nav {
+        display: flex;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        justify-content: flex-start;
+      }
+
+      .tab-item {
+        white-space: nowrap;
+        padding: 0.75rem 1rem;
+      }
+
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+      }
+
+      .card {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 600px; /* Ensures table has enough space for content */
+        white-space: nowrap;
+      }
+
+      .data-table th,
+      .data-table td {
+        padding: 0.5rem 0.75rem;
+        text-align: left;
+      }
+
+      .data-table th {
+        font-size: 0.75rem;
+        padding: 0.75rem 0.5rem;
+      }
+
+      .data-table td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.8125rem;
+      }
+
+      .pagination {
+        flex-wrap: wrap;
+        gap: 0.25rem;
+      }
+
+      .pagination a,
+      .pagination span {
+        padding: 0.375rem 0.5rem;
+        min-width: 28px;
+        font-size: 0.8125rem;
+      }
+
+      .modal-content {
+        width: 95%;
+        padding: 1rem;
+      }
+
+      .form-group {
+        margin-bottom: 0.75rem;
+      }
+
+      .form-control {
+        padding: 0.625rem;
+      }
+
+      .modal-footer {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .btn-primary {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .saldo-card {
+        text-align: center;
+      }
+
+      .saldo-card .btn-primary {
+        display: block;
+        margin: 1rem auto 0;
+        width: 100%;
+        max-width: 250px;
+      }
+    }
   </style>
 </head>
 <body>

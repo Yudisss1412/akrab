@@ -382,6 +382,78 @@
       }
     }
 
+    /* Card view untuk mobile dan tablet */
+    @media (max-width: 991.98px) {
+      .card-view-container {
+        padding: 0.5rem;
+      }
+
+      .card {
+        border: 1px solid var(--ak-border);
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      }
+
+      .card-body {
+        padding: 1rem;
+      }
+
+      .row > div {
+        padding-bottom: 0.25rem;
+      }
+
+      .status-badge {
+        font-size: 0.75rem;
+      }
+
+      .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+      }
+    }
+
+    /* Tabel untuk desktop */
+    @media (min-width: 992px) {
+      .d-lg-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .d-lg-table th, .d-lg-table td {
+        padding: 0.75rem 1rem;
+      }
+    }
+
+    /* Pagination untuk mobile */
+    @media (max-width: 991.98px) {
+      .pagination {
+        padding: 0 0.5rem;
+      }
+
+      .pagination-controls {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 0.25rem 0;
+        justify-content: flex-start !important;
+      }
+
+      .page-btn {
+        min-width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem;
+        font-size: 0.875rem;
+        margin: 0 1px;
+      }
+
+      .pagination-info {
+        width: 100%;
+        text-align: center;
+      }
+    }
+
     /* Penyesuaian untuk tampilan tablet */
     @media (min-width: 769px) and (max-width: 1024px) {
       .modal-dialog {
@@ -493,7 +565,8 @@
         </div>
 
         <div class="table-container">
-          <table id="violationsTable">
+          <!-- Tabel normal untuk desktop -->
+          <table id="violationsTable" class="d-none d-lg-table">
             <thead>
               <tr>
                 <th class="sortable" data-column="date">Tanggal <span class="sort-indicator"></span></th>
@@ -551,40 +624,107 @@
               @endforelse
             </tbody>
           </table>
-        </div>
-          </table>
-        </div>
 
-        <div class="pagination">
-          <div class="pagination-info" id="paginationInfo">
-            @if($reports)
-              Menampilkan {{ $reports->firstItem() }}-{{ $reports->lastItem() }} dari {{ $reports->total() }} laporan
-            @else
-              Menampilkan 0-0 dari 0 laporan
-            @endif
+          <!-- Card view untuk mobile dan tablet -->
+          <div class="card-view-container d-lg-none">
+            @forelse($reports as $report)
+            <div class="card mb-3">
+              <div class="card-body">
+                <div class="row mb-2">
+                  <div class="col-4"><strong>Tanggal:</strong></div>
+                  <div class="col-8">{{ $report->created_at->format('Y-m-d') }}</div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-4"><strong>Jenis:</strong></div>
+                  <div class="col-8">
+                    @if($report->violation_type === 'product')
+                      Produk Palsu
+                    @elseif($report->violation_type === 'content')
+                      Konten Tidak Pantas
+                    @elseif($report->violation_type === 'scam')
+                      Penipuan
+                    @elseif($report->violation_type === 'copyright')
+                      Pelanggaran Hak Cipta
+                    @elseif($report->violation_type === 'other')
+                      Lainnya
+                    @else
+                      {{ ucfirst(str_replace('_', ' ', $report->violation_type)) }}
+                    @endif
+                  </div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-4"><strong>Penjual:</strong></div>
+                  <div class="col-8">{{ $report->violator->name ?? 'Penjual Tidak Ditemukan' }}</div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-4"><strong>Produk:</strong></div>
+                  <div class="col-8">{{ $report->product->name ?? 'Tidak Ada Produk Terkait' }}</div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-4"><strong>Pelapor:</strong></div>
+                  <div class="col-8">{{ $report->reporter->name ?? 'Pelapor Tidak Ditemukan' }}</div>
+                </div>
+                <div class="row mb-3">
+                  <div class="col-4"><strong>Status:</strong></div>
+                  <div class="col-8">
+                    <span class="status-badge
+                      @if($report->status === 'pending') status-pending
+                      @elseif($report->status === 'investigating') status-investigating
+                      @elseif($report->status === 'resolved') status-resolved
+                      @elseif($report->status === 'dismissed') status-dismissed
+                      @else status-pending @endif">
+                      {{ ucfirst(str_replace('_', ' ', $report->status)) }}
+                    </span>
+                  </div>
+                </div>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                  <a href="{{ route('reports.violations.detail', $report->id) }}" class="btn btn-outline-primary btn-sm">Lihat</a>
+                  @if($report->status === 'pending' || $report->status === 'investigating')
+                  <button class="btn btn-success btn-sm" onclick="updateReportStatus({{ $report->id }})">Selesaikan</button>
+                  @endif
+                </div>
+              </div>
+            </div>
+            @empty
+            <div class="text-center p-4">
+              <p>Tidak ada laporan pelanggaran ditemukan</p>
+            </div>
+            @endforelse
           </div>
-          <div class="pagination-controls">
-            @if($reports)
-              @if($reports->onFirstPage())
-                <button class="page-btn" id="firstBtn" disabled>&lt;&lt; Pertama</button>
-                <button class="page-btn" id="prevBtn" disabled>‹ Sebelumnya</button>
-              @else
-                <a href="{{ $reports->url(1) }}" class="page-btn" id="firstBtn">&lt;&lt; Pertama</a>
-                <a href="{{ $reports->previousPageUrl() }}" class="page-btn" id="prevBtn">‹ Sebelumnya</a>
-              @endif
+        </div>
 
-              @for($i = max(1, $reports->currentPage() - 2); $i <= min($reports->lastPage(), $reports->currentPage() + 2); $i++)
-                <a href="{{ $reports->url($i) }}" class="page-btn {{ $i == $reports->currentPage() ? 'active' : '' }}" data-page="{{ $i }}">{{ $i }}</a>
-              @endfor
-
-              @if($reports->hasMorePages())
-                <a href="{{ $reports->nextPageUrl() }}" class="page-btn" id="nextBtn">Berikutnya ›</a>
-                <a href="{{ $reports->url($reports->lastPage()) }}" class="page-btn" id="lastBtn">Terakhir &gt;&gt;</a>
+        <div class="pagination mt-4">
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+            <div class="pagination-info text-center text-md-start" id="paginationInfo">
+              @if($reports)
+                Menampilkan {{ $reports->firstItem() }}-{{ $reports->lastItem() }} dari {{ $reports->total() }} laporan
               @else
-                <button class="page-btn" id="nextBtn" disabled>Berikutnya ›</button>
-                <button class="page-btn" id="lastBtn" disabled>Terakhir &gt;&gt;</button>
+                Menampilkan 0-0 dari 0 laporan
               @endif
-            @endif
+            </div>
+            <div class="pagination-controls d-flex flex-wrap justify-content-center gap-1">
+              @if($reports)
+                @if($reports->onFirstPage())
+                  <button class="page-btn" id="firstBtn" disabled>&lt;&lt;</button>
+                  <button class="page-btn" id="prevBtn" disabled>&lt;</button>
+                @else
+                  <a href="{{ $reports->url(1) }}" class="page-btn" id="firstBtn">&lt;&lt;</a>
+                  <a href="{{ $reports->previousPageUrl() }}" class="page-btn" id="prevBtn">&lt;</a>
+                @endif
+
+                @for($i = max(1, $reports->currentPage() - 2); $i <= min($reports->lastPage(), $reports->currentPage() + 2); $i++)
+                  <a href="{{ $reports->url($i) }}" class="page-btn {{ $i == $reports->currentPage() ? 'active' : '' }}" data-page="{{ $i }}">{{ $i }}</a>
+                @endfor
+
+                @if($reports->hasMorePages())
+                  <a href="{{ $reports->nextPageUrl() }}" class="page-btn" id="nextBtn">&gt;</a>
+                  <a href="{{ $reports->url($reports->lastPage()) }}" class="page-btn" id="lastBtn">&gt;&gt;</a>
+                @else
+                  <button class="page-btn" id="nextBtn" disabled>&gt;</button>
+                  <button class="page-btn" id="lastBtn" disabled>&gt;&gt;</button>
+                @endif
+              @endif
+            </div>
           </div>
         </div>
       </main>

@@ -8,11 +8,12 @@ use App\Models\Product;
 use App\Models\Seller;
 use App\Models\Category;
 use App\Models\ProductVariant;
+use App\Models\ProductImage;
 
 class ProductSeeder extends Seeder
 {
     use WithoutModelEvents;
-    
+
     /**
      * Run the database seeds.
      */
@@ -855,15 +856,28 @@ class ProductSeeder extends Seeder
             $seller = $sellers->get($index % $sellers->count());
             $categoryName = $productData['category_name'];
             $categoryId = $categories[$categoryName] ?? $categories['Fashion']; // fallback to Fashion if category not found
-            
+
             unset($productData['category_name']); // remove temporary category name
-            
+
             $productData['seller_id'] = $seller->id;
             $productData['category_id'] = $categoryId;
-            
-            Product::create($productData);
+
+            // Extract image field if it exists
+            $imagePath = $productData['image'] ?? null;
+            unset($productData['image']); // Remove image from product data since it's no longer in the products table
+
+            $product = Product::create($productData);
+
+            // Add image to product_images table if image path exists
+            if ($imagePath) {
+                $product->images()->create([
+                    'image_path' => $imagePath,
+                    'is_primary' => true,
+                    'sort_order' => 1,
+                ]);
+            }
         }
-        
+
         // Call ProductVariantSeeder after creating products
         $this->call(ProductVariantSeeder::class);
     }

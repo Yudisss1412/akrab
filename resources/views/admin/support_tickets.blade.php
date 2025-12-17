@@ -370,6 +370,41 @@
     .page-btn:hover:not(:disabled):not(.active) {
       background-color: var(--bg);
     }
+
+    /* Mobile Responsive Pagination */
+    @media (max-width: 768px) {
+      .pagination {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .pagination-info {
+        text-align: center;
+        width: 100%;
+      }
+
+      .pagination-controls {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.25rem;
+        width: 100%;
+      }
+
+      .page-btn {
+        padding: 6px 10px;
+        font-size: 0.85rem;
+      }
+
+      /* Adjust button size on very small screens */
+      @media (max-width: 480px) {
+        .page-btn {
+          padding: 5px 8px;
+          font-size: 0.8rem;
+        }
+      }
+    }
   </style>
 @endpush
 
@@ -467,7 +502,13 @@
           </div>
           
           <div class="pagination">
-            <div class="pagination-info">Menampilkan 1-8 dari 24 tiket</div>
+            <div class="pagination-info">
+              @if(method_exists($tickets, 'links') && $tickets->count() > 0)
+                Menampilkan {{ $tickets->firstItem() }}-{{ $tickets->lastItem() }} dari {{ $tickets->total() }} tiket
+              @else
+                Menampilkan {{ count($tickets) }} tiket
+              @endif
+            </div>
             <div class="pagination-controls">
               <button class="page-btn" id="prevBtn" disabled>‹ Sebelumnya</button>
               <button class="page-btn active">1</button>

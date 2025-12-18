@@ -27,18 +27,18 @@
       --border-radius: 0.375rem;
       --transition: all 0.3s ease;
     }
-    
+
     body {
       background-color: #f5f7fa;
       font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       color: #333;
     }
-    
+
     .main-content {
       padding-top: 2rem;
       padding-bottom: 2rem;
     }
-    
+
     .page-header {
       display: flex;
       justify-content: space-between;
@@ -46,7 +46,7 @@
       margin-bottom: 0.5rem;
       padding: 0.25rem 0;
     }
-    
+
     .page-title {
       margin: 0;
       font-size: 1.75rem;
@@ -56,11 +56,11 @@
       align-items: center;
       gap: 0.75rem;
     }
-    
+
     .page-title i {
       color: var(--primary-light);
     }
-    
+
     .filter-panel {
       background: var(--white);
       border-radius: var(--border-radius);
@@ -70,7 +70,7 @@
       overflow: hidden;
       transition: var(--transition);
     }
-    
+
     .filter-panel:hover {
       box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.1);
     }
@@ -137,7 +137,7 @@
       color: white;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
-    
+
     .filter-title {
       margin: 0;
       font-size: 1.1rem;
@@ -146,30 +146,30 @@
       align-items: center;
       gap: 0.5rem;
     }
-    
+
     .filter-content {
       padding: 1.5rem;
     }
-    
+
     .form-label {
       font-weight: 600;
       color: #495057;
       margin-bottom: 0.5rem;
     }
-    
+
     .form-control, .form-select {
       border: 1px solid var(--border);
       border-radius: var(--border-radius);
       padding: 0.65rem 0.75rem;
       transition: var(--transition);
     }
-    
+
     .form-control:focus, .form-select:focus {
       border-color: var(--primary);
       box-shadow: 0 0 0 0.2rem rgba(0, 110, 92, 0.25);
       outline: 0;
     }
-    
+
     .btn {
       border-radius: var(--border-radius);
       padding: 0.5rem 1rem;
@@ -177,29 +177,29 @@
       transition: var(--transition);
       border: none;
     }
-    
+
     .btn-primary {
       background: var(--primary);
       border: 1px solid var(--primary);
     }
-    
+
     .btn-primary:hover {
       background: #005a4a;
       border-color: #005a4a;
       transform: translateY(-2px);
     }
-    
+
     .btn-secondary {
       background: var(--secondary);
       border: 1px solid var(--secondary);
     }
-    
+
     .btn-secondary:hover {
       background: #5a6268;
       border-color: #545b62;
       transform: translateY(-2px);
     }
-    
+
     .table-container {
       background: var(--white);
       border-radius: var(--border-radius);
@@ -208,18 +208,18 @@
       overflow: hidden;
       transition: var(--transition);
     }
-    
+
     .table-container:hover {
       box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.1);
     }
-    
+
     .table-header {
       padding: 1.25rem 1.5rem;
       background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
       color: white;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
-    
+
     .table-title {
       margin: 0;
       font-size: 1.1rem;
@@ -228,15 +228,15 @@
       align-items: center;
       gap: 0.5rem;
     }
-    
+
     .table-content {
       padding: 1.5rem;
     }
-    
+
     .table {
       margin-bottom: 0;
     }
-    
+
     .table th {
       background-color: #f8f9fa;
       color: #495057;
@@ -244,27 +244,27 @@
       padding: 0.9rem 0.75rem;
       border-top: none;
     }
-    
+
     .table td {
       padding: 0.9rem 0.75rem;
       vertical-align: middle;
     }
-    
+
     .table-hover tbody tr:hover {
       background-color: rgba(0, 110, 92, 0.05);
     }
-    
+
     .table-striped tbody tr:nth-of-type(odd) {
       background-color: rgba(0, 0, 0, 0.02);
     }
-    
+
     .badge {
       padding: 0.4em 0.7em;
       font-size: 0.8em;
       font-weight: 500;
       border-radius: 50rem;
     }
-    
+
     .bulk-actions-toolbar {
       background: #e9f7ef;
       border-radius: var(--border-radius);
@@ -273,66 +273,66 @@
       border-left: 4px solid var(--primary);
       box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
     }
-    
+
     .btn-group .btn {
       margin-right: 0.25rem;
     }
-    
+
     .btn-group .btn:last-child {
       margin-right: 0;
     }
-    
+
     .pagination {
       margin-bottom: 0;
     }
-    
+
     .pagination .page-link {
       color: var(--primary);
       border-radius: var(--border-radius);
       margin: 0 0.1rem;
     }
-    
+
     .pagination .page-item.active .page-link {
       background-color: var(--primary);
       border-color: var(--primary);
     }
-    
+
     .card {
       box-shadow: var(--box-shadow);
       border: none;
       border-radius: var(--border-radius);
       transition: var(--transition);
     }
-    
+
     .table-responsive {
       border-radius: var(--border-radius);
     }
-    
+
     /* Responsive table adjustments */
     .table th, .table td {
       white-space: nowrap;
       vertical-align: top;
     }
-    
+
     /* Adjust for smaller screens */
     @media (max-width: 768px) {
       .table th, .table td {
         padding: 0.5rem 0.25rem;
         font-size: 0.9rem;
       }
-      
+
       .btn-group-vertical .btn {
         padding: 0.25rem 0.5rem;
         font-size: 0.8rem;
         margin-bottom: 0.1rem;
       }
     }
-    
+
     /* Ensure actions column doesn't get too wide */
     .table td:last-child {
       min-width: 100px;
     }
-    
+
     /* Improved table styling for better UX */
     .table th {
       background-color: #f8f9fa;
@@ -343,27 +343,27 @@
       font-size: 0.8rem;
       letter-spacing: 0.5px;
     }
-    
+
     .table td {
       vertical-align: top;
       padding: 0.75rem 0.5rem;
     }
-    
+
     /* Responsive improvements */
     @media (max-width: 768px) {
       .table {
         font-size: 0.85rem;
       }
-      
+
       .table th, .table td {
         padding: 0.5rem 0.25rem;
       }
-      
+
       /* Stack table on very small screens */
       .table-responsive {
         overflow-x: auto;
       }
-      
+
       /* Make links more touch-friendly */
       .btn-group .btn {
         padding: 0.3rem 0.4rem;
@@ -372,24 +372,24 @@
         width: 100%;
       }
     }
-    
+
     /* Make table rows more distinct */
     .table-hover tbody tr:hover {
       background-color: rgba(0, 110, 92, 0.05);
     }
-    
+
     /* Better display for mobile */
     @media (max-width: 576px) {
       .table th, .table td {
         padding: 0.4rem 0.2rem;
         font-size: 0.8rem;
       }
-      
+
       .table th:nth-child(1),
       .table td:nth-child(1) {
         min-width: 120px;
       }
-      
+
       .btn-group .btn {
         padding: 0.25rem 0.35rem;
         font-size: 0.65rem;
@@ -397,26 +397,26 @@
         width: 100%;
       }
     }
-    
+
     /* Styling for text elements */
     .font-weight-bold.text-primary:hover {
       text-decoration: underline;
     }
-    
+
     /* Badge improvements */
     .badge {
       font-size: 0.75em;
     }
-    
+
     /* Better spacing in table cells */
     td > div > * {
       margin-bottom: 0.25rem;
     }
-    
+
     td > div > :last-child {
       margin-bottom: 0;
     }
-    
+
         /* Consistent button sizing for all action buttons */
     .table .btn-group.d-block .btn,
     .table form button.btn,
@@ -432,12 +432,12 @@
       white-space: nowrap !important;
       font-size: 0.8rem !important;
     }
-    
+
     /* Better alignment for icon and text */
     .table .btn i {
       margin-right: 0.1rem;
     }
-    
+
     /* Force all action buttons to be perfect squares with icon only */
     .table .square-btn,
     .table .btn.square-btn,
@@ -462,7 +462,7 @@
       margin: 0 !important;
       flex: 0 0 32px !important;
     }
-    
+
     /* Override any conflicting Bootstrap styles with highest specificity */
     .table .btn.square-btn,
     .table button.square-btn,
@@ -475,7 +475,7 @@
       max-width: 32px !important;
       max-height: 32px !important;
     }
-    
+
     /* Ensure form buttons specifically match other buttons */
     .table form button.square-btn {
       width: 32px !important;
@@ -486,7 +486,7 @@
       max-width: 32px !important;
       max-height: 32px !important;
     }
-    
+
     /* Icon sizing for icon-only buttons - force perfect centering */
     .table .btn i {
       font-size: 14px !important;
@@ -500,7 +500,7 @@
       padding: 0 !important;
       line-height: 1 !important;
     }
-    
+
     /* Extra specificity for font awesome icons */
     .table .btn .fas,
     .table .btn .fa {
@@ -511,34 +511,34 @@
       align-items: center !important;
       justify-content: center !important;
     }
-    
+
     /* Fix container styling that might affect button sizing */
     .table .btn-group.d-block {
       display: block !important;
       width: auto !important;
       margin-bottom: 8px !important;
     }
-    
+
     /* Add extra spacing between delete button and status buttons */
     .table .btn-group.d-block:first-child {
       margin-bottom: 10px !important;
     }
-    
+
     .table .btn-group.d-block:last-child {
       margin-bottom: 0 !important;
     }
-    
+
     /* Add spacing between individual buttons */
     .table .btn.square-btn {
       margin-bottom: 4px !important;
       transition: all 0.2s ease !important;
       transform: scale(1) !important;
     }
-    
+
     .table .btn.square-btn:last-child {
       margin-bottom: 0 !important;
     }
-    
+
     /* Consistent spacing between all buttons using modern gap property - highest specificity */
     .table td .btn-group.d-block,
     td .table .btn-group.d-block,
@@ -548,7 +548,7 @@
       gap: 6px !important;
       padding: 2px 0 !important;
     }
-    
+
     /* Remove individual button margins since we're using gap - highest specificity */
     .table td .btn.square-btn,
     td .table .btn.square-btn,
@@ -556,7 +556,7 @@
       margin-bottom: 0 !important;
       margin: 0 !important;
     }
-    
+
     /* Ensure all buttons have consistent styling - highest specificity */
     .table td .btn.square-btn,
     td .table .btn.square-btn,
@@ -569,7 +569,7 @@
       max-width: 32px !important;
       max-height: 32px !important;
     }
-    
+
     /* Add hover animations */
     .table .btn.square-btn:hover {
       transform: scale(1.1) !important;
@@ -577,33 +577,33 @@
       z-index: 10 !important;
       position: relative !important;
     }
-    
+
     /* Specific hover effects for different button types */
     .table .btn-info.square-btn:hover {
       background-color: #005a4a !important;
       border-color: #005a4a !important;
     }
-    
+
     .table .btn-primary.square-btn:hover {
       background-color: #005a9c !important;
       border-color: #005a9c !important;
     }
-    
+
     .table .btn-danger.square-btn:hover {
       background-color: #bd2130 !important;
       border-color: #bd2130 !important;
     }
-    
+
     .table .btn-success.square-btn:hover {
       background-color: #1e7e34 !important;
       border-color: #1e7e34 !important;
     }
-    
+
     .table .btn-warning.square-btn:hover {
       background-color: #d39e00 !important;
       border-color: #d39e00 !important;
     }
-    
+
     /* Specific icon styling within buttons */
     .table .btn i {
       font-size: 0.9em !important;
@@ -612,58 +612,58 @@
       justify-content: center !important;
       min-width: 14px !important;
     }
-    
+
     /* Ensure icon color matches text color for all buttons */
     .table .btn-info i {
       color: #28a745 !important; /* Green icon for info buttons (Lihat) */
     }
-    
+
     .table .btn-primary {
       color: #fff !important; /* White text for primary buttons (Edit) */
     }
-    
+
     .table .btn-primary i {
       color: #fff !important; /* White icon for primary buttons (Edit) */
     }
-    
+
     .table .btn-danger {
       background-color: #dc3545 !important; /* Solid red background for danger buttons (Hapus) */
       border-color: #dc3545 !important; /* Solid red border for danger buttons (Hapus) */
       color: #fff !important; /* White text for danger buttons (Hapus) */
     }
-    
+
     .table .btn-danger i {
       color: #fff !important; /* White icon for danger buttons (Hapus) */
     }
-    
+
     .table .btn-success {
       background-color: #28a745 !important; /* Solid green background for success buttons (Aktifkan) */
       border-color: #28a745 !important; /* Solid green border for success buttons (Aktifkan) */
       color: #fff !important; /* White text for success buttons (Aktifkan) */
     }
-    
+
     .table .btn-success i {
       color: #fff !important; /* White icon for success buttons (Aktifkan) */
     }
-    
+
     /* Special case for warning button with dark text */
     .table .btn-warning.text-dark {
       background-color: #ffc107 !important; /* Solid yellow background for warning buttons (Tangguhkan) */
       border-color: #ffc107 !important; /* Solid yellow border for warning buttons (Tangguhkan) */
       color: #212529 !important; /* Dark text for warning buttons (Tangguhkan) */
     }
-    
+
     .table .btn-warning.text-dark i {
       color: #212529 !important; /* Dark icon for warning buttons (Tangguhkan) */
     }
-    
+
     /* Button styling for better visual consistency */
     .table .btn-sm {
       padding: 0.25rem 0.5rem !important;
       font-size: 0.85rem !important;
       line-height: 1.5 !important;
     }
-    
+
     /* Fixed button height for consistency with higher specificity */
     .table .fixed-btn-height {
       min-width: 85px !important;
@@ -675,7 +675,7 @@
       text-align: center !important;
       white-space: nowrap !important;
     }
-    
+
     /* Additional specificity for form buttons to ensure consistency */
     .table form .btn {
       min-width: 85px !important;
@@ -687,7 +687,7 @@
       text-align: center !important;
       white-space: nowrap !important;
     }
-    
+
     /* Mobile adjustments for consistent button sizes */
     @media (max-width: 768px) {
       .table .fixed-btn-height,
@@ -698,7 +698,7 @@
         font-size: 0.75rem !important;
       }
     }
-    
+
     @media (max-width: 576px) {
       .table .fixed-btn-height,
       .table form .btn {
@@ -708,7 +708,7 @@
         font-size: 0.7rem !important;
       }
     }
-    
+
     /* Additional specificity for form buttons */
     .table form .btn {
       min-width: 85px !important;
@@ -720,7 +720,7 @@
       text-align: center !important;
       white-space: nowrap !important;
     }
-    
+
     /* Mobile adjustments for consistent button sizes */
     @media (max-width: 768px) {
       .table .fixed-btn-height,
@@ -731,7 +731,7 @@
         font-size: 0.75rem !important;
       }
     }
-    
+
     @media (max-width: 576px) {
       .table .fixed-btn-height,
       .table form .btn {
@@ -741,49 +741,49 @@
         font-size: 0.7rem !important;
       }
     }
-    
+
     /* Enhance readability and accessibility */
     .table th {
       font-weight: 600;
       color: #343a40;
       border-bottom: 2px solid #dee2e6;
     }
-    
+
     .table td {
       border-top: 1px solid #dee2e6;
       vertical-align: top;
     }
-    
+
     /* Improve contrast for better accessibility */
     .table a {
       color: #006E5C;
       text-decoration: none;
     }
-    
+
     .table a:hover {
       color: #005a4a;
       text-decoration: underline;
     }
-    
+
     /* Better alignment for badges and status indicators */
     .table .badge {
       margin: 0.1rem 0;
     }
-    
+
     /* Consistent spacing in data cells */
     .table td div {
       margin-bottom: 0.25rem;
     }
-    
+
     .table td div:last-child {
       margin-bottom: 0;
     }
-    
+
     /* Enhance hover state for better UX */
     .table-hover tbody tr:hover {
       background-color: rgba(0, 110, 92, 0.08) !important;
     }
-    
+
     /* Responsive text sizing */
     @media (max-width: 768px) {
       .table th, .table td {
@@ -791,7 +791,7 @@
         padding: 0.5rem 0.25rem;
       }
     }
-    
+
     @media (max-width: 576px) {
       .table th, .table td {
         font-size: 0.8rem;
@@ -897,7 +897,7 @@
                   </form>
                 </div>
               </div>
-              
+
               <!-- Sellers Table -->
               <div class="table-container mt-2">
                 <div class="table-header">
@@ -938,7 +938,7 @@
                         <td>
                           <div>Produk: <strong>{{ $seller->active_products_count }}</strong></div>
                           <div>GMV: <strong>Rp {{ number_format($seller->total_sales, 2, ',', '.') }}</strong></div>
-                          <div>Rating: 
+                          <div>Rating:
                             <span class="badge bg-warning text-dark">
                               <i class="fas fa-star"></i> {{ number_format($seller->rating, 1) }}
                             </span>
@@ -1013,12 +1013,12 @@
                     </tbody>
                   </table>
                 </div>
-                
+
                 <!-- Pagination -->
                 <div class="mt-3 d-flex justify-content-between align-items-center">
                   @if($sellers)
                   <div>
-                    Menampilkan {{ $sellers->firstItem() }} sampai {{ $sellers->lastItem() }} 
+                    Menampilkan {{ $sellers->firstItem() }} sampai {{ $sellers->lastItem() }}
                     dari {{ $sellers->total() }} penjual
                   </div>
                   <nav aria-label="Halaman penjual">
@@ -1130,7 +1130,7 @@
                   </form>
                 </div>
               </div>
-              
+
               <!-- Buyers Table -->
               <div class="table-container mt-2">
                 <div class="table-header">
@@ -1179,21 +1179,21 @@
                         </td>
                         <td>
                           <div class="btn-group d-block" role="group">
-                            <a href="{{ route('sellers.user_history', $buyer) }}" class="btn btn-info d-block text-center square-btn" title="Lihat Riwayat Transaksi">
+                            <a href="{{ route('user_history', $buyer) }}" class="btn btn-info d-block text-center square-btn" title="Lihat Riwayat Transaksi">
                               <i class="fas fa-history"></i>
                             </a>
-                            <a href="{{ route('sellers.edit_user', $buyer) }}" class="btn btn-primary d-block text-center square-btn" title="Edit Profil">
+                            <a href="{{ route('edit_user', $buyer) }}" class="btn btn-primary d-block text-center square-btn" title="Edit Profil">
                               <i class="fas fa-edit"></i>
                             </a>
                             @if($buyer->status === 'suspended')
-                              <form action="{{ route('sellers.activate_user', $buyer) }}" method="POST" class="d-inline activate-user-form">
+                              <form action="{{ route('activate_user', $buyer) }}" method="POST" class="d-inline activate-user-form">
                                 @csrf
                                 <button type="submit" class="btn btn-success d-block text-center square-btn" title="Aktifkan Kembali Akun">
                                   <i class="fas fa-play"></i>
                                 </button>
                               </form>
                             @else
-                              <form action="{{ route('sellers.suspend_user', $buyer) }}" method="POST" class="d-inline suspend-user-form">
+                              <form action="{{ route('suspend_user', $buyer) }}" method="POST" class="d-inline suspend-user-form">
                                 @csrf
                                 <button type="submit" class="btn btn-warning text-dark d-block text-center square-btn" title="Tangguhkan Akun">
                                   <i class="fas fa-pause"></i>
@@ -1211,12 +1211,12 @@
                     </tbody>
                   </table>
                   </div>
-                  
+
                   <!-- Pagination for buyers -->
                   <div class="mt-3 d-flex justify-content-between align-items-center">
                     @if($buyers)
                     <div>
-                      Menampilkan {{ $buyers->firstItem() }} sampai {{ $buyers->lastItem() }} 
+                      Menampilkan {{ $buyers->firstItem() }} sampai {{ $buyers->lastItem() }}
                       dari {{ $buyers->total() }} pembeli
                     </div>
                     <nav aria-label="Halaman pembeli">
@@ -1275,20 +1275,20 @@
   function submitForm() {
     const form = document.getElementById('filterForm');
     const formData = new FormData(form);
-    
+
     // Build URL with parameters
     let url = new URL(window.location.href);
     url.search = '';
-    
+
     for (const [key, value] of formData.entries()) {
       if (value) {
         url.searchParams.append(key, value);
       }
     }
-    
+
     // Ensure tab parameter is preserved
     url.searchParams.set('tab', 'sellers');
-    
+
     // Navigate to the URL with parameters
     window.location.href = url.toString();
   }
@@ -1299,28 +1299,28 @@
     document.getElementById('status').value = '';
     document.getElementById('join_date_from').value = '';
     document.getElementById('join_date_to').value = '';
-    
+
     // Submit the form to refresh results
     submitForm();
   }
-  
+
   function submitBuyerForm() {
     const form = document.getElementById('filterFormBuyers');
     const formData = new FormData(form);
-    
+
     // Build URL with parameters
     let url = new URL(window.location.href);
     url.search = '';
-    
+
     for (const [key, value] of formData.entries()) {
       if (value) {
         url.searchParams.append(key, value);
       }
     }
-    
+
     // Ensure tab parameter is preserved
     url.searchParams.set('tab', 'buyers');
-    
+
     // Navigate to the URL with parameters
     window.location.href = url.toString();
   }
@@ -1331,7 +1331,7 @@
     document.getElementById('buyer_status').value = '';
     document.getElementById('join_date_from_buyer').value = '';
     document.getElementById('join_date_to_buyer').value = '';
-    
+
     // Submit the form to refresh results
     submitBuyerForm();
   }
@@ -1386,13 +1386,13 @@
     const selectAll = document.getElementById('selectAll');
     const selectAllHeader = document.getElementById('selectAllHeader');
     const sellerCheckboxes = document.querySelectorAll('.seller-checkbox');
-    
+
   // Handle tab switching to update URL and ensure correct tab is active
   document.addEventListener('DOMContentLoaded', function() {
       // Add click event listeners to the tab buttons to update URL
       const buyersTab = document.getElementById('buyers-tab');
       const sellersTab = document.getElementById('sellers-tab');
-      
+
       if (buyersTab) {
           buyersTab.addEventListener('click', function(e) {
               // Update URL to include tab=buyers parameter
@@ -1401,7 +1401,7 @@
               window.history.pushState({}, '', newUrl);
           });
       }
-      
+
       if (sellersTab) {
           sellersTab.addEventListener('click', function(e) {
               // Update URL to include tab=sellers parameter (or remove tab param for default)
@@ -1410,12 +1410,12 @@
               window.history.pushState({}, '', newUrl);
           });
       }
-      
+
       // Handle browser back/forward buttons
       window.addEventListener('popstate', function(e) {
           const urlParams = new URLSearchParams(window.location.search);
           const tab = urlParams.get('tab');
-          
+
           if (tab === 'buyers') {
               const buyersTabEl = document.getElementById('buyers-tab');
               if (buyersTabEl) {
@@ -1492,32 +1492,32 @@
         checkbox.checked = this.checked;
       });
     });
-    
+
     selectAllHeader && selectAllHeader.addEventListener('change', function() {
       sellerCheckboxes.forEach(checkbox => {
         checkbox.checked = this.checked;
       });
       selectAll.checked = this.checked;
     });
-    
+
     // Select all functionality for buyers
     const selectAllBuyers = document.getElementById('selectAllBuyers');
     const selectAllBuyersHeader = document.getElementById('selectAllBuyersHeader');
     const buyerCheckboxes = document.querySelectorAll('.buyer-checkbox');
-    
+
     selectAllBuyers && selectAllBuyers.addEventListener('change', function() {
       buyerCheckboxes.forEach(checkbox => {
         checkbox.checked = this.checked;
       });
     });
-    
+
     selectAllBuyersHeader && selectAllBuyersHeader.addEventListener('change', function() {
       buyerCheckboxes.forEach(checkbox => {
         checkbox.checked = this.checked;
       });
       selectAllBuyers.checked = this.checked;
     });
-    
+
     // Custom notification function
     function showNotification(message, type = 'info') {
       // Remove any existing notifications
@@ -1723,8 +1723,8 @@
       }
     });
   });
-  
+
 
   </script>
-  
+
 @endsection

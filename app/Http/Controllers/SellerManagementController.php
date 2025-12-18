@@ -343,11 +343,13 @@ class SellerManagementController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'status' => 'in:active,suspended',
         ]);
 
         $user->update([
             'name' => $request->name,
             'email' => $request->email,
+            'status' => $request->status ?? $user->status, // Jika status tidak disediakan, tetap gunakan status lama
         ]);
 
         return redirect()->route('sellers.index', ['tab' => 'buyers'])->with('success', 'Data pembeli berhasil diperbarui.');

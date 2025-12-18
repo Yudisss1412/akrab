@@ -40,6 +40,11 @@ class DatabaseSeeder extends Seeder
             DummyOrdersSeeder::class,
         ]);
 
+        // Jalankan seeder untuk data dummy riwayat penjualan
+        $this->call([
+            DummySalesHistorySeeder::class,
+        ]);
+
         // Cek data
         $this->checkData();
     }

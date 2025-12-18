@@ -394,7 +394,7 @@ class SellerOrderController extends Controller
             ->whereHas('items.product', function ($q) use ($seller) {
                 $q->where('seller_id', $seller->id);
             })
-            ->where('status', 'completed') // Hanya tampilkan pesanan yang selesai
+            ->where('status', 'delivered') // Hanya tampilkan pesanan yang selesai
             ->orderBy('created_at', 'desc');
 
         // Filter berdasarkan pencarian jika ada
@@ -435,7 +435,7 @@ class SellerOrderController extends Controller
             ->join('order_items', 'orders.id', '=', 'order_items.order_id')
             ->join('products', 'order_items.product_id', '=', 'products.id')
             ->where('products.seller_id', $seller->id)
-            ->where('orders.status', 'completed')
+            ->where('orders.status', 'delivered')
             ->sum('order_items.quantity');
 
         // Hitung total transaksi selesai
@@ -443,7 +443,7 @@ class SellerOrderController extends Controller
             ->join('order_items', 'orders.id', '=', 'order_items.order_id')
             ->join('products', 'order_items.product_id', '=', 'products.id')
             ->where('products.seller_id', $seller->id)
-            ->where('orders.status', 'completed')
+            ->where('orders.status', 'delivered')
             ->distinct('orders.id')
             ->count();
 
@@ -452,7 +452,7 @@ class SellerOrderController extends Controller
             ->join('order_items', 'orders.id', '=', 'order_items.order_id')
             ->join('products', 'order_items.product_id', '=', 'products.id')
             ->where('products.seller_id', $seller->id)
-            ->where('orders.status', 'completed')
+            ->where('orders.status', 'delivered')
             ->whereMonth('orders.created_at', now()->month)
             ->whereYear('orders.created_at', now()->year)
             ->sum('order_items.subtotal');

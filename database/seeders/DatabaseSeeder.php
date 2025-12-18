@@ -50,6 +50,12 @@ class DatabaseSeeder extends Seeder
             ReviewSeeder::class,
         ]);
 
+        // Jalankan seeder khusus untuk produk dan rating penjual
+        $this->call([
+            ProductRatingSeeder::class,
+            SellerProductReviewSeeder::class,
+        ]);
+
         // Cek data
         $this->checkData();
     }

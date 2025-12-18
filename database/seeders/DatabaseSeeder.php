@@ -45,6 +45,11 @@ class DatabaseSeeder extends Seeder
             DummySalesHistorySeeder::class,
         ]);
 
+        // Jalankan seeder untuk ulasan dummy
+        $this->call([
+            ReviewSeeder::class,
+        ]);
+
         // Cek data
         $this->checkData();
     }

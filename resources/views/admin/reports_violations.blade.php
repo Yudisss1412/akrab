@@ -454,11 +454,27 @@
       }
     }
 
-    /* Penyesuaian untuk tampilan tablet */
-    @media (min-width: 769px) and (max-width: 1024px) {
+    /* Penyesuaian untuk tampilan desktop - memperbaiki lebar modal agar tidak seperti mobile */
+    @media (min-width: 992px) {
       .modal-dialog {
-        max-width: 700px;
+        max-width: 500px; /* Ukuran yang lebih proporsional untuk desktop */
+        margin: 1.75rem auto;
+      }
+    }
+
+    /* Penyesuaian untuk tampilan tablet */
+    @media (min-width: 769px) and (max-width: 991px) {
+      .modal-dialog {
+        max-width: 600px;
         margin: 2rem auto;
+      }
+    }
+
+    /* Penyesuaian untuk tampilan mobile */
+    @media (max-width: 768px) {
+      .modal-dialog {
+        margin: 0.5rem;
+        max-width: calc(100% - 1rem);
       }
     }
   </style>
@@ -498,40 +514,93 @@
                 </small>
               @endif
             </div>
-            <button class="btn btn-outline-primary btn-sm" id="toggleFilterBtn" type="button" data-bs-toggle="modal" data-bs-target="#filterModal">
+            <button class="btn btn-outline-primary btn-sm d-lg-none" id="toggleFilterBtn" type="button" data-bs-toggle="modal" data-bs-target="#filterModal">
               <i class="fas fa-filter"></i> Filter
             </button>
           </div>
 
-          <!-- Modal untuk filter -->
+          <!-- Form filter yang langsung tampil di desktop -->
+          <div class="filter-form-container d-none d-lg-block">
+            <form id="filterForm" method="GET" action="{{ route('reports.violations.filter') }}">
+              <div class="row g-2"> <!-- Mengurangi gap antar elemen -->
+                <div class="col-md-2 mb-2">
+                  <label for="searchFilter" class="form-label small">Cari</label>
+                  <input type="text" name="search" id="searchFilter" class="form-control form-control-sm" placeholder="Cari..." value="{{ request('search', '') }}">
+                </div>
+
+                <div class="col-md-2 mb-2">
+                  <label for="startDateFilter" class="form-label small">Tgl Awal</label>
+                  <input type="date" name="start_date" id="startDateFilter" class="form-control form-control-sm" value="{{ request('start_date', '') }}">
+                </div>
+
+                <div class="col-md-2 mb-2">
+                  <label for="endDateFilter" class="form-label small">Tgl Akhir</label>
+                  <input type="date" name="end_date" id="endDateFilter" class="form-control form-control-sm" value="{{ request('end_date', '') }}">
+                </div>
+
+                <div class="col-md-2 mb-2">
+                  <label for="violationTypeFilter" class="form-label small">Jenis Pelanggaran</label>
+                  <select name="violation_type" id="violationTypeFilter" class="form-select form-select-sm">
+                    <option value="">Semua Jenis</option>
+                    <option value="product" {{ request('violation_type') === 'product' ? 'selected' : '' }}>Produk Palsu</option>
+                    <option value="content" {{ request('violation_type') === 'content' ? 'selected' : '' }}>Konten Tidak Pantas</option>
+                    <option value="scam" {{ request('violation_type') === 'scam' ? 'selected' : '' }}>Penipuan</option>
+                    <option value="copyright" {{ request('violation_type') === 'copyright' ? 'selected' : '' }}>Pelanggaran Hak Cipta</option>
+                    <option value="other" {{ request('violation_type') === 'other' ? 'selected' : '' }}>Lainnya</option>
+                  </select>
+                </div>
+
+                <div class="col-md-2 mb-2">
+                  <label for="statusFilter" class="form-label small">Status</label>
+                  <select name="status" id="statusFilter" class="form-select form-select-sm">
+                    <option value="">Semua Status</option>
+                    <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
+                    <option value="investigating" {{ request('status') === 'investigating' ? 'selected' : '' }}>Sedang Ditinjau</option>
+                    <option value="resolved" {{ request('status') === 'resolved' ? 'selected' : '' }}>Diselesaikan</option>
+                    <option value="dismissed" {{ request('status') === 'dismissed' ? 'selected' : '' }}>Ditolak</option>
+                  </select>
+                </div>
+
+                <div class="col-md-2 mb-2">
+                  <label class="form-label small">&nbsp;</label> <!-- Untuk align kolom -->
+                  <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary btn-sm flex-grow-1">Terapkan</button>
+                    <a href="{{ route('reports.violations') }}" class="btn btn-outline-secondary btn-sm flex-grow-1">Hapus</a>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <!-- Modal untuk filter (hanya muncul di mobile) -->
           <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-scrollable modal-sm"> <!-- Menghilangkan modal-dialog-centered agar posisi lebih atas -->
+            <div class="modal-dialog modal-dialog-scrollable">
               <div class="modal-content">
                 <div class="modal-header">
                   <h5 class="modal-title" id="filterModalLabel">Filter Laporan Pelanggaran</h5>
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                  <form id="filterForm" method="GET" action="{{ route('reports.violations.filter') }}">
-                    <div class="row g-2"> <!-- Mengurangi gap antar elemen -->
+                  <form id="mobileFilterForm" method="GET" action="{{ route('reports.violations.filter') }}">
+                    <div class="row g-2">
                       <div class="col-12 mb-2">
-                        <label for="searchFilter" class="form-label small">Cari</label>
-                        <input type="text" name="search" id="searchFilter" class="form-control form-control-sm" placeholder="Cari di Akrab..." value="{{ request('search', '') }}">
+                        <label for="mobileSearchFilter" class="form-label small">Cari</label>
+                        <input type="text" name="search" id="mobileSearchFilter" class="form-control form-control-sm" placeholder="Cari di Akrab..." value="{{ request('search', '') }}">
                       </div>
 
                       <div class="col-12 mb-2">
-                        <label for="startDateFilter" class="form-label small">Tanggal Awal</label>
-                        <input type="date" name="start_date" id="startDateFilter" class="form-control form-control-sm" value="{{ request('start_date', '') }}">
+                        <label for="mobileStartDateFilter" class="form-label small">Tanggal Awal</label>
+                        <input type="date" name="start_date" id="mobileStartDateFilter" class="form-control form-control-sm" value="{{ request('start_date', '') }}">
                       </div>
 
                       <div class="col-12 mb-2">
-                        <label for="endDateFilter" class="form-label small">Tanggal Akhir</label>
-                        <input type="date" name="end_date" id="endDateFilter" class="form-control form-control-sm" value="{{ request('end_date', '') }}">
+                        <label for="mobileEndDateFilter" class="form-label small">Tanggal Akhir</label>
+                        <input type="date" name="end_date" id="mobileEndDateFilter" class="form-control form-control-sm" value="{{ request('end_date', '') }}">
                       </div>
 
                       <div class="col-12 mb-2">
-                        <label for="violationTypeFilter" class="form-label small">Jenis Pelanggaran</label>
-                        <select name="violation_type" id="violationTypeFilter" class="form-select form-select-sm">
+                        <label for="mobileViolationTypeFilter" class="form-label small">Jenis Pelanggaran</label>
+                        <select name="violation_type" id="mobileViolationTypeFilter" class="form-select form-select-sm">
                           <option value="">Semua Jenis</option>
                           <option value="product" {{ request('violation_type') === 'product' ? 'selected' : '' }}>Produk Palsu</option>
                           <option value="content" {{ request('violation_type') === 'content' ? 'selected' : '' }}>Konten Tidak Pantas</option>
@@ -542,8 +611,8 @@
                       </div>
 
                       <div class="col-12 mb-2">
-                        <label for="statusFilter" class="form-label small">Status</label>
-                        <select name="status" id="statusFilter" class="form-select form-select-sm">
+                        <label for="mobileStatusFilter" class="form-label small">Status</label>
+                        <select name="status" id="mobileStatusFilter" class="form-select form-select-sm">
                           <option value="">Semua Status</option>
                           <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
                           <option value="investigating" {{ request('status') === 'investigating' ? 'selected' : '' }}>Sedang Ditinjau</option>
@@ -553,8 +622,10 @@
                       </div>
 
                       <div class="col-12">
-                        <button type="submit" class="btn btn-primary btn-sm w-100">Terapkan Filter</button>
-                        <a href="{{ route('reports.violations') }}" class="btn btn-outline-secondary btn-sm w-100 mt-1">Hapus Filter</a>
+                        <div class="d-grid gap-2 d-md-flex">
+                          <button type="submit" class="btn btn-primary btn-sm flex-md-grow-1">Terapkan Filter</button>
+                          <a href="{{ route('reports.violations') }}" class="btn btn-outline-secondary btn-sm flex-md-grow-1">Hapus Filter</a>
+                        </div>
                       </div>
                     </div>
                   </form>
@@ -731,18 +802,58 @@
     </div>
   </div>
 
+  <!-- Modal untuk Ubah Status Laporan -->
+  <div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="statusModalLabel">Ubah Status Laporan</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="newStatus" class="form-label">Pilih Status Baru</label>
+            <select class="form-select" id="newStatus">
+              <option value="pending">Pending</option>
+              <option value="investigating">Sedang Ditinjau</option>
+              <option value="resolved" selected>Diselesaikan</option>
+              <option value="dismissed">Ditolak</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="adminNotes" class="form-label">Catatan Admin (Opsional)</label>
+            <textarea class="form-control" id="adminNotes" rows="3" placeholder="Tambahkan catatan tambahan..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="button" class="btn btn-primary" id="confirmStatusBtn">Ubah Status</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   @include('components.admin_penjual.footer')
 
   <script>
-    // Function to update report status
-    async function updateReportStatus(reportId) {
-      // In a real implementation, this would open a modal to update the status
-      // For now, we'll simulate with a simple prompt
-      const status = prompt('Masukkan status baru untuk laporan (pending, investigating, resolved, dismissed):', 'resolved');
+    let currentReportId = null; // Variable to store the current report ID
 
-      if (status) {
+    // Function to update report status
+    function updateReportStatus(reportId) {
+      currentReportId = reportId;
+      // Show the modal
+      const statusModal = new bootstrap.Modal(document.getElementById('statusModal'));
+      statusModal.show();
+    }
+
+    // Handle confirmation
+    document.getElementById('confirmStatusBtn').addEventListener('click', async function() {
+      const newStatus = document.getElementById('newStatus').value;
+      const adminNotes = document.getElementById('adminNotes').value;
+
+      if (currentReportId && newStatus) {
         try {
-          const response = await fetch(`/reports/violations/${reportId}/status`, {
+          const response = await fetch(`/reports/violations/${currentReportId}/status`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
@@ -750,14 +861,18 @@
               'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             },
             body: JSON.stringify({
-              status: status,
-              admin_notes: 'Laporan diproses oleh admin'
+              status: newStatus,
+              admin_notes: adminNotes || 'Laporan diproses oleh admin'
             })
           });
 
           const data = await response.json();
 
           if (data.success) {
+            // Close the modal
+            const statusModal = bootstrap.Modal.getInstance(document.getElementById('statusModal'));
+            statusModal.hide();
+
             alert('Status laporan berhasil diperbarui');
             // Reload the page to show updated status
             location.reload();
@@ -769,7 +884,7 @@
           alert('Terjadi kesalahan saat memperbarui status laporan');
         }
       }
-    }
+    });
 
     // Update pagination links to include current filter parameters
     document.addEventListener('DOMContentLoaded', function() {

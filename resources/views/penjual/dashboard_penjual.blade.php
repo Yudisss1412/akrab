@@ -446,7 +446,7 @@
                     </svg>
                     Pesanan Perlu Diproses
                   </a>
-                  <span class="action-count" id="pending-orders-count">0</span>
+                  <span class="action-count" id="pending-orders-count">{{ $stats['pending_orders'] }}</span>
                 </li>
                 <li class="action-item">
                   <a href="https://wa.me/6289680861370" target="_blank" class="action-link">
@@ -466,7 +466,7 @@
                     </svg>
                     Komplain & Retur
                   </a>
-                  <span class="action-count" id="total-urgent-count">0</span>
+                  <span class="action-count" id="total-urgent-count">{{ $stats['urgent_complaints'] }}</span>
                 </li>
               </ul>
             </section>
@@ -675,8 +675,9 @@
             console.log('Updated pending-returns-count to:', data.urgent_tasks.pending_returns);
           }
 
-          // Update total urgent count (komplain + retur)
-          const totalUrgent = data.urgent_tasks.new_complaints + data.urgent_tasks.pending_returns;
+          // Update total urgent count (komplain & retur) - sekarang fokus ke review dengan rating <= 2
+          // Karena Anda ingin tetap menampilkan jumlah komplain/retur berdasarkan review dengan rating <= 2
+          const totalUrgent = data.urgent_tasks.new_complaints; // Hanya ambil jumlah review dengan rating <= 2
           const totalUrgentElement = document.getElementById('total-urgent-count');
           if (totalUrgentElement) {
             totalUrgentElement.textContent = totalUrgent;

@@ -28,8 +28,10 @@ class DashboardController extends Controller
             'new_orders' => $this->getNewOrdersCount($seller->id),
             'viewed_products' => $this->getViewedProductsCount($seller->id),
             'store_rating' => $this->getStoreRating($seller->id),
+            'pending_orders' => $this->getPendingOrdersCount($seller->id),
+            'urgent_complaints' => $this->getUrgentComplaintsCount($seller->id),
         ];
-        
+
         return view('penjual.dashboard_penjual', compact('user', 'seller', 'stats'));
     }
     
@@ -85,5 +87,43 @@ class DashboardController extends Controller
             ->avg('rating');
 
         return $averageRating ? round($averageRating, 1) : 0;
+    }
+
+    private function getPendingOrdersCount($sellerId)
+    {
+        // Ambil produk milik penjual
+        $productIds = Product::where('seller_id', $sellerId)->pluck('id');
+
+        \Log::info("getPendingOrdersCount called with sellerId: " . $sellerId . ", productIds count: " . $productIds->count());
+
+        // Hitung jumlah order pending yang produknya milik penjual ini
+        // Berdasarkan mapping status di SellerOrderController, status database adalah:
+        // pending (mapping dari pending_payment), confirmed (mapping dari processing)
+        $pendingOrdersCount = Order::whereHas('items', function($query) use ($productIds) {
+                $query->whereIn('product_id', $productIds);
+            })
+            ->whereIn('status', ['pending', 'confirmed']) // Hanya pending dan confirmed sebagai pesanan yang perlu diproses
+            ->count();
+
+        \Log::info("getPendingOrdersCount returning: " . $pendingOrdersCount);
+
+        return $pendingOrdersCount;
+    }
+
+    private function getUrgentComplaintsCount($sellerId)
+    {
+        // Hitung jumlah review dengan rating 2 ke bawah (komplain/retur)
+        // yang terkait dengan produk milik penjual
+        \Log::info("getUrgentComplaintsCount called with sellerId: " . $sellerId);
+
+        $urgentComplaintsCount = \App\Models\Review::whereHas('product', function ($q) use ($sellerId) {
+                $q->where('seller_id', $sellerId);
+            })
+            ->where('rating', '<=', 2)
+            ->count();
+
+        \Log::info("getUrgentComplaintsCount returning: " . $urgentComplaintsCount);
+
+        return $urgentComplaintsCount;
     }
 }

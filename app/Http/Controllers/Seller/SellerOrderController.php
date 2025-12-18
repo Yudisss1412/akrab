@@ -559,26 +559,33 @@ class SellerOrderController extends Controller
 
         $unrepliedChatsCount = 0; // Placeholder - bisa diintegrasikan dengan sistem chat
 
-        // Hitung jumlah komplain yang belum diproses (violation reports dengan status pending)
-        $newComplaintsCount = \App\Models\ViolationReport::whereHas('product', function ($q) use ($seller) {
+        // Hitung jumlah review dengan rating 2 ke bawah (komplain)
+        // yang terkait dengan produk milik penjual
+        $newComplaintsCount = \App\Models\Review::whereHas('product', function ($q) use ($seller) {
                 $q->where('seller_id', $seller->id);
             })
-            ->where('status', 'pending')
+            ->where('rating', '<=', 2)
             ->count();
 
+        \Log::info("getUrgentTasks - Count of reviews with rating <= 2 for seller: " . $newComplaintsCount);
+
         // Hitung jumlah permintaan retur yang belum diproses (status pending)
+        // Catatan: Jika hanya ingin menampilkan review dengan rating rendah, maka
+        // pending_returns bisa diset ke 0 atau dihitung sesuai kebijakan
         $pendingReturnsCount = \App\Models\ProductReturn::whereHas('orderItem.product', function ($q) use ($seller) {
                 $q->where('seller_id', $seller->id);
             })
             ->where('status', 'pending')
             ->count();
 
+        \Log::info("getUrgentTasks - Count of pending returns for seller: " . $pendingReturnsCount);
+
         return response()->json([
             'success' => true,
             'urgent_tasks' => [
                 'pending_orders' => $pendingPaymentCount + $processingCount,
                 'unreplied_chats' => $unrepliedChatsCount,
-                'new_complaints' => $newComplaintsCount,
+                'new_complaints' => $newComplaintsCount, // Ini sekarang dari review dengan rating <= 2
                 'pending_returns' => $pendingReturnsCount
             ]
         ]);

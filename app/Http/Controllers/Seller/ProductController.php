@@ -18,31 +18,35 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        // Hanya penjual yang bisa mengakses
+        // Hanya penjual dan admin yang bisa mengakses
         $user = Auth::user();
-        if (!$user || !$user->role || $user->role->name !== 'seller') {
-            abort(403, 'Akses ditolak. Hanya penjual yang dapat mengakses halaman ini.');
+        if (!$user || !$user->role || !in_array($user->role->name, ['seller', 'admin'])) {
+            abort(403, 'Akses ditolak. Hanya penjual dan admin yang dapat mengakses halaman ini.');
         }
 
-        // Ambil ID penjual dari tabel sellers berdasarkan user_id
-        $seller = \App\Models\Seller::where('user_id', $user->id)->first();
-        if (!$seller) {
-            \Log::info("Seller record not found for user: " . $user->id);
-            // Jika tidak ada seller record, kembalikan koleksi kosong
-            $products = collect();
-            $categories = \App\Models\Category::all();
-            return view('penjual.manajemen_produk', compact('products', 'categories'));
+        // Jika user adalah penjual
+        if ($user->role->name === 'seller') {
+            // Ambil ID penjual dari tabel sellers berdasarkan user_id
+            $seller = \App\Models\Seller::where('user_id', $user->id)->first();
+            if (!$seller) {
+                \Log::info("Seller record not found for user: " . $user->id);
+                // Jika tidak ada seller record, kembalikan koleksi kosong
+                $products = collect();
+                $categories = \App\Models\Category::all();
+                return view('penjual.manajemen_produk', compact('products', 'categories'));
+            }
+
+            \Log::info("Seller found for user " . $user->id . ", seller_id: " . $seller->id);
+
+            // Query builder untuk produk milik penjual saat ini
+            $query = Product::where('seller_id', $seller->id)
+                ->with(['variants', 'category', 'subcategory', 'images', 'approvedReviews']);
         }
-
-        \Log::info("Seller found for user " . $user->id . ", seller_id: " . $seller->id);
-
-        // Hitung jumlah produk milik seller ini
-        $productCount = \App\Models\Product::where('seller_id', $seller->id)->count();
-        \Log::info("Product count for seller " . $seller->id . ": " . $productCount);
-        
-        // Query builder untuk produk milik penjual saat ini
-        $query = Product::where('seller_id', $seller->id)
-            ->with(['variants', 'category', 'subcategory', 'images', 'approvedReviews']);
+        // Jika user adalah admin
+        else {
+            // Tampilkan semua produk dari semua penjual
+            $query = Product::with(['variants', 'category', 'subcategory', 'images', 'approvedReviews']);
+        }
 
         // Filter berdasarkan pencarian jika ada
         if ($request->has('search') && $request->search) {
@@ -68,7 +72,6 @@ class ProductController extends Controller
 
         // Paginate hasil
         $products = $query->paginate(10)->appends($request->query());
-        \Log::info("Products retrieved for pagination: " . $products->count());
 
         // Ambil kategori untuk filter dropdown
         $categories = \App\Models\Category::all();
@@ -81,10 +84,10 @@ class ProductController extends Controller
      */
     public function create()
     {
-        // Hanya penjual yang bisa mengakses
+        // Hanya penjual dan admin yang bisa mengakses
         $user = Auth::user();
-        if (!$user || !$user->role || $user->role->name !== 'seller') {
-            abort(403, 'Akses ditolak. Hanya penjual yang dapat mengakses halaman ini.');
+        if (!$user || !$user->role || !in_array($user->role->name, ['seller', 'admin'])) {
+            abort(403, 'Akses ditolak. Hanya penjual dan admin yang dapat mengakses halaman ini.');
         }
 
         $categories = Category::all();
@@ -96,10 +99,10 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        // Hanya penjual yang bisa mengakses
+        // Hanya penjual dan admin yang bisa mengakses
         $user = Auth::user();
-        if (!$user || !$user->role || $user->role->name !== 'seller') {
-            abort(403, 'Akses ditolak. Hanya penjual yang dapat mengakses halaman ini.');
+        if (!$user || !$user->role || !in_array($user->role->name, ['seller', 'admin'])) {
+            abort(403, 'Akses ditolak. Hanya penjual dan admin yang dapat mengakses halaman ini.');
         }
 
         $validator = Validator::make($request->all(), [
@@ -139,13 +142,32 @@ class ProductController extends Controller
             } else {
                 $status = $status ?? 'active';
             }
-            
-            // Ambil ID penjual dari tabel sellers berdasarkan user_id
-            $seller = \App\Models\Seller::where('user_id', $user->id)->first();
-            if (!$seller) {
-                throw new \Exception('Seller record not found for this user');
+
+            // Jika user adalah penjual, ambil seller record
+            if ($user->role->name === 'seller') {
+                $seller = \App\Models\Seller::where('user_id', $user->id)->first();
+                if (!$seller) {
+                    throw new \Exception('Seller record not found for this user');
+                }
+                $sellerId = $seller->id;
             }
-            
+            // Jika user adalah admin, kita perlu menentukan seller mana produk akan dibuat
+            // Untuk saat ini, mungkin perlu ada field tambahan untuk menentukan penjualnya
+            // Tapi untuk sementara, kita bisa menetapkan ke penjual pertama atau meminta input dari form
+            else {
+                // Untuk kasus admin, mungkin perlu mengambil seller_id dari input atau menetapkan ke seller tertentu
+                // Kita akan tetap memerlukan seller_id, karena produk harus terkait dengan penjual
+                $sellerId = $request->input('seller_id');
+                if (!$sellerId) {
+                    // Jika tidak ada seller_id ditentukan, kita bisa gunakan penjual pertama sebagai fallback
+                    $seller = \App\Models\Seller::first();
+                    if (!$seller) {
+                        throw new \Exception('Tidak ada penjual ditemukan, admin tidak bisa membuat produk tanpa menentukan penjual.');
+                    }
+                    $sellerId = $seller->id;
+                }
+            }
+
             // Buat produk
             $product = Product::create([
                 'name' => $request->name,
@@ -162,24 +184,24 @@ class ProductController extends Controller
                 'features' => $request->features ? explode("\n", $request->features) : null, // Tambahkan fitur
                 'stock' => $request->stock,
                 'weight' => $request->weight,
-                'seller_id' => $seller->id,
+                'seller_id' => $sellerId,
                 'status' => $status
             ]);
 
             // Upload dan proses gambar
             if ($request->hasFile('images')) {
                 $files = $request->file('images');
-                
+
                 foreach ($files as $index => $image) {
                     // Simpan gambar
                     $path = $this->processImageTo16By9($image, 'products/' . $product->id);
-                    
+
                     // Simpan semua gambar ke tabel product_images
                     $productImage = $product->images()->create([
                         'image_path' => $path,
                         'alt_text' => $request->name
                     ]);
-                    
+
                     // Tandai gambar pertama sebagai gambar utama
                     if ($index === 0) {
                         $productImage->update([
@@ -196,7 +218,7 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi error
             DB::rollBack();
-            
+
             \Log::error('Error creating product: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan produk: ' . $e->getMessage())->withInput();
         }
@@ -208,20 +230,23 @@ class ProductController extends Controller
     public function show($id)
     {
         $user = Auth::user();
-        if (!$user || !$user->role || $user->role->name !== 'seller') {
-            abort(403, 'Akses ditolak. Hanya penjual yang dapat mengakses halaman ini.');
-        }
-
-        // Ambil ID penjual dari tabel sellers berdasarkan user_id
-        $seller = \App\Models\Seller::where('user_id', $user->id)->first();
-        if (!$seller) {
-            abort(403, 'Akses ditolak. Seller record tidak ditemukan.');
+        if (!$user || !$user->role || !in_array($user->role->name, ['seller', 'admin'])) {
+            abort(403, 'Akses ditolak. Hanya penjual dan admin yang dapat mengakses halaman ini.');
         }
 
         $product = Product::where('id', $id)
-            ->where('seller_id', $seller->id)
-            ->with(['variants', 'category', 'subcategory', 'images', 'reviews.user'])
-            ->firstOrFail();
+            ->with(['variants', 'category', 'subcategory', 'images', 'reviews.user']);
+
+        // Jika user adalah penjual, hanya boleh melihat produk miliknya sendiri
+        if ($user->role->name === 'seller') {
+            $seller = \App\Models\Seller::where('user_id', $user->id)->first();
+            if (!$seller) {
+                abort(403, 'Akses ditolak. Seller record tidak ditemukan.');
+            }
+            $product = $product->where('seller_id', $seller->id);
+        }
+
+        $product = $product->firstOrFail();
 
         // Hitung statistik produk
         $totalSales = $product->orderItems()->sum('quantity');
@@ -238,21 +263,24 @@ class ProductController extends Controller
     public function edit($id)
     {
         $user = Auth::user();
-        if (!$user || !$user->role || $user->role->name !== 'seller') {
-            abort(403, 'Akses ditolak. Hanya penjual yang dapat mengakses halaman ini.');
-        }
-
-        // Ambil ID penjual dari tabel sellers berdasarkan user_id
-        $seller = \App\Models\Seller::where('user_id', $user->id)->first();
-        if (!$seller) {
-            abort(403, 'Akses ditolak. Seller record tidak ditemukan.');
+        if (!$user || !$user->role || !in_array($user->role->name, ['seller', 'admin'])) {
+            abort(403, 'Akses ditolak. Hanya penjual dan admin yang dapat mengakses halaman ini.');
         }
 
         $product = Product::where('id', $id)
-            ->where('seller_id', $seller->id)
-            ->with(['variants', 'category', 'subcategory', 'images'])
-            ->firstOrFail();
-        
+            ->with(['variants', 'category', 'subcategory', 'images']);
+
+        // Jika user adalah penjual, hanya boleh mengedit produk miliknya sendiri
+        if ($user->role->name === 'seller') {
+            $seller = \App\Models\Seller::where('user_id', $user->id)->first();
+            if (!$seller) {
+                abort(403, 'Akses ditolak. Seller record tidak ditemukan.');
+            }
+            $product = $product->where('seller_id', $seller->id);
+        }
+
+        $product = $product->firstOrFail();
+
         $categories = Category::all();
 
         return view('penjual.edit_produk', compact('product', 'categories'));
@@ -264,13 +292,22 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
         $user = Auth::user();
-        if (!$user || !$user->role || $user->role->name !== 'seller') {
-            abort(403, 'Akses ditolak. Hanya penjual yang dapat mengakses halaman ini.');
+        if (!$user || !$user->role || !in_array($user->role->name, ['seller', 'admin'])) {
+            abort(403, 'Akses ditolak. Hanya penjual dan admin yang dapat mengakses halaman ini.');
         }
 
-        $product = Product::where('id', $id)
-            ->where('seller_id', $user->id)
-            ->firstOrFail();
+        $product = Product::where('id', $id);
+
+        // Jika user adalah penjual, hanya boleh mengupdate produk miliknya sendiri
+        if ($user->role->name === 'seller') {
+            $seller = \App\Models\Seller::where('user_id', $user->id)->first();
+            if (!$seller) {
+                abort(403, 'Akses ditolak. Seller record tidak ditemukan.');
+            }
+            $product = $product->where('seller_id', $seller->id);
+        }
+
+        $product = $product->firstOrFail();
 
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
@@ -309,7 +346,7 @@ class ProductController extends Controller
             } else {
                 $status = $status ?? $product->status;
             }
-            
+
             // Update produk
             $product->update([
                 'name' => $request->name,
@@ -332,17 +369,17 @@ class ProductController extends Controller
             // Upload dan proses gambar baru jika ada
             if ($request->hasFile('images')) {
                 $files = $request->file('images');
-                
+
                 foreach ($files as $index => $image) {
                     // Simpan gambar
                     $path = $this->processImageTo16By9($image, 'products/' . $product->id);
-                    
+
                     // Simpan semua gambar ke tabel product_images
                     $productImage = $product->images()->create([
                         'image_path' => $path,
                         'alt_text' => $request->name
                     ]);
-                    
+
                     // Tandai gambar pertama sebagai gambar utama
                     if ($index === 0) {
                         // Hapus tanda primary dari gambar-gambar sebelumnya
@@ -363,7 +400,7 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi error
             DB::rollBack();
-            
+
             \Log::error('Error updating product: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Terjadi kesalahan saat memperbarui produk: ' . $e->getMessage())->withInput();
         }
@@ -375,19 +412,22 @@ class ProductController extends Controller
     public function destroy($id)
     {
         $user = Auth::user();
-        if (!$user || !$user->role || $user->role->name !== 'seller') {
+        if (!$user || !$user->role || !in_array($user->role->name, ['seller', 'admin'])) {
             return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
         }
 
-        // Ambil ID penjual dari tabel sellers berdasarkan user_id
-        $seller = \App\Models\Seller::where('user_id', $user->id)->first();
-        if (!$seller) {
-            return response()->json(['success' => false, 'message' => 'Akses ditolak. Seller record tidak ditemukan.'], 403);
+        $product = Product::where('id', $id);
+
+        // Jika user adalah penjual, hanya boleh menghapus produk miliknya sendiri
+        if ($user->role->name === 'seller') {
+            $seller = \App\Models\Seller::where('user_id', $user->id)->first();
+            if (!$seller) {
+                return response()->json(['success' => false, 'message' => 'Akses ditolak. Seller record tidak ditemukan.'], 403);
+            }
+            $product = $product->where('seller_id', $seller->id);
         }
 
-        $product = Product::where('id', $id)
-            ->where('seller_id', $seller->id)
-            ->firstOrFail();
+        $product = $product->firstOrFail();
 
         try {
             // Mulai transaksi database
@@ -410,7 +450,7 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi error
             DB::rollBack();
-            
+
             \Log::error('Error deleting product: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat menghapus produk: ' . $e->getMessage()], 500);
         }
@@ -422,19 +462,22 @@ class ProductController extends Controller
     public function updateStock(Request $request, $id)
     {
         $user = Auth::user();
-        if (!$user || !$user->role || $user->role->name !== 'seller') {
-            abort(403, 'Akses ditolak. Hanya penjual yang dapat mengakses halaman ini.');
+        if (!$user || !$user->role || !in_array($user->role->name, ['seller', 'admin'])) {
+            abort(403, 'Akses ditolak. Hanya penjual dan admin yang dapat mengakses halaman ini.');
         }
 
-        // Ambil ID penjual dari tabel sellers berdasarkan user_id
-        $seller = \App\Models\Seller::where('user_id', $user->id)->first();
-        if (!$seller) {
-            abort(403, 'Akses ditolak. Seller record tidak ditemukan.');
+        $product = Product::where('id', $id);
+
+        // Jika user adalah penjual, hanya boleh mengupdate produk miliknya sendiri
+        if ($user->role->name === 'seller') {
+            $seller = \App\Models\Seller::where('user_id', $user->id)->first();
+            if (!$seller) {
+                abort(403, 'Akses ditolak. Seller record tidak ditemukan.');
+            }
+            $product = $product->where('seller_id', $seller->id);
         }
 
-        $product = Product::where('id', $id)
-            ->where('seller_id', $seller->id)
-            ->firstOrFail();
+        $product = $product->firstOrFail();
 
         $request->validate([
             'stock' => 'required|integer|min:0'
@@ -455,34 +498,37 @@ class ProductController extends Controller
     public function destroyImage($id)
     {
         $user = Auth::user();
-        if (!$user || !$user->role || $user->role->name !== 'seller') {
+        if (!$user || !$user->role || !in_array($user->role->name, ['seller', 'admin'])) {
             return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
         }
-        
-        // Temukan gambar produk yang dimiliki oleh penjual ini
-        // Ambil ID penjual dari tabel sellers berdasarkan user_id
-        $seller = \App\Models\Seller::where('user_id', $user->id)->first();
-        if (!$seller) {
-            return response()->json(['success' => false, 'message' => 'Akses ditolak. Seller record tidak ditemukan.'], 403);
-        }
-        
-        $image = \App\Models\ProductImage::where('id', $id)
-            ->whereHas('product', function ($query) use ($seller) {
+
+        $image = \App\Models\ProductImage::where('id', $id);
+
+        // Jika user adalah penjual, hanya boleh menghapus gambar dari produk miliknya sendiri
+        if ($user->role->name === 'seller') {
+            $seller = \App\Models\Seller::where('user_id', $user->id)->first();
+            if (!$seller) {
+                return response()->json(['success' => false, 'message' => 'Akses ditolak. Seller record tidak ditemukan.'], 403);
+            }
+
+            $image = $image->whereHas('product', function ($query) use ($seller) {
                 $query->where('seller_id', $seller->id);
-            })
-            ->first();
-        
+            });
+        }
+
+        $image = $image->first();
+
         if (!$image) {
             return response()->json(['success' => false, 'message' => 'Gambar tidak ditemukan'], 404);
         }
-        
+
         try {
             // Hapus file dari storage
             Storage::disk('public')->delete($image->image_path);
-            
+
             // Hapus record dari database
             $image->delete();
-            
+
             return response()->json(['success' => true, 'message' => 'Gambar berhasil dihapus']);
         } catch (\Exception $e) {
             \Log::error('Error deleting product image: ' . $e->getMessage());
@@ -505,22 +551,33 @@ class ProductController extends Controller
     public function fixMissingImages()
     {
         $user = Auth::user();
-        if (!$user || !$user->role || $user->role->name !== 'seller') {
-            abort(403, 'Akses ditolak. Hanya penjual yang dapat mengakses halaman ini.');
+        if (!$user || !$user->role || !in_array($user->role->name, ['seller', 'admin'])) {
+            abort(403, 'Akses ditolak. Hanya penjual dan admin yang dapat mengakses halaman ini.');
         }
 
-        // Ambil ID penjual dari tabel sellers berdasarkan user_id
-        $seller = \App\Models\Seller::where('user_id', $user->id)->first();
-        if (!$seller) {
-            return response()->json(['success' => false, 'message' => 'Akses ditolak. Seller record tidak ditemukan.'], 403);
-        }
+        // Jika user adalah penjual, hanya perbaiki produk miliknya
+        if ($user->role->name === 'seller') {
+            // Ambil ID penjual dari tabel sellers berdasarkan user_id
+            $seller = \App\Models\Seller::where('user_id', $user->id)->first();
+            if (!$seller) {
+                return response()->json(['success' => false, 'message' => 'Akses ditolak. Seller record tidak ditemukan.'], 403);
+            }
 
-        // Ambil semua produk milik penjual ini yang memiliki gambar di kolom image 
-        // tetapi tidak memiliki gambar di tabel product_images
-        $products = \App\Models\Product::where('seller_id', $seller->id)
-            ->whereNotNull('image')  // Produk memiliki gambar di kolom image
-            ->whereDoesntHave('images')  // Tetapi tidak memiliki entri di tabel product_images
-            ->get();
+            // Ambil semua produk milik penjual ini yang memiliki gambar di kolom image
+            // tetapi tidak memiliki gambar di tabel product_images
+            $products = \App\Models\Product::where('seller_id', $seller->id)
+                ->whereNotNull('image')  // Produk memiliki gambar di kolom image
+                ->whereDoesntHave('images')  // Tetapi tidak memiliki entri di tabel product_images
+                ->get();
+        }
+        // Jika user adalah admin, perbaiki semua produk
+        else {
+            // Ambil semua produk yang memiliki gambar di kolom image
+            // tetapi tidak memiliki gambar di tabel product_images
+            $products = \App\Models\Product::whereNotNull('image')  // Produk memiliki gambar di kolom image
+                ->whereDoesntHave('images')  // Tetapi tidak memiliki entri di tabel product_images
+                ->get();
+        }
 
         $fixedCount = 0;
         foreach ($products as $product) {
@@ -548,14 +605,8 @@ class ProductController extends Controller
     public function assignProductsToSellers()
     {
         $user = Auth::user();
-        if (!$user || !$user->role || $user->role->name !== 'seller') {
-            abort(403, 'Akses ditolak. Hanya penjual yang dapat mengakses halaman ini.');
-        }
-
-        // Ambil ID penjual dari tabel sellers berdasarkan user_id
-        $seller = \App\Models\Seller::where('user_id', $user->id)->first();
-        if (!$seller) {
-            return response()->json(['success' => false, 'message' => 'Akses ditolak. Seller record tidak ditemukan.'], 403);
+        if (!$user || !$user->role || !in_array($user->role->name, ['seller', 'admin'])) {
+            abort(403, 'Akses ditolak. Hanya penjual dan admin yang dapat mengakses halaman ini.');
         }
 
         // Ambil semua produk yang tidak memiliki seller_id
@@ -567,15 +618,30 @@ class ProductController extends Controller
             // Kita asumsikan produk dibuat saat penjual sudah terdaftar
             // Dalam skenario ini, kita akan assign ke seller pertama (ini hanya untuk data dummy)
 
-            // Jika produk ini adalah produk dummy yang dibuat sebelum fitur seller ada
-            // kita bisa assign ke seller yang sedang login
-            $product->update(['seller_id' => $seller->id]);
+            // Jika user adalah penjual, assign ke seller tersebut
+            if ($user->role->name === 'seller') {
+                $seller = \App\Models\Seller::where('user_id', $user->id)->first();
+                if (!$seller) {
+                    return response()->json(['success' => false, 'message' => 'Akses ditolak. Seller record tidak ditemukan.'], 403);
+                }
+                $product->update(['seller_id' => $seller->id]);
+            }
+            // Jika user adalah admin, assign ke seller pertama
+            else {
+                $seller = \App\Models\Seller::first();
+                if ($seller) {
+                    $product->update(['seller_id' => $seller->id]);
+                } else {
+                    // Jika tidak ada seller, lewati produk ini
+                    continue;
+                }
+            }
             $assignedCount++;
         }
 
         return response()->json([
             'success' => true,
-            'message' => "Berhasil menghubungkan {$assignedCount} produk ke penjual saat ini",
+            'message' => "Berhasil menghubungkan {$assignedCount} produk ke penjual",
             'assigned_count' => $assignedCount
         ]);
     }

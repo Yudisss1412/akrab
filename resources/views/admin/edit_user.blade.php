@@ -7,17 +7,60 @@
   <link rel="stylesheet" href="{{ asset('css/admin/dashboard_admin.css') }}">
   <link rel="stylesheet" href="{{ asset('css/admin_penjual/style.css') }}">
   <style>
-    .user-form-container {
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    .form-card {
-      background: white;
+    .form-container {
+      background: var(--white);
       border-radius: var(--ak-radius);
       border: 1px solid var(--ak-border);
-      box-shadow: 0 8px 20px rgba(0,0,0,.05);
-      padding: 2rem;
+      box-shadow: var(--box-shadow);
+      overflow: hidden;
+      transition: var(--transition);
+      margin-top: 1.5rem;
+    }
+
+    .form-container:hover {
+      box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.2);
+    }
+
+    .form-header {
+      padding: 1.5rem;
+      background: linear-gradient(135deg, var(--primary) 0%, #00806d 100%);
+      color: white;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .form-title {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-content {
+      padding: 1.75rem;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding: 0.25rem 0;
+    }
+
+    .page-title {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .page-title i {
+      color: var(--primary-light);
     }
 
     .form-group {
@@ -25,60 +68,104 @@
     }
 
     .form-label {
-      display: block;
-      margin-bottom: 0.5rem;
       font-weight: 600;
-      color: #495057;
+      color: var(--ak-muted);
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .form-control, .form-select {
+      border: 1px solid var(--ak-border);
+      border-radius: var(--ak-radius);
+      padding: 0.75rem;
+      font-size: 1rem;
+      background: var(--white);
+      transition: var(--transition);
+      width: 100%;
+    }
+
+    .form-control:focus, .form-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 110, 92, 0.1);
+      outline: none;
     }
 
     .form-control {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid var(--border);
+      height: auto;
+    }
+
+    .btn {
       border-radius: var(--ak-radius);
-      font-size: 1rem;
-      transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    }
-
-    .form-control:focus {
-      border-color: #006E5C;
-      outline: 0;
-      box-shadow: 0 0 0 0.2rem rgba(0, 110, 92, 0.25);
-    }
-
-    .btn-submit {
-      background-color: #006E5C;
-      color: white;
-      border: none;
       padding: 0.75rem 1.5rem;
-      border-radius: var(--ak-radius);
-      font-size: 1rem;
       font-weight: 600;
+      transition: var(--transition);
+      border: none;
+      font-size: 1rem;
       cursor: pointer;
-      transition: background-color 0.2s ease;
     }
 
-    .btn-submit:hover {
-      background-color: #005a4a;
-    }
-
-    .btn-back {
-      background-color: #6c757d;
+    .btn-primary {
+      background: var(--primary);
       color: white;
+      border-color: var(--primary);
+    }
+
+    .btn-primary:hover {
+      background: #005a4a;
+      border-color: #005a4a;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 110, 92, 0.2);
+    }
+
+    .btn-secondary {
+      background: var(--ak-bg);
+      color: var(--ak-text);
+      border-color: var(--ak-border);
+    }
+
+    .btn-secondary:hover {
+      background: #e2e6ea;
+      color: var(--ak-text);
+      border-color: #adb5bd;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(108, 117, 125, 0.2);
+    }
+
+    .invalid-feedback {
+      display: block;
+      width: 100%;
+      margin-top: 0.5rem;
+      font-size: 0.875rem;
+      color: var(--danger);
+    }
+
+    .form-control.is-invalid {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--ak-border);
+    }
+
+    .form-actions .btn {
+      padding: 0.75rem 2rem;
+    }
+
+    .card {
+      box-shadow: var(--box-shadow);
       border: none;
-      padding: 0.75rem 1.5rem;
       border-radius: var(--ak-radius);
-      font-size: 1rem;
-      font-weight: 600;
-      text-decoration: none;
-      display: inline-block;
-      margin-right: 0.5rem;
-      transition: background-color 0.2s ease;
+      transition: var(--transition);
     }
 
-    .btn-back:hover {
-      background-color: #5a6268;
-      color: white;
+    .required::after {
+      content: " *";
+      color: var(--danger);
     }
   </style>
 @endpush
@@ -88,43 +175,53 @@
     <div class="main-layout">
       <div class="content-wrapper">
         <main class="admin-page-content">
-          <div class="user-form-container">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <h1 class="page-title">Edit Pengguna</h1>
-            </div>
+          <div class="page-header">
+            <h2 class="page-title">Edit Pengguna - {{ $user->name }}</h2>
+            <a href="{{ route('sellers.index', ['tab' => 'buyers']) }}" class="btn btn-secondary">
+              Kembali ke Daftar
+            </a>
+          </div>
 
-            <div class="form-card">
+          <div class="form-container">
+            <div class="form-header">
+              <h3 class="form-title">Form Edit Pengguna</h3>
+            </div>
+            <div class="form-content">
               <form action="{{ route('sellers.update_user', $user) }}" method="POST">
                 @csrf
                 @method('PUT')
 
                 <div class="form-group">
-                  <label for="name" class="form-label">Nama</label>
-                  <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $user->name) }}" required>
+                  <label for="name" class="form-label required">Nama Lengkap</label>
+                  <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $user->name) }}" required>
                   @error('name')
-                    <div class="text-danger mt-1">{{ $message }}</div>
+                    <div class="invalid-feedback">{{ $message }}</div>
                   @enderror
                 </div>
 
                 <div class="form-group">
-                  <label for="email" class="form-label">Email</label>
-                  <input type="email" class="form-control" id="email" name="email" value="{{ old('email', $user->email) }}" required>
+                  <label for="email" class="form-label required">Alamat Email</label>
+                  <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email', $user->email) }}" required>
                   @error('email')
-                    <div class="text-danger mt-1">{{ $message }}</div>
+                    <div class="invalid-feedback">{{ $message }}</div>
                   @enderror
                 </div>
 
                 <div class="form-group">
-                  <label for="status" class="form-label">Status</label>
-                  <select class="form-control" id="status" name="status">
-                    <option value="active" {{ $user->status == 'active' ? 'selected' : '' }}>Aktif</option>
-                    <option value="suspended" {{ $user->status == 'suspended' ? 'selected' : '' }}>Ditangguhkan</option>
+                  <label for="status" class="form-label required">Status Akun</label>
+                  <select class="form-select @error('status') is-invalid @enderror" id="status" name="status" required>
+                    <option value="">Pilih Status</option>
+                    <option value="active" {{ old('status', $user->status) == 'active' ? 'selected' : '' }}>Aktif</option>
+                    <option value="suspended" {{ old('status', $user->status) == 'suspended' ? 'selected' : '' }}>Ditangguhkan</option>
                   </select>
+                  @error('status')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                  @enderror
                 </div>
 
-                <div class="mt-4">
-                  <a href="{{ route('sellers.index', ['tab' => 'buyers']) }}" class="btn-back">Batal</a>
-                  <button type="submit" class="btn-submit">Simpan Perubahan</button>
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary">Update Pengguna</button>
+                  <a href="{{ route('sellers.index', ['tab' => 'buyers']) }}" class="btn btn-secondary">Batal</a>
                 </div>
               </form>
             </div>

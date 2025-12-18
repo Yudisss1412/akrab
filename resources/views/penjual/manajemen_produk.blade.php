@@ -693,10 +693,37 @@
       document.body.style.overflow = 'hidden';
     }
 
+    // Variables to store current product being deleted
+    let currentDeleteProductId = null;
+    let currentDeleteProductName = '';
+
     // Function to handle deleting a product
     function deleteProduct(productId, productName) {
-      if (confirm(`Apakah Anda yakin ingin menghapus produk "${productName}"?`)) {
-        fetch(`/penjual/produk/${productId}`, {
+      currentDeleteProductId = productId;
+      currentDeleteProductName = productName;
+
+      // Set product name in modal
+      document.getElementById('productNameToDelete').textContent = productName;
+
+      // Show modal
+      const deleteModal = document.getElementById('deleteModal');
+      deleteModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // Function to close delete modal
+    function closeDeleteModal() {
+      const deleteModal = document.getElementById('deleteModal');
+      deleteModal.classList.remove('active');
+      document.body.style.overflow = '';
+      currentDeleteProductId = null;
+      currentDeleteProductName = '';
+    }
+
+    // Function to confirm deletion
+    function confirmDelete() {
+      if (currentDeleteProductId) {
+        fetch(`/penjual/produk/${currentDeleteProductId}`, {
           method: 'DELETE',
           headers: {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -705,6 +732,7 @@
         .then(response => response.json())
         .then(data => {
           if (data.success) {
+            closeDeleteModal();
             alert(data.message);
             location.reload(); // Reload the page to reflect changes
           } else {
@@ -717,6 +745,26 @@
         });
       }
     }
+
+    // Initialize delete modal event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+      const deleteModal = document.getElementById('deleteModal');
+      const deleteModalBackdrop = deleteModal;
+
+      // Close modal with backdrop click
+      deleteModalBackdrop.addEventListener('click', function(e) {
+        if (e.target === deleteModalBackdrop) {
+          closeDeleteModal();
+        }
+      });
+
+      // Close modal with Escape key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && deleteModal.classList.contains('active')) {
+          closeDeleteModal();
+        }
+      });
+    });
 
     // Function to update URL with filters
     function updateFilters() {
@@ -787,6 +835,25 @@
         }
     });
   </script>
+
+  <!-- Modal Konfirmasi Hapus Produk -->
+  <div class="modal" id="deleteModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Konfirmasi Hapus Produk</h3>
+        <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Apakah Anda yakin ingin menghapus produk "<span id="productNameToDelete"></span>"?</p>
+        <p class="text-muted">Tindakan ini tidak dapat dibatalkan.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeDeleteModal()" style="background: var(--ak-border); color: var(--ak-text);">Batal</button>
+        <button class="btn btn-primary" onclick="confirmDelete()">Hapus Produk</button>
+      </div>
+    </div>
+  </div>
+
   <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body>

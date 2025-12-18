@@ -1179,21 +1179,21 @@
                         </td>
                         <td>
                           <div class="btn-group d-block" role="group">
-                            <a href="{{ route('user_history', $buyer) }}" class="btn btn-info d-block text-center square-btn" title="Lihat Riwayat Transaksi">
+                            <a href="{{ route('sellers.user_history', $buyer) }}" class="btn btn-info d-block text-center square-btn" title="Lihat Riwayat Transaksi">
                               <i class="fas fa-history"></i>
                             </a>
-                            <a href="{{ route('edit_user', $buyer) }}" class="btn btn-primary d-block text-center square-btn" title="Edit Profil">
+                            <a href="{{ route('sellers.edit_user', $buyer) }}" class="btn btn-primary d-block text-center square-btn" title="Edit Profil">
                               <i class="fas fa-edit"></i>
                             </a>
                             @if($buyer->status === 'suspended')
-                              <form action="{{ route('activate_user', $buyer) }}" method="POST" class="d-inline activate-user-form">
+                              <form action="{{ route('sellers.activate_user', $buyer) }}" method="POST" class="d-inline activate-user-form">
                                 @csrf
                                 <button type="submit" class="btn btn-success d-block text-center square-btn" title="Aktifkan Kembali Akun">
                                   <i class="fas fa-play"></i>
                                 </button>
                               </form>
                             @else
-                              <form action="{{ route('suspend_user', $buyer) }}" method="POST" class="d-inline suspend-user-form">
+                              <form action="{{ route('sellers.suspend_user', $buyer) }}" method="POST" class="d-inline suspend-user-form">
                                 @csrf
                                 <button type="submit" class="btn btn-warning text-dark d-block text-center square-btn" title="Tangguhkan Akun">
                                   <i class="fas fa-pause"></i>

@@ -111,14 +111,13 @@
       align-items: center;
       justify-content: flex-start;
       flex-wrap: wrap;
-      overflow: visible; /* Memastikan tidak ada overflow yang tersembunyi */
     }
 
     .search-box {
       flex: 1;
-      min-width: 250px;
+      min-width: 200px;
+      max-width: 100%;
       position: relative;
-      width: 100%; /* Memastikan lebar penuh */
     }
 
     .search-box input {
@@ -127,7 +126,8 @@
       border: 1px solid var(--ak-border);
       border-radius: var(--ak-radius);
       font-size: 0.875rem;
-      box-sizing: border-box; /* Memastikan padding dihitung dalam lebar */
+      box-sizing: border-box;
+      min-width: 0; /* Memungkinkan flex item menyusut di bawah konten */
     }
 
     .search-box svg {
@@ -141,10 +141,9 @@
     }
 
     .date-filter {
-      min-width: 200px;
-      width: 200px;
-      flex-shrink: 0;
-      width: 100%; /* Untuk mobile, akan diatur ulang */
+      min-width: 180px;
+      max-width: 100%;
+      flex: 0 0 auto; /* Mencegah perubahan ukuran */
     }
 
     .date-filter select {
@@ -154,7 +153,8 @@
       border-radius: var(--ak-radius);
       font-size: 0.875rem;
       background-color: var(--ak-white);
-      box-sizing: border-box; /* Memastikan padding dihitung dalam lebar */
+      box-sizing: border-box;
+      min-width: 0;
     }
     
     /* Sales Cards */
@@ -482,14 +482,14 @@
 
         <!-- Control Bar -->
         <div class="control-bar">
-          <form method="GET" action="{{ route('penjual.riwayat.penjualan') }}" id="filterForm" style="display: flex; gap: 1rem; width: 100%; align-items: center;">
-            <div class="search-box">
+          <form method="GET" action="{{ route('penjual.riwayat.penjualan') }}" id="filterForm" style="display: flex; flex-wrap: wrap; gap: 1rem; width: 100%; align-items: center;">
+            <div class="search-box" style="flex: 1; min-width: 200px;">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 10 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
               <input type="text" name="search" placeholder="Cari riwayat penjualan..." value="{{ request('search') }}">
             </div>
-            <div class="date-filter">
+            <div class="date-filter" style="min-width: 180px;">
               <select name="date_filter" onchange="document.getElementById('filterForm').submit();">
                 <option value="">Filter Tanggal</option>
                 <option value="today" {{ request('date_filter') == 'today' ? 'selected' : '' }}>Hari Ini</option>

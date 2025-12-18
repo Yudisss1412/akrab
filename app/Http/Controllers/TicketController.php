@@ -12,7 +12,7 @@ class TicketController extends Controller
     {
         // Check if there are any real tickets in the database
         $hasRealTickets = Ticket::exists();
-        
+
         if (!$hasRealTickets) {
             // No real tickets exist, show filtered dummy data
             return $this->showFilteredDummyTickets($request);
@@ -64,8 +64,89 @@ class TicketController extends Controller
                 abort(403, 'Anda harus login terlebih dahulu');
             }
 
-            // Find the ticket with related data
-            $ticket = Ticket::with('user', 'assignee')->findOrFail($id);
+            // Check if there are real tickets in the database
+            $hasRealTickets = Ticket::exists();
+
+            $ticket = null;
+
+            if ($hasRealTickets) {
+                // Try to find the actual ticket
+                $ticket = Ticket::with('user', 'assignee')->findOrFail($id);
+            } else {
+                // No real tickets exist, try to create a dummy ticket if the ID is within range
+                // Use the same logic as in showFilteredDummyTickets to generate dummy data
+                $users = \App\Models\User::limit(10)->get();
+                if ($users->isEmpty()) {
+                    $users = collect([
+                        (object) ['id' => 1, 'name' => 'Ahmad Santoso', 'email' => 'ahmad@example.com'],
+                        (object) ['id' => 2, 'name' => 'Budi Prasetyo', 'email' => 'budi@example.com'],
+                        (object) ['id' => 3, 'name' => 'Siti Rahayu', 'email' => 'siti@example.com'],
+                        (object) ['id' => 4, 'name' => 'Joko Widodo', 'email' => 'joko@example.com'],
+                        (object) ['id' => 5, 'name' => 'Lina Marlina', 'email' => 'lina@example.com'],
+                        (object) ['id' => 6, 'name' => 'Rina Kusuma', 'email' => 'rina@example.com'],
+                        (object) ['id' => 7, 'name' => 'Agus Setiawan', 'email' => 'agus@example.com'],
+                        (object) ['id' => 8, 'name' => 'Dewi Anggraini', 'email' => 'dewi@example.com'],
+                        (object) ['id' => 9, 'name' => 'Fajar Pamungkas', 'email' => 'fajar@example.com'],
+                        (object) ['id' => 10, 'name' => 'Tina Nurhayati', 'email' => 'tina@example.com'],
+                    ]);
+                }
+
+                // Check if this ID would exist in dummy data (1-15)
+                if ($id >= 1 && $id <= 15) {
+                    $categories = ['technical', 'billing', 'account', 'product', 'other'];
+                    $priorities = ['low', 'medium', 'high', 'urgent'];
+                    $statuses = ['open', 'in_progress', 'resolved', 'closed'];
+
+                    $subjects = [
+                        'Kesulitan saat login ke akun',
+                        'Pembayaran tidak terproses',
+                        'Produk tidak sesuai deskripsi',
+                        'Masalah teknis di website',
+                        'Pertanyaan tentang kebijakan retur',
+                        'Kesalahan harga produk',
+                        'Kesulitan saat checkout',
+                        'Akun saya diblokir',
+                        'Pengiriman terlambat',
+                        'Tidak bisa mengunggah foto profil'
+                    ];
+
+                    $messages = [
+                        'Saya mengalami kesulitan saat mencoba login ke akun saya. Setiap kali saya memasukkan password, sistem mengata니다 password salah padahal saya yakin benar.',
+                        'Pembayaran saya tidak terproses dengan status pending lebih dari 24 jam. Mohon bantuannya untuk mempercepat proses verifikasi.',
+                        'Produk yang saya terima tidak sesuai dengan deskripsi di website. Warna dan ukuran berbeda dari yang saya pesan.',
+                        'Website sering loading lama dan kadang tidak merespon. Ini mengganggu pengalaman belanja saya.',
+                        'Saya ingin bertanya tentang kebijakan retur barang jika produk yang diterima cacat atau rusak.',
+                        'Saya menemukan kesalahan harga di beberapa produk. Harga tertulis lebih murah dari seharusnya, apakah ini promo atau kesalahan sistem?',
+                        'Saya mengalami kesulitan saat proses checkout. Tombol "proses pembayaran" tidak merespon saat saya klik.',
+                        'Akun saya tiba-tiba diblokir tanpa pemberitahuan sebelumnya. Mohon penjelasan dan bantuan untuk membukanya kembali.',
+                        'Pengiriman saya terlambat beberapa hari dari estimasi yang diberikan. Mohon informasi terkini mengenai status pengiriman.',
+                        'Saya tidak bisa mengunggah foto profil di halaman pengaturan akun. Setiap kali mencoba, muncul pesan error.'
+                    ];
+
+                    // Create dummy ticket object
+                    $ticket = new \stdClass();
+                    $ticket->id = $id;
+                    $ticket->subject = $subjects[($id - 1) % count($subjects)];
+                    $ticket->message = $messages[($id - 1) % count($messages)];
+                    $ticket->category = $categories[($id - 1) % count($categories)];
+                    $ticket->priority = $priorities[array_rand($priorities)];
+                    $ticket->status = $statuses[array_rand($statuses)];
+                    $ticket->user_id = $users->get(($id - 1) % $users->count())->id;
+                    $ticket->user = $users->get(($id - 1) % $users->count());
+                    $ticket->assignee = null;
+                    $ticket->assignee_id = null;
+                    $ticket->created_at = now()->subDays(rand(0, 30))->subHours(rand(0, 24))->subMinutes(rand(0, 60));
+                    $ticket->updated_at = now();
+                    $ticket->resolved_at = $ticket->status === 'resolved' ? $ticket->created_at->addHours(rand(1, 48)) : null;
+                    $ticket->resolution_notes = $ticket->status === 'resolved' ? 'Masalah telah diselesaikan sesuai dengan permintaan pelanggan.' : null;
+                }
+            }
+
+            // If ticket still null, it means it wasn't found in real data or valid dummy range
+            if (!$ticket) {
+                \Log::error('Ticket not found - neither real nor in dummy range: ' . $id);
+                abort(404, 'Tiket tidak ditemukan');
+            }
 
             // Check if user is admin or the owner of the ticket
             $user = auth()->user();
@@ -183,7 +264,7 @@ class TicketController extends Controller
     {
         // Check if there are any real tickets in the database
         $hasRealTickets = Ticket::exists();
-        
+
         if (!$hasRealTickets) {
             // No real tickets exist, return filtered dummy data
             return response()->json(['tickets' => $this->getFilteredDummyTicketsForAPI($request)]);
@@ -215,7 +296,84 @@ class TicketController extends Controller
         // Add debug logging
         \Log::info('API getTicketMessages called for ticket ID: ' . $id);
 
-        $ticket = Ticket::with('user')->findOrFail($id);
+        // Check if there are real tickets in the database
+        $hasRealTickets = Ticket::exists();
+
+        if ($hasRealTickets) {
+            // Try to find the actual ticket
+            $ticket = Ticket::with('user')->findOrFail($id);
+        } else {
+            // No real tickets exist, try to create a dummy ticket if the ID is within range
+            $users = \App\Models\User::limit(10)->get();
+            if ($users->isEmpty()) {
+                $users = collect([
+                    (object) ['id' => 1, 'name' => 'Ahmad Santoso', 'email' => 'ahmad@example.com'],
+                    (object) ['id' => 2, 'name' => 'Budi Prasetyo', 'email' => 'budi@example.com'],
+                    (object) ['id' => 3, 'name' => 'Siti Rahayu', 'email' => 'siti@example.com'],
+                    (object) ['id' => 4, 'name' => 'Joko Widodo', 'email' => 'joko@example.com'],
+                    (object) ['id' => 5, 'name' => 'Lina Marlina', 'email' => 'lina@example.com'],
+                    (object) ['id' => 6, 'name' => 'Rina Kusuma', 'email' => 'rina@example.com'],
+                    (object) ['id' => 7, 'name' => 'Agus Setiawan', 'email' => 'agus@example.com'],
+                    (object) ['id' => 8, 'name' => 'Dewi Anggraini', 'email' => 'dewi@example.com'],
+                    (object) ['id' => 9, 'name' => 'Fajar Pamungkas', 'email' => 'fajar@example.com'],
+                    (object) ['id' => 10, 'name' => 'Tina Nurhayati', 'email' => 'tina@example.com'],
+                ]);
+            }
+
+            // Check if this ID would exist in dummy data (1-15)
+            if ($id >= 1 && $id <= 15) {
+                $categories = ['technical', 'billing', 'account', 'product', 'other'];
+                $priorities = ['low', 'medium', 'high', 'urgent'];
+                $statuses = ['open', 'in_progress', 'resolved', 'closed'];
+
+                $subjects = [
+                    'Kesulitan saat login ke akun',
+                    'Pembayaran tidak terproses',
+                    'Produk tidak sesuai deskripsi',
+                    'Masalah teknis di website',
+                    'Pertanyaan tentang kebijakan retur',
+                    'Kesalahan harga produk',
+                    'Kesulitan saat checkout',
+                    'Akun saya diblokir',
+                    'Pengiriman terlambat',
+                    'Tidak bisa mengunggah foto profil'
+                ];
+
+                $messages_arr = [
+                    'Saya mengalami kesulitan saat mencoba login ke akun saya. Setiap kali saya memasukkan password, sistem mengatanda password salah padahal saya yakin benar.',
+                    'Pembayaran saya tidak terproses dengan status pending lebih dari 24 jam. Mohon bantuannya untuk mempercepat proses verifikasi.',
+                    'Produk yang saya terima tidak sesuai dengan deskripsi di website. Warna dan ukuran berbeda dari yang saya pesan.',
+                    'Website sering loading lama dan kadang tidak merespon. Ini mengganggu pengalaman belanja saya.',
+                    'Saya ingin bertanya tentang kebijakan retur barang jika produk yang diterima cacat atau rusak.',
+                    'Saya menemukan kesalahan harga di beberapa produk. Harga tertulis lebih murah dari seharusnya, apakah ini promo atau kesalahan sistem?',
+                    'Saya mengalami kesulitan saat proses checkout. Tombol "proses pembayaran" tidak merespon saat saya klik.',
+                    'Akun saya tiba-tiba diblokir tanpa pemberitahuan sebelumnya. Mohon penjelasan dan bantuan untuk membukanya kembali.',
+                    'Pengiriman saya terlambat beberapa hari dari estimasi yang diberikan. Mohon informasi terkini mengenai status pengiriman.',
+                    'Saya tidak bisa mengunggah foto profil di halaman pengaturan akun. Setiap kali mencoba, muncul pesan error.'
+                ];
+
+                // Create dummy ticket object
+                $ticket = new \stdClass();
+                $ticket->id = $id;
+                $ticket->subject = $subjects[($id - 1) % count($subjects)];
+                $ticket->message = $messages_arr[($id - 1) % count($messages_arr)];
+                $ticket->category = $categories[($id - 1) % count($categories)];
+                $ticket->priority = $priorities[array_rand($priorities)];
+                $ticket->status = $statuses[array_rand($statuses)];
+                $ticket->user_id = $users->get(($id - 1) % $users->count())->id;
+                $ticket->user = $users->get(($id - 1) % $users->count());
+                $ticket->assignee = null;
+                $ticket->assignee_id = null;
+                $ticket->created_at = now()->subDays(rand(0, 30))->subHours(rand(0, 24))->subMinutes(rand(0, 60));
+                $ticket->updated_at = now();
+                $ticket->resolved_at = $ticket->status === 'resolved' ? $ticket->created_at->addHours(rand(1, 48)) : null;
+                $ticket->resolution_notes = $ticket->status === 'resolved' ? 'Masalah telah diselesaikan sesuai dengan permintaan pelanggan.' : null;
+            } else {
+                // If ID is not in dummy range, return 404
+                \Log::error('Ticket not found in dummy range: ' . $id);
+                abort(404, 'Tiket tidak ditemukan');
+            }
+        }
 
         // Format tiket awal sebagai message pertama
         $messages = [
@@ -284,7 +442,84 @@ class TicketController extends Controller
             'is_internal_note' => 'boolean'
         ]);
 
-        $ticket = Ticket::findOrFail($id);
+        // Check if there are real tickets in the database
+        $hasRealTickets = Ticket::exists();
+
+        if ($hasRealTickets) {
+            // Try to find the actual ticket
+            $ticket = Ticket::findOrFail($id);
+        } else {
+            // No real tickets exist, try to create a dummy ticket if the ID is within range
+            $users = \App\Models\User::limit(10)->get();
+            if ($users->isEmpty()) {
+                $users = collect([
+                    (object) ['id' => 1, 'name' => 'Ahmad Santoso', 'email' => 'ahmad@example.com'],
+                    (object) ['id' => 2, 'name' => 'Budi Prasetyo', 'email' => 'budi@example.com'],
+                    (object) ['id' => 3, 'name' => 'Siti Rahayu', 'email' => 'siti@example.com'],
+                    (object) ['id' => 4, 'name' => 'Joko Widodo', 'email' => 'joko@example.com'],
+                    (object) ['id' => 5, 'name' => 'Lina Marlina', 'email' => 'lina@example.com'],
+                    (object) ['id' => 6, 'name' => 'Rina Kusuma', 'email' => 'rina@example.com'],
+                    (object) ['id' => 7, 'name' => 'Agus Setiawan', 'email' => 'agus@example.com'],
+                    (object) ['id' => 8, 'name' => 'Dewi Anggraini', 'email' => 'dewi@example.com'],
+                    (object) ['id' => 9, 'name' => 'Fajar Pamungkas', 'email' => 'fajar@example.com'],
+                    (object) ['id' => 10, 'name' => 'Tina Nurhayati', 'email' => 'tina@example.com'],
+                ]);
+            }
+
+            // Check if this ID would exist in dummy data (1-15)
+            if ($id >= 1 && $id <= 15) {
+                $categories = ['technical', 'billing', 'account', 'product', 'other'];
+                $priorities = ['low', 'medium', 'high', 'urgent'];
+                $statuses = ['open', 'in_progress', 'resolved', 'closed'];
+
+                $subjects = [
+                    'Kesulitan saat login ke akun',
+                    'Pembayaran tidak terproses',
+                    'Produk tidak sesuai deskripsi',
+                    'Masalah teknis di website',
+                    'Pertanyaan tentang kebijakan retur',
+                    'Kesalahan harga produk',
+                    'Kesulitan saat checkout',
+                    'Akun saya diblokir',
+                    'Pengiriman terlambat',
+                    'Tidak bisa mengunggah foto profil'
+                ];
+
+                $messages_arr = [
+                    'Saya mengalami kesulitan saat mencoba login ke akun saya. Setiap kali saya memasukkan password, sistem mengatanda password salah padahal saya yakin benar.',
+                    'Pembayaran saya tidak terproses dengan status pending lebih dari 24 jam. Mohon bantuannya untuk mempercepat proses verifikasi.',
+                    'Produk yang saya terima tidak sesuai dengan deskripsi di website. Warna dan ukuran berbeda dari yang saya pesan.',
+                    'Website sering loading lama dan kadang tidak merespon. Ini mengganggu pengalaman belanja saya.',
+                    'Saya ingin bertanya tentang kebijakan retur barang jika produk yang diterima cacat atau rusak.',
+                    'Saya menemukan kesalahan harga di beberapa produk. Harga tertulis lebih murah dari seharusnya, apakah ini promo atau kesalahan sistem?',
+                    'Saya mengalami kesulitan saat proses checkout. Tombol "proses pembayaran" tidak merespon saat saya klik.',
+                    'Akun saya tiba-tiba diblokir tanpa pemberitahuan sebelumnya. Mohon penjelasan dan bantuan untuk membukanya kembali.',
+                    'Pengiriman saya terlambat beberapa hari dari estimasi yang diberikan. Mohon informasi terkini mengenai status pengiriman.',
+                    'Saya tidak bisa mengunggah foto profil di halaman pengaturan akun. Setiap kali mencoba, muncul pesan error.'
+                ];
+
+                // Create dummy ticket object
+                $ticket = new \stdClass();
+                $ticket->id = $id;
+                $ticket->subject = $subjects[($id - 1) % count($subjects)];
+                $ticket->message = $messages_arr[($id - 1) % count($messages_arr)];
+                $ticket->category = $categories[($id - 1) % count($categories)];
+                $ticket->priority = $priorities[array_rand($priorities)];
+                $ticket->status = $statuses[array_rand($statuses)];
+                $ticket->user_id = $users->get(($id - 1) % $users->count())->id;
+                $ticket->user = $users->get(($id - 1) % $users->count());
+                $ticket->assignee = null;
+                $ticket->assignee_id = null;
+                $ticket->created_at = now()->subDays(rand(0, 30))->subHours(rand(0, 24))->subMinutes(rand(0, 60));
+                $ticket->updated_at = now();
+                $ticket->resolved_at = $ticket->status === 'resolved' ? $ticket->created_at->addHours(rand(1, 48)) : null;
+                $ticket->resolution_notes = $ticket->status === 'resolved' ? 'Masalah telah diselesaikan sesuai dengan permintaan pelanggan.' : null;
+            } else {
+                // If ID is not in dummy range, return 404
+                \Log::error('Ticket not found in dummy range: ' . $id);
+                abort(404, 'Tiket tidak ditemukan');
+            }
+        }
 
         // Check if user has permission to reply to this ticket
         $user = Auth::user();
@@ -297,7 +532,7 @@ class TicketController extends Controller
 
         // Create new ticket reply
         $reply = \App\Models\TicketReply::create([
-            'ticket_id' => $ticket->id,
+            'ticket_id' => $id, // Use the ID parameter directly
             'user_id' => Auth::id(),
             'message' => $request->message,
             'is_internal_note' => $request->boolean('is_internal_note', false)
@@ -307,7 +542,9 @@ class TicketController extends Controller
 
         // Update ticket status to 'in_progress' when admin replies
         if (!$reply->is_internal_note) {
-            $ticket->update(['status' => 'in_progress']);
+            if ($hasRealTickets) {
+                $ticket->update(['status' => 'in_progress']);
+            }
         }
 
         return response()->json([
@@ -442,20 +679,20 @@ class TicketController extends Controller
             $ticket->id = $i + 1;
             $ticket->subject = $subjects[$i % count($subjects)];
             $ticket->message = $messages[$i % count($messages)];
-            
+
             // Apply filters to ticket properties
             $ticket->category = $filteredCategory ?? $categories[$i % count($categories)];
             $ticket->priority = $filteredPriority ?? $priorities[array_rand($priorities)];
             $ticket->status = $filteredStatus ?? $statuses[array_rand($statuses)];
-            
+
             // Select a user from the database to be the ticket creator
             $ticket->user = $users->get($i % $users->count());
             $ticket->user_id = $ticket->user->id;
-            
+
             // Select staff for assignee if ticket is not open
             $ticket->assignee = $ticket->status === 'open' ? null : $staffUsers->first();
             $ticket->assignee_id = $ticket->assignee ? $ticket->assignee->id : null;
-            
+
             $ticket->created_at = now()->subDays(rand(0, 30))->subHours(rand(0, 24))->subMinutes(rand(0, 60));
             $ticket->resolved_at = $ticket->status === 'resolved' ? $ticket->created_at->addHours(rand(1, 48)) : null;
             $ticket->resolution_notes = $ticket->status === 'resolved' ? 'Masalah telah diselesaikan sesuai dengan permintaan pelanggan.' : null;
@@ -590,19 +827,19 @@ class TicketController extends Controller
             $ticketId = $i + 1;
             $subject = $subjects[$i % count($subjects)];
             $message = $messages[$i % count($messages)];
-            
+
             // Apply filters to ticket properties
             $category = $filteredCategory ?? $categories[$i % count($categories)];
             $priority = $filteredPriority ?? $priorities[array_rand($priorities)];
             $status = $filteredStatus ?? $statuses[array_rand($statuses)];
-            
+
             // Select a user from the database to be the ticket creator
             $user = $users->get($i % $users->count());
             $user_name = $user->name;
-            
+
             // Select staff for assignee if ticket is not open
             $assignee_name = $status === 'open' ? 'Unassigned' : ($staffUsers->first() ? $staffUsers->first()->name : 'Staff Support');
-            
+
             $created_at = now()->subDays(rand(0, 30))->subHours(rand(0, 24))->subMinutes(rand(0, 60));
             $resolved_at = $status === 'resolved' ? $created_at->addHours(rand(1, 48))->format('d M Y H:i') : null;
 
@@ -690,7 +927,82 @@ class TicketController extends Controller
 
     public function getTicketStatus($id)
     {
-        $ticket = Ticket::find($id);
+        // Check if there are real tickets in the database
+        $hasRealTickets = Ticket::exists();
+
+        if ($hasRealTickets) {
+            $ticket = Ticket::find($id);
+        } else {
+            // No real tickets exist, try to create a dummy ticket if the ID is within range
+            $users = \App\Models\User::limit(10)->get();
+            if ($users->isEmpty()) {
+                $users = collect([
+                    (object) ['id' => 1, 'name' => 'Ahmad Santoso', 'email' => 'ahmad@example.com'],
+                    (object) ['id' => 2, 'name' => 'Budi Prasetyo', 'email' => 'budi@example.com'],
+                    (object) ['id' => 3, 'name' => 'Siti Rahayu', 'email' => 'siti@example.com'],
+                    (object) ['id' => 4, 'name' => 'Joko Widodo', 'email' => 'joko@example.com'],
+                    (object) ['id' => 5, 'name' => 'Lina Marlina', 'email' => 'lina@example.com'],
+                    (object) ['id' => 6, 'name' => 'Rina Kusuma', 'email' => 'rina@example.com'],
+                    (object) ['id' => 7, 'name' => 'Agus Setiawan', 'email' => 'agus@example.com'],
+                    (object) ['id' => 8, 'name' => 'Dewi Anggraini', 'email' => 'dewi@example.com'],
+                    (object) ['id' => 9, 'name' => 'Fajar Pamungkas', 'email' => 'fajar@example.com'],
+                    (object) ['id' => 10, 'name' => 'Tina Nurhayati', 'email' => 'tina@example.com'],
+                ]);
+            }
+
+            // Check if this ID would exist in dummy data (1-15)
+            if ($id >= 1 && $id <= 15) {
+                $categories = ['technical', 'billing', 'account', 'product', 'other'];
+                $priorities = ['low', 'medium', 'high', 'urgent'];
+                $statuses = ['open', 'in_progress', 'resolved', 'closed'];
+
+                $subjects = [
+                    'Kesulitan saat login ke akun',
+                    'Pembayaran tidak terproses',
+                    'Produk tidak sesuai deskripsi',
+                    'Masalah teknis di website',
+                    'Pertanyaan tentang kebijakan retur',
+                    'Kesalahan harga produk',
+                    'Kesulitan saat checkout',
+                    'Akun saya diblokir',
+                    'Pengiriman terlambat',
+                    'Tidak bisa mengunggah foto profil'
+                ];
+
+                $messages_arr = [
+                    'Saya mengalami kesulitan saat mencoba login ke akun saya. Setiap kali saya memasukkan password, sistem mengatanda password salah padahal saya yakin benar.',
+                    'Pembayaran saya tidak terproses dengan status pending lebih dari 24 jam. Mohon bantuannya untuk mempercepat proses verifikasi.',
+                    'Produk yang saya terima tidak sesuai dengan deskripsi di website. Warna dan ukuran berbeda dari yang saya pesan.',
+                    'Website sering loading lama dan kadang tidak merespon. Ini mengganggu pengalaman belanja saya.',
+                    'Saya ingin bertanya tentang kebijakan retur barang jika produk yang diterima cacat atau rusak.',
+                    'Saya menemukan kesalahan harga di beberapa produk. Harga tertulis lebih murah dari seharusnya, apakah ini promo atau kesalahan sistem?',
+                    'Saya mengalami kesulitan saat proses checkout. Tombol "proses pembayaran" tidak merespon saat saya klik.',
+                    'Akun saya tiba-tiba diblokir tanpa pemberitahuan sebelumnya. Mohon penjelasan dan bantuan untuk membukanya kembali.',
+                    'Pengiriman saya terlambat beberapa hari dari estimasi yang diberikan. Mohon informasi terkini mengenai status pengiriman.',
+                    'Saya tidak bisa mengunggah foto profil di halaman pengaturan akun. Setiap kali mencoba, muncul pesan error.'
+                ];
+
+                // Create dummy ticket object with required data
+                $ticket = new \stdClass();
+                $ticket->id = $id;
+                $ticket->subject = $subjects[($id - 1) % count($subjects)];
+                $ticket->message = $messages_arr[($id - 1) % count($messages_arr)];
+                $ticket->category = $categories[($id - 1) % count($categories)];
+                $ticket->priority = $priorities[array_rand($priorities)];
+                $ticket->status = $statuses[array_rand($statuses)];
+                $ticket->user_id = $users->get(($id - 1) % $users->count())->id;
+                $ticket->user = $users->get(($id - 1) % $users->count());
+                $ticket->assignee = null;
+                $ticket->assignee_id = null;
+                $ticket->created_at = now()->subDays(rand(0, 30))->subHours(rand(0, 24))->subMinutes(rand(0, 60));
+                $ticket->updated_at = now();
+                $ticket->resolved_at = $ticket->status === 'resolved' ? $ticket->created_at->addHours(rand(1, 48)) : null;
+                $ticket->resolution_notes = $ticket->status === 'resolved' ? 'Masalah telah diselesaikan sesuai dengan permintaan pelanggan.' : null;
+            } else {
+                // If ID is not in dummy range, return 404
+                return response()->json(['error' => 'Ticket not found'], 404);
+            }
+        }
 
         if (!$ticket) {
             return response()->json(['error' => 'Ticket not found'], 404);

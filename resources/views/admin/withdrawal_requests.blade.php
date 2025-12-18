@@ -690,6 +690,20 @@
     </div>
   </div>
 
+  <!-- Approve Modal -->
+  <div class="modal-overlay" id="approveModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">Konfirmasi Persetujuan</h3>
+        <button class="modal-close" onclick="closeApproveModal()">&times;</button>
+      </div>
+      <div class="form-group">
+        <p>Apakah Anda yakin ingin menyetujui permintaan penarikan dana ini?</p>
+      </div>
+      <button class="btn-modal" onclick="confirmApprove()">Setujui Permintaan</button>
+    </div>
+  </div>
+
   @include('components.admin_penjual.footer')
 
   <script>
@@ -762,10 +776,30 @@
     }
 
     // Individual request approval
+    let currentApproveRequestId = null;
+
     function approveRequest(requestId) {
-      if (confirm(`Yakin ingin menyetujui permintaan ${requestId}?`)) {
+      currentApproveRequestId = requestId;
+      document.getElementById('approveModal').classList.add('show');
+    }
+
+    // Show approve modal
+    function showApproveModal(requestId = null) {
+      currentApproveRequestId = requestId;
+      document.getElementById('approveModal').classList.add('show');
+    }
+
+    // Close approve modal
+    function closeApproveModal() {
+      document.getElementById('approveModal').classList.remove('show');
+      currentApproveRequestId = null;
+    }
+
+    // Confirm approval
+    function confirmApprove() {
+      if (currentApproveRequestId) {
         // Send approval request to server
-        fetch(`/admin/withdrawals/${requestId}/approve`, {
+        fetch(`/admin/withdrawals/${currentApproveRequestId}/approve`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -775,7 +809,8 @@
         .then(response => response.json())
         .then(data => {
           if(data.success) {
-            showNotification(`Berhasil menyetujui permintaan ${requestId}.`, 'success');
+            showNotification(`Berhasil menyetujui permintaan ${currentApproveRequestId}.`, 'success');
+            document.getElementById('approveModal').classList.remove('show');
             window.location.reload();
           } else {
             showNotification('Gagal menyetujui permintaan: ' + data.message, 'error');
@@ -875,6 +910,13 @@
     document.getElementById('rejectModal').addEventListener('click', function(e) {
       if (e.target === this) {
         closeRejectModal();
+      }
+    });
+
+    // Close approve modal when clicking outside the box
+    document.getElementById('approveModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeApproveModal();
       }
     });
 

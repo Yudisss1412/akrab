@@ -405,8 +405,14 @@ class SellerOrderController extends Controller
                 'total_amount' => $order->total_amount,
                 'customer_name' => $order->user->name ?? 'Pelanggan',
                 'product_name' => $firstItem && $firstItem->product ? $firstItem->product->name : 'Produk tidak ditemukan',
-                'product_image' => $firstItem && $firstItem->product && $firstItem->product->main_image ?
-                    asset('storage/' . $firstItem->product->main_image) :
+                'product_image' => $firstItem && $firstItem->product ?
+                    ($firstItem->product->main_image ?
+                        asset('storage/' . $firstItem->product->main_image) :
+                        (isset($firstItem->product->image) && $firstItem->product->image ?
+                            asset('storage/' . $firstItem->product->image) :
+                            asset('src/placeholder_produk.png')
+                        )
+                    ) :
                     asset('src/placeholder_produk.png'),
                 'quantity' => $firstItem ? $firstItem->quantity : 1,
                 'subtotal' => $firstItem ? $firstItem->subtotal : 0
@@ -732,12 +738,20 @@ class SellerOrderController extends Controller
                 $productName = 'Unknown Product';
                 $productImage = asset('src/product_1.png'); // default image
                 try {
-                    $product = \App\Models\Product::select(['id', 'name', 'main_image'])->find($review->product_id);
+                    // Gunakan accessor main_image dari model Product
+                    $product = \App\Models\Product::find($review->product_id);
                     if ($product) {
                         $productName = $product->name;
 
-                        if (isset($product->main_image) && $product->main_image) {
-                            $productImage = asset('storage/' . $product->main_image);
+                        // Gunakan accessor main_image yang didefinisikan di model
+                        $mainImage = $product->main_image;
+                        if ($mainImage) {
+                            $productImage = asset('storage/' . $mainImage);
+                        } else {
+                            // Fallback ke kolom image jika tidak ada di product_images
+                            if (isset($product->image) && $product->image) {
+                                $productImage = asset('storage/' . $product->image);
+                            }
                         }
                     }
                 } catch (\Exception $e) {

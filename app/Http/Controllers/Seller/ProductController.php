@@ -229,30 +229,55 @@ class ProductController extends Controller
      */
     public function show($id)
     {
+        // Tambahkan pengecekan untuk ID undefined
+        if ($id === 'undefined' || $id === null || $id === '') {
+            \Log::error("Invalid product ID received: " . var_export($id, true));
+            abort(404, 'ID produk tidak valid');
+        }
+
+        \Log::info("Seller ProductController@show called with id: " . $id);
+
         $user = Auth::user();
+        \Log::info("Current user: " . ($user ? $user->name . " (ID: " . $user->id . ")" : "Guest"));
+
         if (!$user || !$user->role || !in_array($user->role->name, ['seller', 'admin'])) {
+            \Log::info("Access denied - invalid role");
             abort(403, 'Akses ditolak. Hanya penjual dan admin yang dapat mengakses halaman ini.');
         }
 
-        $product = Product::where('id', $id)
+        $productQuery = Product::where('id', $id)
             ->with(['variants', 'category', 'subcategory', 'images', 'reviews.user']);
+
+        \Log::info("Product ID: " . $id);
 
         // Jika user adalah penjual, hanya boleh melihat produk miliknya sendiri
         if ($user->role->name === 'seller') {
             $seller = \App\Models\Seller::where('user_id', $user->id)->first();
+            \Log::info("Seller record for user: " . ($seller ? "ID " . $seller->id : "Not found"));
+
             if (!$seller) {
+                \Log::info("Access denied - seller record not found for user: " . $user->id);
                 abort(403, 'Akses ditolak. Seller record tidak ditemukan.');
             }
-            $product = $product->where('seller_id', $seller->id);
+            $productQuery = $productQuery->where('seller_id', $seller->id);
+            \Log::info("Added seller filter - seller_id: " . $seller->id);
         }
 
-        $product = $product->firstOrFail();
+        try {
+            $product = $productQuery->firstOrFail();
+            \Log::info("Product found: " . $product->name . " (ID: " . $product->id . ")");
+        } catch (\Exception $e) {
+            \Log::info("Product not found or not owned by seller: " . $e->getMessage());
+            abort(404, 'Produk tidak ditemukan');
+        }
 
         // Hitung statistik produk
         $totalSales = $product->orderItems()->sum('quantity');
         $totalRevenue = $product->orderItems()->sum(\DB::raw('quantity * price'));
         $averageRating = $product->reviews()->avg('rating') ?? 0;
         $totalReviews = $product->reviews()->count();
+
+        \Log::info("About to return view with product: " . $product->name);
 
         return view('penjual.detail_produk', compact('product', 'totalSales', 'totalRevenue', 'averageRating', 'totalReviews'));
     }

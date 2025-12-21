@@ -821,7 +821,7 @@
                 <img :src="review.product.image" alt="Gambar Produk" class="product-image">
                 <div class="product-info">
                   <h4 class="product-name">
-                    <a :href="`/produk/${review.product.id}`" x-text="review.product.name"></a>
+                    <a href="#" @click.prevent="window.location.href = `/penjual/produk/${review.product.id}`" x-text="review.product.name"></a>
                   </h4>
                 </div>
               </div>

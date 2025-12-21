@@ -277,13 +277,20 @@ class ReviewController extends Controller
                 $productImage = asset('src/product_1.png'); // default image
 
                 try {
-                    // Akses produk dengan SELECT spesifik untuk menghindari memicu relasi bermasalah
-                    $product = \App\Models\Product::select(['id', 'name', 'main_image'])->find($review->product_id);
+                    // Gunakan accessor main_image dari model Product
+                    $product = \App\Models\Product::find($review->product_id);
                     if ($product) {
                         $productName = $product->name;
 
-                        if (isset($product->main_image) && $product->main_image) {
-                            $productImage = asset('storage/' . $product->main_image);
+                        // Gunakan accessor main_image yang didefinisikan di model
+                        $mainImage = $product->main_image;
+                        if ($mainImage) {
+                            $productImage = asset('storage/' . $mainImage);
+                        } else {
+                            // Fallback ke kolom image jika tidak ada di product_images
+                            if (isset($product->image) && $product->image) {
+                                $productImage = asset('storage/' . $product->image);
+                            }
                         }
                     }
                 } catch (\Exception $e) {
@@ -298,6 +305,7 @@ class ReviewController extends Controller
                     'comment' => $review->review_text,
                     'date' => $review->created_at->format('j M Y'),
                     'product' => [
+                        'id' => $review->product_id, // Tambahkan ID produk
                         'name' => $productName,
                         'image' => $productImage
                     ],

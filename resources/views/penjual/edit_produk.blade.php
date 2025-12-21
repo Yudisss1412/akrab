@@ -43,7 +43,35 @@
                                         @enderror
                                     </div>
                                 </div>
-                                
+
+                                <!-- Spesifikasi & Fitur moved to be under description and above images -->
+                                <div class="mb-4">
+                                    <h5>Spesifikasi & Fitur</h5>
+                                    <hr>
+
+                                    <div class="mb-3">
+                                        <label for="specifications" class="form-label">Spesifikasi Produk</label>
+                                        <textarea class="form-control @error('specifications') is-invalid @enderror"
+                                                  id="specifications" name="specifications" rows="8"
+                                                  placeholder="Contoh: Daya tahan baterai 12 jam, Tekanan maksimal 2 bar, dll">{{ old('specifications', $product->specifications ? implode("\n", (array)$product->specifications) : '') }}</textarea>
+                                        @error('specifications')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                        <div class="form-text">Gunakan baris baru untuk setiap spesifikasi</div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="features" class="form-label">Fitur Produk</label>
+                                        <textarea class="form-control @error('features') is-invalid @enderror"
+                                                  id="features" name="features" rows="8"
+                                                  placeholder="Contoh: Tahan air, Mudah dibersihkan, Dilengkapi remote, dll">{{ old('features', $product->features ? implode("\n", (array)$product->features) : '') }}</textarea>
+                                        @error('features')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                        <div class="form-text">Gunakan baris baru untuk setiap fitur</div>
+                                    </div>
+                                </div>
+
                                 <!-- Gambar Produk -->
                                 <div class="mb-4">
                                     <h5>Gambar Produk</h5>
@@ -233,33 +261,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Spesifikasi & Fitur -->
-                                <div class="mb-4">
-                                    <h5>Spesifikasi & Fitur</h5>
-                                    <hr>
-
-                                    <div class="mb-3">
-                                        <label for="specifications" class="form-label">Spesifikasi Produk</label>
-                                        <textarea class="form-control @error('specifications') is-invalid @enderror"
-                                                  id="specifications" name="specifications"
-                                                  placeholder="Contoh: Daya tahan baterai 12 jam, Tekanan maksimal 2 bar, dll">{{ old('specifications', $product->specifications ? implode("\n", (array)$product->specifications) : '') }}</textarea>
-                                        @error('specifications')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                        <div class="form-text">Gunakan baris baru untuk setiap spesifikasi</div>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="features" class="form-label">Fitur Produk</label>
-                                        <textarea class="form-control @error('features') is-invalid @enderror"
-                                                  id="features" name="features"
-                                                  placeholder="Contoh: Tahan air, Mudah dibersihkan, Dilengkapi remote, dll">{{ old('features', $product->features ? implode("\n", (array)$product->features) : '') }}</textarea>
-                                        @error('features')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                        <div class="form-text">Gunakan baris baru untuk setiap fitur</div>
-                                    </div>
-                                </div>
 
                                 <!-- Status -->
                                 <div class="mb-4">

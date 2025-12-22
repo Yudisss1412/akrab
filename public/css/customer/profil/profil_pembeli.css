@@ -470,6 +470,7 @@ body{
   padding: 12px;
   transition: box-shadow .15s, border-color .15s, transform .15s;
   margin-bottom: 0.5rem;
+  position: relative; /* Tambahkan ini agar posisi absolut tombol wishlist bekerja dengan benar */
 }
 
 .wl-card.card:hover {
@@ -487,12 +488,15 @@ body{
 .product {
   position: relative;
   display: flex;
-  flex-direction: column;
+  flex-direction: row; /* Ubah ke tata letak horizontal */
+  gap: 12px; /* Tambahkan jarak antara gambar dan teks */
   text-decoration: none;
   color: inherit;
   background: var(--secondary-color);
   border-radius: var(--radius-md);
   background: var(--background-color);
+  align-items: center; /* Sejajarkan item secara vertikal */
+  padding-right: 40px; /* Tambahkan padding kanan untuk memberi ruang bagi tombol wishlist */
 }
 
 .product:hover {
@@ -500,40 +504,55 @@ body{
   color: inherit;
 }
 
+.wl-card .product__thumb,
 .product__thumb {
-  width: 100%;
-  height: 145px;
+  width: 80px; /* Kurangi lebar gambar */
+  height: 80px; /* Kurangi tinggi gambar */
   object-fit: cover;
   border-radius: 10px;
-  background: var(--background-color);
-  flex-shrink: 0;
+  background: transparent; /* Hapus background yang tidak diinginkan */
+  flex-shrink: 0; /* Mencegah gambar diubah ukurannya */
+}
+
+.wl-card .product__thumb img,
+.product__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+  background: transparent; /* Pastikan tidak ada background pada gambar */
 }
 
 .product__meta {
-  padding: 8px 4px 6px;
-  flex: 1;
+  flex: 1; /* Isi ruang yang tersedia */
   display: flex;
   flex-direction: column;
   gap: 4px;
+  padding: 4px 0; /* Kurangi padding */
 }
 
 .product__title {
-  margin: 8px 0 4px;
-  font-size: 16px;
-  font-weight: 800;
+  margin: 0;
+  font-size: 14px; /* Kurangi ukuran font */
+  font-weight: 600;
   color: var(--primary-color-dark);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .product__shop {
-  font-size: 13px;
+  font-size: 12px; /* Kurangi ukuran font */
   color: var(--text-muted);
-  margin-bottom: 6px;
+  margin: 0;
 }
 
 .wl-price {
   font-weight: 700;
-  margin-bottom: 6px;
+  margin: 2px 0;
   color: var(--primary-color-dark);
+  font-size: 14px;
 }
 
 /* Actions - match product page styling */
@@ -541,49 +560,140 @@ body{
 .produk-card-actions,
 .produk-aksi {
   display: flex;
+  flex-direction: column; /* Tampilkan tombol secara vertikal */
   gap: .55rem;
+  padding: 4px 0; /* Kurangi padding */
+  min-width: 100px; /* Tetapkan lebar minimum untuk kolom tombol */
+  justify-content: center; /* Sejajarkan tombol ke tengah secara vertikal */
+}
+
+/* Specific adjustments for wishlist card actions */
+.wl-card .product__actions {
+  display: flex;
+  gap: 0.55rem;
   padding: 10px 4px 4px;
+  margin-top: auto; /* Push buttons to bottom */
+}
+
+/* Variasi wishlist card tanpa gambar */
+.wl-card.no-image .product__thumb {
+  display: none;
+}
+
+.wl-card.no-image .product__meta {
+  padding: 0;
+  margin: 0;
+}
+
+/* Atur ulang tata letak saat tidak ada gambar */
+.wl-card.no-image .product {
+  flex-direction: row; /* Tetap gunakan tata letak horizontal */
+  gap: 12px;
+  align-items: center;
+}
+
+/* Pastikan tata letak tetap rapi saat gambar disembunyikan */
+.wl-card.no-image {
+  display: flex;
+  flex-direction: column;
+}
+
+.wl-card.no-image .product__meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Penyesuaian untuk tombol saat tidak ada gambar */
+.wl-card.no-image .product__actions {
+  display: flex;
+  flex-direction: column;
+  gap: .55rem;
+  padding: 4px 0;
+  min-width: 100px;
+  justify-content: center;
+}
+
+/* Atur ulang tata letak saat tidak ada gambar dan menggunakan template */
+.wl-card.no-image .product__thumb {
+  display: none;
+}
+
+.wl-card.no-image .product {
+  flex-direction: row;
+  gap: 12px;
+  align-items: center;
+}
+
+.wl-card.no-image .product__meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 /* Styling untuk button di dalam action container - match produk page */
 .produk-aksi a,
 .produk-aksi button {
-  flex:1; 
-  border-radius: var(--btn-radius); 
-  font-weight:700; 
-  font-size:14px; 
-  padding:.70rem 0;
-  cursor:pointer; 
-  transition:background .15s,color .15s,border-color .15s; 
+  flex:1;
+  border-radius: 8px; /* Rounded corners - more consistent with other buttons */
+  font-weight:700;
+  font-size:14px;
+  padding:0.5rem 0; /* Kurangi padding vertikal untuk membuat tombol lebih ramping */
+  cursor:pointer;
+  transition:background .15s,color .15s,border-color .15s;
   text-align:center;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: var(--btn-brd) solid transparent; /* Ensure consistent border styling */
+  min-height: 36px; /* Tetapkan tinggi minimum yang lebih kecil */
 }
 
 .wl-like {
-  position: absolute;
-  right: 10px;
-  top: 10px;
+  position: absolute; /* Gunakan absolute positioning untuk menempatkan di pojok kanan atas */
+  right: 12px;
+  top: 12px;
   border: none;
   background: #fff;
   border-radius: 999px;
-  width: 38px;
-  height: 38px;
+  width: 28px; /* Ukuran tetap kecil */
+  height: 28px;
   display: grid;
   place-items: center;
   box-shadow: 0 2px 8px rgba(0,0,0,.08);
   cursor: pointer;
-  z-index: 2;
   padding: 0;
+  flex-shrink: 0; /* Mencegah ukuran tombol berubah */
+  z-index: 3; /* Naikkan z-index agar tidak tertutup oleh elemen lain */
+  transition: transform 0.2s ease, box-shadow 0.2s ease; /* Tambahkan transisi untuk efek hover */
 }
 
 .wl-like:hover {
   background-color: var(--background-color);
+  transform: scale(1.1); /* Tambahkan efek scaling saat hover */
+  box-shadow: 0 4px 12px rgba(0,0,0,.15);
 }
 
 .wl-like.active {
   outline: 2px solid #ffd2cc;
+}
+
+/* Tambahkan positioning ke container utama untuk mendukung tombol absolute */
+.wl-card.card {
+  position: relative;
+}
+
+/* Sesuaikan tinggi tombol aksi agar lebih ramping */
+.wl-card.card .product__actions .btn-lihat,
+.wl-card.card .produk-card-actions .btn-lihat,
+.wl-card.card .product__actions .btn-add,
+.wl-card.card .produk-card-actions .btn-add,
+.wl-card.card .produk-aksi .btn-primary,
+.wl-card.card .produk-aksi .btn-add {
+  padding: 0.5rem 0; /* Kurangi padding vertikal untuk membuat tombol lebih ramping */
+  min-height: 36px; /* Tetapkan tinggi minimum yang lebih kecil */
 }
 
 /* Styling untuk button sesuai produk page styling */
@@ -611,74 +721,90 @@ body{
 /* Lihat Detail = filled (like btn-primary on product page) */
 .wl-card.card .product__actions .btn-lihat,
 .wl-card.card .produk-card-actions .btn-lihat {
-  background: var(--primary-color-dark); 
-  color:#fff; 
+  background: var(--primary-color-dark);
+  color:#fff;
   border: var(--btn-brd) solid var(--primary-color-dark);
   display: flex;
   align-items: center;
   justify-content: center;
+  flex: 1; /* Ensure equal width distribution */
+  text-align: center;
+  border-radius: 8px; /* Rounded corners */
+  padding: 0.5rem 0; /* Kurangi padding vertikal untuk membuat tombol lebih ramping */
+  font-weight: 600; /* Ensure consistent font weight */
+  min-height: 36px; /* Tetapkan tinggi minimum yang lebih kecil */
 }
 .wl-card.card .product__actions .btn-lihat:hover,
 .wl-card.card .produk-card-actions .btn-lihat:hover {
-  background: var(--primary-color); 
+  background: var(--primary-color);
   color: var(--primary-color-dark);
 }
 
 /* + Keranjang = outline (like btn-add on product page) */
 .wl-card.card .product__actions .btn-add,
 .wl-card.card .produk-card-actions .btn-add {
-  background:#f5fbf8; 
-  color: var(--primary-color-dark); 
+  background:#f5fbf8;
+  color: var(--primary-color-dark);
   border: var(--btn-brd) solid var(--primary-color-dark);
+  flex: 1; /* Ensure equal width distribution */
+  text-align: center;
+  border-radius: 8px; /* Rounded corners */
+  padding: 0.5rem 0; /* Kurangi padding vertikal untuk membuat tombol lebih ramping */
+  font-weight: 600; /* Ensure consistent font weight */
+  min-height: 36px; /* Tetapkan tinggi minimum yang lebih kecil */
 }
 .wl-card.card .product__actions .btn-add:hover,
 .wl-card.card .produk-card-actions .btn-add:hover {
-  background: var(--primary-color-dark); 
+  background: var(--primary-color-dark);
   color:#fff;
 }
 
 /* Tambahan: Terapkan juga styling produk-aksi ke wishlist card untuk konsistensi */
-.produk-aksi a,
-.produk-aksi button,
 .wl-card.card .produk-aksi a,
 .wl-card.card .produk-aksi button {
-  flex:1; 
-  border-radius: var(--btn-radius); 
-  font-weight:700; 
-  font-size:14px; 
-  padding:.70rem 0;
-  cursor:pointer; 
-  transition:background .15s,color .15s,border-color .15s; 
+  flex:1;
+  border-radius: 8px; /* Rounded corners - more consistent with other buttons */
+  font-weight:700;
+  font-size:14px;
+  padding:0.5rem 0; /* Kurangi padding vertikal untuk membuat tombol lebih ramping */
+  cursor:pointer;
+  transition:background .15s,color .15s,border-color .15s;
   text-align:center;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: var(--btn-brd) solid transparent; /* Ensure consistent border styling */
+  min-height: 36px; /* Tetapkan tinggi minimum yang lebih kecil */
 }
 
 .produk-aksi .btn-primary,
 .wl-card.card .produk-aksi .btn-primary {
-  background: var(--primary-color-dark); 
-  color:#fff; 
+  background: var(--primary-color-dark);
+  color:#fff;
   border: var(--btn-brd) solid var(--primary-color-dark);
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0.5rem 0; /* Kurangi padding vertikal untuk membuat tombol lebih ramping */
+  min-height: 36px; /* Tetapkan tinggi minimum yang lebih kecil */
 }
 .produk-aksi .btn-primary:hover,
 .wl-card.card .produk-aksi .btn-primary:hover {
-  background: var(--primary-color); 
+  background: var(--primary-color);
   color: var(--primary-color-dark);
 }
 
 .produk-aksi .btn-add,
 .wl-card.card .produk-aksi .btn-add {
-  background:#f5fbf8; 
-  color: var(--primary-color-dark); 
+  background:#f5fbf8;
+  color: var(--primary-color-dark);
   border: var(--btn-brd) solid var(--primary-color-dark);
+  padding: 0.5rem 0; /* Kurangi padding vertikal untuk membuat tombol lebih ramping */
+  min-height: 36px; /* Tetapkan tinggi minimum yang lebih kecil */
 }
 .produk-aksi .btn-add:hover,
 .wl-card.card .produk-aksi .btn-add:hover {
-  background: var(--primary-color-dark); 
+  background: var(--primary-color-dark);
   color:#fff;
 }
 
@@ -1187,7 +1313,7 @@ a.btn{
   border-radius: var(--radius-md);
   padding:8px; background:#fff;
 }
-.product__thumb{ width:48px; height:48px; background:#eee; border-radius:10px; }
+.review-card .product__thumb{ width:48px; height:48px; background:#eee; border-radius:10px; }
 .product__title{ font-weight:600; font-size:14px; color: var(--text-dark); }
 
 /* footer tombol pada card ulasan */

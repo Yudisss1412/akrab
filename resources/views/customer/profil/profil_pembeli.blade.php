@@ -345,23 +345,25 @@
     const emptyBox = $('#wlEmpty');
 
     // ====== Templates ======
-    function wishlistCardTemplate(item){
+    function wishlistCardTemplate(item, hideImage = false){
       const onStyle  = item.liked ? '' : 'display:none';
       const offStyle = item.liked ? 'display:none' : '';
-      return `<article class="wl-card card" role="listitem" data-id="${item.id}">
+      const imageHtml = hideImage ? '' : `<div class="product__thumb">
+            <img src="${item.img}" alt="${item.title}" onerror="this.onerror=null; this.src='{{ asset('src/placeholder_produk.png') }}';">
+          </div>`;
+      const cardClass = hideImage ? 'wl-card card no-image' : 'wl-card card';
+      return `<article class="${cardClass}" role="listitem" data-id="${item.id}">
         <div class="product">
-          <div class="product__thumb">
-            <img src="${item.img}" alt="${item.title}">
-          </div>
+          <button class="wl-like" aria-pressed="true" title="Hapus dari wishlist" data-wishlist-id="${item.id}">
+            <svg class="svg-off" style="${offStyle}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47 47"><path d="M23.6962 36.3271L23.5003 36.5229L23.2849 36.3271C13.9828 27.8867 7.83366 22.3054 7.83366 16.6458C7.83366 12.7292 10.7712 9.79167 14.6878 9.79167C17.7037 9.79167 20.6412 11.75 21.6791 14.4133H25.3216C26.3595 11.75 29.297 9.79167 32.3128 9.79167C36.2295 9.79167 39.167 12.7292 39.167 16.6458C39.167 22.3054 33.0178 27.8867 23.6962 36.3271ZM32.3128 5.875C28.9053 5.875 25.6349 7.46125 23.5003 9.94833C21.3657 7.46125 18.0953 5.875 14.6878 5.875C8.65616 5.875 3.91699 10.5946 3.91699 16.6458C3.91699 24.0287 10.5753 30.08 20.6607 39.2254L23.5003 41.8104L26.3399 39.2254C36.4253 30.08 43.0837 24.0287 43.0837 16.6458C43.0837 10.5946 38.3445 5.875 32.3128 5.875Z" fill="#F24822"/></svg>
+            <svg class="svg-on"  style="${onStyle}"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47 47"><path d="M23.5003 41.8104L20.6607 39.2254C10.5753 30.08 3.91699 24.0287 3.91699 16.6458C3.91699 10.5946 8.65616 5.875 14.6878 5.875C18.0953 5.875 21.3657 7.46125 23.5003 9.94833C25.6349 7.46125 28.9053 5.875 32.3128 5.875C38.3445 5.875 43.0837 10.5946 43.0837 16.6458C43.0837 24.0287 36.4253 30.08 26.3399 39.2254L23.5003 41.8104Z" fill="#F24822"/></svg>
+          </button>
+          ${imageHtml}
           <div class="product__meta">
             <div class="product__title">${item.title}</div>
             <div class="product__shop">${item.shop}</div>
             <div class="wl-price">Rp ${fmtIDR(item.price)}</div>
           </div>
-          <button class="wl-like" aria-pressed="true" title="Hapus dari wishlist" data-wishlist-id="${item.id}">
-            <svg class="svg-off" style="${offStyle}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47 47"><path d="M23.6962 36.3271L23.5003 36.5229L23.2849 36.3271C13.9828 27.8867 7.83366 22.3054 7.83366 16.6458C7.83366 12.7292 10.7712 9.79167 14.6878 9.79167C17.7037 9.79167 20.6412 11.75 21.6791 14.4133H25.3216C26.3595 11.75 29.297 9.79167 32.3128 9.79167C36.2295 9.79167 39.167 12.7292 39.167 16.6458C39.167 22.3054 33.0178 27.8867 23.6962 36.3271ZM32.3128 5.875C28.9053 5.875 25.6349 7.46125 23.5003 9.94833C21.3657 7.46125 18.0953 5.875 14.6878 5.875C8.65616 5.875 3.91699 10.5946 3.91699 16.6458C3.91699 24.0287 10.5753 30.08 20.6607 39.2254L23.5003 41.8104L26.3399 39.2254C36.4253 30.08 43.0837 24.0287 43.0837 16.6458C43.0837 10.5946 38.3445 5.875 32.3128 5.875Z" fill="#F24822"/></svg>
-            <svg class="svg-on"  style="${onStyle}"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47 47"><path d="M23.5003 41.8104L20.6607 39.2254C10.5753 30.08 3.91699 24.0287 3.91699 16.6458C3.91699 10.5946 8.65616 5.875 14.6878 5.875C18.0953 5.875 21.3657 7.46125 23.5003 9.94833C25.6349 7.46125 28.9053 5.875 32.3128 5.875C38.3445 5.875 43.0837 10.5946 43.0837 16.6458C43.0837 24.0287 36.4253 30.08 26.3399 39.2254L23.5003 41.8104Z" fill="#F24822"/></svg>
-          </button>
           <div class="product__actions">
             <a class="btn-lihat" href="/produk_detail/${item.id}" data-product-id="${item.id}">Lihat Detail</a>
             <button class="btn-add" data-product-id="${item.id}" data-name="${item.title}">+ Keranjang</button>
@@ -371,20 +373,54 @@
     }
 
     // ====== Render ======
-    function renderWishlist(){
+    let hideWishlistImagesFlag = false;
+
+    function renderWishlist(hideImage = false){
       if (!grid) return;
-      
+
       // Pastikan WISHLIST adalah array
       const wishlistArray = Array.isArray(WISHLIST) ? WISHLIST : [];
-      
+
+      // Update flag untuk menyembunyikan gambar
+      hideWishlistImagesFlag = hideImage;
+
       if (wishlistArray.length > 0) {
-        grid.innerHTML = wishlistArray.map(wishlistCardTemplate).join('');
+        grid.innerHTML = wishlistArray.map(item => wishlistCardTemplate(item, hideImage)).join('');
         if (emptyBox) emptyBox.hidden = true;
       } else {
         grid.innerHTML = '';
         if (emptyBox) emptyBox.hidden = false;
       }
     }
+
+    // Fungsi untuk menyembunyikan gambar di wishlist
+    function hideWishlistImages() {
+      hideWishlistImagesFlag = true;
+      renderWishlist(true);
+    }
+
+    // Fungsi untuk menampilkan kembali gambar di wishlist
+    function showWishlistImages() {
+      hideWishlistImagesFlag = false;
+      renderWishlist(false);
+    }
+
+    // Fungsi untuk toggle tampilan gambar di wishlist
+    function toggleWishlistImages() {
+      hideWishlistImagesFlag = !hideWishlistImagesFlag;
+      renderWishlist(hideWishlistImagesFlag);
+    }
+
+    // Fungsi untuk memperbarui tampilan wishlist dengan gambar ditampilkan
+    function refreshWishlistWithImages() {
+      hideWishlistImagesFlag = false;
+      renderWishlist(false);
+    }
+
+    // Ekspor fungsi-fungsi ini agar bisa diakses dari luar
+    window.hideWishlistImages = hideWishlistImages;
+    window.showWishlistImages = showWishlistImages;
+    window.toggleWishlistImages = toggleWishlistImages;
 
     // ====== API Functions ======
     async function removeFromWishlist(wishlistId) {

@@ -18,11 +18,11 @@
       --ak-radius: 12px;
       --ak-space: 16px;
     }
-    
+
     * {
       box-sizing: border-box;
     }
-    
+
     body {
       font-family: 'Poppins', sans-serif;
       margin: 0;
@@ -33,20 +33,20 @@
       display: flex;
       flex-direction: column;
     }
-    
+
     .main-layout {
       flex: 1;
       display: flex;
       flex-direction: column;
     }
-    
+
     .content-wrapper {
       flex: 1;
       display: flex;
       flex-direction: column;
       padding: 0 1.5rem;
     }
-    
+
     /* Page Header */
     .page-header {
       background: var(--ak-white);
@@ -56,16 +56,16 @@
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
       border: 1px solid var(--ak-border);
     }
-    
+
     .page-header h1 {
       margin: 0;
       font-size: 1.5rem;
       font-weight: 600;
       color: var(--ak-primary);
     }
-    
-    /* Order Detail Card */
-    .order-detail-card {
+
+    /* Card Styles */
+    .card {
       background: var(--ak-white);
       border-radius: var(--ak-radius);
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
@@ -73,60 +73,48 @@
       overflow: hidden;
       margin-bottom: 1.5rem;
     }
-    
-    .order-detail-header {
-      padding: 1.5rem;
+
+    .card-header {
+      padding: 1rem 1.5rem;
       border-bottom: 1px solid var(--ak-border);
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    
-    .order-detail-content {
-      padding: 1.5rem;
-      border-bottom: 1px solid var(--ak-border);
-    }
-    
-    .order-detail-footer {
-      padding: 1.5rem;
-    }
-    
-    .order-id {
+
+    .card-title {
+      font-size: 1.1rem;
       font-weight: 600;
-      color: var(--ak-primary);
-      font-size: 1.25rem;
+      color: var(--ak-text);
+      margin: 0;
     }
-    
-    .order-date {
-      color: var(--ak-muted);
-      font-size: 0.875rem;
+
+    .card-content {
+      padding: 1.5rem;
     }
-    
-    .customer-info {
-      margin-bottom: 1rem;
-    }
-    
+
+    /* Info Row */
     .info-row {
       display: flex;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.75rem;
     }
-    
+
     .info-label {
       width: 150px;
       font-weight: 500;
       color: var(--ak-text);
     }
-    
+
     .info-value {
       flex: 1;
       color: var(--ak-muted);
     }
-    
+
     /* Product Items */
     .product-items {
       margin-top: 1rem;
     }
-    
+
     .product-item {
       display: flex;
       align-items: center;
@@ -134,11 +122,11 @@
       padding: 1rem 0;
       border-bottom: 1px solid var(--ak-border);
     }
-    
+
     .product-item:last-child {
       border-bottom: none;
     }
-    
+
     .product-thumb {
       width: 80px;
       height: 80px;
@@ -146,52 +134,52 @@
       object-fit: cover;
       background: #f3f4f6;
     }
-    
+
     .product-info {
       flex: 1;
     }
-    
+
     .product-name {
       font-weight: 500;
       margin-bottom: 0.25rem;
     }
-    
+
     .product-variant {
       color: var(--ak-muted);
       font-size: 0.875rem;
       margin-bottom: 0.25rem;
     }
-    
+
     .product-price {
       color: var(--ak-primary);
       font-weight: 600;
     }
-    
+
     .product-quantity {
       color: var(--ak-muted);
       font-size: 0.875rem;
     }
-    
+
     /* Order Summary */
     .order-summary {
       margin-top: 1rem;
     }
-    
+
     .summary-row {
       display: flex;
       justify-content: space-between;
       margin-bottom: 0.5rem;
     }
-    
+
     .summary-label {
       color: var(--ak-muted);
     }
-    
+
     .summary-value {
       font-weight: 500;
       text-align: right;
     }
-    
+
     .summary-total {
       border-top: 1px solid var(--ak-border);
       padding-top: 0.5rem;
@@ -199,12 +187,12 @@
       font-weight: 600;
       font-size: 1.1rem;
     }
-    
+
     /* Shipping Info */
     .shipping-info {
       margin-top: 1rem;
     }
-    
+
     /* Status Badge */
     .status-badge {
       display: inline-block;
@@ -213,39 +201,39 @@
       font-size: 0.75rem;
       font-weight: 500;
     }
-    
+
     .status-pending-payment {
       background: rgba(245, 158, 11, 0.1);
       color: #d97706;
     }
-    
+
     .status-processing {
       background: rgba(59, 130, 246, 0.1);
       color: #2563eb;
     }
-    
+
     .status-shipping {
       background: rgba(139, 69, 193, 0.1);
       color: #8b45c1;
     }
-    
+
     .status-completed {
       background: rgba(34, 197, 94, 0.1);
       color: #16a34a;
     }
-    
+
     .status-cancelled {
       background: rgba(239, 68, 68, 0.1);
       color: #dc2626;
     }
-    
+
     /* Action Buttons */
     .action-buttons {
       display: flex;
       gap: 0.5rem;
       margin-top: 1rem;
     }
-    
+
     .btn {
       border: 1px solid transparent;
       border-radius: var(--ak-radius);
@@ -258,53 +246,53 @@
       display: inline-block;
       text-align: center;
     }
-    
+
     .btn-outline {
       border: 1px solid var(--ak-primary);
       color: var(--ak-primary);
       background: transparent;
     }
-    
+
     .btn-outline:hover {
       background: var(--ak-primary);
       color: white;
     }
-    
+
     .btn-primary {
       background: var(--ak-primary);
       color: white;
     }
-    
+
     .btn-primary:hover {
       background: #005a4a;
     }
-    
+
     .btn-back {
       border: 1px solid var(--ak-border);
       color: var(--ak-text);
       background: var(--ak-white);
     }
-    
+
     .btn-back:hover {
       background: var(--ak-muted);
       color: white;
     }
-    
+
     /* Responsive */
     @media (max-width: 768px) {
-      .order-detail-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-      }
-      
       .info-row {
         flex-direction: column;
       }
-      
+
       .info-label {
         width: auto;
         margin-bottom: 0.25rem;
+      }
+
+      .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
       }
     }
   </style>
@@ -325,78 +313,95 @@
           </h1>
         </section>
 
-        <!-- Order Detail Card -->
-        <section class="order-detail-card">
-          <div class="order-detail-header">
-            <div>
-              <div class="order-id">#{{ $order->order_number }}</div>
-              <div class="order-date">Dibuat: {{ \Carbon\Carbon::parse($order->created_at)->format('d M Y, H:i') }}</div>
+        <!-- Card 1: Informasi Pesanan -->
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">Informasi Pesanan</h2>
+            <span class="status-badge
+              @if($order->status === 'pending_payment') status-pending-payment
+              @elseif($order->status === 'processing') status-processing
+              @elseif($order->status === 'shipping') status-shipping
+              @elseif($order->status === 'completed') status-completed
+              @elseif($order->status === 'cancelled') status-cancelled
+              @else status-pending-payment @endif">
+              {{ ucfirst(str_replace('_', ' ', $order->status)) }}
+            </span>
+          </div>
+          <div class="card-content">
+            <div class="info-row">
+              <div class="info-label">Nomor Pesanan</div>
+              <div class="info-value">#{{ $order->order_number }}</div>
             </div>
-            <div>
-              <span class="status-badge 
-                @if($order->status === 'pending_payment') status-pending-payment 
-                @elseif($order->status === 'processing') status-processing 
-                @elseif($order->status === 'shipping') status-shipping 
-                @elseif($order->status === 'completed') status-completed 
-                @elseif($order->status === 'cancelled') status-cancelled 
-                @else status-pending-payment @endif">
-                {{ ucfirst(str_replace('_', ' ', $order->status)) }}
-              </span>
+            <div class="info-row">
+              <div class="info-label">Tanggal Pesanan</div>
+              <div class="info-value">{{ \Carbon\Carbon::parse($order->created_at)->format('d M Y, H:i') }}</div>
             </div>
           </div>
-          
-          <div class="order-detail-content">
-            <!-- Customer Information -->
-            <div class="customer-info">
-              <h3>Informasi Pembeli</h3>
-              <div class="info-row">
-                <div class="info-label">Nama</div>
-                <div class="info-value">{{ $order->user->name }}</div>
-              </div>
-              <div class="info-row">
-                <div class="info-label">Email</div>
-                <div class="info-value">{{ $order->user->email }}</div>
-              </div>
-              <div class="info-row">
-                <div class="info-label">Nomor Telepon</div>
-                <div class="info-value">{{ $order->user->phone ?? 'Tidak disediakan' }}</div>
-              </div>
+        </section>
+
+        <!-- Card 2: Informasi Pembeli -->
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">Informasi Pembeli</h2>
+          </div>
+          <div class="card-content">
+            <div class="info-row">
+              <div class="info-label">Nama</div>
+              <div class="info-value">{{ $order->user->name }}</div>
             </div>
-            
-            <!-- Shipping Address -->
-            @if($order->shipping_address)
-            <div class="shipping-info">
-              <h3>Alamat Pengiriman</h3>
-              <div class="info-row">
-                <div class="info-label">Nama Penerima</div>
-                <div class="info-value">{{ $order->shipping_address->name }}</div>
-              </div>
-              <div class="info-row">
-                <div class="info-label">Telepon</div>
-                <div class="info-value">{{ $order->shipping_address->phone }}</div>
-              </div>
-              <div class="info-row">
-                <div class="info-label">Alamat</div>
-                <div class="info-value">{{ $order->shipping_address->address }}</div>
-              </div>
-              <div class="info-row">
-                <div class="info-label">Kota</div>
-                <div class="info-value">{{ $order->shipping_address->city }}</div>
-              </div>
-              <div class="info-row">
-                <div class="info-label">Provinsi</div>
-                <div class="info-value">{{ $order->shipping_address->province }}</div>
-              </div>
-              <div class="info-row">
-                <div class="info-label">Kode Pos</div>
-                <div class="info-value">{{ $order->shipping_address->postal_code }}</div>
-              </div>
+            <div class="info-row">
+              <div class="info-label">Email</div>
+              <div class="info-value">{{ $order->user->email }}</div>
             </div>
-            @endif
-            
-            <!-- Product Items -->
+            <div class="info-row">
+              <div class="info-label">Nomor Telepon</div>
+              <div class="info-value">{{ $order->user->phone ?? 'Tidak disediakan' }}</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Card 3: Alamat Pengiriman -->
+        @if($order->shipping_address)
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">Alamat Pengiriman</h2>
+          </div>
+          <div class="card-content">
+            <div class="info-row">
+              <div class="info-label">Nama Penerima</div>
+              <div class="info-value">{{ $order->shipping_address->name }}</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Telepon</div>
+              <div class="info-value">{{ $order->shipping_address->phone }}</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Alamat</div>
+              <div class="info-value">{{ $order->shipping_address->address }}</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Kota</div>
+              <div class="info-value">{{ $order->shipping_address->city }}</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Provinsi</div>
+              <div class="info-value">{{ $order->shipping_address->province }}</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Kode Pos</div>
+              <div class="info-value">{{ $order->shipping_address->postal_code }}</div>
+            </div>
+          </div>
+        </section>
+        @endif
+
+        <!-- Card 4: Produk -->
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">Produk</h2>
+          </div>
+          <div class="card-content">
             <div class="product-items">
-              <h3>Produk</h3>
               @foreach($order->items as $item)
               <div class="product-item">
                 <img src="{{ $item->product->main_image ? asset('storage/' . $item->product->main_image) : asset('src/placeholder_produk.png') }}" alt="{{ $item->product->name }}" class="product-thumb">
@@ -405,21 +410,25 @@
                   @if($item->variant)
                   <div class="product-variant">{{ $item->variant->name }} - {{ $item->variant->value }}</div>
                   @endif
-                  <div class="product-price">Rp {{ number_format($item->price, 0, ',', '.') }}</div>
+                  <div class="product-price">Rp {{ number_format($item->unit_price, 0, ',', '.') }}</div>
                   <div class="product-quantity">Jumlah: {{ $item->quantity }}</div>
                 </div>
               </div>
               @endforeach
             </div>
           </div>
-          
-          <div class="order-detail-footer">
-            <!-- Order Summary -->
+        </section>
+
+        <!-- Card 5: Ringkasan Pesanan -->
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">Ringkasan Pesanan</h2>
+          </div>
+          <div class="card-content">
             <div class="order-summary">
-              <h3>Ringkasan Pesanan</h3>
               <div class="summary-row">
                 <div class="summary-label">Subtotal</div>
-                <div class="summary-value">Rp {{ number_format($order->items->sum(function($item) { return $item->price * $item->quantity; }), 0, ',', '.') }}</div>
+                <div class="summary-value">Rp {{ number_format($order->items->sum('subtotal'), 0, ',', '.') }}</div>
               </div>
               <div class="summary-row">
                 <div class="summary-label">Ongkos Kirim</div>
@@ -434,30 +443,41 @@
                 <div class="summary-value">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</div>
               </div>
             </div>
-            
-            <!-- Payment Info -->
-            @if($order->payment)
-            <div class="payment-info" style="margin-top: 1rem;">
-              <h3>Informasi Pembayaran</h3>
-              <div class="info-row">
-                <div class="info-label">Metode Pembayaran</div>
-                <div class="info-value">{{ $order->payment->payment_method ?? 'Tidak ditemukan' }}</div>
-              </div>
-              <div class="info-row">
-                <div class="info-label">Status Pembayaran</div>
-                <div class="info-value">{{ ucfirst(str_replace('_', ' ', $order->payment->status ?? 'unknown')) }}</div>
-              </div>
-              <div class="info-row">
-                <div class="info-label">Tanggal Pembayaran</div>
-                <div class="info-value">{{ $order->payment->paid_at ? \Carbon\Carbon::parse($order->payment->paid_at)->format('d M Y, H:i') : 'Belum dibayar' }}</div>
-              </div>
+          </div>
+        </section>
+
+        <!-- Card 6: Informasi Pembayaran -->
+        @if($order->payment)
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">Informasi Pembayaran</h2>
+          </div>
+          <div class="card-content">
+            <div class="info-row">
+              <div class="info-label">Metode Pembayaran</div>
+              <div class="info-value">{{ $order->payment->payment_method ?? 'Tidak ditemukan' }}</div>
             </div>
-            @endif
-            
-            <!-- Action Buttons -->
+            <div class="info-row">
+              <div class="info-label">Status Pembayaran</div>
+              <div class="info-value">{{ ucfirst(str_replace('_', ' ', $order->payment->status ?? 'unknown')) }}</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Tanggal Pembayaran</div>
+              <div class="info-value">{{ $order->payment->paid_at ? \Carbon\Carbon::parse($order->payment->paid_at)->format('d M Y, H:i') : 'Belum dibayar' }}</div>
+            </div>
+          </div>
+        </section>
+        @endif
+
+        <!-- Card 7: Aksi -->
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">Aksi Pesanan</h2>
+          </div>
+          <div class="card-content">
             <div class="action-buttons">
               <a href="{{ route('penjual.pesanan') }}" class="btn btn-back">Kembali ke Daftar Pesanan</a>
-              
+
               @if($order->status === 'pending_payment')
                 <button class="btn btn-primary" onclick="updateOrderStatus({{ $order->id }}, 'processing')">Konfirmasi Pembayaran</button>
               @elseif($order->status === 'processing')
@@ -477,7 +497,7 @@
   </div>
 
   @include('components.admin_penjual.footer')
-  
+
   <script>
     // Function to update order status
     function updateOrderStatus(orderId, newStatus) {

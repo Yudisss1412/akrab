@@ -560,7 +560,7 @@
                             </td>
                             <td>
                               <div class="btn-group" role="group">
-                                <a href="{{ route('halaman.produk') }}?product={{ $product->id }}" class="btn btn-sm btn-view" title="Lihat di Situs">
+                                <a href="{{ route('produk.detail', $product->id) }}" class="btn btn-sm btn-view" title="Lihat di Situs">
                                   <i class="fas fa-external-link-alt"></i>
                                 </a>
                                 <a href="{{ route('penjual.produk.edit', $product->id) }}" class="btn btn-sm btn-edit" title="Edit">

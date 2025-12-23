@@ -105,7 +105,7 @@
                     </div>
                     <div class="option-text">
                       <h3>Transfer Bank</h3>
-                      <p>Bayar via rekening bank</p>
+                      <p>Transfer Bank, Kartu Kredit, dan lainnya (via Midtrans)</p>
                     </div>
                   </div>
                 </label>
@@ -123,7 +123,7 @@
                     </div>
                     <div class="option-text">
                       <h3>Dompet Digital</h3>
-                      <p>OVO, GoPay, DANA, dll.</p>
+                      <p>OVO, GoPay, DANA, ShopeePay, dan lainnya (via Midtrans)</p>
                     </div>
                   </div>
                 </label>
@@ -148,27 +148,6 @@
                 </label>
               </div>
 
-              <div class="payment-option">
-                <input type="radio" id="midtrans" name="paymentMethod" value="midtrans">
-                <label for="midtrans" class="option-content">
-                  <div class="option-header">
-                    <div class="option-icon">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M12 2C6.477 2 2 6.477 2 12C2 17.523 6.477 22 12 22C17.523 22 22 17.523 22 12C22 6.477 17.523 2 12 2Z" stroke="#006E5C" stroke-width="2"/>
-                        <path d="M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z" stroke="#006E5C" stroke-width="2"/>
-                        <path d="M12 6V8" stroke="#006E5C" stroke-width="2" stroke-linecap="round"/>
-                        <path d="M12 16V18" stroke="#006E5C" stroke-width="2" stroke-linecap="round"/>
-                        <path d="M6 12H8" stroke="#006E5C" stroke-width="2" stroke-linecap="round"/>
-                        <path d="M16 12H18" stroke="#006E5C" stroke-width="2" stroke-linecap="round"/>
-                      </svg>
-                    </div>
-                    <div class="option-text">
-                      <h3>Midtrans</h3>
-                      <p>Bayar via Midtrans (Kartu Kredit, Debit, e-Wallet, Transfer Bank)</p>
-                    </div>
-                  </div>
-                </label>
-              </div>
             </div>
           </section>
         </div>
@@ -260,7 +239,15 @@
               // Redirect to appropriate payment confirmation page based on selected method
               const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
               const orderNumber = data.order_number;
-              window.location.href = '{{ route("payment.confirmation") }}?order=' + orderNumber + '&method=' + selectedMethod;
+
+              // Redirect to appropriate payment confirmation page based on selected method
+              if (selectedMethod === 'bank_transfer') {
+                window.location.href = '{{ route("payment.confirmation") }}?order=' + orderNumber + '&method=bank_transfer';
+              } else if (selectedMethod === 'e_wallet') {
+                window.location.href = '{{ route("payment.confirmation") }}?order=' + orderNumber + '&method=e_wallet';
+              } else {
+                window.location.href = '{{ route("payment.confirmation") }}?order=' + orderNumber + '&method=' + selectedMethod;
+              }
             } else {
               // Show error message
               alert(data.message || 'Terjadi kesalahan saat memproses pembayaran.');

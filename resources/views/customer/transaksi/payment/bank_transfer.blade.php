@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Konfirmasi Pembayaran - Transfer Bank')
+@section('title', 'Pembayaran Transfer Bank')
 
 @section('header')
   @include('components.customer.header.header')
@@ -14,7 +14,7 @@
   <main class="payment-confirmation-page">
     <div class="container">
       <div class="page-header">
-        <h1>Konfirmasi Pembayaran</h1>
+        <h1>Pembayaran Transfer Bank</h1>
         <div class="progress-steps">
           <div class="step completed">
             <span class="step-number">1</span>
@@ -35,96 +35,70 @@
         <div class="main-content">
           <!-- Informasi Pembayaran -->
           <section class="payment-info">
-            <h2>Transfer Bank</h2>
-            
+            <h2>Detail Pembayaran</h2>
+
             <div class="payment-details">
               <div class="detail-card">
-                <div class="detail-item highlight-payment">
-                  <span class="label">Jumlah Pembayaran Asli</span>
-                  <span class="value original-amount">Rp{{ number_format($order->total_amount, 0, ',', '.') }}</span>
-                </div>
-
-                @php
-                  $seller = $order->items->first() ? ($order->items->first()->product ? $order->items->first()->product->seller : null) : null;
-                  $uniqueCode = str_pad(mt_rand(1, 999), 3, '0', STR_PAD_LEFT);
-                  $totalTransfer = $order->total_amount + $uniqueCode;
-                @endphp
-                @if($seller && $seller->bank_account_number)
-                  <div class="detail-item">
-                    <span class="label">Ke Rekening</span>
-                    <div class="bank-account-info">
-                      <span class="account-number">{{ $seller->bank_account_number }}</span>
-                      <span class="bank-name">{{ $seller->bank_name ?? 'Bank tidak disebutkan' }}</span>
-                      <span class="account-holder">a.n. {{ $seller->account_holder_name ?? $seller->store_name }}</span>
-                    </div>
-                  </div>
-                @else
-                  <div class="detail-item">
-                    <span class="label">Ke Rekening</span>
-                    <span class="value">Informasi rekening penjual tidak ditemukan</span>
-                    <small class="text-muted">Silakan hubungi admin atau penjual untuk informasi rekening tujuan</small>
-                  </div>
-                @endif
-
                 <div class="detail-item">
-                  <span class="label">Kode Unik</span>
-                  <span class="value unique-code">{{ $uniqueCode }}</span>
-                </div>
-
-                <div class="detail-item highlight-payment">
-                  <span class="label">JUMLAH YANG HARUS DITRANSFER</span>
-                  <span class="value total-amount highlight">Rp{{ number_format($totalTransfer, 0, ',', '.') }}</span>
-                  <small class="text-warning">* Transfer sesuai jumlah ini agar pembayaran terverifikasi otomatis</small>
+                  <span class="label">Jumlah Pembayaran</span>
+                  <span class="value">Rp{{ number_format($order->total_amount, 0, ',', '.') }}</span>
                 </div>
 
                 <div class="detail-item">
-                  <span class="label">Batas Waktu Pembayaran</span>
-                  <span class="value">{{ \Carbon\Carbon::now()->addHours(24)->format('d M Y H:i') }}</span>
+                  <span class="label">Nomor Pesanan</span>
+                  <span class="value">{{ $order->order_number }}</span>
+                </div>
+
+                <div class="detail-item">
+                  <span class="label">Metode Pembayaran</span>
+                  <span class="value">Transfer Bank</span>
                 </div>
               </div>
             </div>
           </section>
 
-          <!-- QR Code -->
-          <section class="qr-section">
-            <h3>QR Code Pembayaran</h3>
-            <div class="qr-container">
-              <div class="qr-placeholder">
-                <svg width="200" height="200" viewBox="0 0 200 200">
-                  <rect x="10" y="10" width="180" height="180" fill="#f0f0f0"/>
-                  <rect x="20" y="20" width="20" height="20" fill="#000"/>
-                  <rect x="160" y="20" width="20" height="20" fill="#000"/>
-                  <rect x="20" y="160" width="20" height="20" fill="#000"/>
-                  <rect x="40" y="40" width="10" height="10" fill="#000"/>
-                  <rect x="60" y="40" width="10" height="10" fill="#000"/>
-                  <rect x="80" y="40" width="10" height="10" fill="#000"/>
-                  <rect x="100" y="40" width="10" height="10" fill="#000"/>
-                  <rect x="120" y="40" width="10" height="10" fill="#000"/>
-                  <rect x="140" y="40" width="10" height="10" fill="#000"/>
-                  <rect x="40" y="60" width="10" height="10" fill="#000"/>
-                  <rect x="80" y="60" width="10" height="10" fill="#000"/>
-                  <rect x="100" y="60" width="10" height="10" fill="#000"/>
-                  <rect x="140" y="60" width="10" height="10" fill="#000"/>
-                  <rect x="40" y="80" width="10" height="10" fill="#000"/>
-                  <rect x="140" y="80" width="10" height="10" fill="#000"/>
-                  <rect x="40" y="100" width="10" height="10" fill="#000"/>
-                  <rect x="80" y="100" width="10" height="10" fill="#000"/>
-                  <rect x="100" y="100" width="10" height="10" fill="#000"/>
-                  <rect x="120" y="100" width="10" height="10" fill="#000"/>
-                  <rect x="140" y="100" width="10" height="10" fill="#000"/>
-                  <rect x="60" y="120" width="10" height="10" fill="#000"/>
-                  <rect x="80" y="120" width="10" height="10" fill="#000"/>
-                  <rect x="100" y="120" width="10" height="10" fill="#000"/>
-                  <rect x="120" y="120" width="10" height="10" fill="#000"/>
-                  <rect x="140" y="120" width="10" height="10" fill="#000"/>
-                  <rect x="40" y="140" width="10" height="10" fill="#000"/>
-                  <rect x="60" y="140" width="10" height="10" fill="#000"/>
-                  <rect x="80" y="140" width="10" height="10" fill="#000"/>
-                  <rect x="100" y="140" width="10" height="10" fill="#000"/>
-                  <rect x="120" y="140" width="10" height="10" fill="#000"/>
-                  <rect x="140" y="140" width="10" height="10" fill="#000"/>
-                </svg>
-                <p>Scan QR Code untuk transfer otomatis</p>
+          <!-- Pembayaran Transfer Bank via Midtrans -->
+          <section class="bank-transfer-payment-section">
+            <h3>Bank Tujuan</h3>
+            <div class="bank-options">
+              <div class="bank-option">
+                <div class="bank-logo">
+                  <i class="fas fa-university"></i>
+                </div>
+                <div class="bank-info">
+                  <div class="bank-name">BCA Virtual Account</div>
+                  <div class="bank-account">700xx-xxx-xxx</div>
+                </div>
+              </div>
+              
+              <div class="bank-option">
+                <div class="bank-logo">
+                  <i class="fas fa-university"></i>
+                </div>
+                <div class="bank-info">
+                  <div class="bank-name">BNI Virtual Account</div>
+                  <div class="bank-account">888xx-xxx-xxx</div>
+                </div>
+              </div>
+              
+              <div class="bank-option">
+                <div class="bank-logo">
+                  <i class="fas fa-university"></i>
+                </div>
+                <div class="bank-info">
+                  <div class="bank-name">BRI Virtual Account</div>
+                  <div class="bank-account">543xx-xxx-xxx</div>
+                </div>
+              </div>
+              
+              <div class="bank-option">
+                <div class="bank-logo">
+                  <i class="fas fa-university"></i>
+                </div>
+                <div class="bank-info">
+                  <div class="bank-name">Permata Bank Virtual Account</div>
+                  <div class="bank-account">456xx-xxx-xxx</div>
+                </div>
               </div>
             </div>
           </section>
@@ -133,12 +107,12 @@
           <section class="instructions-section">
             <h3>Instruksi Pembayaran</h3>
             <ol class="instructions-list">
-              <li>Buka aplikasi mobile banking atau internet banking dari bank Anda</li>
-              <li>Pilih menu "Transfer" atau "Transfer ke Rekening Bank"</li>
-              <li>Masukkan nomor rekening {{ $seller ? $seller->bank_account_number : 'Tidak tersedia' }} ({{ $seller ? $seller->bank_name : 'Tidak tersedia' }})</li>
-              <li>Masukkan jumlah transfer sebesar Rp{{ number_format($totalTransfer, 0, ',', '.') }}</li>
-              <li>Periksa kembali data transfer Anda</li>
-              <li>Konfirmasi dan selesaikan transaksi</li>
+              <li>Masuk ke aplikasi mobile banking atau internet banking dari bank pilihan Anda</li>
+              <li>Pilih menu "Transfer" atau "Virtual Account"</li>
+              <li>Masukkan nomor Virtual Account yang tertera di atas</li>
+              <li>Masukkan jumlah pembayaran sesuai tagihan (jumlah harus pas, tidak boleh dibulatkan)</li>
+              <li>Ikuti instruksi selanjutnya hingga proses pembayaran selesai</li>
+              <li>Simpan bukti pembayaran Anda</li>
             </ol>
           </section>
         </div>
@@ -175,6 +149,7 @@
               Saya Telah Bayar
             </button>
             <input type="file" id="proofUpload" style="display: none;" accept="image/*" onchange="handleProofUpload(this)">
+            <small class="text-muted d-block mt-2">Upload bukti pembayaran dari aplikasi banking Anda</small>
           </section>
         </div>
       </div>
@@ -306,6 +281,48 @@
   </script>
 
   <style>
+    .bank-options {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+
+    .bank-option {
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .bank-option:hover {
+      border-color: #006E5C;
+      background-color: #f0fdfa;
+    }
+
+    .bank-logo {
+      font-size: 2rem;
+      margin-right: 1rem;
+      color: #006E5C;
+    }
+
+    .bank-info {
+      flex: 1;
+    }
+
+    .bank-name {
+      font-weight: bold;
+      color: #333;
+    }
+
+    .bank-account {
+      color: #666;
+      font-family: monospace;
+    }
+
     .notification-toast {
       position: fixed;
       top: 50%;

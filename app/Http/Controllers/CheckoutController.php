@@ -459,7 +459,7 @@ class CheckoutController extends Controller
     public function processPayment(Request $request)
     {
         $request->validate([
-            'payment_method' => 'required|in:bank_transfer,e_wallet,cod,midtrans',
+            'payment_method' => 'required|in:bank_transfer,e_wallet,cod',
             'order_number' => 'required|string'  // Changed: make it required since we're using it in confirmation pages
         ]);
 
@@ -498,22 +498,18 @@ class CheckoutController extends Controller
 
         switch ($request->payment_method) {
             case 'bank_transfer':
-                // For bank transfer, set status to waiting for payment verification
-                $newStatus = 'waiting_payment_verification';
+                // For bank transfer, redirect to Midtrans payment page
+                // Status will be updated via callback
+                $newStatus = 'pending';
                 break;
             case 'e_wallet':
-                // For e-wallet, set status to confirmed immediately if using a payment gateway
-                $newStatus = 'paid';
-                $paidAt = now();
+                // For e-wallet, redirect to Midtrans payment page
+                // Status will be updated via callback
+                $newStatus = 'pending';
                 break;
             case 'cod':
                 // For COD, set status to confirmed, payment will be done on delivery
                 $newStatus = 'confirmed';
-                break;
-            case 'midtrans':
-                // For Midtrans, redirect to Midtrans payment page
-                // Status will be updated via callback
-                $newStatus = 'pending';
                 break;
         }
 
@@ -559,13 +555,13 @@ class CheckoutController extends Controller
         // Return the appropriate view based on payment method
         switch ($request->method) {
             case 'bank_transfer':
-                return view($viewPath, compact('order'));
+                return view('customer.transaksi.payment.bank_transfer', compact('order'));
             case 'e_wallet':
-                return view($viewPath, compact('order'));
+                return view('customer.transaksi.payment.e_wallet', compact('order'));
             case 'cod':
                 return view($viewPath, compact('order'));
             case 'midtrans':
-                return view($viewPath, compact('order'));
+                return view('customer.transaksi.payment.midtrans', compact('order'));
             default:
                 return redirect()->route('cust.pembayaran')
                     ->withErrors(['method' => 'Metode pembayaran tidak valid.']);

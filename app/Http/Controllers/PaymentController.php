@@ -50,16 +50,17 @@ class PaymentController extends Controller
             ], 400);
         }
 
-        if ($request->payment_method === 'midtrans') {
+        if ($request->payment_method === 'bank_transfer' || $request->payment_method === 'e_wallet' || $request->payment_method === 'midtrans') {
             // Proses pembayaran Midtrans
             try {
                 $snapToken = $this->midtransService->getSnapToken($order, $order->items->toArray());
 
                 // Simpan transaction_id di payment record
+                $paymentMethod = $request->payment_method; // Use the original payment method requested
                 $payment = Payment::updateOrCreate(
                     ['order_id' => $order->id],
                     [
-                        'payment_method' => 'midtrans',
+                        'payment_method' => $paymentMethod,
                         'transaction_id' => $order->order_number,
                         'payment_status' => 'pending',
                         'amount' => $order->total_amount,
@@ -71,7 +72,7 @@ class PaymentController extends Controller
                     'message' => 'Pembayaran Midtrans berhasil diproses',
                     'snap_token' => $snapToken,
                     'order_number' => $order->order_number,
-                    'payment_method' => 'midtrans'
+                    'payment_method' => $request->payment_method // Return the original payment method requested
                 ]);
 
             } catch (\Exception $e) {

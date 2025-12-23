@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Konfirmasi Pembayaran - E-wallet')
+@section('title', 'Pembayaran Dompet Digital')
 
 @section('header')
   @include('components.customer.header.header')
@@ -14,7 +14,7 @@
   <main class="payment-confirmation-page">
     <div class="container">
       <div class="page-header">
-        <h1>Konfirmasi Pembayaran</h1>
+        <h1>Pembayaran Dompet Digital</h1>
         <div class="progress-steps">
           <div class="step completed">
             <span class="step-number">1</span>
@@ -35,90 +35,75 @@
         <div class="main-content">
           <!-- Informasi Pembayaran -->
           <section class="payment-info">
-            <h2>Pembayaran E-wallet</h2>
-            
+            <h2>Detail Pembayaran</h2>
+
             <div class="payment-details">
               <div class="detail-card">
                 <div class="detail-item">
                   <span class="label">Jumlah Pembayaran</span>
                   <span class="value">Rp{{ number_format($order->total_amount, 0, ',', '.') }}</span>
                 </div>
-                
-                @php
-                  $seller = $order->items->first() ? ($order->items->first()->product ? $order->items->first()->product->seller : null) : null;
-                @endphp
+
                 <div class="detail-item">
-                  <span class="label">Ke Nomor</span>
-                  <div class="wallet-info">
-                    <span class="wallet-number">{{ $seller ? $seller->phone : 'Tidak tersedia' }}</span>
-                    <small class="text-muted">a.n. {{ $seller ? ($seller->account_holder_name ?: $seller->store_name) : 'Nama Tidak Tersedia' }}</small>
-                  </div>
+                  <span class="label">Nomor Pesanan</span>
+                  <span class="value">{{ $order->order_number }}</span>
                 </div>
-                
+
                 <div class="detail-item">
-                  <span class="label">Batas Waktu Pembayaran</span>
-                  <span class="value">{{ \Carbon\Carbon::now()->addHours(24)->format('d M Y H:i') }}</span>
+                  <span class="label">Metode Pembayaran</span>
+                  <span class="value">Dompet Digital</span>
                 </div>
               </div>
             </div>
           </section>
 
-          <!-- QR Code -->
-          <section class="qr-section">
-            <h3>Kode QR Pembayaran</h3>
-            <div class="qr-container">
-              <div class="qr-placeholder">
-                <svg width="200" height="200" viewBox="0 0 200 200">
-                  <rect x="10" y="10" width="180" height="180" fill="#f0f0f0"/>
-                  <rect x="20" y="20" width="20" height="20" fill="#000"/>
-                  <rect x="160" y="20" width="20" height="20" fill="#000"/>
-                  <rect x="20" y="160" width="20" height="20" fill="#000"/>
-                  <rect x="40" y="40" width="10" height="10" fill="#000"/>
-                  <rect x="60" y="40" width="10" height="10" fill="#000"/>
-                  <rect x="80" y="40" width="10" height="10" fill="#000"/>
-                  <rect x="100" y="40" width="10" height="10" fill="#000"/>
-                  <rect x="120" y="40" width="10" height="10" fill="#000"/>
-                  <rect x="140" y="40" width="10" height="10" fill="#000"/>
-                  <rect x="40" y="60" width="10" height="10" fill="#000"/>
-                  <rect x="80" y="60" width="10" height="10" fill="#000"/>
-                  <rect x="100" y="60" width="10" height="10" fill="#000"/>
-                  <rect x="140" y="60" width="10" height="10" fill="#000"/>
-                  <rect x="40" y="80" width="10" height="10" fill="#000"/>
-                  <rect x="140" y="80" width="10" height="10" fill="#000"/>
-                  <rect x="40" y="100" width="10" height="10" fill="#000"/>
-                  <rect x="80" y="100" width="10" height="10" fill="#000"/>
-                  <rect x="100" y="100" width="10" height="10" fill="#000"/>
-                  <rect x="120" y="100" width="10" height="10" fill="#000"/>
-                  <rect x="140" y="100" width="10" height="10" fill="#000"/>
-                  <rect x="60" y="120" width="10" height="10" fill="#000"/>
-                  <rect x="80" y="120" width="10" height="10" fill="#000"/>
-                  <rect x="100" y="120" width="10" height="10" fill="#000"/>
-                  <rect x="120" y="120" width="10" height="10" fill="#000"/>
-                  <rect x="140" y="120" width="10" height="10" fill="#000"/>
-                  <rect x="40" y="140" width="10" height="10" fill="#000"/>
-                  <rect x="60" y="140" width="10" height="10" fill="#000"/>
-                  <rect x="80" y="140" width="10" height="10" fill="#000"/>
-                  <rect x="100" y="140" width="10" height="10" fill="#000"/>
-                  <rect x="120" y="140" width="10" height="10" fill="#000"/>
-                  <rect x="140" y="140" width="10" height="10" fill="#000"/>
-                </svg>
-                <p>Scan QR Code untuk membayar</p>
+          <!-- Pembayaran E-wallet via Midtrans -->
+          <section class="ewallet-payment-section">
+            <h3>Pilih Metode Pembayaran</h3>
+            <div class="ewallet-options">
+              <div class="ewallet-option" data-method="gopay">
+                <div class="ewallet-logo">
+                  <i class="fab fa-google-pay" style="font-size: 2rem; color: #0f9d58;"></i>
+                </div>
+                <div class="ewallet-info">
+                  <div class="ewallet-name">GoPay</div>
+                </div>
+              </div>
+              
+              <div class="ewallet-option" data-method="shopeepay">
+                <div class="ewallet-logo">
+                  <i class="fas fa-wallet" style="font-size: 2rem; color: #ee4d2d;"></i>
+                </div>
+                <div class="ewallet-info">
+                  <div class="ewallet-name">ShopeePay</div>
+                </div>
+              </div>
+              
+              <div class="ewallet-option" data-method="ovo">
+                <div class="ewallet-logo">
+                  <i class="fas fa-mobile-alt" style="font-size: 2rem; color: #ae00ff;"></i>
+                </div>
+                <div class="ewallet-info">
+                  <div class="ewallet-name">OVO</div>
+                </div>
+              </div>
+              
+              <div class="ewallet-option" data-method="dana">
+                <div class="ewallet-logo">
+                  <i class="fas fa-money-bill-wave" style="font-size: 2rem; color: #007bff;"></i>
+                </div>
+                <div class="ewallet-info">
+                  <div class="ewallet-name">DANA</div>
+                </div>
               </div>
             </div>
           </section>
 
-          <!-- Instruksi Pembayaran -->
-          <section class="instructions-section">
-            <h3>Instruksi Pembayaran</h3>
-            <ol class="instructions-list">
-              <li>Buka aplikasi {{ $seller ? ($seller->bank_name ?: 'Dompet Digital') : 'Dompet Digital' }} di smartphone Anda</li>
-              <li>Pilih menu "Transfer" atau "Bayar"</li>
-              <li>Masukkan nomor HP penjual: <strong>{{ $seller ? $seller->phone : 'Tidak tersedia' }}</strong></li>
-              <li>Atau scan QR Code yang tersedia di halaman ini</li>
-              <li>Verifikasi informasi pembayaran (jumlah, nama penerima, dll)</li>
-              <li>Konfirmasi pembayaran</li>
-              <li>Tunggu notifikasi bahwa pembayaran berhasil</li>
-            </ol>
+          <!-- Tombol Bayar -->
+          <section class="payment-action">
+            <button class="btn btn-primary btn-pay" id="pay-button">
+              <i class="fas fa-shopping-cart"></i> Bayar Sekarang
+            </button>
           </section>
         </div>
 
@@ -150,11 +135,10 @@
               </div>
             </div>
 
-            <button class="btn btn-primary btn-upload-proof" id="uploadProofBtn" onclick="document.getElementById('proofUpload').click()">
-              Saya Telah Bayar
-            </button>
-            <input type="file" id="proofUpload" style="display: none;" accept="image/*" onchange="handleProofUpload(this)">
-            <small class="text-muted d-block mt-2">Upload bukti pembayaran dari aplikasi e-wallet Anda (OVO, DANA, GoPay, dll.)</small>
+            <div class="payment-security">
+              <i class="fas fa-shield-alt"></i>
+              <span>Dilindungi oleh Midtrans</span>
+            </div>
           </section>
         </div>
       </div>
@@ -163,85 +147,64 @@
 @endsection
 
 @push('scripts')
+  <!-- Midtrans Snap Script -->
+  <script src="https://app.sandbox.midtrans.com/snap/snap.js" 
+          data-client-key="{{ config('midtrans.client_key') }}"></script>
+  
   <script>
-    function handleProofUpload(input) {
-      // Validasi bahwa file dipilih
-      if (!input.files || !input.files[0]) {
-        showNotification('error', 'Silakan pilih file untuk diunggah.');
-        return;
-      }
-
-      const file = input.files[0];
-
-      // Validasi bahwa file tidak kosong
-      if (file.size === 0) {
-        showNotification('error', 'File tidak boleh kosong.');
-        return;
-      }
-
-      // Validasi tipe file
-      if (!file.type.match('image.*')) {
-        showNotification('error', 'Silakan pilih file gambar (JPG, PNG, JPEG)');
-        return;
-      }
-
-      // Validasi ukuran file (maksimal 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        showNotification('error', 'Ukuran file terlalu besar. Maksimal 5MB');
-        return;
-      }
-
-      // Tampilkan loading state
-      const uploadBtn = document.getElementById('uploadProofBtn');
-      uploadBtn.disabled = true;
-      uploadBtn.innerHTML = 'Mengunggah...';
-
-      // Siapkan form data
-      const formData = new FormData();
-      formData.append('order_number', '{{ $order->order_number }}');
-      formData.append('proof_image', file);
-      formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
-
-      // Upload bukti pembayaran
-      fetch('{{ route("payment.upload-proof") }}', {
+    document.getElementById('pay-button').addEventListener('click', function() {
+      // Ambil snap token dari server
+      fetch('{{ route("payment.process") }}', {
         method: 'POST',
-        body: formData
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+          order_number: '{{ $order->order_number }}',
+          payment_method: 'e_wallet'
+        })
       })
-      .then(async response => {
-        if (!response.ok) {
-          const responseText = await response.text();
-          console.error('HTTP Error:', response.status, response.statusText);
-          console.error('Response body:', responseText);
-          throw new Error(`HTTP error! status: ${response.status}, message: ${responseText}`);
-        }
-        return response.json();
-      })
+      .then(response => response.json())
       .then(data => {
         if (data.success) {
-          showNotification('success', 'Bukti pembayaran berhasil diunggah. Pesanan Anda akan diproses setelah verifikasi.');
-          setTimeout(() => {
-            window.location.href = '{{ route("cust.welcome") }}';
-          }, 1500);
+          // Buka Snap popup
+          snap.pay(data.snap_token, {
+            onSuccess: function(result) {
+              /* handle success */
+              console.log(result);
+              showNotification('success', 'Pembayaran berhasil! Pesanan akan segera diproses.');
+              setTimeout(() => {
+                window.location.href = '{{ route("cust.welcome") }}';
+              }, 2000);
+            },
+            onPending: function(result) {
+              /* handle pending */
+              console.log(result);
+              showNotification('info', 'Pembayaran sedang diproses. Kami akan mengirimkan notifikasi setelah pembayaran diverifikasi.');
+              setTimeout(() => {
+                window.location.href = '{{ route("cust.welcome") }}';
+              }, 2000);
+            },
+            onError: function(result) {
+              /* handle error */
+              console.log(result);
+              showNotification('error', 'Pembayaran gagal. Silakan coba lagi.');
+            },
+            onClose: function() {
+              /* handle close */
+              showNotification('warning', 'Pembayaran dibatalkan. Silakan lanjutkan pembayaran kapan saja.');
+            }
+          });
         } else {
-          showNotification('error', data.message || 'Terjadi kesalahan saat mengunggah bukti pembayaran.');
-          uploadBtn.disabled = false;
-          uploadBtn.innerHTML = 'Saya Telah Bayar';
+          showNotification('error', data.message || 'Terjadi kesalahan saat memproses pembayaran');
         }
       })
       .catch(error => {
-        console.error('Error during fetch:', error);
-        // Tampilkan pesan error yang lebih informatif
-        let errorMessage = 'Terjadi kesalahan saat mengunggah bukti pembayaran.';
-        if (error.message.includes('HTTP error!')) {
-          errorMessage = `Server error: ${error.message}`;
-        } else if (error.message.includes('NetworkError')) {
-          errorMessage = 'Koneksi jaringan error. Periksa koneksi internet Anda.';
-        }
-        showNotification('error', errorMessage + ' Silakan coba lagi.');
-        uploadBtn.disabled = false;
-        uploadBtn.innerHTML = 'Saya Telah Bayar';
+        console.error('Error:', error);
+        showNotification('error', 'Terjadi kesalahan saat memproses pembayaran. Silakan coba lagi.');
       });
-    }
+    });
 
     // Fungsi untuk menampilkan notifikasi
     function showNotification(type, message) {
@@ -257,7 +220,7 @@
       notification.className = `notification-toast notification-${type}`;
       notification.innerHTML = `
         <div class="notification-content">
-          <div class="notification-icon">${type === 'success' ? '✓' : '⚠'}</div>
+          <div class="notification-icon">${type === 'success' ? '✓' : type === 'error' ? '✕' : '⚠'}</div>
           <div class="notification-message">${message}</div>
         </div>
         <button class="notification-close" onclick="this.parentElement.remove()">&times;</button>
@@ -286,6 +249,52 @@
   </script>
 
   <style>
+    .ewallet-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+
+    .ewallet-option {
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .ewallet-option:hover {
+      border-color: #006E5C;
+      background-color: #f0fdfa;
+    }
+
+    .ewallet-option.selected {
+      border-color: #006E5C;
+      background-color: #e8f4f1;
+    }
+
+    .ewallet-logo {
+      margin-bottom: 0.5rem;
+    }
+
+    .ewallet-info {
+      text-align: center;
+    }
+
+    .ewallet-name {
+      font-weight: bold;
+      color: #333;
+    }
+
+    .btn-pay {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+
     .notification-toast {
       position: fixed;
       top: 50%;
@@ -323,6 +332,18 @@
       color: #721c24;
     }
 
+    .notification-info {
+      border-left-color: #17a2b8;
+      background-color: #f8fdff;
+      color: #0c5460;
+    }
+
+    .notification-warning {
+      border-left-color: #ffc107;
+      background-color: #fffdf8;
+      color: #856404;
+    }
+
     .notification-content {
       display: flex;
       align-items: center;
@@ -351,6 +372,16 @@
     .notification-error .notification-icon {
       background-color: #f8d7da;
       color: #dc3545;
+    }
+
+    .notification-info .notification-icon {
+      background-color: #d1ecf1;
+      color: #17a2b8;
+    }
+
+    .notification-warning .notification-icon {
+      background-color: #fff3cd;
+      color: #856404;
     }
 
     .notification-message {

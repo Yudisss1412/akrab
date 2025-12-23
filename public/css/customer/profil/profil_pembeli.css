@@ -485,6 +485,7 @@ body{
 }
 
 /* Horizontal product layout for wishlist - Modified to match product card */
+.wl-card .product,
 .product {
   position: relative;
   display: flex;
@@ -496,7 +497,13 @@ body{
   border-radius: var(--radius-md);
   background: var(--background-color);
   align-items: center; /* Sejajarkan item secara vertikal */
-  padding-right: 40px; /* Tambahkan padding kanan untuk memberi ruang bagi tombol wishlist */
+  padding-right: 50px; /* Tambahkan padding kanan untuk memberi ruang bagi tombol wishlist */
+  cursor: pointer; /* Tambahkan kursor pointer untuk menunjukkan bahwa card bisa diklik */
+}
+
+.wl-card .product:hover {
+  text-decoration: none; /* Pastikan tidak ada garis bawah saat hover */
+  background-color: var(--background-color); /* Tambahkan efek hover jika perlu */
 }
 
 .product:hover {
@@ -668,6 +675,18 @@ body{
   flex-shrink: 0; /* Mencegah ukuran tombol berubah */
   z-index: 3; /* Naikkan z-index agar tidak tertutup oleh elemen lain */
   transition: transform 0.2s ease, box-shadow 0.2s ease; /* Tambahkan transisi untuk efek hover */
+  margin-right: 0; /* Tambahkan margin kanan agar tidak terlalu dekat dengan tepi */
+}
+
+/* Pastikan product container memiliki posisi relatif untuk tombol wishlist */
+.wl-card .product {
+  position: relative;
+}
+
+/* Pastikan product aksi tetap terlihat dengan benar */
+.wl-card .product__actions {
+  position: relative;
+  z-index: 1; /* Pastikan tombol aksi tetap di atas background jika ada */
 }
 
 .wl-like:hover {
@@ -740,23 +759,14 @@ body{
   color: var(--primary-color-dark);
 }
 
-/* + Keranjang = outline (like btn-add on product page) */
-.wl-card.card .product__actions .btn-add,
-.wl-card.card .produk-card-actions .btn-add {
-  background:#f5fbf8;
-  color: var(--primary-color-dark);
-  border: var(--btn-brd) solid var(--primary-color-dark);
-  flex: 1; /* Ensure equal width distribution */
-  text-align: center;
-  border-radius: 8px; /* Rounded corners */
-  padding: 0.5rem 0; /* Kurangi padding vertikal untuk membuat tombol lebih ramping */
-  font-weight: 600; /* Ensure consistent font weight */
-  min-height: 36px; /* Tetapkan tinggi minimum yang lebih kecil */
+/* Atur ulang tata letak untuk wishlist card karena tidak ada tombol aksi */
+.wl-card .product__actions {
+  display: none; /* Sembunyikan tombol aksi di wishlist card karena sudah dihapus */
 }
-.wl-card.card .product__actions .btn-add:hover,
-.wl-card.card .produk-card-actions .btn-add:hover {
-  background: var(--primary-color-dark);
-  color:#fff;
+
+/* Sesuaikan tata letak untuk wishlist card tanpa tombol aksi */
+.wl-card .product__meta {
+  flex: 1; /* Tetap berikan fleksibilitas pada metadata produk */
 }
 
 /* Tambahan: Terapkan juga styling produk-aksi ke wishlist card untuk konsistensi */

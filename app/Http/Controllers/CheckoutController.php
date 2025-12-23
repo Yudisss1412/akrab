@@ -459,7 +459,7 @@ class CheckoutController extends Controller
     public function processPayment(Request $request)
     {
         $request->validate([
-            'payment_method' => 'required|in:bank_transfer,e_wallet,cod',
+            'payment_method' => 'required|in:bank_transfer,e_wallet,cod,midtrans',
             'order_number' => 'required|string'  // Changed: make it required since we're using it in confirmation pages
         ]);
 
@@ -510,6 +510,11 @@ class CheckoutController extends Controller
                 // For COD, set status to confirmed, payment will be done on delivery
                 $newStatus = 'confirmed';
                 break;
+            case 'midtrans':
+                // For Midtrans, redirect to Midtrans payment page
+                // Status will be updated via callback
+                $newStatus = 'pending';
+                break;
         }
 
         // Update the order status and payment information
@@ -541,7 +546,7 @@ class CheckoutController extends Controller
     {
         $request->validate([
             'order' => 'required|string|exists:orders,order_number',
-            'method' => 'required|in:bank_transfer,e_wallet,cod'
+            'method' => 'required|in:bank_transfer,e_wallet,cod,midtrans'
         ]);
 
         $order = Order::where('order_number', $request->order)
@@ -558,6 +563,8 @@ class CheckoutController extends Controller
             case 'e_wallet':
                 return view($viewPath, compact('order'));
             case 'cod':
+                return view($viewPath, compact('order'));
+            case 'midtrans':
                 return view($viewPath, compact('order'));
             default:
                 return redirect()->route('cust.pembayaran')

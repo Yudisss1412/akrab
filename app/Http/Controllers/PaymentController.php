@@ -4,12 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Models\Payment;
 use App\Models\Order;
+use App\Services\MidtransService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
+    protected $midtransService;
+
+    public function __construct(MidtransService $midtransService)
+    {
+        $this->midtransService = $midtransService;
+        $this->middleware('auth');
+    }
+
     /**
      * Proses pembayaran untuk pesanan
      */
@@ -17,12 +26,13 @@ class PaymentController extends Controller
     {
         $request->validate([
             'order_number' => 'required|string|exists:orders,order_number',
-            'payment_method' => 'required|in:bank_transfer,e_wallet,cod'
+            'payment_method' => 'required|in:bank_transfer,e_wallet,cod,midtrans'
         ]);
 
         // Ambil order berdasarkan order number
         $order = Order::where('order_number', $request->order_number)
                      ->where('user_id', Auth::id())
+                     ->with(['user', 'shipping_address', 'items.product', 'items.variant'])
                      ->first();
 
         if (!$order) {
@@ -40,52 +50,85 @@ class PaymentController extends Controller
             ], 400);
         }
 
-        DB::beginTransaction();
+        if ($request->payment_method === 'midtrans') {
+            // Proses pembayaran Midtrans
+            try {
+                $snapToken = $this->midtransService->getSnapToken($order, $order->items->toArray());
 
-        try {
-            // Buat atau update payment record
-            $payment = Payment::updateOrCreate(
-                ['order_id' => $order->id],
-                [
-                    'payment_method' => $request->payment_method,
-                    'payment_status' => $request->payment_method === 'cod' ? 'success' : 'pending',
-                    'amount' => $order->total_amount,
-                    'paid_at' => $request->payment_method === 'cod' ? now() : null,
-                ]
-            );
+                // Simpan transaction_id di payment record
+                $payment = Payment::updateOrCreate(
+                    ['order_id' => $order->id],
+                    [
+                        'payment_method' => 'midtrans',
+                        'transaction_id' => $order->order_number,
+                        'payment_status' => 'pending',
+                        'amount' => $order->total_amount,
+                    ]
+                );
 
-            // Update status order
-            $order->update([
-                'status' => $request->payment_method === 'cod' ? 'confirmed' : 'pending',
-                'paid_at' => $request->payment_method === 'cod' ? now() : null
-            ]);
-
-            // Jika pembayaran COD, tambahkan log bahwa pembayaran telah dikonfirmasi
-            if ($request->payment_method === 'cod') {
-                $order->logs()->create([
-                    'status' => 'confirmed',
-                    'description' => 'Pembayaran COD dikonfirmasi, pesanan siap diproses'
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Pembayaran Midtrans berhasil diproses',
+                    'snap_token' => $snapToken,
+                    'order_number' => $order->order_number,
+                    'payment_method' => 'midtrans'
                 ]);
+
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Terjadi kesalahan saat memproses pembayaran Midtrans: ' . $e->getMessage()
+                ], 500);
             }
+        } else {
+            // Proses pembayaran metode lama
+            DB::beginTransaction();
 
-            DB::commit();
+            try {
+                // Buat atau update payment record
+                $payment = Payment::updateOrCreate(
+                    ['order_id' => $order->id],
+                    [
+                        'payment_method' => $request->payment_method,
+                        'payment_status' => $request->payment_method === 'cod' ? 'success' : 'pending',
+                        'amount' => $order->total_amount,
+                        'paid_at' => $request->payment_method === 'cod' ? now() : null,
+                    ]
+                );
 
-            return response()->json([
-                'success' => true,
-                'message' => $request->payment_method === 'cod' ? 
-                    'Pesanan berhasil dikonfirmasi. Pembayaran akan dilakukan saat pengiriman.' : 
-                    'Silakan selesaikan pembayaran sesuai instruksi yang akan dikirimkan',
-                'payment' => $payment,
-                'order_number' => $order->order_number
-            ]);
+                // Update status order
+                $order->update([
+                    'status' => $request->payment_method === 'cod' ? 'confirmed' : 'pending',
+                    'paid_at' => $request->payment_method === 'cod' ? now() : null
+                ]);
 
-        } catch (\Exception $e) {
-            DB::rollback();
-            
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan saat memproses pembayaran: ' . $e->getMessage()
-            ], 500);
+                // Jika pembayaran COD, tambahkan log bahwa pembayaran telah dikonfirmasi
+                if ($request->payment_method === 'cod') {
+                    $order->logs()->create([
+                        'status' => 'confirmed',
+                        'description' => 'Pembayaran COD dikonfirmasi, pesanan siap diproses'
+                    ]);
+                }
+
+                DB::commit();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => $request->payment_method === 'cod' ?
+                        'Pesanan berhasil dikonfirmasi. Pembayaran akan dilakukan saat pengiriman.' :
+                        'Silakan selesaikan pembayaran sesuai instruksi yang akan dikirimkan',
+                    'payment' => $payment,
+                    'order_number' => $order->order_number
+                ]);
+
+            } catch (\Exception $e) {
+                DB::rollback();
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Terjadi kesalahan saat memproses pembayaran: ' . $e->getMessage()
+                ], 500);
+            }
         }
     }
 
@@ -98,11 +141,15 @@ class PaymentController extends Controller
         $externalId = $request->get('external_id') ?: $request->get('transaction_id'); // ID transaksi dari payment gateway
         $status = $request->get('status') ?: $request->get('transaction_status'); // Status pembayaran dari payment gateway
         $orderId = $request->get('order_id');
+        $statusCode = $request->get('status_code');
+        $fraudStatus = $request->get('fraud_status', 'accept');
 
         \Log::info('Payment callback received', [
             'external_id' => $externalId,
             'status' => $status,
             'order_id' => $orderId,
+            'status_code' => $statusCode,
+            'fraud_status' => $fraudStatus,
             'request_data' => $request->all()
         ]);
 
@@ -117,6 +164,7 @@ class PaymentController extends Controller
         }
 
         if ($payment) {
+            // Update payment record
             $payment->update([
                 'payment_status' => $status,
                 'paid_at' => in_array($status, ['settlement', 'capture', 'success', 'paid']) ? now() : null,
@@ -129,11 +177,18 @@ class PaymentController extends Controller
                 $newOrderStatus = $order->status; // Default status tidak berubah
 
                 if (in_array($status, ['settlement', 'capture', 'success', 'paid'])) {
-                    $newOrderStatus = 'paid';
-                    $order->update([
-                        'status' => $newOrderStatus,
-                        'paid_at' => now()
-                    ]);
+                    if ($fraudStatus === 'accept') {
+                        $newOrderStatus = 'paid';
+                        $order->update([
+                            'status' => $newOrderStatus,
+                            'paid_at' => now()
+                        ]);
+                    } else {
+                        $newOrderStatus = 'pending';
+                        $order->update([
+                            'status' => $newOrderStatus
+                        ]);
+                    }
                 } elseif (in_array($status, ['pending', 'waiting'])) {
                     $newOrderStatus = 'waiting_payment_verification';
                     $order->update([
@@ -149,7 +204,7 @@ class PaymentController extends Controller
                 // Tambahkan log bahwa pembayaran telah diterima
                 $order->logs()->create([
                     'status' => $newOrderStatus,
-                    'description' => 'Pembayaran berhasil diterima melalui gateway. Status: ' . $status
+                    'description' => 'Pembayaran berhasil diterima melalui gateway. Status: ' . $status . ', Fraud Status: ' . $fraudStatus
                 ]);
             }
 

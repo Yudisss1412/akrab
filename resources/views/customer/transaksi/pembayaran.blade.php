@@ -195,6 +195,10 @@
 @endsection
 
 @push('scripts')
+  <!-- Midtrans Snap Script -->
+  <script src="https://app.sandbox.midtrans.com/snap/snap.js"
+          data-client-key="{{ config('midtrans.client_key') }}"></script>
+
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Payment method selection
@@ -236,16 +240,47 @@
           .then(response => response.json())
           .then(data => {
             if (data.success) {
-              // Redirect to appropriate payment confirmation page based on selected method
+              // Check if selected method is bank_transfer or e_wallet to show Midtrans popup
               const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
               const orderNumber = data.order_number;
 
-              // Redirect to appropriate payment confirmation page based on selected method
-              if (selectedMethod === 'bank_transfer') {
-                window.location.href = '{{ route("payment.confirmation") }}?order=' + orderNumber + '&method=bank_transfer';
-              } else if (selectedMethod === 'e_wallet') {
-                window.location.href = '{{ route("payment.confirmation") }}?order=' + orderNumber + '&method=e_wallet';
+              if (selectedMethod === 'bank_transfer' || selectedMethod === 'e_wallet') {
+                // For bank_transfer and e_wallet, show Midtrans popup directly
+                if (data.snap_token) {
+                  // Show Midtrans Snap popup
+                  snap.pay(data.snap_token, {
+                    onSuccess: function(result) {
+                      /* handle success */
+                      console.log(result);
+                      showNotification('success', 'Pembayaran berhasil! Pesanan akan segera diproses.');
+                      setTimeout(() => {
+                        window.location.href = '{{ route("cust.welcome") }}';
+                      }, 2000);
+                    },
+                    onPending: function(result) {
+                      /* handle pending */
+                      console.log(result);
+                      showNotification('info', 'Pembayaran sedang diproses. Kami akan mengirimkan notifikasi setelah pembayaran diverifikasi.');
+                      setTimeout(() => {
+                        window.location.href = '{{ route("cust.welcome") }}';
+                      }, 2000);
+                    },
+                    onError: function(result) {
+                      /* handle error */
+                      console.log(result);
+                      showNotification('error', 'Pembayaran gagal. Silakan coba lagi.');
+                    },
+                    onClose: function() {
+                      /* handle close */
+                      showNotification('warning', 'Pembayaran dibatalkan. Silakan lanjutkan pembayaran kapan saja.');
+                    }
+                  });
+                } else {
+                  // If no snap token, redirect to confirmation page
+                  window.location.href = '{{ route("payment.confirmation") }}?order=' + orderNumber + '&method=' + selectedMethod;
+                }
               } else {
+                // For other methods, redirect to confirmation page
                 window.location.href = '{{ route("payment.confirmation") }}?order=' + orderNumber + '&method=' + selectedMethod;
               }
             } else {

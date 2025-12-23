@@ -459,7 +459,7 @@ class CheckoutController extends Controller
     public function processPayment(Request $request)
     {
         $request->validate([
-            'payment_method' => 'required|in:bank_transfer,e_wallet,cod',
+            'payment_method' => 'required|in:bank_transfer,e_wallet,cod,midtrans',
             'order_number' => 'required|string'  // Changed: make it required since we're using it in confirmation pages
         ]);
 
@@ -542,7 +542,7 @@ class CheckoutController extends Controller
     {
         $request->validate([
             'order' => 'required|string|exists:orders,order_number',
-            'method' => 'required|in:bank_transfer,e_wallet,cod,midtrans'
+            'method' => 'required|in:e_wallet,cod,midtrans'
         ]);
 
         $order = Order::where('order_number', $request->order)
@@ -554,8 +554,6 @@ class CheckoutController extends Controller
 
         // Return the appropriate view based on payment method
         switch ($request->method) {
-            case 'bank_transfer':
-                return view('customer.transaksi.payment.bank_transfer', compact('order'));
             case 'e_wallet':
                 return view('customer.transaksi.payment.e_wallet', compact('order'));
             case 'cod':

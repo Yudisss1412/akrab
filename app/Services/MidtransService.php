@@ -33,7 +33,7 @@ class MidtransService
                 'email' => $order->user->email,
                 'phone' => $order->shipping_address->phone ?? $order->user->phone,
             ],
-            'item_details' => $this->formatItems($items),
+            'item_details' => $this->formatItems($items, $order),
             'enabled_payments' => ['gopay', 'shopeepay', 'ovo', 'danacita', 'permata_va', 'bca_va', 'bni_va', 'bri_va', 'echannel', 'credit_card'],
         ];
 
@@ -49,9 +49,11 @@ class MidtransService
     /**
      * Format item untuk Midtrans
      */
-    private function formatItems($items)
+    private function formatItems($items, $order)
     {
         $formattedItems = [];
+
+        // Tambahkan item produk
         foreach ($items as $item) {
             $product = $item['product'] ?? null;
             $productVariant = $item['product_variant'] ?? null;
@@ -73,6 +75,27 @@ class MidtransService
                 'name' => $product->name . ($productVariant ? ' (' . $productVariant->name . ')' : ''),
             ];
         }
+
+        // Tambahkan ongkir sebagai item terpisah
+        if ($order->shipping_cost > 0) {
+            $formattedItems[] = [
+                'id' => 'shipping-' . $order->id,
+                'price' => $order->shipping_cost,
+                'quantity' => 1,
+                'name' => 'Ongkos Kirim',
+            ];
+        }
+
+        // Tambahkan asuransi sebagai item terpisah
+        if ($order->insurance_cost > 0) {
+            $formattedItems[] = [
+                'id' => 'insurance-' . $order->id,
+                'price' => $order->insurance_cost,
+                'quantity' => 1,
+                'name' => 'Asuransi Pengiriman',
+            ];
+        }
+
         return $formattedItems;
     }
 

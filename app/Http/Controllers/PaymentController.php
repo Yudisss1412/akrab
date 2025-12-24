@@ -53,7 +53,21 @@ class PaymentController extends Controller
         if ($request->payment_method === 'bank_transfer' || $request->payment_method === 'e_wallet' || $request->payment_method === 'midtrans') {
             // Proses pembayaran Midtrans
             try {
-                $snapToken = $this->midtransService->getSnapToken($order, $order->items->toArray());
+                // Load relasi produk dan varian sebelum mengirim ke Midtrans
+                $orderItems = $order->load('items.product', 'items.variant')->items;
+
+                // Format items untuk dikirim ke Midtrans
+                $itemsForMidtrans = [];
+                foreach ($orderItems as $item) {
+                    $itemsForMidtrans[] = [
+                        'product' => $item->product,
+                        'product_variant' => $item->variant,
+                        'quantity' => $item->quantity,
+                        'unit_price' => $item->unit_price,
+                    ];
+                }
+
+                $snapToken = $this->midtransService->getSnapToken($order, $itemsForMidtrans);
 
                 // Simpan transaction_id di payment record
                 $paymentMethod = $request->payment_method; // Use the original payment method requested

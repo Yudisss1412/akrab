@@ -230,7 +230,7 @@
           formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
 
           // Make AJAX request to process payment
-          fetch('{{ route("payment.process") }}', {
+          fetch('{{ route("payment.process.api") }}', {
             method: 'POST',
             body: formData,
             headers: {

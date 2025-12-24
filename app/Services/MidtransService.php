@@ -53,11 +53,16 @@ class MidtransService
     {
         $formattedItems = [];
         foreach ($items as $item) {
-            $product = $item['product'];
-            $productVariant = $item['product_variant'];
+            $product = $item['product'] ?? null;
+            $productVariant = $item['product_variant'] ?? null;
 
-            $unitPrice = $product->price;
-            if ($productVariant) {
+            if (!$product) {
+                continue; // Skip item jika product tidak ditemukan
+            }
+
+            // Gunakan unit_price dari order item
+            $unitPrice = $item['unit_price'] ?? $item['product']->price;
+            if ($productVariant && !isset($item['unit_price'])) {
                 $unitPrice += $productVariant->additional_price;
             }
 

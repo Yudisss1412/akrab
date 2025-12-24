@@ -475,4 +475,91 @@ class PaymentController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Endpoint untuk mensimulasikan callback pembayaran (development only)
+     */
+    public function simulateCallback(Request $request)
+    {
+        // Hanya untuk development/testing
+        if (app()->environment('production')) {
+            return response()->json(['error' => 'Endpoint ini hanya tersedia di lingkungan development'], 403);
+        }
+
+        $request->validate([
+            'order_number' => 'required|string|exists:orders,order_number',
+            'status' => 'required|in:settlement,capture,success,paid,pending,waiting,cancel,expire,failure,declined',
+            'fraud_status' => 'required|in:accept,deny'
+        ]);
+
+        $order = Order::where('order_number', $request->order_number)
+                     ->where('user_id', Auth::id())
+                     ->first();
+
+        if (!$order) {
+            return response()->json(['success' => false, 'message' => 'Pesanan tidak ditemukan'], 404);
+        }
+
+        $payment = $order->payment;
+
+        if (!$payment) {
+            return response()->json(['success' => false, 'message' => 'Pembayaran tidak ditemukan'], 404);
+        }
+
+        $status = $request->status;
+        $fraudStatus = $request->fraud_status;
+
+        // Update payment record
+        $payment->update([
+            'payment_status' => $status,
+            'paid_at' => in_array($status, ['settlement', 'capture', 'success', 'paid']) ? now() : null,
+            'payment_gateway_response' => [
+                'status' => $status,
+                'fraud_status' => $fraudStatus,
+                'simulated' => true,
+                'timestamp' => now()->toISOString()
+            ]
+        ]);
+
+        // Update status order
+        $newOrderStatus = $order->status; // Default status tidak berubah
+
+        if (in_array($status, ['settlement', 'capture', 'success', 'paid'])) {
+            if ($fraudStatus === 'accept') {
+                $newOrderStatus = 'paid';
+                $order->update([
+                    'status' => $newOrderStatus,
+                    'paid_at' => now()
+                ]);
+            } else {
+                $newOrderStatus = 'pending';
+                $order->update([
+                    'status' => $newOrderStatus
+                ]);
+            }
+        } elseif (in_array($status, ['pending', 'waiting'])) {
+            $newOrderStatus = 'waiting_payment_verification';
+            $order->update([
+                'status' => $newOrderStatus
+            ]);
+        } elseif (in_array($status, ['cancel', 'expire', 'failure', 'declined'])) {
+            $newOrderStatus = 'cancelled';
+            $order->update([
+                'status' => $newOrderStatus
+            ]);
+        }
+
+        // Tambahkan log bahwa pembayaran telah diterima
+        $order->logs()->create([
+            'status' => $newOrderStatus,
+            'description' => 'Pembayaran berhasil disimulasikan melalui endpoint testing. Status: ' . $status . ', Fraud Status: ' . $fraudStatus
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Callback berhasil disimulasikan',
+            'order' => $order->fresh(),
+            'payment' => $payment->fresh()
+        ]);
+    }
 }

@@ -140,7 +140,6 @@ class SellerProductReviewSeeder extends Seeder
                 'origin' => 'China',
                 'warranty' => '1 Tahun Garansi Resmi',
                 'min_order' => 1,
-                'ready_stock' => rand(10, 100),
                 'features' => [
                     'Kualitas terjamin',
                     'Bergaransi resmi',

@@ -13,96 +13,180 @@ class CategorySubcategorySeeder extends Seeder
      */
     public function run(): void
     {
-        // Hapus semua subkategori dan kategori yang lama
+        // Hapus semua subkategori dan kategori yang lama (kecuali role)
         Subcategory::truncate();
-        // Kita akan membuat ulang kategori dengan struktur yang diinginkan
         Category::whereNotIn('name', ['admin', 'seller', 'buyer'])->delete(); // Jaga role tidak terhapus
 
-        // Definisikan kategori dan subkategori yang sesuai permintaan
+        // Definisikan kategori dan subkategori yang lebih spesifik
         $categoriesWithSubcategories = [
             [
-                'category' => 'Kuliner',
+                'category' => [
+                    'name' => 'Makanan & Minuman',
+                    'slug' => 'makanan-minuman',
+                    'description' => 'Temukan berbagai produk makanan dan minuman menarik dari UMKM lokal',
+                ],
                 'subcategories' => [
-                    'Makanan Berat',
-                    'Camilan', 
-                    'Minuman',
-                    'Bumbu & Bahan Masak',
-                    'Kue & Kering',
                     'Makanan Ringan',
-                    'Produk Olahan Susu'
+                    'Makanan Berat',
+                    'Minuman',
+                    'Oleh-oleh Khas',
+                    'Bahan Masakan',
+                    'Bumbu Dapur',
+                    'Camilan Sehat',
+                    'Makanan Beku'
                 ]
             ],
             [
-                'category' => 'Fashion',
+                'category' => [
+                    'name' => 'Pakaian & Aksesori',
+                    'slug' => 'pakaian-aksesori',
+                    'description' => 'Temukan berbagai produk fashion dan aksesori menarik dari UMKM lokal',
+                ],
                 'subcategories' => [
                     'Pakaian Pria',
-                    'Pakaian Wanita', 
+                    'Pakaian Wanita',
                     'Pakaian Anak',
                     'Aksesoris',
-                    'Tas',
                     'Sepatu',
-                    'Perhiasan'
+                    'Tas',
+                    'Perhiasan',
+                    'Jam Tangan'
                 ]
             ],
             [
-                'category' => 'Kerajinan Tangan',
+                'category' => [
+                    'name' => 'Kerajinan & Hobi',
+                    'slug' => 'kerajinan-hobi',
+                    'description' => 'Temukan berbagai produk kerajinan tangan unik dari UMKM lokal',
+                ],
                 'subcategories' => [
-                    'Kerajinan Logam',
+                    'Kerajinan Tangan',
                     'Kerajinan Kayu',
-                    'Kerajinan Kertas', 
                     'Kerajinan Kain',
+                    'Kerajinan Logam',
                     'Kerajinan Tanah Liat',
-                    'Souvenir & Hadiah',
-                    'Alat Tulis Kerajinan'
+                    'Kerajinan Bambu',
+                    'Kerajinan Anyaman',
+                    'Alat Musik Tradisional'
                 ]
             ],
             [
-                'category' => 'Produk Berkebun',
+                'category' => [
+                    'name' => 'Rumah & Taman',
+                    'slug' => 'rumah-taman',
+                    'description' => 'Temukan berbagai produk untuk rumah dan taman dari UMKM lokal',
+                ],
                 'subcategories' => [
+                    'Perabotan Rumah',
+                    'Dekorasi',
+                    'Alat Dapur',
+                    'Perawatan Rumah',
                     'Tanaman Hias',
-                    'Tanaman Buah',
-                    'Tanaman Sayur',
-                    'Tanaman Obat', 
-                    'Pupuk & Nutrisi Tanaman',
                     'Peralatan Berkebun',
-                    'Pot & Media Tanam'
+                    'Pupuk & Nutrisi',
+                    'Pot & Wadah Tanaman'
                 ]
             ],
             [
-                'category' => 'Produk Kesehatan',
+                'category' => [
+                    'name' => 'Kesehatan & Kecantikan',
+                    'slug' => 'kesehatan-kecantikan',
+                    'description' => 'Temukan berbagai produk kesehatan dan kecantikan alami dari UMKM lokal',
+                ],
                 'subcategories' => [
-                    'Vitamin & Suplemen',
+                    'Perawatan Wajah',
+                    'Perawatan Tubuh',
+                    'Perawatan Rambut',
+                    'Suplemen Kesehatan',
                     'Obat Herbal',
                     'Alat Kesehatan',
-                    'Produk Perawatan Diri',
-                    'Produk Terapi',
-                    'Produk Diet & Nutrisi', 
-                    'Alat Bantu Kesehatan'
+                    'Minyak Esensial',
+                    'Perawatan Gigi & Mulut'
                 ]
             ],
             [
-                'category' => 'Mainan',
+                'category' => [
+                    'name' => 'Mainan & Edukasi',
+                    'slug' => 'mainan-edukasi',
+                    'description' => 'Temukan berbagai produk mainan edukatif dari UMKM lokal',
+                ],
                 'subcategories' => [
-                    'Mainan Edukatif',
-                    'Mainan Bayi',
                     'Mainan Anak',
-                    'Mainan Outdoor',
+                    'Alat Peraga Edukatif',
+                    'Puzzle & Permainan Meja',
                     'Boneka & Action Figure',
-                    'Permainan Tradisional',
-                    'Puzzle & Permainan Meja'
+                    'Mainan Musik',
+                    'Mainan Tradisional',
+                    'Buku & Alat Tulis',
+                    'Alat Peraga Montessori'
                 ]
             ],
             [
-                'category' => 'Hampers',
+                'category' => [
+                    'name' => 'Hadiah & Souvenir',
+                    'slug' => 'hadiah-souvenir',
+                    'description' => 'Temukan berbagai produk hadiah dan souvenir menarik dari UMKM lokal',
+                ],
                 'subcategories' => [
-                    'Hampers Makanan',
-                    'Hampers Minuman',
-                    'Hampers Kecantikan',
-                    'Hampers Fashion',
-                    'Hampers Bayi',
-                    'Hampers Kesehatan',
-                    'Hampers Buah & Sayur',
-                    'Hampers Hari Raya'
+                    'Kado Ulang Tahun',
+                    'Kado Pernikahan',
+                    'Souvenir Lebaran',
+                    'Souvenir Natal',
+                    'Souvenir Unik',
+                    'Kerajinan Lokal',
+                    'Produk Khas Daerah',
+                    'Hadiah Kecil'
+                ]
+            ],
+            [
+                'category' => [
+                    'name' => 'Elektronik & Gadget',
+                    'slug' => 'elektronik-gadget',
+                    'description' => 'Berbagai produk elektronik dan gadget terbaru',
+                ],
+                'subcategories' => [
+                    'Handphone & Aksesoris',
+                    'Laptop & Aksesoris',
+                    'Komputer & Perangkat',
+                    'Audio & Video',
+                    'Kamera & Aksesoris',
+                    'Perangkat Jaringan',
+                    'Aksesoris Gadget',
+                    'Smart Home'
+                ]
+            ],
+            [
+                'category' => [
+                    'name' => 'Otomotif',
+                    'slug' => 'otomotif',
+                    'description' => 'Aneka perlengkapan otomotif berkualitas',
+                ],
+                'subcategories' => [
+                    'Spare Part Motor',
+                    'Spare Part Mobil',
+                    'Aksesoris Motor',
+                    'Aksesoris Mobil',
+                    'Perawatan Kendaraan',
+                    'Oli & Pelumas',
+                    'Ban & Velg',
+                    'Audio Mobil'
+                ]
+            ],
+            [
+                'category' => [
+                    'name' => 'Olahraga & Rekreasi',
+                    'slug' => 'olahraga-rekreasi',
+                    'description' => 'Produk-produk untuk olahraga dan rekreasi',
+                ],
+                'subcategories' => [
+                    'Perlengkapan Olahraga',
+                    'Sepatu Olahraga',
+                    'Pakaian Olahraga',
+                    'Alat Fitness',
+                    'Perlengkapan Renang',
+                    'Perlengkapan Camping',
+                    'Perlengkapan Sepeda',
+                    'Mainan Air'
                 ]
             ]
         ];
@@ -110,9 +194,9 @@ class CategorySubcategorySeeder extends Seeder
         foreach ($categoriesWithSubcategories as $data) {
             // Buat kategori
             $category = Category::create([
-                'name' => $data['category'],
-                'slug' => strtolower(str_replace(' ', '-', $data['category'])),
-                'description' => 'Kategori ' . $data['category'] . ' dengan berbagai produk unggulan',
+                'name' => $data['category']['name'],
+                'slug' => $data['category']['slug'],
+                'description' => $data['category']['description'],
                 'status' => 'active'
             ]);
 

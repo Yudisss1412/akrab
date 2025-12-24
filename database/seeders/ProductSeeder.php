@@ -59,7 +59,6 @@ class ProductSeeder extends Seeder
                 'origin' => 'Indonesia',
                 'warranty' => 'Tidak berlaku',
                 'min_order' => 1,
-                'ready_stock' => 100,
                 'features' => [
                     'Renyah dan gurih',
                     'Bumbu balado asli',
@@ -89,7 +88,6 @@ class ProductSeeder extends Seeder
                 'origin' => 'Indonesia',
                 'warranty' => 'Tidak berlaku',
                 'min_order' => 1,
-                'ready_stock' => 50,
                 'features' => [
                     'Paket lengkap oleh-oleh',
                     'Bahan lokal terpilih',
@@ -119,7 +117,6 @@ class ProductSeeder extends Seeder
                 'origin' => 'Indonesia',
                 'warranty' => 'Tidak berlaku',
                 'min_order' => 1,
-                'ready_stock' => 75,
                 'features' => [
                     'Rasa pedas mantap',
                     'Bahan segar',
@@ -150,7 +147,6 @@ class ProductSeeder extends Seeder
                 'origin' => 'Indonesia',
                 'warranty' => 'Tidak ada',
                 'min_order' => 1,
-                'ready_stock' => 40,
                 'features' => [
                     'Batik tulis asli',
                     'Motif tradisional',
@@ -180,7 +176,6 @@ class ProductSeeder extends Seeder
                 'origin' => 'Indonesia',
                 'warranty' => 'Tidak ada',
                 'min_order' => 1,
-                'ready_stock' => 30,
                 'features' => [
                     'Kain asli tenun ikat',
                     'Motif unik dan tradisional',
@@ -210,7 +205,6 @@ class ProductSeeder extends Seeder
                 'origin' => 'Indonesia',
                 'warranty' => 'Garansi jahitan 30 hari',
                 'min_order' => 1,
-                'ready_stock' => 25,
                 'features' => [
                     'Desain modern dengan sentuhan etnik',
                     'Bahan berkualitas tinggi',
@@ -240,7 +234,6 @@ class ProductSeeder extends Seeder
                 'origin' => 'Indonesia',
                 'warranty' => 'Garansi produk 7 hari',
                 'min_order' => 1,
-                'ready_stock' => 35,
                 'features' => [
                     'Anyaman halus dan kuat',
                     'Bahan alami dan tahan lama',
@@ -269,7 +262,6 @@ class ProductSeeder extends Seeder
                 'origin' => 'Indonesia',
                 'warranty' => 'Garansi produk 7 hari',
                 'min_order' => 1,
-                'ready_stock' => 15,
                 'features' => [
                     'Karya seni asli',
                     'Motif khas Toraja',
@@ -298,7 +290,6 @@ class ProductSeeder extends Seeder
                 'origin' => 'Indonesia',
                 'warranty' => 'Garansi produk 7 hari',
                 'min_order' => 1,
-                'ready_stock' => 50,
                 'features' => [
                     'Bahan alami',
                     'Desain unik',
@@ -328,14 +319,13 @@ class ProductSeeder extends Seeder
                 'origin' => 'Indonesia',
                 'warranty' => 'Tidak berlaku',
                 'min_order' => 1,
-                'ready_stock' => 80,
                 'features' => [
                     'Ramah lingkungan',
                     'Meningkatkan kesuburan tanah',
                     'Diperkaya mikroorganisme',
                     'Aman untuk tanaman'
                 ],
-                'category_name' => 'Berkebun'
+                'category_name' => 'Produk Berkebun'
             ],
             [
                 'name' => 'Set Alat Berkebun',
@@ -357,14 +347,13 @@ class ProductSeeder extends Seeder
                 'origin' => 'Indonesia',
                 'warranty' => 'Garansi produk 6 bulan',
                 'min_order' => 1,
-                'ready_stock' => 45,
                 'features' => [
                     'Set lengkap',
                     'Bahan kuat dan tahan karat',
                     'Ergonomis dan nyaman digunakan',
                     'Cocok untuk pemula dan profesional'
                 ],
-                'category_name' => 'Berkebun'
+                'category_name' => 'Produk Berkebun'
             ],
             [
                 'name' => 'Bibit Tomat Cherry',
@@ -387,14 +376,13 @@ class ProductSeeder extends Seeder
                 'origin' => 'Indonesia',
                 'warranty' => 'Tidak berlaku',
                 'min_order' => 1,
-                'ready_stock' => 100,
                 'features' => [
                     'Bibit sehat dan kuat',
                     'Cepat berbuah',
                     'Mudah dirawat',
                     'Buah manis dan lezat'
                 ],
-                'category_name' => 'Berkebun'
+                'category_name' => 'Produk Berkebun'
             ],
             // Produk Kesehatan
             [
@@ -418,14 +406,13 @@ class ProductSeeder extends Seeder
                 'origin' => 'Indonesia',
                 'warranty' => 'Tidak berlaku',
                 'min_order' => 1,
-                'ready_stock' => 60,
                 'features' => [
                     'Murni 100% dari lebah hutan',
                     'Tidak melalui proses pemanasan',
                     'Kaya akan antioksidan',
                     'Khasiat alami'
                 ],
-                'category_name' => 'Kesehatan'
+                'category_name' => 'Produk Kesehatan'
             ],
             [
                 'name' => 'Minyak Kayu Putih',
@@ -448,14 +435,13 @@ class ProductSeeder extends Seeder
                 'origin' => 'Indonesia',
                 'warranty' => 'Tidak berlaku',
                 'min_order' => 1,
-                'ready_stock' => 120,
                 'features' => [
                     'Kandungan 100% eucalyptus',
                     'Aman untuk semua usia',
                     'Tidak mengandung bahan kimia',
                     'Khasiat alami'
                 ],
-                'category_name' => 'Kesehatan'
+                'category_name' => 'Produk Kesehatan'
             ],
             [
                 'name' => 'Jahe Merah Organik',
@@ -479,14 +465,13 @@ class ProductSeeder extends Seeder
                 'origin' => 'Indonesia',
                 'warranty' => 'Tidak berlaku',
                 'min_order' => 1,
-                'ready_stock' => 70,
                 'features' => [
                     'Jahe merah organik',
                     'Bebas pestisida',
                     'Segar dan berkualitas',
                     'Khasiat tinggi'
                 ],
-                'category_name' => 'Kesehatan'
+                'category_name' => 'Produk Kesehatan'
             ],
             // Produk Mainan
             [
@@ -510,7 +495,6 @@ class ProductSeeder extends Seeder
                 'origin' => 'Indonesia',
                 'warranty' => 'Garansi produk 30 hari',
                 'min_order' => 1,
-                'ready_stock' => 40,
                 'features' => [
                     'Aman untuk anak',
                     'Bebas bahan kimia berbahaya',
@@ -540,7 +524,6 @@ class ProductSeeder extends Seeder
                 'origin' => 'Indonesia',
                     'warranty' => 'Garansi produk 30 hari',
                 'min_order' => 1,
-                'ready_stock' => 60,
                 'features' => [
                     'Melatih keterampilan anak',
                     'Bahan aman dan kuat',
@@ -569,7 +552,6 @@ class ProductSeeder extends Seeder
                 'origin' => 'Indonesia',
                 'warranty' => 'Garansi produk 30 hari',
                 'min_order' => 1,
-                'ready_stock' => 80,
                 'features' => [
                     'Mainan daur ulang ramah lingkungan',
                     'Mengajarkan konsep daur ulang',
@@ -595,11 +577,10 @@ class ProductSeeder extends Seeder
                 'material' => 'Makanan dan kemasan',
                 'size' => 'Box 30x20x15 cm',
                 'color' => 'Merah dan emas',
-                'brand' => 'Hamper Spesial',
+                'brand' => 'Hari Raya Spesial',
                 'origin' => 'Indonesia',
                 'warranty' => 'Tidak berlaku',
                 'min_order' => 1,
-                'ready_stock' => 25,
                 'features' => [
                     'Paket lengkap untuk Lebaran',
                     'Kemasan eksklusif',
@@ -628,7 +609,6 @@ class ProductSeeder extends Seeder
                 'origin' => 'Indonesia',
                 'warranty' => 'Tidak berlaku',
                 'min_order' => 1,
-                'ready_stock' => 35,
                 'features' => [
                     'Paket lengkap untuk anak',
                     'Tema ulang tahun',
@@ -657,7 +637,6 @@ class ProductSeeder extends Seeder
                 'origin' => 'Indonesia',
                 'warranty' => 'Tidak berlaku',
                 'min_order' => 1,
-                'ready_stock' => 20,
                 'features' => [
                     'Tema Natal dan Tahun Baru',
                     'Isi premium dan lengkap',
@@ -688,7 +667,6 @@ class ProductSeeder extends Seeder
                 'origin' => 'China',
                 'warranty' => 'Garansi 1 tahun',
                 'min_order' => 1,
-                'ready_stock' => 45,
                 'features' => [
                     'Suara jernih dan bass kuat',
                     'Konektivitas Bluetooth',
@@ -718,7 +696,6 @@ class ProductSeeder extends Seeder
                 'origin' => 'China',
                 'warranty' => 'Garansi 1 tahun',
                 'min_order' => 1,
-                'ready_stock' => 60,
                 'features' => [
                     'Kapasitas besar',
                     'Pengisian cepat',
@@ -748,7 +725,6 @@ class ProductSeeder extends Seeder
                 'origin' => 'Indonesia',
                 'warranty' => 'Tidak ada',
                 'min_order' => 1,
-                'ready_stock' => 100,
                 'features' => [
                     'Ringan dan nyaman',
                     'Bahan aman dan tidak mengganggu kulit',
@@ -778,7 +754,6 @@ class ProductSeeder extends Seeder
                 'origin' => 'Indonesia',
                 'warranty' => 'Garansi 6 bulan',
                 'min_order' => 1,
-                'ready_stock' => 50,
                 'features' => [
                     'Desain minimalis',
                     'Bahan kulit asli',
@@ -809,7 +784,6 @@ class ProductSeeder extends Seeder
                 'origin' => 'Indonesia',
                 'warranty' => 'Garansi 1 tahun',
                 'min_order' => 1,
-                'ready_stock' => 25,
                 'features' => [
                     'Kulit asli premium',
                     'Desain simpel dan elegan',
@@ -840,7 +814,6 @@ class ProductSeeder extends Seeder
                 'origin' => 'Indonesia',
                 'warranty' => 'Garansi 6 bulan',
                 'min_order' => 1,
-                'ready_stock' => 40,
                 'features' => [
                     'Kulit asli kualitas tinggi',
                     'Gesper anti karat',
@@ -873,7 +846,6 @@ class ProductSeeder extends Seeder
                 $product->images()->create([
                     'image_path' => $imagePath,
                     'is_primary' => true,
-                    'sort_order' => 1,
                 ]);
             }
         }

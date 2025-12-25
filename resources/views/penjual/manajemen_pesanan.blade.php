@@ -430,10 +430,45 @@
       border-radius: 6px;
       margin-bottom: 10px;
       font-size: 0.8rem;
+      line-height: 1.3;
     }
 
     .tracking-info p {
-      margin: 0;
+      margin: 3px 0;
+    }
+
+    .tracking-info small {
+      display: block;
+    }
+
+    .order-footer .action-buttons .btn {
+      font-size: 0.85rem;
+      padding: 6px 10px;
+    }
+
+    .order-footer .action-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .order-footer .action-buttons .btn-outline {
+      flex: 0 0 auto;
+    }
+
+    .order-footer .action-buttons-right {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      flex: 0 0 auto;
+      margin-left: auto; /* Mendorong ke kanan */
+    }
+
+    .order-footer .tracking-info {
+      flex: 0 0 auto;
+      min-width: 180px;
     }
   </style>
 </head>
@@ -527,20 +562,26 @@
               </div>
               <div class="action-buttons">
                 <a href="{{ route('penjual.pesanan.show', $order->id) }}" class="btn btn-outline">Lihat Detail</a>
-                @if($order->status === 'pending')
-                  <button class="btn btn-primary" onclick="updateOrderStatus({{ $order->id }}, 'confirmed')">Konfirmasi Pembayaran</button>
-                @elseif($order->status === 'confirmed')
-                  <button class="btn btn-primary" onclick="showShippingModal({{ $order->id }})">Proses Pengiriman</button>
-                @elseif($order->status === 'shipped')
-                  @if($order->tracking_number)
-                    <div class="tracking-info">
-                      <p><small><strong>Resi:</strong> {{ $order->tracking_number }}</small></p>
-                    </div>
-                    <button class="btn btn-primary" onclick="location.reload()">Perbarui</button>
-                  @else
-                    <button class="btn btn-primary" onclick="showShippingModal({{ $order->id }})">Masukkan Resi</button>
-                  @endif
+                @if($order->status === 'shipped' && $order->tracking_number)
+                  <div class="tracking-info">
+                    <p><small><strong>Resi:</strong> {{ $order->tracking_number }}</small></p>
+                  </div>
+                @else
+                  <a href="{{ route('penjual.pesanan') }}" class="btn btn-back">Kembali</a>
                 @endif
+                <div class="action-buttons-right">
+                  @if($order->status === 'pending')
+                    <button class="btn btn-primary" onclick="updateOrderStatus({{ $order->id }}, 'confirmed')">Konfirmasi Pembayaran</button>
+                  @elseif($order->status === 'confirmed')
+                    <button class="btn btn-primary" onclick="showShippingModal({{ $order->id }})">Proses Pengiriman</button>
+                  @elseif($order->status === 'shipped')
+                    @if($order->tracking_number)
+                      <button class="btn btn-primary" onclick="location.reload()">Perbarui</button>
+                    @else
+                      <button class="btn btn-primary" onclick="showShippingModal({{ $order->id }})">Masukkan Resi</button>
+                    @endif
+                  @endif
+                </div>
               </div>
             </div>
           </div>

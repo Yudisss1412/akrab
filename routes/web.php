@@ -646,6 +646,9 @@ Route::get('/api/penjual/pembayaran/pending', [App\Http\Controllers\Seller\Selle
 // Order Invoice Route
 Route::get('/invoice/{order}', [App\Http\Controllers\OrderDetailController::class, 'invoice'])->name('order.invoice');
 
+// Shipping Tracking Route - Simulated tracking page
+Route::get('/shipping-track/{order}', [App\Http\Controllers\ShippingTrackingController::class, 'show'])->name('shipping.track');
+
 // Shipping Label Route - Simple approach
 Route::get('/shipping-label/{order}', function ($order) {
     $orderData = App\Models\Order::where('order_number', $order)->firstOrFail();

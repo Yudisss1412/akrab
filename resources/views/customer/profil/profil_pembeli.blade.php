@@ -841,7 +841,7 @@
           </div>
           <div class="order-actions">
             <a href="/invoice/${order.order_number}" class="btn btn-outline">Lihat Detail</a>
-            ${order.status === 'shipped' ? '<a href="#" class="btn btn-primary">Lacak Pesanan</a>' : ''}
+            ${order.status === 'shipped' ? `<a href="/shipping-track/${order.order_number}" class="btn btn-primary">Lacak Pesanan</a>` : ''}
           </div>
         </div>
       </article>`;

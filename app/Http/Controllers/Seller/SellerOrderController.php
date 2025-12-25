@@ -148,31 +148,20 @@ class SellerOrderController extends Controller
                 $statusData[$appStatus] = 0; // Inisialisasi dengan 0
 
                 // Tambahkan jumlah dari setiap status database yang dipetakan ke status aplikasi ini
-                foreach ($statusMapping as $dbStatus => $mappedStatus) {
-                    if ($mappedStatus === $appStatus && $statusCounts->has($dbStatus)) {
-                        $statusData[$appStatus] += $statusCounts[$dbStatus];
+                foreach ($statusCounts as $dbStatus => $count) {
+                    if ($statusMapping[$dbStatus] === $appStatus) {
+                        $statusData[$appStatus] += $count;
                     }
                 }
             }
 
             \Log::info("Mapped status counts (index function): " . json_encode($statusData));
 
-            \Log::info("Returning statusData from index: " . json_encode($statusData));
+            return view('penjual.manajemen_pesanan', compact('orders', 'statusData'));
         } catch (\Exception $e) {
             \Log::error("Error in index method: " . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
-
-            // Jika terjadi error, tetap berikan data default untuk mencegah crash
-            $orders = collect([]);
-            $statusData = [
-                'pending_payment' => 0,
-                'processing' => 0,
-                'shipping' => 0,
-                'completed' => 0,
-                'cancelled' => 0
-            ];
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat memuat data pesanan.');
         }
-
-        return view('penjual.manajemen_pesanan', compact('orders', 'statusData'));
     }
 
     /**
@@ -180,8 +169,6 @@ class SellerOrderController extends Controller
      */
     public function getOrderStatusCounts()
     {
-        \Log::info("getOrderStatusCounts API endpoint called");
-
         try {
             // Hanya penjual yang bisa mengakses
             $user = Auth::user();
@@ -189,32 +176,21 @@ class SellerOrderController extends Controller
                 return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
             }
 
-            \Log::info("User authenticated: " . $user->id . ", role: " . ($user->role->name ?? 'no role'));
-
             // Ambil ID penjual dari tabel sellers berdasarkan user_id
             $seller = Seller::where('user_id', $user->id)->first();
             if (!$seller) {
-                \Log::info("No seller record found for user: " . $user->id);
                 return response()->json(['success' => false, 'message' => 'Seller record tidak ditemukan'], 403);
             }
-
-            \Log::info("Seller authenticated: " . $user->id . ", seller_id: " . $seller->id);
 
             // Debug: lihat apakah seller_id valid dan berapa banyak produk yang dimiliki (fungsi getOrderStatusCounts)
             \Log::info("Seller ID (getOrderStatusCounts function): " . $seller->id);
             $productCount = DB::table('products')->where('seller_id', $seller->id)->count();
             \Log::info("Product count for seller (getOrderStatusCounts function): " . $productCount);
 
-            // Debug tambahan: cek apakah produk-produk milik seller tersedia di order_items
+            // Debug: cek apakah produk-produk milik seller tersedia di order_items
             $productsForSeller = DB::table('products')->where('seller_id', $seller->id)->get(['id']);
             $productIds = $productsForSeller->pluck('id')->toArray();
             \Log::info("Product IDs for seller (getOrderStatusCounts function): " . json_encode($productIds));
-
-            // Debug: cek apakah ada order_items yang terkait dengan produk milik seller
-            $orderItemsForSellerProducts = DB::table('order_items')
-                ->whereIn('product_id', $productIds)
-                ->get();
-            \Log::info("Order items count for seller products (getOrderStatusCounts function): " . $orderItemsForSellerProducts->count());
 
             // Debug: query untuk mendapatkan semua pesanan yang terkait dengan penjual
             $allOrders = DB::table('orders')
@@ -226,19 +202,7 @@ class SellerOrderController extends Controller
 
             \Log::info("All orders for seller (getOrderStatusCounts function): " . $seller->id . ", count: " . $allOrders->count());
             \Log::info("Order numbers for seller (getOrderStatusCounts function): " . $allOrders->pluck('order_number')->toJson());
-            \Log::info("Order statuses (getOrderStatusCounts function): " . $allOrders->pluck('status')->toJson());
-
-            // Debug tambahan: lihat apakah benar-benar ada order_items dan products untuk seller ini
-            $orderItems = DB::table('order_items')
-                ->join('products', 'order_items.product_id', '=', 'products.id')
-                ->where('products.seller_id', $seller->id)
-                ->count();
-            \Log::info("Order items count for seller: " . $orderItems);
-
-            $products = DB::table('products')
-                ->where('seller_id', $seller->id)
-                ->count();
-            \Log::info("Products count for seller (verification): " . $products);
+            \Log::info("Order statuses for seller (getOrderStatusCounts function): " . $allOrders->pluck('status')->toJson());
 
             // Hitung jumlah pesanan per status dari database
             $statusCounts = DB::table('orders')
@@ -267,15 +231,14 @@ class SellerOrderController extends Controller
                 $statusData[$appStatus] = 0; // Inisialisasi dengan 0
 
                 // Tambahkan jumlah dari setiap status database yang dipetakan ke status aplikasi ini
-                foreach ($statusMapping as $dbStatus => $mappedStatus) {
-                    if ($mappedStatus === $appStatus && $statusCounts->has($dbStatus)) {
-                        $statusData[$appStatus] += $statusCounts[$dbStatus];
+                foreach ($statusCounts as $dbStatus => $count) {
+                    if ($statusMapping[$dbStatus] === $appStatus) {
+                        $statusData[$appStatus] += $count;
                     }
                 }
             }
 
             \Log::info("Mapped status counts (getOrderStatusCounts function): " . json_encode($statusData));
-
             \Log::info("Returning status counts: " . json_encode($statusData));
 
             return response()->json([
@@ -290,6 +253,34 @@ class SellerOrderController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit($id)
+    {
+        // Hanya penjual yang bisa mengakses
+        $user = Auth::user();
+        if (!$user || !$user->role || $user->role->name !== 'seller') {
+            abort(403, 'Akses ditolak. Hanya penjual yang dapat mengakses halaman ini.');
+        }
+
+        // Ambil ID penjual dari tabel sellers berdasarkan user_id
+        $seller = Seller::where('user_id', $user->id)->first();
+        if (!$seller) {
+            abort(403, 'Akses ditolak. Seller record tidak ditemukan.');
+        }
+
+        // Ambil pesanan dengan produk milik penjual ini
+        $order = Order::with(['user', 'items.product', 'items.variant', 'shipping_address', 'logs', 'payment'])
+            ->where('id', $id)
+            ->whereHas('items.product', function ($q) use ($seller) {
+                $q->where('seller_id', $seller->id);
+            })
+            ->firstOrFail();
+
+        return view('penjual.detail_pesanan', compact('order'));
     }
 
     /**
@@ -325,9 +316,9 @@ class SellerOrderController extends Controller
      */
     public function updateStatus(Request $request, $id)
     {
-        // Validasi input
+        // Validasi input - menerima status dalam format database
         $request->validate([
-            'status' => 'required|in:pending_payment,processing,shipping,completed,cancelled'
+            'status' => 'required|in:pending,confirmed,shipped,delivered,cancelled'
         ]);
 
         // Hanya penjual yang bisa mengakses
@@ -367,6 +358,57 @@ class SellerOrderController extends Controller
     }
 
     /**
+     * Update the shipping status and tracking number of the specified order.
+     */
+    public function updateShipping(Request $request, $id)
+    {
+        // Validasi input
+        $request->validate([
+            'tracking_number' => 'required|string|max:255',
+            'shipping_courier' => 'nullable|string|max:255'
+        ]);
+
+        // Hanya penjual yang bisa mengakses
+        $user = Auth::user();
+        if (!$user || !$user->role || $user->role->name !== 'seller') {
+            return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
+        }
+
+        // Ambil ID penjual dari tabel sellers berdasarkan user_id
+        $seller = Seller::where('user_id', $user->id)->first();
+        if (!$seller) {
+            return response()->json(['success' => false, 'message' => 'Akses ditolak. Seller record tidak ditemukan.'], 403);
+        }
+
+        // Ambil pesanan dengan produk milik penjual ini
+        $order = Order::where('id', $id)
+            ->whereHas('items.product', function ($q) use ($seller) {
+                $q->where('seller_id', $seller->id);
+            })
+            ->firstOrFail();
+
+        // Update status menjadi shipped dan tambahkan nomor resi
+        $order->update([
+            'status' => 'shipped',
+            'tracking_number' => $request->tracking_number,
+            'shipping_courier' => $request->shipping_courier
+        ]);
+
+        // Tambahkan log transisi status
+        $order->logs()->create([
+            'status' => 'shipped',
+            'description' => "Pesanan dikirim dengan nomor resi {$request->tracking_number}",
+            'updated_by' => 'seller',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pesanan berhasil dikirim dengan nomor resi',
+            'order' => $order
+        ]);
+    }
+
+    /**
      * API endpoint untuk mendapatkan pesanan terbaru untuk ditampilkan di profil penjual
      */
     public function getRecentOrders()
@@ -392,30 +434,26 @@ class SellerOrderController extends Controller
             ->limit(3)
             ->get();
 
-        // Format data untuk frontend
-        $formattedOrders = $recentOrders->map(function($order) {
-            // Ambil item pertama untuk ditampilkan (bisa disesuaikan)
-            $firstItem = $order->items->first();
+        // Mapping status database ke status aplikasi
+        $statusMapping = [
+            'pending' => 'pending_payment',    // Menunggu Pembayaran
+            'confirmed' => 'processing',       // Diproses
+            'shipped' => 'shipping',           // Dikirim
+            'delivered' => 'completed',        // Selesai
+            'cancelled' => 'cancelled'         // Dibatalkan
+        ];
 
+        $formattedOrders = $recentOrders->map(function ($order) use ($statusMapping) {
+            $appStatus = $statusMapping[$order->status] ?? $order->status;
             return [
                 'id' => $order->id,
                 'order_number' => $order->order_number,
-                'created_at' => $order->created_at->format('d M Y'),
-                'status' => $order->status,
+                'customer_name' => $order->getUserNameAttribute(),
+                'status' => $appStatus,
+                'status_display' => ucfirst(str_replace('_', ' ', $appStatus)),
                 'total_amount' => $order->total_amount,
-                'customer_name' => $order->user->name ?? 'Pelanggan',
-                'product_name' => $firstItem && $firstItem->product ? $firstItem->product->name : 'Produk tidak ditemukan',
-                'product_image' => $firstItem && $firstItem->product ?
-                    ($firstItem->product->main_image ?
-                        asset('storage/' . $firstItem->product->main_image) :
-                        (isset($firstItem->product->image) && $firstItem->product->image ?
-                            asset('storage/' . $firstItem->product->image) :
-                            asset('src/placeholder_produk.png')
-                        )
-                    ) :
-                    asset('src/placeholder_produk.png'),
-                'quantity' => $firstItem ? $firstItem->quantity : 1,
-                'subtotal' => $firstItem ? $firstItem->subtotal : 0
+                'created_at' => $order->created_at->format('d M Y'),
+                'tracking_number' => $order->tracking_number
             ];
         });
 
@@ -425,776 +463,5 @@ class SellerOrderController extends Controller
         ]);
     }
 
-    /**
-     * Display the sales history page for sellers
-     */
-    public function salesHistory(Request $request)
-    {
-        // Hanya penjual yang bisa mengakses
-        $user = Auth::user();
-        if (!$user || !$user->role || $user->role->name !== 'seller') {
-            abort(403, 'Akses ditolak. Hanya penjual yang dapat mengakses halaman ini.');
-        }
-
-        // Ambil ID penjual dari tabel sellers berdasarkan user_id
-        $seller = Seller::where('user_id', $user->id)->first();
-        if (!$seller) {
-            abort(403, 'Akses ditolak. Seller record tidak ditemukan.');
-        }
-
-        // Query builder untuk pesanan selesai berdasarkan produk penjual
-        $query = Order::with(['user', 'items.product', 'items.variant', 'shipping_address', 'logs', 'payment'])
-            ->whereHas('items.product', function ($q) use ($seller) {
-                $q->where('seller_id', $seller->id);
-            })
-            ->where('status', 'delivered') // Hanya tampilkan pesanan yang selesai
-            ->orderBy('created_at', 'desc');
-
-        // Filter berdasarkan pencarian jika ada
-        if ($request->has('search') && $request->search) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('order_number', 'LIKE', "%{$search}%")
-                  ->orWhereHas('user', function ($userQuery) use ($search) {
-                      $userQuery->where('name', 'LIKE', "%{$search}%");
-                  });
-            });
-        }
-
-        // Filter berdasarkan tanggal jika ada
-        if ($request->has('date_filter') && $request->date_filter) {
-            switch ($request->date_filter) {
-                case 'today':
-                    $query->whereDate('created_at', today());
-                    break;
-                case 'this_week':
-                    $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
-                    break;
-                case 'this_month':
-                    $query->whereMonth('created_at', now()->month)
-                          ->whereYear('created_at', now()->year);
-                    break;
-                case 'this_year':
-                    $query->whereYear('created_at', now()->year);
-                    break;
-            }
-        }
-
-        // Pagination hasil
-        $completedOrders = $query->paginate(10)->appends($request->query());
-
-        // Hitung total penjualan (jumlah produk terjual)
-        $totalSales = DB::table('orders')
-            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
-            ->join('products', 'order_items.product_id', '=', 'products.id')
-            ->where('products.seller_id', $seller->id)
-            ->where('orders.status', 'delivered')
-            ->sum('order_items.quantity');
-
-        // Hitung total transaksi selesai
-        $totalTransactions = DB::table('orders')
-            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
-            ->join('products', 'order_items.product_id', '=', 'products.id')
-            ->where('products.seller_id', $seller->id)
-            ->where('orders.status', 'delivered')
-            ->distinct('orders.id')
-            ->count();
-
-        // Hitung pendapatan bulan ini
-        $monthlyRevenue = DB::table('orders')
-            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
-            ->join('products', 'order_items.product_id', '=', 'products.id')
-            ->where('products.seller_id', $seller->id)
-            ->where('orders.status', 'delivered')
-            ->whereMonth('orders.created_at', now()->month)
-            ->whereYear('orders.created_at', now()->year)
-            ->sum('order_items.subtotal');
-
-        // Hitung rata-rata per transaksi
-        $avgPerTransaction = $totalTransactions > 0 ? $monthlyRevenue / $totalTransactions : 0;
-
-        return view('penjual.riwayat_penjualan', compact(
-            'completedOrders',
-            'totalSales',
-            'totalTransactions',
-            'monthlyRevenue',
-            'avgPerTransaction'
-        ));
-    }
-
-    /**
-     * API endpoint to fetch urgent tasks counts for the seller dashboard
-     */
-    public function getUrgentTasks()
-    {
-        // Hanya penjual yang bisa mengakses
-        $user = Auth::user();
-        if (!$user || !$user->role || $user->role->name !== 'seller') {
-            return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
-        }
-
-        // Ambil ID penjual dari tabel sellers berdasarkan user_id
-        $seller = Seller::where('user_id', $user->id)->first();
-        if (!$seller) {
-            return response()->json(['success' => false, 'message' => 'Seller record tidak ditemukan'], 403);
-        }
-
-        // Hitung pesanan yang perlu diproses (status processing atau pending_payment)
-        // Berdasarkan mapping status di fungsi lain, status database adalah: pending, confirmed, shipped, delivered, cancelled
-        // Sedangkan status aplikasi adalah: pending_payment, processing, shipping, completed, cancelled
-        $pendingPaymentCount = DB::table('orders')
-            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
-            ->join('products', 'order_items.product_id', '=', 'products.id')
-            ->where('products.seller_id', $seller->id)
-            ->where('orders.status', 'pending')  // mapping dari pending_payment
-            ->count();
-
-        $processingCount = DB::table('orders')
-            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
-            ->join('products', 'order_items.product_id', '=', 'products.id')
-            ->where('products.seller_id', $seller->id)
-            ->where('orders.status', 'confirmed')  // mapping dari processing
-            ->count();
-
-        // Debug logging untuk memastikan perhitungan benar
-        \Log::info("getUrgentTasks - Current user ID: " . $user->id);
-        \Log::info("getUrgentTasks - Associated seller_id: " . $seller->id);
-        \Log::info("getUrgentTasks - Count of orders with status 'pending' for this seller: " . $pendingPaymentCount);
-        \Log::info("getUrgentTasks - Count of orders with status 'confirmed' for this seller: " . $processingCount);
-        \Log::info("getUrgentTasks - Total urgent pending_orders to return: " . ($pendingPaymentCount + $processingCount));
-
-        $unrepliedChatsCount = 0; // Placeholder - bisa diintegrasikan dengan sistem chat
-
-        // Hitung jumlah review dengan rating 2 ke bawah (komplain)
-        // yang terkait dengan produk milik penjual
-        $newComplaintsCount = \App\Models\Review::whereHas('product', function ($q) use ($seller) {
-                $q->where('seller_id', $seller->id);
-            })
-            ->where('rating', '<=', 2)
-            ->count();
-
-        \Log::info("getUrgentTasks - Count of reviews with rating <= 2 for seller: " . $newComplaintsCount);
-
-        // Hitung jumlah permintaan retur yang belum diproses (status pending)
-        // Catatan: Jika hanya ingin menampilkan review dengan rating rendah, maka
-        // pending_returns bisa diset ke 0 atau dihitung sesuai kebijakan
-        $pendingReturnsCount = \App\Models\ProductReturn::whereHas('orderItem.product', function ($q) use ($seller) {
-                $q->where('seller_id', $seller->id);
-            })
-            ->where('status', 'pending')
-            ->count();
-
-        \Log::info("getUrgentTasks - Count of pending returns for seller: " . $pendingReturnsCount);
-
-        return response()->json([
-            'success' => true,
-            'urgent_tasks' => [
-                'pending_orders' => $pendingPaymentCount + $processingCount,
-                'unreplied_chats' => $unrepliedChatsCount,
-                'new_complaints' => $newComplaintsCount, // Ini sekarang dari review dengan rating <= 2
-                'pending_returns' => $pendingReturnsCount
-            ]
-        ]);
-    }
-
-    /**
-     * Display the complaints and returns page
-     */
-    public function complaintsAndReturns()
-    {
-        // Hanya penjual yang bisa mengakses
-        $user = Auth::user();
-        if (!$user || !$user->role || $user->role->name !== 'seller') {
-            abort(403, 'Akses ditolak. Hanya penjual yang dapat mengakses halaman ini.');
-        }
-
-        // Ambil ID penjual dari tabel sellers berdasarkan user_id
-        $seller = Seller::where('user_id', $user->id)->first();
-        if (!$seller) {
-            abort(403, 'Akses ditolak. Seller record tidak ditemukan.');
-        }
-
-        // Kita tetap kirim data kosong karena sekarang data akan dimuat secara dinamis
-        $complaints = [];
-        $returns = [];
-
-        return view('penjual.komplain_retur', compact('complaints', 'returns'));
-    }
-
-    /**
-     * API endpoint untuk mendapatkan data komplain & retur dalam format JSON
-     */
-    public function getComplaintsAndReturnsJson(Request $request)
-    {
-        error_log("=== COMPLAINTS & RETURNS API DEBUG ===");
-        error_log("Request Params: " . json_encode($request->all()));
-
-        try {
-            // Pastikan penjual tersedia
-            $user = Auth::user();
-            if (!$user) {
-                error_log("=== API DEBUG - User not authenticated ===");
-                return response()->json(['error' => 'User not authenticated'], 401);
-            }
-
-            $seller = Seller::where('user_id', $user->id)->first();
-            if (!$seller) {
-                error_log("=== API DEBUG - Seller not found ===");
-                return response()->json(['error' => 'Seller not found'], 403);
-            }
-
-            $products = $seller->products()->pluck('id')->toArray();
-            error_log("Seller products count: " . count($products));
-
-            // Bangun query dasar untuk reviews (komplain)
-            $reviewsQuery = Review::with(['user', 'product'])->whereIn('product_id', $products);
-
-            // Debug sebelum filter komplain
-            $totalBeforeComplainFilter = $reviewsQuery->count();
-            $allRatingsBefore = $reviewsQuery->pluck('rating')->toArray();
-            error_log("=== DEBUG START ===");
-            error_log("Total reviews BEFORE low rating filter: " . $totalBeforeComplainFilter);
-            error_log("All ratings BEFORE low rating filter: " . json_encode(array_count_values($allRatingsBefore)));
-
-            // Filter untuk rating rendah (komplain) saja - INI ADALAH YANG MEMBUAT ENDPOINT INI KHUSUS UNTUK KOMPLAIN
-            $reviewsQuery->where('rating', '<=', 2);
-
-            // Debug setelah filter komplain
-            $totalAfterLowRating = (clone $reviewsQuery)->count();
-            $ratingsAfterLowRating = (clone $reviewsQuery)->pluck('rating')->toArray();
-            error_log("Total reviews AFTER low rating filter (≤2): " . $totalAfterLowRating);
-            error_log("All ratings AFTER low rating filter: " . json_encode(array_count_values($ratingsAfterLowRating)));
-
-            // Terapkan filter jika ada parameter
-            $filterStar = $request->get('filter_star');
-            if (!empty($filterStar)) {
-                error_log("Applying rating filter: " . $filterStar);
-                $reviewsQuery->where('rating', $filterStar);
-
-                // Debug setelah filter spesifik rating
-                $totalAfterSpecificRating = (clone $reviewsQuery)->count();
-                $ratingsAfterSpecificRating = (clone $reviewsQuery)->pluck('rating')->toArray();
-                error_log("Total reviews AFTER specific rating filter ($filterStar): " . $totalAfterSpecificRating);
-                error_log("Ratings after specific filter: " . json_encode(array_count_values($ratingsAfterSpecificRating)));
-            }
-
-            // Filter berdasarkan status balasan jika ada
-            $filterReply = $request->get('filter_reply');
-            if (!empty($filterReply)) {
-                error_log("Applying reply filter: " . $filterReply);
-                if ($filterReply === 'replied') {
-                    $reviewsQuery->whereNotNull('reply');
-                    error_log("Query now: WHERE reply IS NOT NULL");
-                } else if ($filterReply === 'pending') {
-                    $reviewsQuery->whereNull('reply');
-                    error_log("Query now: WHERE reply IS NULL");
-                }
-
-                // Debug setelah filter reply
-                $totalAfterReplyFilter = (clone $reviewsQuery)->count();
-                $repliesAfterFilter = (clone $reviewsQuery)->get()->map(function($r) {
-                    return !empty($r->reply) ? 'replied' : 'pending';
-                })->toArray();
-                error_log("Total reviews AFTER reply filter: " . $totalAfterReplyFilter);
-                error_log("Reply status after filter: " . json_encode(array_count_values($repliesAfterFilter)));
-            }
-
-            // Urutkan jika ada parameter
-            $sortBy = $request->get('sort_by', 'newest');
-            error_log("Applying sort: " . $sortBy);
-
-            switch ($sortBy) {
-                case 'oldest':
-                    $reviewsQuery->orderBy('created_at', 'asc');
-                    break;
-                case 'highest':
-                    $reviewsQuery->orderBy('rating', 'desc');
-                    break;
-                case 'lowest':
-                    $reviewsQuery->orderBy('rating', 'asc');
-                    break;
-                default: // newest
-                    $reviewsQuery->orderBy('created_at', 'desc');
-                    break;
-            }
-
-            // Ambil hasil dengan pagination
-            $reviews = $reviewsQuery->paginate(10);
-
-            // Format hasil - ambil data user dan produk secara manual untuk menghindari error relasi
-            $formattedReviews = $reviews->map(function($review) {
-                // Ambil nama user secara manual untuk menghindari error relasi
-                $userName = 'Unknown User';
-                try {
-                    $user = \App\Models\User::select(['id', 'name'])->find($review->user_id);
-                    if ($user) {
-                        $userName = $user->name;
-                    }
-                } catch (\Exception $e) {
-                    \Log::warning('Could not load user: ' . $e->getMessage());
-                }
-
-                // Ambil nama dan gambar produk secara manual untuk menghindari error relasi
-                $productName = 'Unknown Product';
-                $productImage = asset('src/product_1.png'); // default image
-                try {
-                    // Gunakan accessor main_image dari model Product
-                    $product = \App\Models\Product::find($review->product_id);
-                    if ($product) {
-                        $productName = $product->name;
-
-                        // Gunakan accessor main_image yang didefinisikan di model
-                        $mainImage = $product->main_image;
-                        if ($mainImage) {
-                            $productImage = asset('storage/' . $mainImage);
-                        } else {
-                            // Fallback ke kolom image jika tidak ada di product_images
-                            if (isset($product->image) && $product->image) {
-                                $productImage = asset('storage/' . $product->image);
-                            }
-                        }
-                    }
-                } catch (\Exception $e) {
-                    \Log::warning('Could not load product: ' . $e->getMessage());
-                }
-
-                return [
-                    'id' => $review->id,
-                    'name' => $userName,
-                    'rating' => $review->rating,
-                    'comment' => $review->review_text,
-                    'date' => $review->created_at->format('j M Y'),
-                    'product' => [
-                        'name' => $productName,
-                        'image' => $productImage
-                    ],
-                    'replied' => !empty($review->reply),
-                    'reply' => $review->reply,
-                    'item_type' => 'review',  // Identifikasi bahwa ini adalah review/ulasan, bukan retur
-                    'source_endpoint' => 'complaints'  // Untuk debugging, tunjukkan ini dari endpoint komplain
-                ];
-            });
-
-            // Tambahkan debugging sebelum response
-            $finalRatings = $reviews->pluck('rating')->toArray();
-            $finalReplyStatus = $reviews->map(function($r) {
-                return !empty($r->reply) ? 'replied' : 'pending';
-            })->toArray();
-
-            error_log("Final results on page:");
-            error_log("- Reviews count: " . $reviews->count());
-            error_log("- Total reviews: " . $reviews->total());
-            error_log("- Ratings distribution: " . json_encode(array_count_values($finalRatings)));
-            error_log("- Reply status distribution: " . json_encode(array_count_values($finalReplyStatus)));
-
-            // Verification: semua rating ≤ 2 (komplain)
-            $allAreComplaints = count(array_filter($finalRatings, function($rating) { return $rating <= 2; })) == count($finalRatings);
-            error_log("Verification - All reviews are complaints (≤2 rating): " . ($allAreComplaints ? 'YES' : 'NO'));
-
-            if (!$allAreComplaints) {
-                $invalidRatings = array_filter($finalRatings, function($rating) { return $rating > 2; });
-                error_log("ERROR - Invalid ratings found (should be ≤2): " . json_encode($invalidRatings));
-            }
-
-            // Verifikasi filter jika diterapkan
-            if ($filterStar) {
-                $allMatchSpecificRating = count(array_filter($finalRatings, function($rating) use ($filterStar) {
-                    return $rating == $filterStar;
-                })) == count($finalRatings);
-                error_log("Rating filter verification - Expected: $filterStar, All match: " . ($allMatchSpecificRating ? 'YES' : 'NO'));
-            }
-
-            if ($filterReply) {
-                $expectedReplyStatus = $filterReply === 'replied';
-                $actualReplyValues = $reviews->pluck('replied')->toArray();
-                $allMatchReply = count(array_filter($actualReplyValues, function($r) use ($expectedReplyStatus) {
-                    return $expectedReplyStatus ? !empty($r) : empty($r);
-                })) == count($actualReplyValues);
-                error_log("Reply filter verification - Expected: $filterReply, All match: " . ($allMatchReply ? 'YES' : 'NO'));
-            }
-
-            error_log("=== COMPLAINTS API RESPONSE SENT ===");
-
-            // Variabel-variabel untuk verifikasi
-            $finalRatings = $reviews->pluck('rating')->toArray();
-            $finalReplyStatus = $reviews->map(function($r) {
-                return !empty($r->reply) ? 'replied' : 'pending';
-            })->toArray();
-            $allAreComplaints = count(array_filter($finalRatings, function($rating) { return $rating <= 2; })) == count($finalRatings);
-
-            // Definisikan $sortBy untuk menghindari error jika tidak didefinisikan
-            $sortBy = $request->get('sort_by', 'newest');
-
-            return response()->json([
-                'reviews' => $formattedReviews,
-                'pagination' => [
-                    'current_page' => $reviews->currentPage(),
-                    'last_page' => $reviews->lastPage(),
-                    'total' => $reviews->total(),
-                    'per_page' => $reviews->perPage()
-                ],
-                'verification_info' => [
-                    'total_reviews_returned' => count($finalRatings),
-                    'all_are_complaints' => $allAreComplaints, // Ini penting: harus selalu TRUE karena endpoint ini untuk komplain
-                    'rating_distribution' => array_count_values($finalRatings),
-                    'reply_status_distribution' => array_count_values($finalReplyStatus),
-                    'filters_applied' => [
-                        'filter_star' => $filterStar,
-                        'filter_reply' => $filterReply,
-                        'sort_by' => $sortBy
-                    ],
-                    'filter_verification' => [
-                        'rating_filter_works' => $filterStar ?
-                            (count(array_unique($finalRatings)) === 1 && in_array((int)$filterStar, $finalRatings)) :
-                            'Not applied',
-                        'reply_filter_works' => $filterReply ?
-                            (count(array_unique($finalReplyStatus)) === 1 && in_array(
-                                $filterReply === 'replied' ? 'replied' : 'pending',
-                                $finalReplyStatus
-                            )) :
-                            'Not applied'
-                    ]
-                ]
-            ]);
-        } catch (\Exception $e) {
-            error_log("API Error: " . $e->getMessage());
-            return response()->json(['error' => 'Internal server error'], 500);
-        }
-    }
-
-    /**
-     * Approve a return request
-     */
-    public function approveReturn($id)
-    {
-        // Hanya penjual yang bisa mengakses
-        $user = Auth::user();
-        if (!$user || !$user->role || $user->role->name !== 'seller') {
-            return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
-        }
-
-        // Ambil ID penjual dari tabel sellers berdasarkan user_id
-        $seller = Seller::where('user_id', $user->id)->first();
-        if (!$seller) {
-            return response()->json(['success' => false, 'message' => 'Seller record tidak ditemukan'], 403);
-        }
-
-        // Ambil permintaan retur
-        $return = \App\Models\ProductReturn::where('id', $id)
-            ->whereHas('orderItem.product', function ($q) use ($seller) {
-                $q->where('seller_id', $seller->id);
-            })
-            ->first();
-
-        if (!$return) {
-            return response()->json(['success' => false, 'message' => 'Permintaan retur tidak ditemukan'], 404);
-        }
-
-        if ($return->status !== 'pending') {
-            return response()->json(['success' => false, 'message' => 'Permintaan retur sudah diproses sebelumnya'], 400);
-        }
-
-        // Update status menjadi approved
-        $return->update([
-            'status' => 'approved',
-            'processed_by' => $user->id,
-            'processed_at' => now()
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Permintaan retur berhasil disetujui'
-        ]);
-    }
-
-    /**
-     * Reject a return request
-     */
-    public function rejectReturn($id)
-    {
-        // Hanya penjual yang bisa mengakses
-        $user = Auth::user();
-        if (!$user || !$user->role || $user->role->name !== 'seller') {
-            return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
-        }
-
-        // Ambil ID penjual dari tabel sellers berdasarkan user_id
-        $seller = Seller::where('user_id', $user->id)->first();
-        if (!$seller) {
-            return response()->json(['success' => false, 'message' => 'Seller record tidak ditemukan'], 403);
-        }
-
-        // Ambil permintaan retur
-        $return = \App\Models\ProductReturn::where('id', $id)
-            ->whereHas('orderItem.product', function ($q) use ($seller) {
-                $q->where('seller_id', $seller->id);
-            })
-            ->first();
-
-        if (!$return) {
-            return response()->json(['success' => false, 'message' => 'Permintaan retur tidak ditemukan'], 404);
-        }
-
-        if ($return->status !== 'pending') {
-            return response()->json(['success' => false, 'message' => 'Permintaan retur sudah diproses sebelumnya'], 400);
-        }
-
-        // Update status menjadi rejected
-        $return->update([
-            'status' => 'rejected',
-            'processed_by' => $user->id,
-            'processed_at' => now()
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Permintaan retur berhasil ditolak'
-        ]);
-    }
-
-    /**
-     * Complete a return request
-     */
-    public function completeReturn($id)
-    {
-        // Hanya penjual yang bisa mengakses
-        $user = Auth::user();
-        if (!$user || !$user->role || $user->role->name !== 'seller') {
-            return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
-        }
-
-        // Ambil ID penjual dari tabel sellers berdasarkan user_id
-        $seller = Seller::where('user_id', $user->id)->first();
-        if (!$seller) {
-            return response()->json(['success' => false, 'message' => 'Seller record tidak ditemukan'], 403);
-        }
-
-        // Ambil permintaan retur
-        $return = \App\Models\ProductReturn::where('id', $id)
-            ->whereHas('orderItem.product', function ($q) use ($seller) {
-                $q->where('seller_id', $seller->id);
-            })
-            ->first();
-
-        if (!$return) {
-            return response()->json(['success' => false, 'message' => 'Permintaan retur tidak ditemukan'], 404);
-        }
-
-        if ($return->status !== 'approved') {
-            return response()->json(['success' => false, 'message' => 'Hanya permintaan retur yang disetujui yang bisa diselesaikan'], 400);
-        }
-
-        // Update status menjadi completed
-        $return->update([
-            'status' => 'completed',
-            'processed_by' => $user->id,
-            'processed_at' => now()
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Permintaan retur berhasil diselesaikan'
-        ]);
-    }
-
-    /**
-     * API endpoint untuk mendapatkan data retur produk untuk ditampilkan di halaman komplain & retur
-     */
-    public function getReturnsData(Request $request)
-    {
-        // Hanya penjual yang bisa mengakses
-        $user = Auth::user();
-        if (!$user || !$user->role || $user->role->name !== 'seller') {
-            return response()->json(['error' => 'Akses ditolak'], 403);
-        }
-
-        // Ambil ID penjual dari tabel sellers berdasarkan user_id
-        $seller = Seller::where('user_id', $user->id)->first();
-        if (!$seller) {
-            return response()->json(['error' => 'Seller record tidak ditemukan'], 403);
-        }
-
-        // Query untuk permintaan retur
-        $returnsQuery = \App\Models\ProductReturn::with(['user', 'orderItem.product'])
-            ->whereHas('orderItem.product', function ($q) use ($seller) {
-                $q->where('seller_id', $seller->id);
-            })
-            ->orderBy('requested_at', 'desc');
-
-        // Filter berdasarkan status jika ada
-        if ($request->has('status') && $request->status) {
-            $returnsQuery->where('status', $request->status);
-        }
-
-        $returns = $returnsQuery->paginate(10);
-
-        $formattedReturns = $returns->map(function($return) {
-            return [
-                'id' => $return->id,
-                'customer_name' => $return->user->name ?? 'Pelanggan',
-                'reason' => $return->reason,
-                'description' => $return->description ?? 'Tidak ada deskripsi',
-                'product_name' => $return->orderItem->product->name ?? 'Produk Tidak Ditemukan',
-                'status' => $return->status,
-                'status_label' => ucfirst(str_replace('_', ' ', $return->status)),
-                'created_at' => $return->requested_at->format('d M Y, H:i'),
-                'refund_amount' => $return->refund_amount,
-                'tracking_number' => $return->tracking_number,
-                'item_type' => 'return',  // Identifikasi bahwa ini adalah data retur, bukan komplain
-                'source_endpoint' => 'returns'  // Untuk debugging, tunjukkan ini dari endpoint retur
-            ];
-        });
-
-        return response()->json([
-            'returns' => $formattedReturns,
-            'pagination' => [
-                'current_page' => $returns->currentPage(),
-                'last_page' => $returns->lastPage(),
-                'total' => $returns->total(),
-                'per_page' => $returns->perPage()
-            ]
-        ]);
-    }
-
-    /**
-     * Display payment verification page for seller - orders waiting for payment verification
-     */
-    public function paymentVerification(Request $request)
-    {
-        // Hanya penjual yang bisa mengakses
-        $user = Auth::user();
-        if (!$user || !$user->role || $user->role->name !== 'seller') {
-            abort(403, 'Akses ditolak. Hanya penjual yang dapat mengakses halaman ini.');
-        }
-
-        // Ambil ID penjual dari tabel sellers berdasarkan user_id
-        $seller = Seller::where('user_id', $user->id)->first();
-        if (!$seller) {
-            abort(403, 'Akses ditolak. Seller record tidak ditemukan.');
-        }
-
-        // Query orders that need payment verification (with proof of payment)
-        $query = Order::with(['user', 'items.product', 'items.variant', 'shipping_address', 'payment'])
-            ->whereHas('items.product', function ($q) use ($seller) {
-                $q->where('seller_id', $seller->id);
-            })
-            ->whereHas('payment', function ($q) {
-                $q->where('payment_status', 'pending_verification')
-                  ->whereNotNull('proof_image');
-            })
-            ->orderBy('created_at', 'desc');
-
-        // Filter berdasarkan pencarian jika ada
-        if ($request->has('search') && $request->search) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('order_number', 'LIKE', "%{$search}%")
-                  ->orWhereHas('user', function ($userQuery) use ($search) {
-                      $userQuery->where('name', 'LIKE', "%{$search}%");
-                  });
-            });
-        }
-
-        $pendingPayments = $query->paginate(10)->appends($request->query());
-
-        // Format data for display
-        $formattedPayments = $pendingPayments->map(function($order) {
-            return [
-                'id' => $order->id,
-                'order_number' => $order->order_number,
-                'customer_name' => $order->user->name ?? 'Pelanggan Tidak Ditemukan',
-                'total_amount' => $order->total_amount,
-                'proof_image' => $order->payment ? asset('storage/' . $order->payment->proof_image) : null,
-                'created_at' => $order->created_at->format('d M Y H:i'),
-                'payment_status' => $order->payment ? $order->payment->payment_status : 'Tidak Ditemukan',
-                'items' => $order->items->map(function($item) {
-                    return [
-                        'product_name' => $item->product->name ?? 'Produk Tidak Ditemukan',
-                        'quantity' => $item->quantity,
-                        'subtotal' => $item->subtotal
-                    ];
-                })
-            ];
-        });
-
-        return view('penjual.payment_verification', compact('pendingPayments'));
-    }
-
-    /**
-     * API endpoint to get pending payments that need verification
-     */
-    public function getPendingPayments(Request $request)
-    {
-        // Hanya penjual yang bisa mengakses
-        $user = Auth::user();
-        if (!$user || !$user->role || $user->role->name !== 'seller') {
-            return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
-        }
-
-        // Ambil ID penjual dari tabel sellers berdasarkan user_id
-        $seller = Seller::where('user_id', $user->id)->first();
-        if (!$seller) {
-            return response()->json(['success' => false, 'message' => 'Seller record tidak ditemukan'], 403);
-        }
-
-        // Query orders that need payment verification (with proof of payment)
-        $query = Order::with(['user', 'items.product', 'payment'])
-            ->whereHas('items.product', function ($q) use ($seller) {
-                $q->where('seller_id', $seller->id);
-            })
-            ->whereHas('payment', function ($q) {
-                $q->where('payment_status', 'pending_verification')
-                  ->whereNotNull('proof_image');
-            })
-            ->orderBy('created_at', 'desc');
-
-        // Apply search filter if provided
-        if ($request->has('search') && $request->search) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('order_number', 'LIKE', "%{$search}%")
-                  ->orWhereHas('user', function ($userQuery) use ($search) {
-                      $userQuery->where('name', 'LIKE', "%{$search}%");
-                  });
-            });
-        }
-
-        $pendingPayments = $query->paginate($request->get('per_page', 10));
-
-        // Format data for API response
-        $formattedPayments = $pendingPayments->map(function($order) {
-            return [
-                'id' => $order->id,
-                'order_number' => $order->order_number,
-                'customer_name' => $order->user->name ?? 'Pelanggan Tidak Ditemukan',
-                'customer_phone' => $order->user->phone ?? 'Tidak Tersedia',
-                'total_amount' => $order->total_amount,
-                'formatted_amount' => 'Rp' . number_format($order->total_amount, 0, ',', '.'),
-                'proof_image' => $order->payment ? asset('storage/' . $order->payment->proof_image) : null,
-                'created_at' => $order->created_at->format('d M Y H:i'),
-                'payment_status' => $order->payment ? $order->payment->payment_status : 'Tidak Ditemukan',
-                'items' => $order->items->map(function($item) {
-                    return [
-                        'product_name' => $item->product->name ?? 'Produk Tidak Ditemukan',
-                        'quantity' => $item->quantity,
-                        'subtotal' => $item->subtotal,
-                        'formatted_subtotal' => 'Rp' . number_format($item->subtotal, 0, ',', '.')
-                    ];
-                })->toArray()
-            ];
-        });
-
-        return response()->json([
-            'success' => true,
-            'data' => $formattedPayments,
-            'pagination' => [
-                'current_page' => $pendingPayments->currentPage(),
-                'last_page' => $pendingPayments->lastPage(),
-                'total' => $pendingPayments->total(),
-                'per_page' => $pendingPayments->perPage(),
-                'from' => $pendingPayments->firstItem(),
-                'to' => $pendingPayments->lastItem()
-            ]
-        ]);
-    }
+    // Fungsi-fungsi lainnya...
 }

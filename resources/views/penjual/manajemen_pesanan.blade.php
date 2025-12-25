@@ -423,6 +423,18 @@
         -webkit-overflow-scrolling: touch;
       }
     }
+
+    .tracking-info {
+      background: #f8f9fa;
+      padding: 8px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      font-size: 0.8rem;
+    }
+
+    .tracking-info p {
+      margin: 0;
+    }
   </style>
 </head>
 <body>
@@ -504,10 +516,10 @@
             <div class="order-footer">
               <div>
                 <span class="status-badge
-                  @if($order->status === 'pending_payment') status-pending-payment
-                  @elseif($order->status === 'processing') status-processing
-                  @elseif($order->status === 'shipping') status-shipping
-                  @elseif($order->status === 'completed') status-completed
+                  @if($order->status === 'pending') status-pending-payment
+                  @elseif($order->status === 'confirmed') status-processing
+                  @elseif($order->status === 'shipped') status-shipping
+                  @elseif($order->status === 'delivered') status-completed
                   @elseif($order->status === 'cancelled') status-cancelled
                   @else status-pending-payment @endif">
                   {{ ucfirst(str_replace('_', ' ', $order->status)) }}
@@ -515,12 +527,19 @@
               </div>
               <div class="action-buttons">
                 <a href="{{ route('penjual.pesanan.show', $order->id) }}" class="btn btn-outline">Lihat Detail</a>
-                @if($order->status === 'pending_payment')
-                  <button class="btn btn-primary" onclick="updateOrderStatus({{ $order->id }}, 'processing')">Konfirmasi Pembayaran</button>
-                @elseif($order->status === 'processing')
-                  <button class="btn btn-primary" onclick="updateOrderStatus({{ $order->id }}, 'shipping')">Proses Pesanan</button>
-                @elseif($order->status === 'shipping')
-                  <button class="btn btn-primary">Lacak Pengiriman</button>
+                @if($order->status === 'pending')
+                  <button class="btn btn-primary" onclick="updateOrderStatus({{ $order->id }}, 'confirmed')">Konfirmasi Pembayaran</button>
+                @elseif($order->status === 'confirmed')
+                  <button class="btn btn-primary" onclick="showShippingModal({{ $order->id }})">Proses Pengiriman</button>
+                @elseif($order->status === 'shipped')
+                  @if($order->tracking_number)
+                    <div class="tracking-info">
+                      <p><small><strong>Resi:</strong> {{ $order->tracking_number }}</small></p>
+                    </div>
+                    <button class="btn btn-primary" onclick="location.reload()">Perbarui</button>
+                  @else
+                    <button class="btn btn-primary" onclick="showShippingModal({{ $order->id }})">Masukkan Resi</button>
+                  @endif
                 @endif
               </div>
             </div>
@@ -737,6 +756,90 @@
       .catch(error => {
         console.error('Error fetching order status counts:', error);
       });
+    }
+
+    // Function to show shipping modal
+    function showShippingModal(orderId) {
+      // Create modal HTML
+      const modalHtml = `
+        <div id="shippingModal" class="modal" style="display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; padding: 50px; box-sizing: border-box;">
+          <div class="modal-content" style="background: white; padding: 20px; border-radius: 8px; max-width: 500px; margin: 0 auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+              <h3 style="margin: 0;">Masukkan Informasi Pengiriman</h3>
+              <span onclick="closeShippingModal()" style="font-size: 24px; cursor: pointer;">&times;</span>
+            </div>
+            <div class="modal-body">
+              <form id="shippingForm">
+                <div class="form-group" style="margin-bottom: 15px;">
+                  <label for="trackingNumber" style="display: block; margin-bottom: 5px;">Nomor Resi:</label>
+                  <input type="text" id="trackingNumber" name="tracking_number" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                  <label for="shippingCourier" style="display: block; margin-bottom: 5px;">Kurir Pengiriman:</label>
+                  <input type="text" id="shippingCourier" name="shipping_courier" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
+                <div class="form-actions" style="margin-top: 20px; text-align: right;">
+                  <button type="button" onclick="closeShippingModal()" class="btn btn-outline" style="margin-right: 10px;">Batal</button>
+                  <button type="submit" class="btn btn-primary">Kirim Barang</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Add modal to body
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+      // Add event listener to form
+      document.getElementById('shippingForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const trackingNumber = document.getElementById('trackingNumber').value;
+        const shippingCourier = document.getElementById('shippingCourier').value;
+
+        updateShippingStatus(orderId, trackingNumber, shippingCourier);
+      });
+    }
+
+    // Function to close shipping modal
+    function closeShippingModal() {
+      const modal = document.getElementById('shippingModal');
+      if (modal) {
+        modal.remove();
+      }
+    }
+
+    // Function to update shipping status with tracking number
+    function updateShippingStatus(orderId, trackingNumber, shippingCourier) {
+      if (confirm('Apakah Anda yakin ingin mengirimkan pesanan ini dengan nomor resi: ' + trackingNumber + '?')) {
+        fetch(`/penjual/pesanan/${orderId}/shipping`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          },
+          body: JSON.stringify({
+            tracking_number: trackingNumber,
+            shipping_courier: shippingCourier
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert(data.message);
+            closeShippingModal();
+            // Refresh page to show updated status
+            location.reload();
+          } else {
+            alert('Gagal mengirimkan pesanan: ' + (data.message || 'Unknown error'));
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Terjadi kesalahan saat mengirimkan pesanan');
+        });
+      }
     }
 
     // Panggil fungsi update saat halaman dimuat

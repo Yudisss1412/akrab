@@ -639,6 +639,7 @@ Route::middleware(['auth'])->get('/debug-filtering', function(\Illuminate\Http\R
 // Order Detail Route - parameter sebagai string karena menggunakan order number
 Route::get('/penjual/pesanan/{order}', [App\Http\Controllers\Seller\SellerOrderController::class, 'show'])->name('penjual.pesanan.show');
 Route::put('/penjual/pesanan/{order}/status', [App\Http\Controllers\Seller\SellerOrderController::class, 'updateStatus'])->name('penjual.pesanan.status.update');
+Route::put('/penjual/pesanan/{order}/shipping', [App\Http\Controllers\Seller\SellerOrderController::class, 'updateShipping'])->name('penjual.pesanan.shipping.update');
 Route::get('/penjual/pembayaran/verifikasi', [App\Http\Controllers\Seller\SellerOrderController::class, 'paymentVerification'])->name('penjual.pembayaran.verifikasi');
 Route::get('/api/penjual/pembayaran/pending', [App\Http\Controllers\Seller\SellerOrderController::class, 'getPendingPayments'])->name('api.penjual.pembayaran.pending');
 

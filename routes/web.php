@@ -403,6 +403,9 @@ Route::get('/kategori', function () {
 })->name('kategori');
 
 // Route untuk masing-masing kategori yang langsung menuju controller
+
+// Route untuk Get Directions
+Route::get('/seller-coordinates/{sellerId}', [App\Http\Controllers\Seller\ProfileController::class, 'getSellerCoordinates'])->name('seller.coordinates');
 Route::get('/kategori/kuliner', function () {
     $controller = new App\Http\Controllers\ProductController();
     return $controller->showCategoryPage('kuliner', request());

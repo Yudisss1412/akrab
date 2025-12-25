@@ -376,3 +376,293 @@ function handleImageError(img) {
   const svgString = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
   img.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(svgString);
 }
+
+/* ---------- GET DIRECTIONS FUNCTIONALITY ---------- */
+async function showDirectionsModal() {
+  // Cek apakah browser mendukung Geolocation
+  if (!navigator.geolocation) {
+    showNotification('Geolocation tidak didukung oleh browser ini.', 'error');
+    return;
+  }
+
+  // Dapatkan ID penjual dari elemen halaman
+  const sellerIdElement = document.querySelector('.toko-identity');
+  if (!sellerIdElement) {
+    showNotification('ID penjual tidak ditemukan.', 'error');
+    return;
+  }
+
+  const sellerId = sellerIdElement.dataset.sellerId;
+  if (!sellerId) {
+    showNotification('ID penjual tidak ditemukan.', 'error');
+    return;
+  }
+
+  try {
+    // Ambil koordinat penjual terlebih dahulu
+    const response = await fetch(`/seller-coordinates/${sellerId}`);
+    if (!response.ok) {
+      if (response.status === 404) {
+        showNotification('Lokasi penjual tidak tersedia.', 'error');
+      } else {
+        showNotification('Gagal mengambil informasi penjual.', 'error');
+      }
+      return;
+    }
+
+    const sellerData = await response.json();
+
+    // Cek apakah respons berisi error
+    if (sellerData.error) {
+      showNotification(sellerData.error, 'error');
+      return;
+    }
+
+    // Cek apakah penjual memiliki koordinat
+    if (!sellerData.lat || !sellerData.lng || isNaN(sellerData.lat) || isNaN(sellerData.lng) ||
+        sellerData.lat === null || sellerData.lng === null) {
+      showNotification('Lokasi penjual belum diatur.', 'error');
+      return;
+    }
+
+    // Tampilkan loading
+    showNotification('Mengambil lokasi Anda...', 'info');
+
+    // Dapatkan lokasi pengguna
+    navigator.geolocation.getCurrentPosition(
+      function(position) {
+        try {
+          // Buat modal untuk menampilkan peta dan rute
+          createDirectionsModal(position.coords, sellerData);
+        } catch (error) {
+          console.error('Error creating directions modal:', error);
+          showNotification('Gagal menampilkan rute. Silakan coba lagi.', 'error');
+        }
+      },
+      function(error) {
+        console.error('Geolocation error:', error);
+        let errorMessage = 'Gagal mendapatkan lokasi Anda: ';
+
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage += 'Izin lokasi ditolak. Silakan aktifkan izin lokasi di pengaturan browser.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage += 'Informasi lokasi tidak tersedia.';
+            break;
+          case error.TIMEOUT:
+            errorMessage += 'Waktu permintaan lokasi habis.';
+            break;
+          default:
+            errorMessage += 'Terjadi kesalahan yang tidak diketahui.';
+            break;
+        }
+
+        showNotification(errorMessage, 'error');
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 60000
+      }
+    );
+  } catch (error) {
+    console.error('Error getting seller coordinates:', error);
+    showNotification('Gagal menghubungi server. Silakan coba lagi.', 'error');
+  }
+}
+
+function createDirectionsModal(userCoords, sellerData) {
+  // Hapus modal sebelumnya jika ada
+  const existingModal = document.querySelector('#directions-modal');
+  if (existingModal) {
+    existingModal.remove();
+  }
+
+  // Buat elemen modal
+  const modal = document.createElement('div');
+  modal.id = 'directions-modal';
+  modal.className = 'directions-modal';
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  `;
+
+  modal.innerHTML = `
+    <div class="directions-modal-content" style="
+      background: white;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 800px;
+      height: 80%;
+      max-height: 600px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    ">
+      <div class="directions-modal-header" style="
+        padding: 20px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      ">
+        <h3 style="margin: 0; color: #333;">Rute ke Toko</h3>
+        <button id="close-directions-modal" style="
+          background: none;
+          border: none;
+          font-size: 24px;
+          cursor: pointer;
+          color: #666;
+        ">&times;</button>
+      </div>
+      <div class="directions-modal-body" style="
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        overflow: hidden;
+      ">
+        <div class="seller-info" style="
+          margin-bottom: 15px;
+          padding: 10px;
+          background-color: #f8f9fa;
+          border-radius: 8px;
+        ">
+          <h4 style="margin: 0 0 5px 0; color: #2c3e50;">${sellerData.name}</h4>
+          <p style="margin: 0; color: #666; font-size: 14px;">${sellerData.address}</p>
+        </div>
+        <div id="map-container" style="
+          flex: 1;
+          border-radius: 8px;
+          overflow: hidden;
+          position: relative;
+        ">
+          <div id="directions-map" style="
+            width: 100%;
+            height: 100%;
+          "></div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  // Tambahkan event listener untuk tombol tutup
+  document.getElementById('close-directions-modal').addEventListener('click', function() {
+    modal.remove();
+  });
+
+  // Tambahkan event listener untuk menutup modal saat klik di luar konten
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) {
+      modal.remove();
+    }
+  });
+
+  // Tampilkan peta dan rute setelah modal dibuat
+  setTimeout(() => {
+    showDirectionsOnMap(userCoords, sellerData);
+  }, 100);
+}
+
+function showDirectionsOnMap(userCoords, sellerData) {
+  // Kita akan menggunakan Leaflet untuk menampilkan peta dan rute
+  // Karena kita tidak bisa menyisipkan Leaflet langsung tanpa library,
+  // kita buat implementasi sederhana dengan iframe OpenStreetMap
+
+  const mapContainer = document.getElementById('directions-map');
+
+  // Buat URL OpenStreetMap directions
+  const osmUrl = `https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=${userCoords.latitude},${userCoords.longitude};${sellerData.lat},${sellerData.lng}#map=13/${sellerData.lat}/${sellerData.lng}`;
+
+  // Tambahkan loading indicator
+  mapContainer.innerHTML = `
+    <div style="
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      background-color: #f8f9fa;
+    ">
+      <div style="
+        text-align: center;
+        color: #666;
+      ">
+        <div class="spinner" style="
+          width: 40px;
+          height: 40px;
+          border: 4px solid #e0e0e0;
+          border-top: 4px solid #006E5C;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin: 0 auto 15px;
+        "></div>
+        <p>Memuat peta rute...</p>
+      </div>
+    </div>
+    <style>
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+  `;
+
+  // Tunggu sebentar lalu ganti dengan iframe
+  setTimeout(() => {
+    mapContainer.innerHTML = `
+      <iframe
+        src="${osmUrl}"
+        width="100%"
+        height="100%"
+        style="border: none;"
+        title="Peta Rute"
+        loading="lazy"
+        onload="this.style.opacity='1';"
+      ></iframe>
+    `;
+  }, 1000); // Tunggu 1 detik untuk loading
+}
+
+// Tambahkan tombol Get Directions ke halaman toko saat DOM siap
+document.addEventListener('DOMContentLoaded', function() {
+  // Cek apakah ini halaman toko
+  const tokoIdentity = document.querySelector('.toko-identity');
+  if (tokoIdentity) {
+    // Tambahkan tombol Get Directions
+    const tokoHeader = document.querySelector('.toko-header') || document.querySelector('.toko-identity');
+    if (tokoHeader) {
+      const directionsButton = document.createElement('button');
+      directionsButton.innerHTML = '🚗 Lihat Rute';
+      directionsButton.className = 'btn-get-directions';
+      directionsButton.style.cssText = `
+        background-color: #006E5C;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-left: 10px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      `;
+
+      directionsButton.addEventListener('click', showDirectionsModal);
+      tokoHeader.appendChild(directionsButton);
+    }
+  }
+});

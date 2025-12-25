@@ -17,7 +17,7 @@
     <div class="container">
       <!-- Header Toko -->
       <div class="toko-header">
-        <div class="toko-identity">
+        <div class="toko-identity" data-seller-id="{{ $seller->id }}">
           <div class="toko-avatar">
             @if($seller->profile_image)
               <img src="{{ asset('storage/' . $seller->profile_image) }}" alt="{{ $seller->store_name }} profile">
@@ -242,9 +242,9 @@
 
       // Ambil data dari server melalui seller object
       // Kita perlu mendapatkan data user terkait dengan seller
-      const address = @json($seller->user->address ?? '');
-      const lat = @json($seller->user->lat);
-      const lng = @json($seller->user->lng);
+      const address = @json($seller->user->address ?? $seller->address ?? '');
+      const lat = @json($seller->user->lat ?? $seller->lat ?? null);
+      const lng = @json($seller->user->lng ?? $seller->lng ?? null);
 
       // Inisialisasi peta setelah DOM sepenuhnya dimuat
       setTimeout(function() {
@@ -256,14 +256,14 @@
 
         try {
           // Jika ada koordinat yang disimpan di database, gunakan langsung
-          if (lat && lng) {
-            const map = L.map('toko-map').setView([lat, lng], 15);
+          if (lat && lng && lat != 'null' && lng != 'null' && lat != 0 && lng != 0 && !isNaN(lat) && !isNaN(lng)) {
+            const map = L.map('toko-map').setView([parseFloat(lat), parseFloat(lng)], 15);
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
               attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
 
-            L.marker([lat, lng]).addTo(map)
+            L.marker([parseFloat(lat), parseFloat(lng)]).addTo(map)
               .bindPopup(address || 'Lokasi Toko').openPopup();
           }
           // Jika tidak ada koordinat disimpan tapi ada alamat, coba geocode

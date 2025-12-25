@@ -310,4 +310,59 @@ class ProfileController extends Controller
             ]
         ]);
     }
+
+    /**
+     * Get seller coordinates for directions
+     */
+    public function getSellerCoordinates($sellerId)
+    {
+        $seller = \App\Models\Seller::with('user')->find($sellerId);
+
+        if (!$seller) {
+            return response()->json(['error' => 'Seller not found'], 404);
+        }
+
+        // Pastikan koordinat valid
+        $lat = null;
+        $lng = null;
+
+        // Cek koordinat di seller terlebih dahulu
+        if ($seller->lat && $seller->lng && $seller->lat != 'null' && $seller->lng != 'null' &&
+            $seller->lat != 0 && $seller->lng != 0 &&
+            !is_null($seller->lat) && !is_null($seller->lng) &&
+            $seller->lat != '' && $seller->lng != '') {
+            $lat = (float)$seller->lat;
+            $lng = (float)$seller->lng;
+        }
+
+        // Jika tidak ditemukan di seller, cek di user
+        if ((!$lat || !$lng) && $seller->user) {
+            if ($seller->user->lat && $seller->user->lng &&
+                $seller->user->lat != 'null' && $seller->user->lng != 'null' &&
+                $seller->user->lat != 0 && $seller->user->lng != 0 &&
+                !is_null($seller->user->lat) && !is_null($seller->user->lng) &&
+                $seller->user->lat != '' && $seller->user->lng != '') {
+                $lat = (float)$seller->user->lat;
+                $lng = (float)$seller->user->lng;
+            }
+        }
+
+        // Jika koordinat masih null, kirimkan informasi debugging
+        if ($lat === null || $lng === null) {
+            \Log::info('Seller coordinates not found', [
+                'seller_id' => $sellerId,
+                'seller_lat' => $seller->lat,
+                'seller_lng' => $seller->lng,
+                'user_lat' => $seller->user ? $seller->user->lat : null,
+                'user_lng' => $seller->user ? $seller->user->lng : null,
+            ]);
+        }
+
+        return response()->json([
+            'lat' => $lat,
+            'lng' => $lng,
+            'name' => $seller->store_name ?? $seller->name,
+            'address' => $seller->address ?? $seller->user->address ?? 'Alamat tidak tersedia'
+        ]);
+    }
 }

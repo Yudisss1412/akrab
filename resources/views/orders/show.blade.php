@@ -406,7 +406,54 @@
                                 <div class="col-12">
                                     <div class="fw-semibold">Nomor Resi</div>
                                     <div>
-                                        <a href="#" class="text-decoration-none">{{ $order->tracking_number }}</a>
+                                        @php
+                                            $trackingUrl = '';
+                                            $courier = strtolower($order->shipping_courier ?? '');
+
+                                            // Mapping untuk beberapa ekspedisi umum di Indonesia
+                                            switch ($courier) {
+                                                case 'jne':
+                                                    $trackingUrl = 'https://www.jne.co.id/id/tracking?waybill=' . $order->tracking_number;
+                                                    break;
+                                                case 'jnt':
+                                                case 'j&t':
+                                                case 'jnt express':
+                                                    $trackingUrl = 'https://www.jet.co.id/track?waybill=' . $order->tracking_number;
+                                                    break;
+                                                case 'sicepat':
+                                                    $trackingUrl = 'https://sicepat.com/track?awb=' . $order->tracking_number;
+                                                    break;
+                                                case 'tiki':
+                                                    $trackingUrl = 'https://www.tiki.id/tracking?track=' . $order->tracking_number;
+                                                    break;
+                                                case 'pos':
+                                                case 'pos indonesia':
+                                                    $trackingUrl = 'https://www.posindonesia.co.id/id/track-and-trace?waybill=' . $order->tracking_number;
+                                                    break;
+                                                case 'anteraja':
+                                                    $trackingUrl = 'https://anteraja.id/waybill?waybill=' . $order->tracking_number;
+                                                    break;
+                                                case 'wahana':
+                                                    $trackingUrl = 'https://www.wahana.com/waybill?waybill=' . $order->tracking_number;
+                                                    break;
+                                                case 'ninja van':
+                                                case 'ninjavan':
+                                                    $trackingUrl = 'https://www.ninjavan.co/id/track?search=' . $order->tracking_number;
+                                                    break;
+                                                default:
+                                                    // Jika kurir tidak dikenali, coba beberapa situs pelacakan umum
+                                                    $trackingUrl = '#';
+                                            }
+                                        @endphp
+                                        @if($trackingUrl !== '#')
+                                            <a href="{{ $trackingUrl }}" target="_blank" class="text-decoration-none">
+                                                <i class="bi bi-box-seam me-1"></i>{{ $order->tracking_number }}
+                                                <i class="bi bi-box-arrow-up-right ms-1"></i>
+                                            </a>
+                                        @else
+                                            <span class="text-muted">{{ $order->tracking_number }}</span>
+                                            <small class="d-block text-muted">Kurir tidak dikenali untuk pelacakan otomatis</small>
+                                        @endif
                                     </div>
                                 </div>
                             </div>

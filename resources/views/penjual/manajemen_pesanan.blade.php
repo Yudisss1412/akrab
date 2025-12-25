@@ -576,7 +576,7 @@
                     <button class="btn btn-primary" onclick="showShippingModal({{ $order->id }})">Proses Pengiriman</button>
                   @elseif($order->status === 'shipped')
                     @if($order->tracking_number)
-                      <button class="btn btn-primary" onclick="location.reload()">Perbarui</button>
+                      <button class="btn btn-primary" onclick="console.log('Reloading page...'); location.reload();">Perbarui</button>
                     @else
                       <button class="btn btn-primary" onclick="showShippingModal({{ $order->id }})">Masukkan Resi</button>
                     @endif

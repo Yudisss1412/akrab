@@ -56,6 +56,16 @@ class DatabaseSeeder extends Seeder
             SellerProductReviewSeeder::class,
         ]);
 
+        // Jalankan seeder untuk mengisi alamat dan deskripsi toko
+        $this->call([
+            SellerAddressDescriptionSeeder::class,
+        ]);
+
+        // Jalankan seeder untuk mengisi data kontak dan bank penjual
+        $this->call([
+            RandomSellerDataSeeder::class,
+        ]);
+
         // Cek data
         $this->checkData();
     }

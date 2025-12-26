@@ -620,18 +620,62 @@
       }, 5000);
     }
 
-    // Fungsi untuk melaporkan pesanan yang belum diterima
-    function reportUndeliveredOrder(orderNumber) {
+    // Fungsi untuk melaporkan pesanan yang belum diterima - V3
+    function reportUndeliveredOrderV2(orderNumber) {
       if (confirm('Apakah Anda yakin ingin melaporkan bahwa pesanan ini belum diterima?')) {
-        fetch(`/api/orders/${orderNumber}/report-undelivered`, {
+        // Dapatkan CSRF token
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        if (!csrfToken) {
+          console.error('CSRF token tidak ditemukan');
+          showNotification('Terjadi kesalahan: CSRF token tidak ditemukan', 'error');
+          return;
+        }
+
+        const tokenValue = csrfToken.getAttribute('content');
+        console.log('Mengirim laporan untuk order:', orderNumber);
+        console.log('CSRF Token:', tokenValue);
+
+        // Gunakan URL yang sesuai dengan route yang baru ditambahkan (tanpa /api/ prefix)
+        fetch(`/orders/${orderNumber}/report-undelivered`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            'X-CSRF-TOKEN': tokenValue,
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
           }
         })
-        .then(response => response.json())
+        .then(async response => {
+          console.log('Response status:', response.status);
+
+          if (!response.ok) {
+            // Jika respons bukan ok, baca teksnya untuk melihat apa yang dikembalikan
+            const text = await response.text();
+            console.log('Response text:', text);
+
+            // Cek apakah respons adalah HTML (menunjukkan error page atau redirect)
+            if (text.includes('<!DOCTYPE') || text.includes('<html')) {
+              // Cek apakah ini redirect ke halaman login
+              if (text.toLowerCase().includes('login') || text.toLowerCase().includes('auth')) {
+                throw new Error('401 - Anda harus login terlebih dahulu');
+              }
+              throw new Error('Server mengembalikan halaman error, bukan data JSON');
+            }
+
+            // Jika bukan HTML, coba parsing sebagai JSON
+            try {
+              const errorData = JSON.parse(text);
+              throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+            } catch (e) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+          }
+
+          // Jika respons OK, parsing JSON
+          return response.json();
+        })
         .then(data => {
+          console.log('Response data:', data);
           if (data.success) {
             showNotification('Laporan berhasil dikirim. Status pesanan telah diperbarui.', 'success');
             setTimeout(() => {
@@ -642,8 +686,21 @@
           }
         })
         .catch(error => {
-          console.error('Error:', error);
-          showNotification('Terjadi kesalahan saat mengirim laporan', 'error');
+          console.error('Error saat mengirim laporan:', error);
+          // Tampilkan pesan error yang lebih spesifik
+          if (error.message.includes('404')) {
+            showNotification('Gagal mengirim laporan: Endpoint tidak ditemukan (404)', 'error');
+          } else if (error.message.includes('403')) {
+            showNotification('Gagal mengirim laporan: Anda tidak memiliki izin (403)', 'error');
+          } else if (error.message.includes('401')) {
+            showNotification('Gagal mengirim laporan: Anda harus login terlebih dahulu (401)', 'error');
+          } else if (error.message.includes('400')) {
+            showNotification('Gagal mengirim laporan: Permintaan tidak valid (400) - mungkin pesanan tidak dalam status yang benar', 'error');
+          } else if (error.message.includes('Server mengembalikan halaman error')) {
+            showNotification('Gagal mengirim laporan: Server mengalami masalah', 'error');
+          } else {
+            showNotification('Terjadi kesalahan saat mengirim laporan: ' + error.message, 'error');
+          }
         });
       }
     }
@@ -924,7 +981,7 @@
               ${order.status === 'shipped' ? `<a href="/shipping-track/${order.order_number}" class="btn btn-primary">Lacak Pesanan</a>` : ''}
             </div>
             <div class="right-actions">
-              ${(order.status === 'shipped' || order.status === 'delivered') ? `<button type="button" class="btn-report" onclick="reportUndeliveredOrder('${order.order_number}')">Laporkan Barang Belum Diterima</button>` : ''}
+              ${(order.status === 'delivered') ? `<button type="button" class="btn-report" onclick="reportUndeliveredOrderV2('${order.order_number}')">Laporkan Barang Belum Diterima</button>` : ''}
             </div>
           </div>
         </div>

@@ -21,6 +21,11 @@ class Kernel extends ConsoleKernel
         $schedule->command('orders:auto-update-delivered')
                  ->daily()
                  ->withoutOverlapping();
+
+        // Jalankan command update status pesanan otomatis berdasarkan estimasi waktu pengiriman
+        $schedule->command('order:update-status')
+                 ->everyMinute() // Jalankan setiap menit untuk update status otomatis
+                 ->withoutOverlapping();
     }
 
     /**

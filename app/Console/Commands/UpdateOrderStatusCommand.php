@@ -1,0 +1,109 @@
+<?php
+
+namespace App\Console\Commands;
+
+use Illuminate\Console\Command;
+use App\Models\Order;
+
+class UpdateOrderStatusCommand extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'order:update-status {--test : Hanya menampilkan pesanan yang akan diupdate tanpa benar-benar mengupdate}';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Mengupdate status pesanan otomatis berdasarkan estimasi waktu pengiriman';
+
+    /**
+     * Execute the console command.
+     */
+    public function handle()
+    {
+        $isTest = $this->option('test');
+
+        if ($isTest) {
+            $this->info('Menjalankan dalam mode test - hanya menampilkan pesanan yang akan diupdate...');
+        } else {
+            $this->info('Memulai proses update status pesanan...');
+        }
+
+        // Ambil semua pesanan dengan status 'shipped'
+        $orders = Order::where('status', 'shipped')->get();
+
+        $updatedCount = 0;
+
+        foreach ($orders as $order) {
+            // Hitung batas waktu berdasarkan kurir
+            $timeLimitInMinutes = $this->getDeliveryTimeLimit($order->shipping_courier);
+
+            // Cari log terakhir dengan status 'shipped' untuk mendapatkan waktu pengiriman yang akurat
+            $shippedLog = $order->logs()
+                ->where('status', 'shipped')
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            // Jika tidak ditemukan log 'shipped', gunakan waktu saat pesanan dibuat
+            $shippedAt = $shippedLog ? $shippedLog->created_at : $order->created_at;
+
+            // Hitung waktu batas (waktu saat status berubah menjadi shipped + batas waktu)
+            $deadline = $shippedAt->addMinutes($timeLimitInMinutes);
+
+            // Jika waktu sekarang sudah melewati batas waktu
+            if (now()->gte($deadline)) {
+                if ($isTest) {
+                    $this->info("Order {$order->order_number} akan diupdate menjadi delivered (waktu: {$deadline}, kurir: {$order->shipping_courier})");
+                } else {
+                    // Update status menjadi 'delivered'
+                    $order->update([
+                        'status' => 'delivered'
+                    ]);
+
+                    // Tambahkan log untuk perubahan status
+                    $order->logs()->create([
+                        'status' => 'delivered',
+                        'description' => 'Status pesanan diubah otomatis menjadi diterima karena telah melewati batas waktu pengiriman',
+                        'updated_by' => 'system',
+                    ]);
+
+                    $this->info("Order {$order->order_number} status diubah menjadi delivered");
+                }
+                $updatedCount++;
+            }
+        }
+
+        if ($isTest) {
+            $this->info("Proses test selesai. {$updatedCount} pesanan akan diupdate jika dijalankan tanpa mode test.");
+        } else {
+            $this->info("Proses update status pesanan selesai. {$updatedCount} pesanan diperbarui.");
+        }
+    }
+
+    /**
+     * Fungsi untuk menghitung batas waktu berdasarkan kurir
+     */
+    private function getDeliveryTimeLimit($courier) {
+        $courier = strtolower($courier);
+
+        switch ($courier) {
+            case 'reguler':
+            case 'regular':
+                return 10; // 10 menit
+            case 'kilat':
+            case 'express':
+            case 'instant':
+                return 5; // 5 menit
+            case 'same day':
+            case 'sameday':
+                return 2; // 2 menit
+            default:
+                return 10; // Default ke 10 menit untuk reguler
+        }
+    }
+}

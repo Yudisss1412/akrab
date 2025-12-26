@@ -685,6 +685,12 @@ Route::post('/payment/midtrans/callback', [App\Http\Controllers\PaymentControlle
 
     // Endpoint untuk testing/callback simulation (development only)
     Route::post('/payment/simulate-callback', [App\Http\Controllers\PaymentController::class, 'simulateCallback'])->name('payment.simulate-callback');
+
+    // API route for reporting undelivered orders (duplicate without /api/ prefix for web access)
+    Route::post('/orders/{order}/report-undelivered', [App\Http\Controllers\OrderDetailController::class, 'reportUndelivered'])->name('order.report.undelivered.web');
+
+    // Customer-specific route for reporting undelivered orders (simplified)
+    Route::post('/customer/orders/{order}/report-undelivered', [App\Http\Controllers\OrderDetailController::class, 'reportUndelivered'])->name('customer.order.report.undelivered');
 });
 
 // Withdrawal Routes

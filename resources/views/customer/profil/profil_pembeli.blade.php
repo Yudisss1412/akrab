@@ -8,6 +8,40 @@
 
 @push('styles')
   <link rel="stylesheet" href="{{ asset('css/customer/profil/profil_pembeli.css') }}">
+  <style>
+    .order-actions {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      width: 100% !important;
+    }
+
+    .left-actions {
+      display: flex !important;
+      gap: 0.5rem !important;
+    }
+
+    .right-actions {
+      display: flex !important;
+    }
+
+    .btn-report {
+      background: none !important;
+      border: none !important;
+      color: #006E5C !important;
+      text-decoration: underline !important;
+      cursor: pointer !important;
+      padding: 0.5rem 0 !important;
+      font-size: 0.85rem !important;
+      font-weight: 500 !important;
+      white-space: nowrap !important;
+      display: inline-block !important;
+    }
+
+    .btn-report:hover {
+      color: #005a4a !important;
+    }
+  </style>
 @endpush
 
 @section('content')
@@ -537,36 +571,81 @@
 
     // ====== Notification ======
     function showNotification(message, type = 'info') {
+      // Hapus notifikasi sebelumnya jika ada
+      const existingNotification = document.querySelector('.notification');
+      if (existingNotification) {
+        existingNotification.remove();
+      }
+
       // Buat elemen notifikasi
       const notification = document.createElement('div');
       notification.className = `notification notification-${type}`;
       notification.textContent = message;
-      
+
       // Gaya dasar untuk notifikasi
       Object.assign(notification.style, {
         position: 'fixed',
         top: '20px',
         right: '20px',
-        padding: '12px 20px',
-        borderRadius: '6px',
+        padding: '15px 20px',
+        borderRadius: '8px',
         color: '#fff',
-        backgroundColor: type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : '#007bff',
+        fontWeight: '500',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
         zIndex: '9999',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-        fontSize: '14px',
-        maxWidth: '400px',
-        wordWrap: 'break-word'
+        transform: 'translateX(400px)',
+        transition: 'transform 0.3s ease-in-out',
+        maxWidth: '350px',
+        background: type === 'error' ? 'linear-gradient(135deg, #ff5252, #e53935)' :
+                   type === 'success' ? 'linear-gradient(135deg, #00c853, #009624)' :
+                   'linear-gradient(135deg, #2979ff, #2962ff)'
       });
-      
+
       // Tambahkan ke body
       document.body.appendChild(notification);
-      
-      // Hapus notifikasi setelah 3 detik
+
+      // Tampilkan notifikasi
       setTimeout(() => {
-        if (notification.parentNode) {
-          notification.parentNode.removeChild(notification);
-        }
-      }, 3000);
+        notification.style.transform = 'translateX(0)';
+      }, 100);
+
+      // Hapus notifikasi setelah 5 detik
+      setTimeout(() => {
+        notification.style.transform = 'translateX(400px)';
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+          }
+        }, 300);
+      }, 5000);
+    }
+
+    // Fungsi untuk melaporkan pesanan yang belum diterima
+    function reportUndeliveredOrder(orderNumber) {
+      if (confirm('Apakah Anda yakin ingin melaporkan bahwa pesanan ini belum diterima?')) {
+        fetch(`/api/orders/${orderNumber}/report-undelivered`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            showNotification('Laporan berhasil dikirim. Status pesanan telah diperbarui.', 'success');
+            setTimeout(() => {
+              location.reload(); // Refresh halaman untuk menampilkan status terbaru
+            }, 1500);
+          } else {
+            showNotification('Gagal mengirim laporan: ' + (data.message || 'Terjadi kesalahan'), 'error');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showNotification('Terjadi kesalahan saat mengirim laporan', 'error');
+        });
+      }
     }
 
     // ====== Init ======
@@ -840,8 +919,13 @@
             ${additionalItemsCount > 0 ? `<span class="item-count">+${additionalItemsCount} item lainnya</span>` : ''}
           </div>
           <div class="order-actions">
-            <a href="/invoice/${order.order_number}" class="btn btn-outline">Lihat Detail</a>
-            ${order.status === 'shipped' ? `<a href="/shipping-track/${order.order_number}" class="btn btn-primary">Lacak Pesanan</a>` : ''}
+            <div class="left-actions">
+              <a href="/invoice/${order.order_number}" class="btn btn-outline">Lihat Detail</a>
+              ${order.status === 'shipped' ? `<a href="/shipping-track/${order.order_number}" class="btn btn-primary">Lacak Pesanan</a>` : ''}
+            </div>
+            <div class="right-actions">
+              ${(order.status === 'shipped' || order.status === 'delivered') ? `<button type="button" class="btn-report" onclick="reportUndeliveredOrder('${order.order_number}')">Laporkan Barang Belum Diterima</button>` : ''}
+            </div>
           </div>
         </div>
       </article>`;

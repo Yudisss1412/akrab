@@ -266,6 +266,38 @@
       justify-content: center;
       gap: 0.5rem;
     }
+
+    /* Styling untuk notifikasi */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 20px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 9999;
+      transform: translateX(400px);
+      transition: transform 0.3s ease-in-out;
+      max-width: 350px;
+    }
+
+    .notification.show {
+      transform: translateX(0);
+    }
+
+    .notification.success {
+      background: linear-gradient(135deg, #00c853, #009624);
+    }
+
+    .notification.error {
+      background: linear-gradient(135deg, #ff5252, #e53935);
+    }
+
+    .notification.info {
+      background: linear-gradient(135deg, #2979ff, #2962ff);
+    }
     </style>
 </head>
 <body>
@@ -459,20 +491,6 @@
                                 </div>
                             </div>
                             @endif
-
-                            @if($order->status === 'delivered')
-                            <div class="row mb-2">
-                                <div class="col-12">
-                                    <div class="alert alert-info">
-                                        <i class="bi bi-info-circle me-1"></i>
-                                        Pesanan ini telah ditandai sebagai diterima. Jika Anda belum menerima pesanan ini, silakan laporkan:
-                                        <button type="button" class="btn btn-link p-0 ms-2 text-decoration-underline" onclick="reportUndeliveredOrder('{{ $order->order_number }}')">
-                                            Laporkan Barang Belum Diterima
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            @endif
                             <button class="btn btn-outline btn-sm mt-2">
                                 <i class="bi bi-clipboard"></i> Salin Alamat
                             </button>
@@ -640,6 +658,37 @@
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        function showNotification(message, type = 'info') {
+            // Hapus notifikasi sebelumnya jika ada
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+
+            // Buat elemen notifikasi
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+
+            // Tambahkan ke body
+            document.body.appendChild(notification);
+
+            // Tampilkan notifikasi
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+
+            // Hapus notifikasi setelah 5 detik
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 5000);
+        }
+
         function reportUndeliveredOrder(orderNumber) {
             if (confirm('Apakah Anda yakin ingin melaporkan bahwa pesanan ini belum diterima?')) {
                 // Kirim permintaan ke server untuk mengubah status kembali ke 'shipped'
@@ -653,15 +702,17 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert('Laporan berhasil dikirim. Status pesanan telah diperbarui.');
-                        location.reload(); // Refresh halaman untuk menampilkan status terbaru
+                        showNotification('Laporan berhasil dikirim. Status pesanan telah diperbarui.', 'success');
+                        setTimeout(() => {
+                            location.reload(); // Refresh halaman untuk menampilkan status terbaru
+                        }, 1500);
                     } else {
-                        alert('Gagal mengirim laporan: ' + (data.message || 'Terjadi kesalahan'));
+                        showNotification('Gagal mengirim laporan: ' + (data.message || 'Terjadi kesalahan'), 'error');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('Terjadi kesalahan saat mengirim laporan');
+                    showNotification('Terjadi kesalahan saat mengirim laporan', 'error');
                 });
             }
         }

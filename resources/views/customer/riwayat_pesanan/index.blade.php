@@ -53,7 +53,7 @@
                       @endif
                     @endif
                   </div>
-                  
+
                   <div class="order-actions">
                     <a href="{{ route('order.invoice', ['order' => $order['order_number']]) }}" class="btn btn-outline">Lihat Detail</a>
                   </div>

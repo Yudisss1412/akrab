@@ -36,19 +36,19 @@ class AutoUpdateDeliveredOrders extends Command
         $updatedCount = 0;
 
         foreach ($orders as $order) {
-            // Tentukan threshold berdasarkan jenis pengiriman
-            $thresholdDays = 7; // default
+            // Tentukan threshold berdasarkan jenis pengiriman (untuk pengujian, gunakan menit)
+            $thresholdMinutes = 15; // default
 
             // Jika ada kolom shipping_method di order, gunakan untuk menentukan threshold
             if ($order->shipping_courier) {
                 $shippingMethod = strtolower($order->shipping_courier);
 
                 if (strpos($shippingMethod, 'same_day') !== false || strpos($shippingMethod, 'same day') !== false) {
-                    $thresholdDays = 2; // Same day: 2 hari threshold
+                    $thresholdMinutes = 2; // Same day: 2 menit threshold
                 } elseif (strpos($shippingMethod, 'express') !== false || strpos($shippingMethod, 'kilat') !== false || strpos($shippingMethod, 'instant') !== false) {
-                    $thresholdDays = 3; // Express/Kilat: 3 hari threshold
+                    $thresholdMinutes = 5; // Express/Kilat: 5 menit threshold
                 } elseif (strpos($shippingMethod, 'reguler') !== false || strpos($shippingMethod, 'regular') !== false) {
-                    $thresholdDays = 7; // Reguler: 7 hari threshold
+                    $thresholdMinutes = 10; // Reguler: 10 menit threshold
                 }
             }
 
@@ -61,36 +61,36 @@ class AutoUpdateDeliveredOrders extends Command
             if ($shippedLog) {
                 // Periksa apakah sudah melewati threshold sejak status menjadi shipped
                 $shippedAt = $shippedLog->created_at;
-                if ($shippedAt->addDays($thresholdDays)->lte(now())) {
+                if ($shippedAt->addMinutes($thresholdMinutes)->lte(now())) {
                     // Update status ke delivered
                     $order->update(['status' => 'delivered']);
 
                     // Tambahkan log bahwa status telah diupdate otomatis
                     $order->logs()->create([
                         'status' => 'delivered',
-                        'description' => "Status pesanan diubah otomatis menjadi diterima setelah melewati estimasi waktu pengiriman ({$order->shipping_courier}: {$thresholdDays} hari)",
+                        'description' => "Status pesanan diubah otomatis menjadi diterima setelah melewati estimasi waktu pengiriman ({$order->shipping_courier}: {$thresholdMinutes} menit)",
                         'updated_by' => 'system',
                     ]);
 
                     $updatedCount++;
-                    $this->info("Order {$order->order_number} diupdate ke status delivered ({$order->shipping_courier}, {$thresholdDays} hari, shipped on {$shippedAt->format('Y-m-d H:i:s')})");
+                    $this->info("Order {$order->order_number} diupdate ke status delivered ({$order->shipping_courier}, {$thresholdMinutes} menit, shipped on {$shippedAt->format('Y-m-d H:i:s')})");
                 }
             } else {
                 // Jika tidak ditemukan log 'shipped', gunakan created_at sebagai fallback
                 $shippedAt = $order->created_at;
-                if ($shippedAt->addDays($thresholdDays)->lte(now())) {
+                if ($shippedAt->addMinutes($thresholdMinutes)->lte(now())) {
                     // Update status ke delivered
                     $order->update(['status' => 'delivered']);
 
                     // Tambahkan log bahwa status telah diupdate otomatis
                     $order->logs()->create([
                         'status' => 'delivered',
-                        'description' => "Status pesanan diubah otomatis menjadi diterima setelah melewati estimasi waktu pengiriman (fallback, {$order->shipping_courier}: {$thresholdDays} hari)",
+                        'description' => "Status pesanan diubah otomatis menjadi diterima setelah melewati estimasi waktu pengiriman (fallback, {$order->shipping_courier}: {$thresholdMinutes} menit)",
                         'updated_by' => 'system',
                     ]);
 
                     $updatedCount++;
-                    $this->info("Order {$order->order_number} diupdate ke status delivered (fallback, {$order->shipping_courier}, {$thresholdDays} hari, created on {$shippedAt->format('Y-m-d H:i:s')})");
+                    $this->info("Order {$order->order_number} diupdate ke status delivered (fallback, {$order->shipping_courier}, {$thresholdMinutes} menit, created on {$shippedAt->format('Y-m-d H:i:s')})");
                 }
             }
         }

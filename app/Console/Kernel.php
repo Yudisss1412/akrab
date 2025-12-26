@@ -16,6 +16,11 @@ class Kernel extends ConsoleKernel
         $schedule->command('orders:cancel-unpaid')
                  ->hourly()
                  ->withoutOverlapping();
+
+        // Jalankan command otomatisasi update status pesanan setiap hari
+        $schedule->command('orders:auto-update-delivered')
+                 ->daily()
+                 ->withoutOverlapping();
     }
 
     /**

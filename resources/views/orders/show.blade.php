@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Detail Pesanan #{{ $order->order_number }} - UMKM AKRAB</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -458,6 +459,20 @@
                                 </div>
                             </div>
                             @endif
+
+                            @if($order->status === 'delivered')
+                            <div class="row mb-2">
+                                <div class="col-12">
+                                    <div class="alert alert-info">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Pesanan ini telah ditandai sebagai diterima. Jika Anda belum menerima pesanan ini, silakan laporkan:
+                                        <button type="button" class="btn btn-link p-0 ms-2 text-decoration-underline" onclick="reportUndeliveredOrder('{{ $order->order_number }}')">
+                                            Laporkan Barang Belum Diterima
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
                             <button class="btn btn-outline btn-sm mt-2">
                                 <i class="bi bi-clipboard"></i> Salin Alamat
                             </button>
@@ -624,5 +639,32 @@
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function reportUndeliveredOrder(orderNumber) {
+            if (confirm('Apakah Anda yakin ingin melaporkan bahwa pesanan ini belum diterima?')) {
+                // Kirim permintaan ke server untuk mengubah status kembali ke 'shipped'
+                fetch(`/api/orders/${orderNumber}/report-undelivered`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Laporan berhasil dikirim. Status pesanan telah diperbarui.');
+                        location.reload(); // Refresh halaman untuk menampilkan status terbaru
+                    } else {
+                        alert('Gagal mengirim laporan: ' + (data.message || 'Terjadi kesalahan'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan saat mengirim laporan');
+                });
+            }
+        }
+    </script>
 </body>
 </html>

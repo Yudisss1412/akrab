@@ -649,6 +649,9 @@ Route::get('/invoice/{order}', [App\Http\Controllers\OrderDetailController::clas
 // Shipping Tracking Route - Simulated tracking page
 Route::get('/shipping-track/{order}', [App\Http\Controllers\ShippingTrackingController::class, 'show'])->name('shipping.track');
 
+// API route for reporting undelivered orders
+Route::post('/api/orders/{order}/report-undelivered', [App\Http\Controllers\OrderDetailController::class, 'reportUndelivered'])->name('order.report.undelivered');
+
 // Shipping Label Route - Simple approach
 Route::get('/shipping-label/{order}', function ($order) {
     $orderData = App\Models\Order::where('order_number', $order)->firstOrFail();

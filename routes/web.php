@@ -220,30 +220,43 @@ Route::get('/orders/{orderNumber}/review', [App\Http\Controllers\ReviewControlle
 // API endpoint untuk mengambil ulasan pengguna
 Route::get('/api/reviews', function() {
     if (!auth()->check()) {
+        \Log::info('API /api/reviews: User not authenticated');
         return response()->json(['reviews' => []]);
     }
 
-    $reviews = \App\Models\Review::with(['product', 'product.seller'])
-        ->where('user_id', auth()->id())
-        ->latest()
-        ->get()
-        ->map(function($review) {
-            return [
-                'id' => $review->id,
-                'product_name' => $review->product->name ?? 'Produk Tidak Ditemukan',
-                'shop_name' => $review->product->seller->name ?? $review->product->seller_name ?? 'Toko Tidak Diketahui',
-                'product_image' => $review->product->main_image ? asset('storage/' . $review->product->main_image) :
-asset('src/placeholder_produk.png'),
-                'rating' => $review->rating,
-                'review_text' => $review->review_text,
-                'media' => $review->media ? array_map(function($path) {
-                    return asset('storage/' . $path);
-                }, json_decode($review->media, true)) : null,
-                'created_at' => $review->created_at->format('d M Y')
-            ];
-        });
+    $userId = auth()->id();
+    \Log::info('API /api/reviews: Fetching reviews for user ID: ' . $userId);
 
-    return response()->json(['reviews' => $reviews]);
+    $reviews = \App\Models\Review::with(['product', 'product.seller'])
+        ->where('user_id', $userId)
+        ->latest()
+        ->get();
+
+    \Log::info('API /api/reviews: Found ' . $reviews->count() . ' reviews for user ID: ' . $userId);
+
+    $formattedReviews = $reviews->map(function($review) {
+        $product = $review->product;
+        $seller = $product ? $product->seller : null;
+
+        \Log::debug('API /api/reviews: Processing review ID: ' . $review->id . ' for product: ' . ($product ? $product->name : 'NULL'));
+
+        return [
+            'id' => $review->id,
+            'product_name' => $product ? $product->name : 'Produk Tidak Ditemukan',
+            'shop_name' => $seller ? $seller->store_name : ($product ? $product->seller_name : 'Toko Tidak Diketahui'),
+            'product_image' => $product && $product->main_image ? asset('storage/' . $product->main_image) : asset('src/placeholder_produk.png'),
+            'rating' => $review->rating,
+            'review_text' => $review->review_text,
+            'media' => $review->media ? array_map(function($path) {
+                return asset('storage/' . $path);
+            }, (array)$review->media) : null,  // Cast to array to handle both string and array formats
+            'created_at' => $review->created_at->format('d M Y')
+        ];
+    });
+
+    \Log::info('API /api/reviews: Returning ' . $formattedReviews->count() . ' formatted reviews');
+
+    return response()->json(['reviews' => $formattedReviews]);
 })->name('api.reviews');
 
 // API endpoint untuk mengambil riwayat pesanan pengguna
@@ -501,6 +514,8 @@ Route::middleware(['auth', 'admin.role'])->prefix('admin')->name('admin.')->grou
     Route::put('/reviews/{id}/approve', [App\Http\Controllers\Admin\ProductController::class, 'approveReview'])->name('reviews.approve');
     Route::put('/reviews/{id}/reject', [App\Http\Controllers\Admin\ProductController::class, 'rejectReview'])->name('reviews.reject');
     Route::delete('/reviews/{id}', [App\Http\Controllers\Admin\ProductController::class, 'deleteReview'])->name('reviews.delete');
+    Route::get('/reviews/ajax', [App\Http\Controllers\Admin\ProductController::class, 'getReviewsAjax'])->name('admin.reviews.ajax');
+    Route::put('/reviews/{id}/spam', [App\Http\Controllers\Admin\ProductController::class, 'markAsSpam'])->name('reviews.spam');
 });
 
 

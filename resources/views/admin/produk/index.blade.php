@@ -762,105 +762,25 @@
                             <th scope="col">Aksi</th>
                           </tr>
                         </thead>
-                        <tbody>
-                          @forelse($reviews ?? collect() as $review)
-                          <tr id="review-row-{{ $review->id }}">
-                            <td>
-                              <div>{!! preg_replace('/\(\d+\)/', '', $review->review_text) !!}</div>
-                              <div>
-                                <span class="badge bg-warning text-dark">
-                                  <i class="fas fa-star"></i> {{ $review->rating }}
-                                </span>
-                              </div>
-                            </td>
-                            <td>
-                              <span class="text-primary">{{ $review->product->name ?? 'Produk Tidak Ditemukan' }}</span>
-                            </td>
-                            <td>
-                              <div><strong>{{ $review->user->name ?? 'User Tidak Ditemukan' }}</strong></div>
-                              <small class="text-muted">{{ $review->user->email ?? 'N/A' }}</small>
-                            </td>
-                            <td>{{ $review->created_at->format('d M Y') }}</td>
-                            <td>
-                              @if($review->status == 'approved')
-                                <span class="badge badge-active d-block">Disetujui</span>
-                              @elseif($review->status == 'rejected')
-                                <span class="badge badge-rejected d-block">Ditolak</span>
-                              @else
-                                <span class="badge badge-pending d-block">Menunggu Persetujuan</span>
-                              @endif
-                            </td>
-                            <td>
-                              <div class="btn-group" role="group">
-                                @if($review->status != 'approved' && $review->status != 'rejected')
-                                  <button type="button" class="btn btn-sm btn-approve" title="Setujui" onclick="approveReview({{ $review->id }})">
-                                    <i class="fas fa-check"></i>
-                                  </button>
-                                  <button type="button" class="btn btn-sm btn-reject" title="Tolak" onclick="rejectReview({{ $review->id }})">
-                                    <i class="fas fa-times"></i>
-                                  </button>
-                                @endif
-                                <button type="button" class="btn btn-sm btn-delete" title="Hapus" onclick="deleteReview({{ $review->id }})">
-                                  <i class="fas fa-trash"></i>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-spam" title="Tandai sebagai Spam" onclick="markAsSpam({{ $review->id }})">
-                                  <i class="fas fa-ban"></i>
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                          @empty
+                        <tbody id="reviews-table-body">
                           <tr>
-                            <td colspan="6" class="text-center py-4">Tidak ada data ulasan produk ditemukan.</td>
+                            <td colspan="6" class="text-center py-4">Memuat data ulasan...</td>
                           </tr>
-                          @endforelse
                         </tbody>
                       </table>
                     </div>
-                    
+
                     <!-- Pagination -->
-                    @if(isset($reviews) && $reviews->count() > 0)
-                    <div class="mt-3 d-flex justify-content-between align-items-center">
-                      Menampilkan {{ $reviews->firstItem() }} sampai {{ $reviews->lastItem() }} dari {{ $reviews->total() }} ulasan
-                    </div>
-                    <div>
+                    <div id="reviews-pagination" class="mt-3 d-none">
+                      <div class="d-flex justify-content-between align-items-center mb-3" id="reviews-info">
+                        <!-- Info akan diisi oleh JavaScript -->
+                      </div>
                       <nav aria-label="Navigasi ulasan">
-                        <ul class="pagination">
-                          @if ($reviews->onFirstPage())
-                            <li class="page-item disabled">
-                              <span class="page-link">«« Sebelumnya</span>
-                            </li>
-                          @else
-                            <li class="page-item">
-                              <a class="page-link" href="{{ $reviews->previousPageUrl() }}&tab=reviews" aria-label="Previous">
-                                <span aria-hidden="true">«« Sebelumnya</span>
-                              </a>
-                            </li>
-                          @endif
-
-                          @for ($i = max(1, $reviews->currentPage() - 2); $i <= min($reviews->lastPage(), $reviews->currentPage() + 2); $i++)
-                            @if ($i == $reviews->currentPage())
-                              <li class="page-item active"><span class="page-link" style="color: white;">{{ $i }}</span></li>
-                            @else
-                              <li class="page-item"><a class="page-link" href="{{ $reviews->url($i) }}&tab=reviews">{{ $i }}</a></li>
-                            @endif
-                          @endfor
-
-                          @if ($reviews->hasMorePages())
-                            <li class="page-item">
-                              <a class="page-link" href="{{ $reviews->nextPageUrl() }}&tab=reviews" aria-label="Next">
-                                <span aria-hidden="true">Berikutnya »»</span>
-                              </a>
-                            </li>
-                          @else
-                            <li class="page-item disabled">
-                              <span class="page-link">Berikutnya »»</span>
-                            </li>
-                          @endif
+                        <ul class="pagination" id="reviews-pagination-links">
+                          <!-- Pagination akan diisi oleh JavaScript -->
                         </ul>
                       </nav>
                     </div>
-                    @endif
                   </div>
                 </div>
               </div>
@@ -899,7 +819,23 @@
         .then(function(data) {
           if (data.success) {
             alert(data.message);
-            location.reload();
+            // Perbarui baris produk yang bersangkutan tanpa refresh halaman
+            var productRow = document.getElementById('product-row-' + productId);
+            if (productRow) {
+              // Update status badge
+              var statusCell = productRow.querySelector('td:nth-child(5)');
+              statusCell.innerHTML = '<span class="badge badge-active d-block">Aktif</span>';
+
+              // Update tombol aksi
+              var actionCell = productRow.querySelector('td:nth-child(6)');
+              actionCell.innerHTML = '<div class="btn-group" role="group">' +
+                '<a href="/produk_detail/' + productId + '" class="btn btn-sm btn-view" title="Lihat di Situs">' +
+                '<i class="fas fa-external-link-alt"></i></a>' +
+                '<a href="/penjual/produk/' + productId + '/edit" class="btn btn-sm btn-edit" title="Edit">' +
+                '<i class="fas fa-edit"></i></a>' +
+                '<button type="button" class="btn btn-sm btn-suspend" title="Tangguhkan" onclick="suspendProduct(' + productId + ')">' +
+                '<i class="fas fa-pause"></i></button></div>';
+            }
           } else {
             alert('Gagal menyetujui produk: ' + data.message);
           }
@@ -927,7 +863,23 @@
         .then(function(data) {
           if (data.success) {
             alert(data.message);
-            location.reload();
+            // Perbarui baris produk yang bersangkutan tanpa refresh halaman
+            var productRow = document.getElementById('product-row-' + productId);
+            if (productRow) {
+              // Update status badge
+              var statusCell = productRow.querySelector('td:nth-child(5)');
+              statusCell.innerHTML = '<span class="badge badge-rejected d-block">Ditolak</span>';
+
+              // Update tombol aksi
+              var actionCell = productRow.querySelector('td:nth-child(6)');
+              actionCell.innerHTML = '<div class="btn-group" role="group">' +
+                '<a href="/produk_detail/' + productId + '" class="btn btn-sm btn-view" title="Lihat di Situs">' +
+                '<i class="fas fa-external-link-alt"></i></a>' +
+                '<a href="/penjual/produk/' + productId + '/edit" class="btn btn-sm btn-edit" title="Edit">' +
+                '<i class="fas fa-edit"></i></a>' +
+                '<button type="button" class="btn btn-sm btn-approve" title="Setujui" onclick="approveProduct(' + productId + ')">' +
+                '<i class="fas fa-check"></i></button></div>';
+            }
           } else {
             alert('Gagal menolak produk: ' + data.message);
           }
@@ -955,7 +907,23 @@
         .then(function(data) {
           if (data.success) {
             alert(data.message);
-            location.reload();
+            // Perbarui baris produk yang bersangkutan tanpa refresh halaman
+            var productRow = document.getElementById('product-row-' + productId);
+            if (productRow) {
+              // Update status badge
+              var statusCell = productRow.querySelector('td:nth-child(5)');
+              statusCell.innerHTML = '<span class="badge badge-suspended d-block">Ditangguhkan</span>';
+
+              // Update tombol aksi
+              var actionCell = productRow.querySelector('td:nth-child(6)');
+              actionCell.innerHTML = '<div class="btn-group" role="group">' +
+                '<a href="/produk_detail/' + productId + '" class="btn btn-sm btn-view" title="Lihat di Situs">' +
+                '<i class="fas fa-external-link-alt"></i></a>' +
+                '<a href="/penjual/produk/' + productId + '/edit" class="btn btn-sm btn-edit" title="Edit">' +
+                '<i class="fas fa-edit"></i></a>' +
+                '<button type="button" class="btn btn-sm btn-approve" title="Setujui" onclick="approveProduct(' + productId + ')">' +
+                '<i class="fas fa-check"></i></button></div>';
+            }
           } else {
             alert('Gagal menangguhkan produk: ' + data.message);
           }
@@ -984,7 +952,8 @@
         .then(function(data) {
           if (data.success) {
             alert(data.message);
-            location.reload();
+            // Refresh the reviews list to show updated status
+            loadReviews();
           } else {
             alert('Gagal menyetujui ulasan: ' + data.message);
           }
@@ -1012,7 +981,8 @@
         .then(function(data) {
           if (data.success) {
             alert(data.message);
-            location.reload();
+            // Refresh the reviews list to show updated status
+            loadReviews();
           } else {
             alert('Gagal menolak ulasan: ' + data.message);
           }
@@ -1040,7 +1010,8 @@
         .then(function(data) {
           if (data.success) {
             alert(data.message);
-            location.reload();
+            // Refresh the reviews list to show updated status
+            loadReviews();
           } else {
             alert('Gagal menghapus ulasan: ' + data.message);
           }
@@ -1053,44 +1024,324 @@
     }
     
     function markAsSpam(reviewId) {
-      alert('Fitur ini akan segera hadir: Tandai ulasan sebagai spam');
+      if (confirm('Apakah Anda yakin ingin menandai ulasan ini sebagai spam?')) {
+        var url = '/admin/reviews/' + reviewId + '/spam';
+        fetch(url, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': getCSRFToken()
+          }
+        })
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(data) {
+          if (data.success) {
+            alert(data.message);
+            // Refresh the reviews list to show updated status
+            loadReviews();
+          } else {
+            alert('Gagal menandai ulasan sebagai spam: ' + data.message);
+          }
+        })
+        .catch(function(error) {
+          console.error('Error:', error);
+          alert('Terjadi kesalahan saat menandai ulasan sebagai spam');
+        });
+      }
     }
     
     // Functions for category management
     function selectCategory(categoryId) {
       console.log('selectCategory called with ID:', categoryId);
-      
+
       // Update URL dengan selected_category
       var urlParams = new URLSearchParams(window.location.search);
       urlParams.set('selected_category', categoryId);
       urlParams.set('tab', 'categories');
       var newUrl = window.location.pathname + '?' + urlParams.toString();
-      
+
       // Update the URL without reloading the page
       history.pushState({}, '', newUrl);
-      
+
       // Remove active class from all categories
       var allCategories = document.querySelectorAll('#categories-tab-pane .category-list li');
       allCategories.forEach(function(li) {
         li.classList.remove('active');
       });
-      
+
       // Add active class to clicked category
       var clickedElement = document.querySelector('#categories-tab-pane .category-list li[data-id="' + categoryId + '"]');
       if (clickedElement) {
           clickedElement.classList.add('active');
           console.log('Active class added to category ID:', categoryId);
       }
-      
+
       // Load subcategories for the selected category
       console.log('About to load subcategories for category ID:', categoryId);
       loadSubcategories(categoryId);
     }
+
+    // Add event listeners for tab changes to ensure fresh data when switching tabs
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get all tab buttons
+      const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
+
+      tabButtons.forEach(button => {
+        button.addEventListener('shown.bs.tab', function (event) {
+          // Update URL parameter to reflect current tab
+          const tabId = event.target.getAttribute('data-bs-target').replace('#', '').replace('-pane', '');
+          const urlParams = new URLSearchParams(window.location.search);
+          urlParams.set('tab', tabId);
+
+          // Update URL without triggering page reload
+          const newUrl = window.location.pathname + '?' + urlParams.toString();
+          history.pushState({}, '', newUrl);
+        });
+      });
+    });
     
+    // Load reviews via AJAX
+    function loadReviews(page = 1) {
+      // Show loading indicator
+      const tableBody = document.getElementById('reviews-table-body');
+      if (tableBody) {
+        tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-4">Memuat data ulasan...</td></tr>';
+      }
+
+      // Get filter values
+      const statusFilter = document.getElementById('review_status_filter') ? document.getElementById('review_status_filter').value : '';
+      const ratingFilter = document.getElementById('rating_filter') ? document.getElementById('rating_filter').value : '';
+      const searchFilter = document.getElementById('review_search') ? document.getElementById('review_search').value : '';
+
+      // Build query parameters
+      const params = new URLSearchParams();
+      params.append('page', page);
+      if (statusFilter) params.append('review_status', statusFilter);
+      if (ratingFilter) params.append('rating', ratingFilter);
+      if (searchFilter) params.append('review_search', searchFilter);
+
+      // Make AJAX request
+      console.log('Loading reviews with params:', params.toString());
+
+      fetch(`/admin/reviews/ajax?${params.toString()}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': getCSRFToken()
+        }
+      })
+      .then(response => {
+        console.log('Reviews API Response Status:', response.status);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Reviews API Response Data:', data);
+        if (data.success) {
+          // Update table with new data
+          updateReviewsTable(data.reviews);
+
+          // Update pagination
+          updateReviewsPagination(data.pagination);
+        } else {
+          // Show error message
+          if (tableBody) {
+            tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-danger">Gagal memuat data ulasan: ' + (data.message || 'Terjadi kesalahan') + '</td></tr>';
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error loading reviews:', error);
+        if (tableBody) {
+          tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-danger">Terjadi kesalahan saat memuat data ulasan: ' + error.message + '</td></tr>';
+        }
+      });
+    }
+
+    // Update reviews table with data
+    function updateReviewsTable(reviews) {
+      const tableBody = document.getElementById('reviews-table-body');
+      if (!tableBody) return;
+
+      if (reviews.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-4">Tidak ada data ulasan produk ditemukan.</td></tr>';
+        return;
+      }
+
+      let rows = '';
+      reviews.forEach(review => {
+        const statusClass = review.status === 'approved' ? 'badge-active' :
+                           review.status === 'rejected' ? 'badge-rejected' : 'badge-pending';
+
+        const canAction = review.can_action;
+
+        rows += `
+          <tr id="review-row-${review.id}">
+            <td>
+              <div>${review.review_text.replace(/\(\d+\)/g, '')}</div>
+              <div>
+                <span class="badge bg-warning text-dark">
+                  <i class="fas fa-star"></i> ${review.rating}
+                </span>
+              </div>
+            </td>
+            <td>
+              <span class="text-primary">${review.product_name}</span>
+            </td>
+            <td>
+              <div><strong>${review.user_name}</strong></div>
+              <small class="text-muted">${review.user_email}</small>
+            </td>
+            <td>${review.created_at}</td>
+            <td>
+              <span class="badge ${statusClass} d-block">${review.status_label}</span>
+            </td>
+            <td>
+              <div class="btn-group" role="group">
+                ${canAction ? `
+                  <button type="button" class="btn btn-sm btn-approve" title="Setujui" onclick="approveReview(${review.id})">
+                    <i class="fas fa-check"></i>
+                  </button>
+                  <button type="button" class="btn btn-sm btn-reject" title="Tolak" onclick="rejectReview(${review.id})">
+                    <i class="fas fa-times"></i>
+                  </button>
+                ` : ''}
+                <button type="button" class="btn btn-sm btn-delete" title="Hapus" onclick="deleteReview(${review.id})">
+                  <i class="fas fa-trash"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-spam" title="Tandai sebagai Spam" onclick="markAsSpam(${review.id})">
+                  <i class="fas fa-ban"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+
+      tableBody.innerHTML = rows;
+    }
+
+    // Update reviews pagination
+    function updateReviewsPagination(pagination) {
+      const paginationContainer = document.getElementById('reviews-pagination');
+      const paginationLinks = document.getElementById('reviews-pagination-links');
+      const reviewsInfo = document.getElementById('reviews-info');
+
+      if (!paginationContainer || !paginationLinks || !reviewsInfo) return;
+
+      // Show pagination container
+      paginationContainer.classList.remove('d-none');
+
+      // Update info text
+      const start = (pagination.current_page - 1) * pagination.per_page + 1;
+      const end = Math.min(pagination.current_page * pagination.per_page, pagination.total);
+      reviewsInfo.innerHTML = `Menampilkan ${start} sampai ${end} dari ${pagination.total} ulasan`;
+
+      // Build pagination links
+      let links = '';
+
+      // Previous button
+      if (pagination.current_page > 1) {
+        links += `<li class="page-item"><a class="page-link" href="#" onclick="loadReviews(${pagination.current_page - 1}); return false;">«« Sebelumnya</a></li>`;
+      } else {
+        links += `<li class="page-item disabled"><span class="page-link">«« Sebelumnya</span></li>`;
+      }
+
+      // Page numbers
+      const startPage = Math.max(1, pagination.current_page - 2);
+      const endPage = Math.min(pagination.last_page, pagination.current_page + 2);
+
+      for (let i = startPage; i <= endPage; i++) {
+        if (i === pagination.current_page) {
+          links += `<li class="page-item active"><span class="page-link" style="color: white;">${i}</span></li>`;
+        } else {
+          links += `<li class="page-item"><a class="page-link" href="#" onclick="loadReviews(${i}); return false;">${i}</a></li>`;
+        }
+      }
+
+      // Next button
+      if (pagination.current_page < pagination.last_page) {
+        links += `<li class="page-item"><a class="page-link" href="#" onclick="loadReviews(${pagination.current_page + 1}); return false;">Berikutnya »»</a></li>`;
+      } else {
+        links += `<li class="page-item disabled"><span class="page-link">Berikutnya »»</span></li>`;
+      }
+
+      paginationLinks.innerHTML = links;
+    }
+
+    // Load reviews when reviews tab is shown
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get all tab buttons
+      const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
+
+      tabButtons.forEach(button => {
+        button.addEventListener('shown.bs.tab', function (event) {
+          // Update URL parameter to reflect current tab
+          const tabId = event.target.getAttribute('data-bs-target').replace('#', '').replace('-pane', '');
+          const urlParams = new URLSearchParams(window.location.search);
+          urlParams.set('tab', tabId);
+
+          // Update URL without triggering page reload
+          const newUrl = window.location.pathname + '?' + urlParams.toString();
+          history.pushState({}, '', newUrl);
+
+          // If the reviews tab is activated, load reviews
+          if (tabId === 'reviews-tab') {
+            loadReviews();
+          }
+        });
+      });
+
+      // Add event listeners to filter elements to reload reviews when changed
+      const reviewStatusFilter = document.getElementById('review_status_filter');
+      const ratingFilter = document.getElementById('rating_filter');
+      const reviewSearch = document.getElementById('review_search');
+
+      if (reviewStatusFilter) {
+        reviewStatusFilter.addEventListener('change', function() {
+          loadReviews();
+        });
+      }
+
+      if (ratingFilter) {
+        ratingFilter.addEventListener('change', function() {
+          loadReviews();
+        });
+      }
+
+      if (reviewSearch) {
+        reviewSearch.addEventListener('keyup', function(e) {
+          if (e.key === 'Enter') {
+            loadReviews();
+          }
+        });
+
+        // Also add a small delay to handle rapid typing
+        let searchTimeout;
+        reviewSearch.addEventListener('input', function() {
+          clearTimeout(searchTimeout);
+          searchTimeout = setTimeout(() => {
+            loadReviews();
+          }, 500); // Delay 500ms after user stops typing
+        });
+      }
+
+      // Load reviews if the reviews tab is active on page load
+      const urlParams = new URLSearchParams(window.location.search);
+      const activeTab = urlParams.get('tab');
+      if (activeTab === 'reviews' || !activeTab) { // Load reviews if reviews tab is active or if no tab is specified
+        loadReviews();
+      }
+    });
+
     // Load subcategories when category is selected
     function loadSubcategories(categoryId) {
       console.log('loadSubcategories called with ID:', categoryId); // Debug log
-      
+
       if (!categoryId) {
         console.log('No categoryId provided, clearing subcategory list');
         document.getElementById('selected-category-name').textContent = 'Pilih Kategori';

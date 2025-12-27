@@ -770,9 +770,11 @@
             .then(response => response.json())
             .then(data => {
               if (data.success) {
-                updateReviewState(data.reply);
                 // Show success message
                 alert('Balasan berhasil dikirim');
+
+                // Refresh the reviews data to show the updated status
+                this.fetchReviews();
               } else {
                 alert('Gagal mengirim balasan: ' + data.message);
               }
@@ -943,6 +945,24 @@
       // Kembalikan komentar asli dari database, bukan teks default
       // Ini memungkinkan perbedaan komentar benar-benar terlihat setelah filter diterapkan
       return comment;
+    }
+
+    // Fungsi global untuk merefresh data ulasan
+    function refreshReviews() {
+      // Cari elemen dengan Alpine.js data
+      const reviewContainer = document.querySelector('[x-data*="reviews"]');
+      if (reviewContainer && reviewContainer.__x) {
+        // Akses komponen Alpine.js dan panggil fetchReviews
+        const component = reviewContainer.__x.$data;
+        if (component && typeof component.fetchReviews === 'function') {
+          component.fetchReviews();
+        }
+      }
+    }
+
+    // Fungsi global untuk memperbarui data ulasan secara manual
+    function updateReviewsData() {
+      refreshReviews();
     }
   </script>
 </body>

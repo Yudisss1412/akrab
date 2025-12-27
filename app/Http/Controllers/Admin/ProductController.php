@@ -399,4 +399,168 @@ class ProductController extends Controller
             return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
     } // End of deleteReview
+
+    /**
+     * Get reviews data via AJAX for dynamic loading
+     */
+    public function getReviewsAjax(Request $request)
+    {
+        try {
+            \Log::info('AJAX Reviews Request - Start', [
+                'user_id' => Auth::id(),
+                'request_params' => $request->all()
+            ]);
+
+            $user = Auth::user();
+            if (!$user || !$user->role || $user->role->name !== 'admin') {
+                \Log::warning('Access denied for AJAX reviews request', [
+                    'user_id' => $user ? $user->id : null,
+                    'role' => $user && $user->role ? $user->role->name : null
+                ]);
+                return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
+            }
+
+            // Fetch reviews with related product and user - only load necessary fields
+            $query = Review::with(['product:id,name', 'user:id,name,email']);
+
+            // Filter by review status - using the status column directly
+            if ($request->filled('review_status')) {
+                $status = $request->get('review_status');
+                \Log::info('Filtering by status: ' . $status);
+                $query->where('status', $status);
+            }
+            // Jika tidak ada filter status, tampilkan semua termasuk spam
+
+            // Filter by rating
+            if ($request->filled('rating')) {
+                $rating = $request->get('rating');
+                \Log::info('Filtering by rating: ' . $rating);
+                $query->where('rating', $rating);
+            }
+
+            // Search in review text, product name, or user name
+            if ($request->filled('review_search')) {
+                $search = $request->get('review_search');
+                \Log::info('Searching for: ' . $search);
+                $query->where(function($q) use ($search) {
+                    $q->where('review_text', 'LIKE', "%{$search}%")
+                      ->orWhereHas('product', function($p) use ($search) {
+                          $p->where('name', 'LIKE', "%{$search}%");
+                      })
+                      ->orWhereHas('user', function($u) use ($search) {
+                          $u->where('name', 'LIKE', "%{$search}%");
+                      });
+                });
+            }
+
+            // Count total before pagination
+            $totalBeforePagination = $query->count();
+            \Log::info('Total reviews before pagination: ' . $totalBeforePagination);
+
+            $reviews = $query->orderBy('created_at', 'desc')->paginate(10);
+
+            \Log::info('Reviews pagination info', [
+                'total' => $reviews->total(),
+                'current_page' => $reviews->currentPage(),
+                'last_page' => $reviews->lastPage(),
+                'count_on_page' => $reviews->count()
+            ]);
+
+            // Format data for AJAX response
+            $formattedReviews = $reviews->map(function($review) {
+                \Log::debug('Formatting review: ' . $review->id, [
+                    'status' => $review->status,
+                    'product_name' => $review->product->name ?? 'NULL',
+                    'user_name' => $review->user->name ?? 'NULL'
+                ]);
+
+                return [
+                    'id' => $review->id,
+                    'review_text' => $review->review_text,
+                    'rating' => $review->rating,
+                    'product_name' => $review->product->name ?? 'Produk Tidak Ditemukan',
+                    'user_name' => $review->user->name ?? 'User Tidak Ditemukan',
+                    'user_email' => $review->user->email ?? 'N/A',
+                    'created_at' => $review->created_at->format('d M Y'),
+                    'status' => $review->status,
+                    'status_label' => $this->getStatusLabel($review->status),
+                    'can_action' => $review->status !== 'approved' && $review->status !== 'rejected'
+                ];
+            });
+
+            \Log::info('AJAX Reviews Request - Success', [
+                'formatted_reviews_count' => count($formattedReviews),
+                'pagination_total' => $reviews->total()
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'reviews' => $formattedReviews,
+                'pagination' => [
+                    'current_page' => $reviews->currentPage(),
+                    'last_page' => $reviews->lastPage(),
+                    'total' => $reviews->total(),
+                    'per_page' => $reviews->perPage(),
+                    'has_more_pages' => $reviews->hasMorePages(),
+                ]
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error getting reviews via AJAX: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Mark review as spam
+     */
+    public function markAsSpam($id)
+    {
+        try {
+            $user = Auth::user();
+            if (!$user) {
+                return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
+            }
+
+            // Muat relasi role
+            $user->load('role');
+
+            if (!$user->role || $user->role->name !== 'admin') {
+                return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
+            }
+
+            $review = Review::findOrFail($id);
+            $review->status = 'spam';
+            $review->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Ulasan berhasil ditandai sebagai spam',
+                'review' => $review
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error marking review as spam: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Helper function to get status label
+     */
+    private function getStatusLabel($status)
+    {
+        switch ($status) {
+            case 'approved':
+                return 'Disetujui';
+            case 'rejected':
+                return 'Ditolak';
+            case 'spam':
+                return 'Spam';
+            case 'pending':
+                return 'Menunggu Persetujuan';
+            default:
+                return $status ? ucfirst($status) : 'Menunggu Persetujuan';
+        }
+    }
 }

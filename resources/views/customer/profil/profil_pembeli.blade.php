@@ -743,7 +743,11 @@
     document.addEventListener('DOMContentLoaded', function() {
       console.log('DOM fully loaded and parsed');
       fetchWishlist();
-      fetchUserReviews();
+      fetchUserReviews().then(() => {
+        console.log('User reviews fetched successfully');
+      }).catch(error => {
+        console.error('Error in fetchUserReviews:', error);
+      });
       fetchUserOrders();  // Add this to fetch orders as well
 
       // Initialize active session modal
@@ -818,10 +822,14 @@
     async function fetchUserReviews() {
       try {
         const response = await fetch('/api/reviews');
+        console.log('Reviews API response status:', response.status);
+
         if(response.ok) {
           const data = await response.json();
+          console.log('Reviews API response data:', data);
           renderReviews(data.reviews || []);
         } else {
+          console.error('Reviews API response not ok:', response.status);
           // Fallback to empty array if API fails
           renderReviews([]);
         }
@@ -833,39 +841,50 @@
 
     // Template function for a single review
     function reviewCardTemplate(review) {
-      // Create stars based on rating
-      let starsHTML = '';
-      for (let i = 1; i <= 5; i++) {
-        if (i <= review.rating) {
-          starsHTML += '<i class="bi bi-star-fill"></i>';
-        } else {
-          starsHTML += '<i class="bi bi-star"></i>';
+      try {
+        // Create stars based on rating
+        let starsHTML = '';
+        const rating = review.rating || 0;
+        for (let i = 1; i <= 5; i++) {
+          if (i <= rating) {
+            starsHTML += '<i class="bi bi-star-fill"></i>';
+          } else {
+            starsHTML += '<i class="bi bi-star"></i>';
+          }
         }
-      }
 
-      return `<article class="review-card">
-        <div class="review-product">
-          <img src="${review.product_image || '{{ asset("src/placeholder_produk.png") }}'}" alt="${review.product_name || 'Produk'}">
-          <div class="product-info">
-            <h4>${review.product_name || 'Nama Produk'}</h4>
-            <p class="shop-name">${review.shop_name || 'Nama Toko'}</p>
-            <div class="rating">
-              ${starsHTML}
-              <span>(${review.rating || 0})</span>
+        return `<article class="review-card">
+          <div class="review-product">
+            <img src="${review.product_image || '{{ asset("src/placeholder_produk.png") }}'}" alt="${review.product_name || 'Produk'}">
+            <div class="product-info">
+              <h4>${review.product_name || 'Nama Produk'}</h4>
+              <p class="shop-name">${review.shop_name || 'Nama Toko'}</p>
+              <div class="rating">
+                ${starsHTML}
+                <span>(${rating})</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="review-content">
-          <p>${(review.review_text || 'Ulasan tidak tersedia').replace(/\(\d+\)/g, '')}</p>
-        </div>
+          <div class="review-content">
+            <p>${(review.review_text || 'Ulasan tidak tersedia').replace(/\(\d+\)/g, '')}</p>
+          </div>
 
-        <div class="review-actions">
-          <button class="btn btn-icon edit-review-btn" title="Edit Ulasan" data-review-id="${review.id}">
-            <i class="bi bi-pencil"></i>
-          </button>
-        </div>
-      </article>`;
+          <div class="review-actions">
+            <button class="btn btn-icon edit-review-btn" title="Edit Ulasan" data-review-id="${review.id || ''}">
+              <i class="bi bi-pencil"></i>
+            </button>
+          </div>
+        </article>`;
+      } catch (error) {
+        console.error('Error in reviewCardTemplate:', error);
+        console.log('Review data:', review);
+        return `<article class="review-card">
+          <div class="review-content">
+            <p>Terjadi kesalahan saat menampilkan ulasan ini.</p>
+          </div>
+        </article>`;
+      }
     }
 
     // Render reviews to the page
@@ -873,13 +892,16 @@
       const reviewsList = document.getElementById('reviewsList');
       const reviewsLoading = document.getElementById('reviewsLoading');
 
-      if (!reviewsList) return;
+      if (!reviewsList) {
+        console.error('Reviews list element not found');
+        return;
+      }
 
       if (reviewsLoading) {
         reviewsLoading.remove();
       }
 
-      if (reviews.length > 0) {
+      if (reviews && reviews.length > 0) {
         reviewsList.innerHTML = reviews.map(reviewCardTemplate).join('');
 
         // Add event listeners for edit buttons
@@ -1046,7 +1068,11 @@
 
     // Tab functionality for profile navigation
     document.addEventListener('DOMContentLoaded', function() {
-      fetchUserReviews();
+      fetchUserReviews().then(() => {
+        console.log('User reviews fetched successfully in tab functionality');
+      }).catch(error => {
+        console.error('Error in fetchUserReviews in tab functionality:', error);
+      });
       fetchUserOrders();  // Add this to fetch orders as well
       fetchWishlist(); // Tambahkan pemanggilan fetchWishlist
 

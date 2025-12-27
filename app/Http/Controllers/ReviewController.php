@@ -166,13 +166,19 @@ class ReviewController extends Controller
      */
     public function getUserReviews()
     {
+        \Log::info('API /api/user-reviews: Fetching reviews for user ID: ' . Auth::id());
+
         $reviews = Review::with(['product', 'order'])
                         ->where('user_id', Auth::id())
                         ->orderBy('created_at', 'desc')
                         ->get();
 
+        \Log::info('API /api/user-reviews: Found ' . $reviews->count() . ' reviews for user ID: ' . Auth::id());
+
         // Format data untuk frontend
         $formattedReviews = $reviews->map(function($review) {
+            \Log::debug('API /api/user-reviews: Processing review ID: ' . $review->id . ' for product: ' . ($review->product ? $review->product->name : 'NULL'));
+
             return [
                 'id' => $review->id,
                 'timeISO' => $review->created_at->toISOString(),
@@ -183,7 +189,7 @@ class ReviewController extends Controller
                     'variant' => '', // Jika ada varian bisa ditambahkan
                     'url' => $review->product ? route('produk.detail', $review->product->id) : '#'
                 ],
-                'images' => $review->media ? collect(json_decode($review->media))->map(function($path) {
+                'images' => $review->media ? collect((array)$review->media)->map(function($path) {
                     return [
                         'name' => basename($path),
                         'size' => 0, // Tidak ada info ukuran dari storage
@@ -193,6 +199,8 @@ class ReviewController extends Controller
                 })->toArray() : []
             ];
         });
+
+        \Log::info('API /api/user-reviews: Returning ' . $formattedReviews->count() . ' formatted reviews');
 
         $user = [
             'name' => Auth::user()->name

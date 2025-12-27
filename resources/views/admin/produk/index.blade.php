@@ -387,6 +387,26 @@
       background-color: #c82333;
       color: white;
     }
+
+    .btn-delete {
+      background-color: #6c757d;
+      color: white;
+    }
+
+    .btn-delete:hover {
+      background-color: #5a6268;
+      color: white;
+    }
+
+    .btn-spam {
+      background-color: #ffc107;
+      color: #212529;
+    }
+
+    .btn-spam:hover {
+      background-color: #e0a800;
+      color: #212529;
+    }
     
     .btn-suspend {
       background-color: #ffc107;
@@ -762,9 +782,9 @@
                             </td>
                             <td>{{ $review->created_at->format('d M Y') }}</td>
                             <td>
-                              @if($review->approved_at)
+                              @if($review->status == 'approved')
                                 <span class="badge badge-active d-block">Disetujui</span>
-                              @elseif($review->rejected_at)
+                              @elseif($review->status == 'rejected')
                                 <span class="badge badge-rejected d-block">Ditolak</span>
                               @else
                                 <span class="badge badge-pending d-block">Menunggu Persetujuan</span>
@@ -772,18 +792,18 @@
                             </td>
                             <td>
                               <div class="btn-group" role="group">
-                                @if(!$review->approved_at && !$review->rejected_at)
+                                @if($review->status != 'approved' && $review->status != 'rejected')
                                   <button type="button" class="btn btn-sm btn-approve" title="Setujui" onclick="approveReview({{ $review->id }})">
                                     <i class="fas fa-check"></i>
                                   </button>
-                                  <button type="button" class="btn btn-sm btn-danger" title="Tolak" onclick="rejectReview({{ $review->id }})">
+                                  <button type="button" class="btn btn-sm btn-reject" title="Tolak" onclick="rejectReview({{ $review->id }})">
                                     <i class="fas fa-times"></i>
                                   </button>
                                 @endif
-                                <button type="button" class="btn btn-sm btn-danger" title="Hapus" onclick="deleteReview({{ $review->id }})">
+                                <button type="button" class="btn btn-sm btn-delete" title="Hapus" onclick="deleteReview({{ $review->id }})">
                                   <i class="fas fa-trash"></i>
                                 </button>
-                                <button type="button" class="btn btn-sm btn-warning" title="Tandai sebagai Spam" onclick="markAsSpam({{ $review->id }})">
+                                <button type="button" class="btn btn-sm btn-spam" title="Tandai sebagai Spam" onclick="markAsSpam({{ $review->id }})">
                                   <i class="fas fa-ban"></i>
                                 </button>
                               </div>

@@ -308,61 +308,95 @@ class ProductController extends Controller
      */
     public function approveReview($id)
     {
-        $user = Auth::user();
-        if (!$user || !$user->role || $user->role->name !== 'admin') {
-            return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
-        }
+        try {
+            $user = Auth::user();
+            if (!$user) {
+                return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
+            }
 
-        $review = Review::findOrFail($id);
-        $review->approved_at = now();
-        $review->rejected_at = null;
-        $review->save();
+            // Muat relasi role
+            $user->load('role');
+
+            if (!$user->role || $user->role->name !== 'admin') {
+                return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
+            }
+
+            $review = Review::findOrFail($id);
+            $review->status = 'approved';
+            $review->save();
+        } catch (\Exception $e) {
+            \Log::error('Error approving review: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+        }
 
         return response()->json([
             'success' => true,
             'message' => 'Ulasan berhasil disetujui',
             'review' => $review
         ]);
-    }
+    } // End of approveReview
 
     /**
      * Reject review
      */
     public function rejectReview($id)
     {
-        $user = Auth::user();
-        if (!$user || !$user->role || $user->role->name !== 'admin') {
-            return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
+        try {
+            $user = Auth::user();
+            if (!$user) {
+                return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
+            }
+
+            // Muat relasi role
+            $user->load('role');
+
+            if (!$user->role || $user->role->name !== 'admin') {
+                return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
+            }
+
+            $review = Review::findOrFail($id);
+            $review->status = 'rejected';
+            $review->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Ulasan berhasil ditolak',
+                'review' => $review
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error rejecting review: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
-
-        $review = Review::findOrFail($id);
-        $review->rejected_at = now();
-        $review->approved_at = null;
-        $review->save();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Ulasan berhasil ditolak',
-            'review' => $review
-        ]);
-    }
+    } // End of rejectReview
 
     /**
      * Delete review
      */
     public function deleteReview($id)
     {
-        $user = Auth::user();
-        if (!$user || !$user->role || $user->role->name !== 'admin') {
-            return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
+        try {
+            $user = Auth::user();
+            if (!$user) {
+                return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
+            }
+
+            // Muat relasi role
+            $user->load('role');
+
+            if (!$user->role || $user->role->name !== 'admin') {
+                return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
+            }
+
+            $review = Review::findOrFail($id);
+            $review->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Ulasan berhasil dihapus'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error deleting review: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
-
-        $review = Review::findOrFail($id);
-        $review->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Ulasan berhasil dihapus'
-        ]);
-    }
+    } // End of deleteReview
 }

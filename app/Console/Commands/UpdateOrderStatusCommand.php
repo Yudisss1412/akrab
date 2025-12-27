@@ -110,11 +110,11 @@ class UpdateOrderStatusCommand extends Command
     private function getDeliveryTimeLimit($courier) {
         $courier = strtolower($courier);
 
-        // Cek apakah mengandung kata kunci tertentu
-        if (strpos($courier, 'same day') !== false || strpos($courier, 'sameday') !== false) {
+        // Cek apakah mengandung kata kunci tertentu (mendukung format-format lama dan baru)
+        if (strpos($courier, 'same_day') !== false || strpos($courier, 'same day') !== false || strpos($courier, 'sameday') !== false) {
             return 2; // 2 menit untuk same day
         } elseif (strpos($courier, 'kilat') !== false || strpos($courier, 'express') !== false || strpos($courier, 'instant') !== false) {
-            return 5; // 5 menit untuk express
+            return 5; // 5 menit untuk express/kilat
         } elseif (strpos($courier, 'reguler') !== false || strpos($courier, 'regular') !== false) {
             return 10; // 10 menit untuk reguler
         } else {

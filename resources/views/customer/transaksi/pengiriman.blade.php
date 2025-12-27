@@ -131,7 +131,7 @@
                   <p class="option-description">Layanan pengiriman reguler dengan asuransi barang.</p>
                 </div>
 
-                <div class="shipping-option @if(isset($order) && $order->shipping_courier == 'express') selected @endif" data-shipping-method="express" data-shipping-cost="25000">
+                <div class="shipping-option @if(isset($order) && $order->shipping_courier == 'kilat') selected @endif" data-shipping-method="kilat" data-shipping-cost="25000">
                   <div class="option-header">
                     <div class="option-info">
                       <h3>Kilat</h3>
@@ -142,7 +142,7 @@
                   <p class="option-description">Layanan pengiriman cepat dengan prioritas pengemasan.</p>
                 </div>
 
-                <div class="shipping-option" data-shipping-method="same_day" data-shipping-cost="50000">
+                <div class="shipping-option @if(isset($order) && $order->shipping_courier == 'same_day') selected @endif" data-shipping-method="same_day" data-shipping-cost="50000">
                   <div class="option-header">
                     <div class="option-info">
                       <h3>Same Day</h3>

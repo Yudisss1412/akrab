@@ -53,8 +53,8 @@
                   <span class="value">
                     @if($order->shipping_courier == 'reguler')
                       Reguler (3-5 hari kerja)
-                    @elseif($order->shipping_courier == 'express')
-                      Express (1-2 hari kerja)
+                    @elseif($order->shipping_courier == 'kilat')
+                      Kilat (1-2 hari kerja)
                     @elseif($order->shipping_courier == 'same_day')
                       Same Day (Hari yang sama)
                     @else
@@ -68,7 +68,7 @@
                   <span class="value">
                     @if($order->shipping_courier == 'same_day')
                       Hari ini
-                    @elseif($order->shipping_courier == 'express')
+                    @elseif($order->shipping_courier == 'kilat')
                       1-2 hari kerja
                     @elseif($order->shipping_courier == 'reguler')
                       3-5 hari kerja

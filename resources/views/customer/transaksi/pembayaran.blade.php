@@ -73,12 +73,14 @@
                 <div class="info-row">
                   <span class="label">Metode Pengiriman</span>
                   <span class="value">
-                    @if($order->shipping_courier == 'reguler') 
-                      Reguler (3-5 hari kerja) 
-                    @elseif($order->shipping_courier == 'express') 
-                      Express (1-2 hari kerja) 
-                    @else 
-                      {{ ucfirst($order->shipping_courier) }} 
+                    @if($order->shipping_courier == 'reguler')
+                      Reguler (3-5 hari kerja)
+                    @elseif($order->shipping_courier == 'kilat')
+                      Kilat (1-2 hari kerja)
+                    @elseif($order->shipping_courier == 'same_day')
+                      Same Day (hari ini juga)
+                    @else
+                      {{ ucfirst($order->shipping_courier) }}
                     @endif
                   </span>
                 </div>

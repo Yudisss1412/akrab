@@ -43,9 +43,9 @@ class AutoUpdateDeliveredOrders extends Command
             if ($order->shipping_courier) {
                 $shippingMethod = strtolower($order->shipping_courier);
 
-                if (strpos($shippingMethod, 'same_day') !== false || strpos($shippingMethod, 'same day') !== false) {
+                if (strpos($shippingMethod, 'same_day') !== false || strpos($shippingMethod, 'same day') !== false || strpos($shippingMethod, 'sameday') !== false) {
                     $thresholdMinutes = 2; // Same day: 2 menit threshold
-                } elseif (strpos($shippingMethod, 'express') !== false || strpos($shippingMethod, 'kilat') !== false || strpos($shippingMethod, 'instant') !== false) {
+                } elseif (strpos($shippingMethod, 'kilat') !== false || strpos($shippingMethod, 'express') !== false || strpos($shippingMethod, 'instant') !== false) {
                     $thresholdMinutes = 5; // Express/Kilat: 5 menit threshold
                 } elseif (strpos($shippingMethod, 'reguler') !== false || strpos($shippingMethod, 'regular') !== false) {
                     $thresholdMinutes = 10; // Reguler: 10 menit threshold

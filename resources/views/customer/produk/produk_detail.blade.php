@@ -83,7 +83,18 @@ function createStarsHTML($rating, $size = 20) {
           @endforeach
         </ul>
 
+        @if($produk['stock'] > 0)
+        <div class="stock-info available">
+          <i class="fas fa-check-circle"></i> Stok Tersedia: {{ $produk['stock'] }} pcs
+        </div>
+        @else
+        <div class="stock-info out-of-stock">
+          <i class="fas fa-exclamation-triangle"></i> Stok Habis
+        </div>
+        @endif
+
         <div class="cta-row">
+          @if($produk['stock'] > 0)
           <button class="btn btn-add" data-product-id="{{ $produk['id'] }}">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="9" cy="21" r="1"/>
@@ -93,6 +104,17 @@ function createStarsHTML($rating, $size = 20) {
             + Keranjang
           </button>
           <button class="btn btn-lihat" data-product-id="{{ $produk['id'] }}">Beli Sekarang</button>
+          @else
+          <button class="btn btn-add disabled" disabled>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="9" cy="21" r="1"/>
+              <circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+            Stok Habis
+          </button>
+          <button class="btn btn-lihat disabled" disabled>Beli Sekarang</button>
+          @endif
         </div>
 
       </div>

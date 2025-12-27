@@ -973,6 +973,22 @@ function createStarsHTML($rating) {
       outline-offset: 2px !important;
     }
 
+    /* Styling untuk tombol yang dinonaktifkan */
+    .btn-add.btn-disabled {
+      background-color: #e9ecef !important;
+      color: #6c757d !important;
+      border-color: #ced4da !important;
+      cursor: not-allowed !important;
+      opacity: 0.65 !important;
+    }
+
+    .btn-add.btn-disabled:hover {
+      background-color: #e9ecef !important;
+      color: #6c757d !important;
+      border-color: #ced4da !important;
+      transform: none !important;
+    }
+
     button:focus,
     input:focus,
     select:focus,
@@ -1015,6 +1031,18 @@ function createStarsHTML($rating) {
                         <h3 class="produk-card-name">{{ $product->name }}</h3>
                         <div class="produk-card-sub">{{ $product->category ? $product->category->name : 'Umum' }}</div>
                         <div class="produk-card-price">{{ formatRupiah($product->price ?? 0) }}</div>
+                        @if($product->stock <= 0)
+                        <div class="produk-card-stock out-of-stock" style="color: #dc3545; font-weight: 600; font-size: 0.85rem; margin-top: 0.25rem;">
+                            <i class="fas fa-exclamation-triangle"></i> Stok Habis
+                        </div>
+                        @elseif($product->stock <= 5)
+                        <div class="produk-card-stock low-stock" style="color: #ffc107; font-weight: 500; font-size: 0.85rem; margin-top: 0.25rem;">
+                            <i class="fas fa-exclamation-circle"></i> Stok Terbatas: {{ $product->stock }} pcs
+                        @else
+                        <div class="produk-card-stock in-stock" style="color: #28a745; font-weight: 500; font-size: 0.85rem; margin-top: 0.25rem;">
+                            <i class="fas fa-check-circle"></i> Stok Tersedia
+                        </div>
+                        @endif
                         <div class="produk-card-toko">
                             <a href="/toko/{{ $product->seller ? $product->seller->id : 'toko-tidak-ditemukan' }}"
                                class="toko-link"
@@ -1031,10 +1059,15 @@ function createStarsHTML($rating) {
                     <button class="btn-lihat lihat-detail-btn"
                             data-product-id="{{ $product->id }}"
                             data-idx="{{ $loop->index }}">Lihat Detail</button>
+                    @if($product->stock > 0)
                     <button class="btn-add"
                             data-product-id="{{ $product->id }}"
                             data-name="{{ $product->name }}"
                             type="button">+ Keranjang</button>
+                    @else
+                    <button class="btn-add btn-disabled" disabled
+                            title="Stok habis">Stok Habis</button>
+                    @endif
                 </div>
             </div>
             @endforeach

@@ -980,13 +980,222 @@
       );
     }
 
+    // Define a namespace object to avoid conflicts
+    const ShippingModalNS = {
+      // Array to store callback functions
+      confirmCallbacks: [],
+
+      // Function to add a callback and return its index
+      addConfirmCallback: function(callback) {
+        const index = this.confirmCallbacks.length;
+        this.confirmCallbacks[index] = callback;
+        return index;
+      },
+
+      // Function to execute a callback by index
+      executeConfirmCallback: function(index) {
+        if (this.confirmCallbacks[index] && typeof this.confirmCallbacks[index] === 'function') {
+          this.confirmCallbacks[index]();
+          // Clean up to prevent memory leaks
+          delete this.confirmCallbacks[index];
+        }
+      },
+
+      // Function to close shipping modal
+      closeShippingModal: function() {
+        const modal = document.getElementById('shippingModal');
+        if (modal) {
+          modal.remove();
+        }
+      },
+
+      // Function to show confirmation modal
+      showConfirmationModal: function(title, message, onConfirm, onCancel = null) {
+        // Store the confirm and cancel callbacks and get their indices
+        const confirmIndex = this.addConfirmCallback(onConfirm);
+        const cancelIndex = onCancel ? this.addConfirmCallback(onCancel) : null;
+
+        // Create modal HTML with consistent styling
+        const modalHtml = `
+          <div id="confirmationModal" class="modal" style="display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; padding: 50px; box-sizing: border-box;">
+            <div class="modal-content" style="background: white; padding: 20px; border-radius: 8px; max-width: 400px; margin: 0 auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+              <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="margin: 0; color: var(--ak-primary, #006E5C);">${title}</h3>
+                <span onclick="ShippingModalNS.closeConfirmationModal()" style="font-size: 24px; cursor: pointer; color: #666;">&times;</span>
+              </div>
+              <div class="modal-body" style="margin-bottom: 20px;">
+                <p style="margin: 0 0 15px 0;">${message}</p>
+              </div>
+              <div class="modal-footer" style="text-align: right;">
+                <button type="button" onclick="ShippingModalNS.closeConfirmationModal(); ${cancelIndex !== null ? `ShippingModalNS.executeConfirmCallback(${cancelIndex});` : ''}" class="btn btn-outline" style="margin-right: 10px; padding: 8px 16px;">Batal</button>
+                <button type="button" onclick="ShippingModalNS.executeConfirmCallback(${confirmIndex}); ShippingModalNS.closeConfirmationModal();" class="btn btn-primary" style="padding: 8px 16px;">Ya, Lanjutkan</button>
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Add modal to body
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+      },
+
+      // Function to close confirmation modal
+      closeConfirmationModal: function() {
+        const modal = document.getElementById('confirmationModal');
+        if (modal) {
+          modal.remove();
+        }
+      },
+
+      // Function to update shipping status with tracking number
+      updateShippingStatus: function(orderId, trackingNumber, shippingCourier, shippingCarrier) {
+        // Get CSRF token value using multiple methods to ensure it's found
+        let csrfToken = null;
+
+        // Method 1: Try to get from meta tag
+        const metaToken = document.querySelector('meta[name="csrf-token"]');
+        if (metaToken) {
+          csrfToken = metaToken.getAttribute('content');
+        }
+
+        // Method 2: If not found in meta tag, try to get from data attribute in body or other element
+        if (!csrfToken) {
+          const bodyToken = document.body.getAttribute('data-csrf-token');
+          if (bodyToken) {
+            csrfToken = bodyToken;
+          }
+        }
+
+        // Method 3: If still not found, try to get from a hidden input
+        if (!csrfToken) {
+          const inputToken = document.querySelector('input[name="_token"]');
+          if (inputToken) {
+            csrfToken = inputToken.value;
+          }
+        }
+
+        // Method 4: If still not found, try to get from window object (if set by Laravel)
+        if (!csrfToken && window.Laravel && window.Laravel.csrfToken) {
+          csrfToken = window.Laravel.csrfToken;
+        }
+
+        if (!csrfToken) {
+          alert('CSRF token tidak ditemukan. Harap refresh halaman.');
+          return;
+        }
+
+        // Show confirmation modal instead of browser confirm
+        this.showConfirmationModal(
+          'Konfirmasi Pengiriman',
+          'Apakah Anda yakin ingin mengirimkan pesanan ini dengan nomor resi: ' + trackingNumber + '?',
+          function() {
+            // This function is called when user confirms
+            // Prepare the data to send
+            const requestData = {
+              tracking_number: trackingNumber,
+            };
+
+            // Only add shipping_carrier if it has a value
+            if (shippingCarrier.trim() !== '') {
+              requestData.shipping_carrier = shippingCarrier;
+            }
+
+            // Only add shipping_courier if it has a value
+            if (shippingCourier.trim() !== '' && shippingCourier !== 'akan diisi otomatis') {
+              requestData.shipping_courier = shippingCourier;
+            }
+
+            fetch(`/penjual/pesanan/${orderId}/shipping`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+              },
+              body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                alert(data.message);
+                ShippingModalNS.closeShippingModal();
+                // Refresh page to show updated status
+                location.reload();
+              } else {
+                alert('Gagal mengirimkan pesanan: ' + (data.message || 'Unknown error'));
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              alert('Terjadi kesalahan saat mengirimkan pesanan');
+            });
+          }
+        );
+      }
+    };
+
+    // Override the existing showShippingModal function to ensure it has 3 fields
+    function showShippingModal(orderId) {
+      // Create modal HTML with 3 fields
+      const modalHtml = `
+        <div id="shippingModal" class="modal" style="display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; padding: 50px; box-sizing: border-box;">
+          <div class="modal-content" style="background: white; padding: 20px; border-radius: 8px; max-width: 500px; margin: 0 auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+              <h3 style="margin: 0;">Masukkan Informasi Pengiriman</h3>
+              <span onclick="ShippingModalNS.closeShippingModal()" style="font-size: 24px; cursor: pointer;">&times;</span>
+            </div>
+            <div class="modal-body">
+              <form id="shippingForm">
+                <div class="form-group" style="margin-bottom: 15px;">
+                  <label for="trackingNumber" style="display: block; margin-bottom: 5px;">Nomor Resi:</label>
+                  <input type="text" id="trackingNumber" name="tracking_number" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                  <label for="shippingCourier" style="display: block; margin-bottom: 5px;">Jenis Layanan (Otomatis):</label>
+                  <input type="text" id="shippingCourier" name="shipping_courier" readonly style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #f5f5f5;" value="akan diisi otomatis" title="Nilai ini akan diisi otomatis dari pilihan customer saat checkout">
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                  <label for="shippingCarrier" style="display: block; margin-bottom: 5px;">Nama Ekspedisi:</label>
+                  <input type="text" id="shippingCarrier" name="shipping_carrier" placeholder="Contoh: JNE, J&T, SiCepat" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
+                <div class="form-actions" style="margin-top: 20px; text-align: right;">
+                  <button type="button" onclick="ShippingModalNS.closeShippingModal()" class="btn btn-outline" style="margin-right: 10px;">Batal</button>
+                  <button type="submit" class="btn btn-primary">Kirim Barang</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Add modal to body
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+      // Add event listener to form
+      document.getElementById('shippingForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const trackingNumber = document.getElementById('trackingNumber').value;
+        // For shipping_courier, we'll send an empty value and let the backend handle it
+        // by retrieving the original value from the database
+        const shippingCourier = ''; // This will be handled by backend
+        const shippingCarrier = document.getElementById('shippingCarrier').value;
+
+        ShippingModalNS.updateShippingStatus(orderId, trackingNumber, shippingCourier, shippingCarrier);
+      });
+    }
+
     // Panggil fungsi update saat halaman dimuat
     document.addEventListener('DOMContentLoaded', function() {
       // Panggil update setelah DOM selesai dimuat
-      updateOrderStatusCounts();
+      if (typeof updateOrderStatusCounts === 'function') {
+        updateOrderStatusCounts();
+      }
 
       // Refresh jumlah status setiap 30 detik
-      setInterval(updateOrderStatusCounts, 30000);
+      setInterval(function() {
+        if (typeof updateOrderStatusCounts === 'function') {
+          updateOrderStatusCounts();
+        }
+      }, 30000);
     });
   </script>
 </body>

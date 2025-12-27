@@ -21,6 +21,7 @@ class Order extends Model
         'paid_at',
         'notes',
         'shipping_courier',
+        'shipping_carrier',
         'tracking_number',
     ];
 

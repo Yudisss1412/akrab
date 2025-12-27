@@ -543,7 +543,10 @@
                 <div class="tracking-info">
                   <p><strong>Nomor Resi:</strong> {{ $order->tracking_number }}</p>
                   @if($order->shipping_courier)
-                    <p><strong>Kurir:</strong> {{ $order->shipping_courier }}</p>
+                    <p><strong>Jenis Layanan (Otomatis):</strong> {{ $order->shipping_courier }}</p>
+                  @endif
+                  @if($order->shipping_carrier)
+                    <p><strong>Nama Ekspedisi:</strong> {{ $order->shipping_carrier }}</p>
                   @endif
                 </div>
               @else
@@ -643,8 +646,12 @@
                   <input type="text" id="trackingNumber" name="tracking_number" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
                 </div>
                 <div class="form-group" style="margin-bottom: 15px;">
-                  <label for="shippingCourier" style="display: block; margin-bottom: 5px;">Kurir Pengiriman:</label>
-                  <input type="text" id="shippingCourier" name="shipping_courier" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                  <label for="shippingCourier" style="display: block; margin-bottom: 5px;">Jenis Layanan (Otomatis):</label>
+                  <input type="text" id="shippingCourier" name="shipping_courier" value="{{ $order->shipping_courier }}" readonly style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #f5f5f5;">
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                  <label for="shippingCarrier" style="display: block; margin-bottom: 5px;">Nama Ekspedisi:</label>
+                  <input type="text" id="shippingCarrier" name="shipping_carrier" placeholder="Contoh: JNE, J&T, SiCepat" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
                 </div>
                 <div class="form-actions" style="margin-top: 20px; text-align: right;">
                   <button type="button" onclick="closeShippingModal()" class="btn btn-outline" style="margin-right: 10px;">Batal</button>
@@ -665,8 +672,9 @@
 
         const trackingNumber = document.getElementById('trackingNumber').value;
         const shippingCourier = document.getElementById('shippingCourier').value;
+        const shippingCarrier = document.getElementById('shippingCarrier').value;
 
-        updateShippingStatus(orderId, trackingNumber, shippingCourier);
+        updateShippingStatus(orderId, trackingNumber, shippingCourier, shippingCarrier);
       });
     }
 
@@ -716,7 +724,7 @@
     }
 
     // Function to update shipping status with tracking number
-    function updateShippingStatus(orderId, trackingNumber, shippingCourier) {
+    function updateShippingStatus(orderId, trackingNumber, shippingCourier, shippingCarrier) {
       // Get CSRF token value using multiple methods to ensure it's found
       let csrfToken = null;
 
@@ -766,8 +774,10 @@
             },
             body: JSON.stringify({
               tracking_number: trackingNumber,
-              shipping_courier: shippingCourier
+              shipping_courier: shippingCourier,
+              shipping_carrier: shippingCarrier
             })
+          })
           })
           .then(response => response.json())
           .then(data => {

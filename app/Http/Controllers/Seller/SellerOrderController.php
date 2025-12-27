@@ -365,7 +365,8 @@ class SellerOrderController extends Controller
         // Validasi input
         $request->validate([
             'tracking_number' => 'required|string|max:255',
-            'shipping_courier' => 'nullable|string|max:255'
+            'shipping_courier' => 'nullable|string|max:255',
+            'shipping_carrier' => 'nullable|string|max:255'
         ]);
 
         // Hanya penjual yang bisa mengakses
@@ -387,12 +388,24 @@ class SellerOrderController extends Controller
             })
             ->firstOrFail();
 
-        // Update status menjadi shipped dan tambahkan nomor resi
-        $order->update([
+        // Siapkan data untuk update
+        $updateData = [
             'status' => 'shipped',
             'tracking_number' => $request->tracking_number,
-            'shipping_courier' => $request->shipping_courier
-        ]);
+        ];
+
+        // Hanya update shipping_carrier jika disediakan
+        if (!empty($request->shipping_carrier)) {
+            $updateData['shipping_carrier'] = $request->shipping_carrier;
+        }
+
+        // Hanya update shipping_courier jika disediakan (jika tidak kosong)
+        if (!empty($request->shipping_courier)) {
+            $updateData['shipping_courier'] = $request->shipping_courier;
+        }
+
+        // Update status menjadi shipped dan tambahkan nomor resi
+        $order->update($updateData);
 
         // Tambahkan log transisi status
         $order->logs()->create([

@@ -19,7 +19,7 @@ class AutoConfirmOrderCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Mengkonfirmasi otomatis pesanan yang belum dilaporkan sebagai belum diterima setelah 15 menit';
+    protected $description = 'Mengkonfirmasi otomatis pesanan yang belum dilaporkan sebagai belum diterima setelah 5 menit';
 
     /**
      * Execute the console command.
@@ -58,10 +58,10 @@ class AutoConfirmOrderCommand extends Command
 
             // Jika ditemukan log 'delivered' dari update-status otomatis
             if ($deliveredLog) {
-                // Hitung waktu batas (waktu saat status berubah menjadi delivered + 15 menit)
-                $deadline = $deliveredLog->created_at->addMinutes(15);
+                // Hitung waktu batas (waktu saat status berubah menjadi delivered + 5 menit)
+                $deadline = $deliveredLog->created_at->addMinutes(5);
 
-                // Jika waktu sekarang sudah melewati batas waktu 15 menit
+                // Jika waktu sekarang sudah melewati batas waktu 5 menit
                 if (now()->gte($deadline)) {
                     // Cek apakah pesanan ini pernah dilaporkan sebagai belum diterima setelah status menjadi delivered
                     $hasReport = $order->logs()
@@ -72,16 +72,16 @@ class AutoConfirmOrderCommand extends Command
                     // Jika tidak ada laporan bahwa barang belum diterima setelah status menjadi delivered, maka konfirmasi otomatis
                     if (!$hasReport) {
                         if ($isTest) {
-                            $this->info("Order {$order->order_number} akan dikonfirmasi otomatis setelah 15 menit dari status delivered (waktu: {$deadline})");
+                            $this->info("Order {$order->order_number} akan dikonfirmasi otomatis setelah 5 menit dari status delivered (waktu: {$deadline})");
                         } else {
                             // Tambahkan log bahwa pesanan dikonfirmasi otomatis
                             $order->logs()->create([
                                 'status' => 'delivered',
-                                'description' => 'Status pesanan dikonfirmasi otomatis setelah 15 menit tanpa laporan bahwa barang belum diterima',
+                                'description' => 'Status pesanan dikonfirmasi otomatis setelah 5 menit tanpa laporan bahwa barang belum diterima',
                                 'updated_by' => 'system',
                             ]);
 
-                            $this->info("Order {$order->order_number} dikonfirmasi otomatis setelah 15 menit dari status delivered");
+                            $this->info("Order {$order->order_number} dikonfirmasi otomatis setelah 5 menit dari status delivered");
                         }
                         $updatedCount++;
                     } else {

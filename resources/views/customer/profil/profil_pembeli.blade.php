@@ -345,7 +345,7 @@
     // ====== Data Wishlist untuk profil ======
     // Data akan diambil dari backend melalui AJAX
     let WISHLIST = [];
-    
+
     // Ambil data wishlist dari API
     async function fetchWishlist() {
       try {
@@ -462,7 +462,7 @@
             'Content-Type': 'application/json',
           },
         });
-        
+
         if (!response.ok) {
           if (response.status === 401 || response.status === 403) {
             alert('Anda harus login terlebih dahulu untuk mengakses wishlist');
@@ -472,7 +472,7 @@
           const errorData = await response.json();
           throw new Error(errorData.message || 'Gagal menghapus dari wishlist');
         }
-        
+
         return await response.json();
       } catch (error) {
         // Handle authentication error in catch block as well
@@ -483,17 +483,17 @@
         throw error;
       }
     }
-    
+
     // Add to cart functionality
     async function addToCart(productId, productName = 'Produk') {
       // Ambil CSRF token
       const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-      
+
       if (!productId) {
         showNotification('Produk tidak ditemukan', 'error');
         return;
       }
-      
+
       try {
         const response = await fetch('/cart/add', {
           method: 'POST',
@@ -501,7 +501,7 @@
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': csrfToken
           },
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             product_id: productId,
             quantity: 1 // Default quantity
           })
@@ -531,19 +531,19 @@
       if (!btn) return;
       const art = btn.closest('.wl-card');
       const wishlistId = btn.dataset.wishlistId || art?.dataset.wishlistId;
-      
+
       if (!wishlistId) return;
-      
+
       try {
         // Hapus dari wishlist di backend
         await removeFromWishlist(wishlistId);
-        
+
         // Hapus dari state lokal
         const idx = WISHLIST.findIndex(it => it.id == wishlistId);
         if (idx !== -1) {
           WISHLIST.splice(idx, 1);
           renderWishlist();
-          
+
           // Tampilkan notifikasi sukses bahwa produk telah dihapus dari wishlist
           showNotification('Produk berhasil dihapus dari wishlist', 'success');
         }
@@ -558,7 +558,7 @@
         showNotification('Gagal menghapus produk dari wishlist: ' + errorMessage, 'error');
       }
     });
-    
+
     // Prevent click propagation from wishlist button to parent link
     document.addEventListener('click', (e) => {
       const wishlistBtn = e.target.closest('.wl-like');
@@ -711,28 +711,28 @@
       fetchWishlist();
       fetchUserReviews();
       fetchUserOrders();  // Add this to fetch orders as well
-      
+
       // Initialize active session modal
       initActiveSessionModal();
     });
-    
+
     // ====== Active Session Modal Initialization ======
     function initActiveSessionModal() {
       console.log('Initializing active session modal...');
-      
+
       // Fungsi untuk menangani klik tombol "Lihat & Kelola" Sesi Login Aktif
       const activeSessionBtn = document.getElementById('activeSessionBtn');
       const activeSessionModal = document.getElementById('activeSessionModal');
       const closeActiveSessionModal = document.getElementById('closeActiveSessionModal');
       const logoutAllSessionsBtn = document.getElementById('logoutAllSessionsBtn');
-      
+
       console.log('Active session elements found:', {
         activeSessionBtn: activeSessionBtn,
         activeSessionModal: activeSessionModal,
         closeActiveSessionModal: closeActiveSessionModal,
         logoutAllSessionsBtn: logoutAllSessionsBtn
       });
-      
+
       if (activeSessionBtn && activeSessionModal) {
         console.log('Adding event listener to active session button');
         activeSessionBtn.addEventListener('click', function() {
@@ -748,7 +748,7 @@
         console.log('activeSessionBtn:', activeSessionBtn ? 'found' : 'not found');
         console.log('activeSessionModal:', activeSessionModal ? 'found' : 'not found');
       }
-      
+
       if (closeActiveSessionModal && activeSessionModal) {
         console.log('Adding event listener to close modal button');
         closeActiveSessionModal.addEventListener('click', function() {
@@ -756,7 +756,7 @@
           activeSessionModal.classList.remove('show');
         });
       }
-      
+
       if (logoutAllSessionsBtn) {
         console.log('Adding event listener to logout all sessions button');
         logoutAllSessionsBtn.addEventListener('click', function() {
@@ -767,7 +767,7 @@
           }
         });
       }
-      
+
       // Close modal when clicking outside of it
       if (activeSessionModal) {
         console.log('Adding event listener to close modal when clicking outside');
@@ -779,7 +779,7 @@
         });
       }
     }
-    
+
     // ====== Fetch and Render User Reviews ======
     async function fetchUserReviews() {
       try {
@@ -821,11 +821,11 @@
             </div>
           </div>
         </div>
-        
+
         <div class="review-content">
           <p>${(review.review_text || 'Ulasan tidak tersedia').replace(/\(\d+\)/g, '')}</p>
         </div>
-        
+
         <div class="review-actions">
           <button class="btn btn-icon edit-review-btn" title="Edit Ulasan" data-review-id="${review.id}">
             <i class="bi bi-pencil"></i>
@@ -838,16 +838,16 @@
     function renderReviews(reviews) {
       const reviewsList = document.getElementById('reviewsList');
       const reviewsLoading = document.getElementById('reviewsLoading');
-      
+
       if (!reviewsList) return;
-      
+
       if (reviewsLoading) {
         reviewsLoading.remove();
       }
-      
+
       if (reviews.length > 0) {
         reviewsList.innerHTML = reviews.map(reviewCardTemplate).join('');
-        
+
         // Add event listeners for edit buttons
         document.querySelectorAll('.edit-review-btn').forEach(button => {
           button.addEventListener('click', function() {
@@ -860,14 +860,14 @@
         reviewsList.innerHTML = '<p class="no-reviews">Anda belum memberikan ulasan untuk produk apapun.</p>';
       }
     }
-    
+
     // Tambahkan fungsi renderWishlist yang benar
     function renderWishlistCorrected(){
       if (!grid) return;
-      
+
       // Pastikan WISHLIST adalah array
       const wishlistArray = Array.isArray(WISHLIST) ? WISHLIST : [];
-      
+
       if (wishlistArray.length > 0) {
         grid.innerHTML = wishlistArray.map(wishlistCardTemplate).join('');
         if (emptyBox) emptyBox.hidden = true;
@@ -876,10 +876,10 @@
         if (emptyBox) emptyBox.hidden = false;
       }
     }
-    
+
     // Ganti fungsi renderWishlist dengan fungsi yang benar
     renderWishlist = renderWishlistCorrected;
-    
+
     // ====== Broadcast Channel for Wishlist Sync ======
     const wishlistChannel = new BroadcastChannel('wishlist_sync');
 
@@ -935,6 +935,10 @@
           statusClass = 'status-completed';
           statusText = 'Selesai';
           break;
+        case 'delivered':
+          statusClass = 'status-completed';
+          statusText = 'Diterima';
+          break;
         case 'shipped':
           statusClass = 'status-shipping';
           statusText = 'Dikirim';
@@ -955,21 +959,21 @@
       // Get first item image and count for display
       const firstItem = order.items && order.items.length > 0 ? order.items[0] : null;
       const additionalItemsCount = order.items ? order.items.length - 1 : 0;
-      
+
       // Format total amount with proper number formatting
       const formattedAmount = new Intl.NumberFormat('id-ID').format(order.total_amount);
-      
+
       return `<article class="order-card">
         <div class="order-header">
           <div class="order-id">#${order.order_number}</div>
           <div class="order-status ${statusClass}">${statusText}</div>
         </div>
-        
+
         <div class="order-details">
           <div class="order-date">${order.created_at}</div>
           <div class="order-amount">Rp ${formattedAmount}</div>
         </div>
-        
+
         <div class="order-items">
           <div class="item-preview">
             ${firstItem ? `<img src="${firstItem.image}" alt="${firstItem.product_name}">` : ''}
@@ -992,20 +996,20 @@
     function renderOrders(orders) {
       const ordersList = document.getElementById('ordersList');
       const ordersLoading = document.getElementById('ordersLoading');
-      
+
       if (!ordersList) return;
-      
+
       if (ordersLoading) {
         ordersLoading.remove();
       }
-      
+
       if (orders.length > 0) {
         ordersList.innerHTML = orders.map(orderCardTemplate).join('');
       } else {
         ordersList.innerHTML = '<p class="no-orders">Belum ada riwayat pesanan.</p>';
       }
     }
-    
+
     // Tab functionality for profile navigation
     document.addEventListener('DOMContentLoaded', function() {
       fetchUserReviews();
@@ -1132,15 +1136,15 @@
         }
       }, 100); // Small delay to make sure all DOM is loaded
     });
-    
+
     // ====== Modal Sesi Login Aktif ======
-    
+
     // Fungsi untuk menangani klik tombol "Lihat & Kelola" Sesi Login Aktif
     const activeSessionBtn = document.getElementById('activeSessionBtn');
     const activeSessionModal = document.getElementById('activeSessionModal');
     const closeActiveSessionModal = document.getElementById('closeActiveSessionModal');
     const logoutAllSessionsBtn = document.getElementById('logoutAllSessionsBtn');
-    
+
     if (activeSessionBtn && activeSessionModal) {
       activeSessionBtn.addEventListener('click', function() {
         console.log('Active session button clicked');
@@ -1151,13 +1155,13 @@
         loadActiveSessions();
       });
     }
-    
+
     if (closeActiveSessionModal && activeSessionModal) {
       closeActiveSessionModal.addEventListener('click', function() {
         activeSessionModal.classList.remove('show');
       });
     }
-    
+
     if (logoutAllSessionsBtn) {
       logoutAllSessionsBtn.addEventListener('click', function() {
         if (confirm('Apakah Anda yakin ingin logout dari semua perangkat?')) {
@@ -1167,7 +1171,7 @@
         }
       });
     }
-    
+
     // Close modal when clicking outside of it
     if (activeSessionModal) {
       activeSessionModal.addEventListener('click', function(event) {
@@ -1176,13 +1180,13 @@
         }
       });
     }
-    
+
     // Load active sessions data from API
     async function loadActiveSessions() {
       try {
         console.log('Loading active sessions from API...');
         const response = await fetch('/api/active-sessions');
-        
+
         if (response.ok) {
           const data = await response.json();
           console.log('Active sessions data received:', data);
@@ -1250,12 +1254,12 @@
         renderActiveSessions(dummySessions);
       }
     }
-    
+
     // Function to logout a specific session
     async function logoutSession(sessionId) {
       try {
         console.log(`Logout session requested for session ID: ${sessionId}`);
-        
+
         const response = await fetch(`/api/active-sessions/${sessionId}`, {
           method: 'DELETE',
           headers: {
@@ -1263,7 +1267,7 @@
             'Content-Type': 'application/json'
           }
         });
-        
+
         if (response.ok) {
           const data = await response.json();
           if (data.success) {
@@ -1281,12 +1285,12 @@
         alert('Terjadi kesalahan saat mengakhiri sesi');
       }
     }
-    
+
     // Function to logout all sessions
     async function logoutAllSessions() {
       try {
         console.log('Logout all sessions requested');
-        
+
         const response = await fetch('/api/active-sessions', {
           method: 'DELETE',
           headers: {
@@ -1294,7 +1298,7 @@
             'Content-Type': 'application/json'
           }
         });
-        
+
         if (response.ok) {
           const data = await response.json();
           if (data.success) {
@@ -1313,7 +1317,7 @@
       }
     }
   </script>
-  
+
   <!-- Modal Sesi Login Aktif -->
   <div id="activeSessionModal" class="modal">
     <div class="modal-content" style="width: 90%; max-width: 600px;">

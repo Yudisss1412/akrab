@@ -26,6 +26,11 @@ class Kernel extends ConsoleKernel
         $schedule->command('order:update-status')
                  ->everyMinute() // Jalankan setiap menit untuk update status otomatis
                  ->withoutOverlapping();
+
+        // Jalankan command konfirmasi otomatis pesanan setelah 15 menit tanpa laporan bahwa barang belum diterima
+        $schedule->command('order:auto-confirm')
+                 ->everyMinute() // Jalankan setiap menit untuk konfirmasi otomatis
+                 ->withoutOverlapping();
     }
 
     /**

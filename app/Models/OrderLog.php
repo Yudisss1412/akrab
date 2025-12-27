@@ -12,7 +12,9 @@ class OrderLog extends Model
     protected $fillable = [
         'order_id',
         'user_id',
+        'status',
         'description',
+        'updated_by',
     ];
 
     // Relasi ke pesanan

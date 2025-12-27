@@ -49,11 +49,30 @@ class UpdateOrderStatusCommand extends Command
                 ->orderBy('created_at', 'desc')
                 ->first();
 
-            // Jika tidak ditemukan log 'shipped', gunakan waktu saat pesanan dibuat
-            $shippedAt = $shippedLog ? $shippedLog->created_at : $order->created_at;
+            // Jika tidak ditemukan log dengan status 'shipped', coba cari berdasarkan deskripsi
+            if (!$shippedLog) {
+                $shippedLog = $order->logs()
+                    ->where('description', 'like', '%dikirim%')
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+            }
+
+            // Jika tetap tidak ditemukan log 'shipped', lewati pesanan ini
+            if (!$shippedLog) {
+                if ($isTest) {
+                    $this->info("Order {$order->order_number} tidak memiliki log 'shipped', dilewati");
+                }
+                continue;
+            }
+
+            $shippedAt = $shippedLog->created_at;
 
             // Hitung waktu batas (waktu saat status berubah menjadi shipped + batas waktu)
             $deadline = $shippedAt->addMinutes($timeLimitInMinutes);
+
+            if ($isTest) {
+                $this->info("Order {$order->order_number}: kurir='{$order->shipping_courier}', waktu shipped='{$shippedAt}', deadline='{$deadline}', sekarang='".now()."', selisih='".(now()->diffInMinutes($shippedAt))." menit'");
+            }
 
             // Jika waktu sekarang sudah melewati batas waktu
             if (now()->gte($deadline)) {

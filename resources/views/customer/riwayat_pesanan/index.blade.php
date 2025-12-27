@@ -56,6 +56,9 @@
 
                   <div class="order-actions">
                     <a href="{{ route('order.invoice', ['order' => $order['order_number']]) }}" class="btn btn-outline">Lihat Detail</a>
+                    @if($order['status'] === 'delivered')
+                      <a href="{{ route('ulasan.create', ['orderItemId' => $order['items']->first()['id'] ?? null]) }}" class="btn btn-primary">Berikan Ulasan</a>
+                    @endif
                   </div>
                 </div>
               </article>

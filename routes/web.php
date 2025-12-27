@@ -230,7 +230,7 @@ Route::get('/api/reviews', function() {
             return [
                 'id' => $review->id,
                 'product_name' => $review->product->name ?? 'Produk Tidak Ditemukan',
-                'shop_name' => $review->product->seller->name ?? 'Toko Tidak Diketahui',
+                'shop_name' => $review->product->seller->name ?? $review->product->seller_name ?? 'Toko Tidak Diketahui',
                 'product_image' => $review->product->main_image ? asset('storage/' . $review->product->main_image) :
 asset('src/placeholder_produk.png'),
                 'rating' => $review->rating,

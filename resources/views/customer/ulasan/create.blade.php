@@ -19,7 +19,7 @@
         <img src="{{ $orderItem->product->main_image ? asset('storage/' . $orderItem->product->main_image) : asset('src/placeholder_produk.png') }}" alt="{{ $orderItem->product->name }}">
         <div class="product-details">
           <h2>{{ $orderItem->product->name }}</h2>
-          <p class="shop-name">Toko: {{ $orderItem->product->seller->name ?? 'Toko Tidak Diketahui' }}</p>
+          <p class="shop-name">Toko: {{ $orderItem->product->seller->name ?? $orderItem->product->seller_name ?? 'Toko Tidak Diketahui' }}</p>
           <p class="order-info">Dibeli pada: {{ $orderItem->order->created_at->format('d M Y') }}</p>
         </div>
       </div>
@@ -37,6 +37,7 @@
             <input type="radio" id="star4" name="rating" value="4" />
             <label for="star4" title="4 bintang" class="star">★</label>
             <input type="radio" id="star3" name="rating" value="3" />
+            <label for="star3" title="3 bintang" class="star">★</label>
             <input type="radio" id="star2" name="rating" value="2" />
             <label for="star2" title="2 bintang" class="star">★</label>
             <input type="radio" id="star1" name="rating" value="1" />

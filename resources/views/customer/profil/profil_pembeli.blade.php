@@ -41,6 +41,33 @@
     .btn-report:hover {
       color: #005a4a !important;
     }
+
+    .btn-review {
+      background: #006E5C !important;
+      border: none !important;
+      color: white !important;
+      text-decoration: none !important;
+      cursor: pointer !important;
+      padding: 0.5rem 1rem !important;
+      font-size: 0.85rem !important;
+      font-weight: 500 !important;
+      border-radius: 4px !important;
+      white-space: nowrap !important;
+      display: inline-block !important;
+      margin-left: 0.5rem !important;
+    }
+
+    .btn-review:hover {
+      background: #005a4a !important;
+      color: white !important;
+    }
+
+    .action-buttons {
+      display: flex !important;
+      flex-direction: row !important;
+      gap: 0.5rem !important;
+      align-items: center !important;
+    }
   </style>
 @endpush
 
@@ -705,6 +732,13 @@
       }
     }
 
+    // Fungsi untuk mengarahkan ke halaman ulasan produk
+    function redirectToReview(orderNumber) {
+      // Arahkan ke halaman ulasan berdasarkan nomor pesanan
+      // Kita akan ke halaman yang menampilkan semua item dalam pesanan untuk diulas
+      window.location.href = `/orders/${orderNumber}/review`;
+    }
+
     // ====== Init ======
     document.addEventListener('DOMContentLoaded', function() {
       console.log('DOM fully loaded and parsed');
@@ -985,7 +1019,7 @@
               ${order.status === 'shipped' ? `<a href="/shipping-track/${order.order_number}" class="btn btn-primary">Lacak Pesanan</a>` : ''}
             </div>
             <div class="right-actions">
-              ${(order.status === 'delivered') ? `<button type="button" class="btn-report" onclick="reportUndeliveredOrderV2('${order.order_number}')">Laporkan Barang Belum Diterima</button>` : ''}
+              ${(order.status === 'delivered') ? `<div class="action-buttons"><button type="button" class="btn-review" onclick="redirectToReview('${order.order_number}')">Berikan Ulasan</button></div>` : ''}
             </div>
           </div>
         </div>

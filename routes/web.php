@@ -215,6 +215,7 @@ Route::post('/ulasan', [App\Http\Controllers\ReviewController::class, 'store'])-
 Route::get('/ulasan/{orderItemId}/create', [App\Http\Controllers\ReviewController::class, 'create'])->name('ulasan.create');
 Route::get('/ulasan/produk/{productId}', [App\Http\Controllers\ReviewController::class,
 'showByProduct'])->name('ulasan.show_by_product');
+Route::get('/orders/{orderNumber}/review', [App\Http\Controllers\ReviewController::class, 'showReviewPageForOrder'])->name('orders.review');
 
 // API endpoint untuk mengambil ulasan pengguna
 Route::get('/api/reviews', function() {

@@ -287,4 +287,40 @@ class ReviewController extends Controller
             'message' => 'Ulasan berhasil dihapus'
         ]);
     }
+
+    /**
+     * Menampilkan halaman untuk memberikan ulasan untuk semua item dalam pesanan
+     */
+    public function showReviewPageForOrder($orderNumber)
+    {
+        // Cari order berdasarkan nomor pesanan
+        $order = Order::where('order_number', $orderNumber)->firstOrFail();
+
+        // Pastikan hanya pembeli yang bisa memberikan ulasan
+        if ($order->user_id !== Auth::id()) {
+            abort(403, 'Anda tidak diizinkan memberikan ulasan untuk pesanan ini');
+        }
+
+        // Ambil semua item dalam pesanan
+        $orderItems = $order->items()->with(['product', 'product.seller'])->get();
+
+        // Cek apakah sudah ada ulasan untuk masing-masing produk
+        $itemsWithReviewStatus = $orderItems->map(function ($item) use ($order) {
+            $existingReview = Review::where('user_id', Auth::id())
+                                    ->where('product_id', $item->product_id)
+                                    ->where('order_id', $order->id)
+                                    ->first();
+
+            return [
+                'id' => $item->id,
+                'product' => $item->product,
+                'quantity' => $item->quantity,
+                'unit_price' => $item->unit_price,
+                'has_review' => $existingReview !== null,
+                'review_id' => $existingReview ? $existingReview->id : null
+            ];
+        });
+
+        return view('customer.ulasan.create_for_order', compact('order', 'itemsWithReviewStatus'));
+    }
 }

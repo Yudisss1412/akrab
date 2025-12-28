@@ -101,7 +101,7 @@
 
     .shortcut-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: 1fr;
       gap: 0.75rem;
     }
 
@@ -109,11 +109,15 @@
       background: var(--bg);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 0.75rem;
+      padding: 1rem;
       text-align: center;
       cursor: pointer;
       transition: all 0.2s ease;
       color: #006E5C; /* Green color */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
 
     .shortcut-btn:hover {
@@ -405,7 +409,7 @@
         
 
         <!-- Dashboard Widgets -->
-        <div class="dashboard-grid">
+        <div class="dashboard-grid" style="grid-template-columns: repeat(2, 1fr);">
           <!-- Widget 1: Ecosystem Key Metrics -->
           <div class="widget">
             <div class="widget-header">
@@ -438,6 +442,8 @@
                   <canvas id="revenueChart"></canvas>
                 </div>
               </div>
+
+              <div style="margin-bottom: 1rem;"></div> <!-- Space between metric card and stats grid -->
 
               <div class="stats-grid">
                 <div class="stat-card">
@@ -489,6 +495,8 @@
                 </div>
               </div>
 
+              <div style="margin-top: 1rem;"></div> <!-- Space between stats grid and metric card -->
+
               <div class="metric-card">
                 <div class="metric-title">Aktivitas Terbaru</div>
                 <div id="recentActivitiesList" style="margin-top: 10px;">
@@ -498,33 +506,40 @@
             </div>
           </div>
 
-          <!-- Widget 3: Campaign Performance Trends -->
+          <!-- Widget 3: Quick Shortcuts -->
           <div class="widget">
             <div class="widget-header">
-              <h3 class="widget-title">Tren Kinerja Kampanye</h3>
+              <h3 class="widget-title">Pintasan Cepat</h3>
             </div>
-            <div class="widget-content expanded with-chart">
-              <div class="chart-container campaign-trends-container">
-                <canvas id="campaignTrendsChart"></canvas>
-              </div>
-              <div class="stats-grid" style="margin-top: 15px;">
-                <div class="stat-card">
-                  <div class="stat-value" id="totalCampaignsCount">0</div>
-                  <div class="stat-label">Total Kampanye</div>
-                </div>
-                <div class="stat-card">
-                  <div class="stat-value" id="activeCampaignsCount">0</div>
-                  <div class="stat-label">Kampanye Aktif</div>
-                </div>
-                <div class="stat-card">
-                  <div class="stat-value" id="avgROIPercentage">0%</div>
-                  <div class="stat-label">Rata-rata ROI</div>
-                </div>
+            <div class="widget-content expanded">
+              <div class="shortcut-grid">
+                <a href="{{ route('sellers.index') }}" class="shortcut-btn">
+                  <div class="shortcut-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M20 21V19C20 16.24 16.42 14 12 14C7.58 14 4 16.24 4 19V21" stroke="currentColor" stroke-width="2"/>
+                      <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                  </div>
+                  <div>Manajemen Akun</div>
+                </a>
+
+                <a href="{{ route('admin.produk.index') }}" class="shortcut-btn">
+                  <div class="shortcut-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5 21C4.44772 21 4 20.5523 4 20V4C4 3.44772 4.44772 3 5 3H19C19.5523 3 20 3.44772 20 4V20C20 20.5523 19.5523 21 19 21H5Z" stroke="currentColor" stroke-width="2"/>
+                      <path d="M4 8H20" stroke="currentColor" stroke-width="2"/>
+                      <path d="M9 13H15" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                  </div>
+                  <div>Manajemen Produk</div>
+                </a>
+
+
               </div>
             </div>
           </div>
 
-          <!-- Widget 4: Management & Moderation Feed -->
+          <!-- Widget 5: Management & Moderation Feed -->
           <div class="widget">
             <div class="widget-header">
               <h3 class="widget-title">Manajemen & Moderation</h3>
@@ -555,39 +570,6 @@
                     <div class="metric-value">18</div>
                   </div>
                 </a>
-              </div>
-            </div>
-          </div>
-
-          <!-- Widget 4: Quick Shortcuts -->
-          <div class="widget">
-            <div class="widget-header">
-              <h3 class="widget-title">Pintasan Cepat</h3>
-            </div>
-            <div class="widget-content expanded">
-              <div class="shortcut-grid">
-                <a href="{{ route('sellers.index') }}" class="shortcut-btn">
-                  <div class="shortcut-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M20 21V19C20 16.24 16.42 14 12 14C7.58 14 4 16.24 4 19V21" stroke="currentColor" stroke-width="2"/>
-                      <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                  </div>
-                  <div>Manajemen Akun</div>
-                </a>
-
-                <a href="{{ route('admin.produk.index') }}" class="shortcut-btn">
-                  <div class="shortcut-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M5 21C4.44772 21 4 20.5523 4 20V4C4 3.44772 4.44772 3 5 3H19C19.5523 3 20 3.44772 20 4V20C20 20.5523 19.5523 21 19 21H5Z" stroke="currentColor" stroke-width="2"/>
-                      <path d="M4 8H20" stroke="currentColor" stroke-width="2"/>
-                      <path d="M9 13H15" stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                  </div>
-                  <div>Manajemen Produk</div>
-                </a>
-
-
               </div>
             </div>
           </div>
@@ -819,7 +801,7 @@
     }
 
     // Initialize Chart.js charts
-    let gmvChart, revenueChart, campaignTrendsChart;
+    let gmvChart, revenueChart;
 
     function initCharts() {
       const gmvCtx = document.getElementById('gmvChart').getContext('2d');
@@ -828,7 +810,6 @@
       // Destroy existing charts if they exist
       if (gmvChart) gmvChart.destroy();
       if (revenueChart) revenueChart.destroy();
-      if (campaignTrendsChart) campaignTrendsChart.destroy();
 
       // Sample data - this will be replaced with actual API data
       const chartData = {
@@ -917,134 +898,16 @@
           }
         }
       });
-
-      // Initialize campaign trends chart with sample data
-      const campaignCtx = document.getElementById('campaignTrendsChart').getContext('2d');
-      campaignTrendsChart = new Chart(campaignCtx, {
-        type: 'bar',
-        data: {
-          labels: ['Email', 'Social Media', 'Banner', 'Search'],
-          datasets: [{
-            label: 'Jumlah Konversi',
-            data: [65, 59, 80, 81],
-            backgroundColor: 'rgba(0, 110, 92, 0.6)',
-            borderColor: '#006E5C',
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              display: false // Hide y-axis labels to save space
-            },
-            x: {
-              display: true
-            }
-          }
-        }
-      });
     }
 
     function updateCharts(range) {
       // Update the charts with new data based on selected range
       initCharts();
 
-      // Update campaign trends chart with real data
-      updateCampaignTrendsChart(range);
-
       // Update metrics with new data based on selected range
       updateMetrics(range);
     }
 
-    // Function to update campaign trends chart with real data from API
-    async function updateCampaignTrendsChart(range) {
-      try {
-        const response = await fetch(`/api/admin/marketing-campaigns/trends?range=${range}`);
-        const result = await response.json();
-
-        if (result.success) {
-          const data = result.data;
-
-          // Update campaign statistics
-          updateCampaignStats();
-
-          // Prepare chart data from API response
-          const labels = data.map(item => item.campaign_type || 'Tidak Diketahui');
-          const conversionData = data.map(item => item.avg_conversions || 0);
-
-          // Update the campaign trends chart
-          if (campaignTrendsChart) {
-            campaignTrendsChart.destroy();
-          }
-
-          const campaignCtx = document.getElementById('campaignTrendsChart').getContext('2d');
-          campaignTrendsChart = new Chart(campaignCtx, {
-            type: 'bar',
-            data: {
-              labels: labels,
-              datasets: [{
-                label: 'Rata-rata Konversi',
-                data: conversionData,
-                backgroundColor: 'rgba(0, 110, 92, 0.6)',
-                borderColor: '#006E5C',
-                borderWidth: 1
-              }]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                legend: {
-                  display: false
-                }
-              },
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  display: false // Hide y-axis labels to save space
-                },
-                x: {
-                  display: true
-                }
-              }
-            }
-          });
-        } else {
-          console.error('Failed to load campaign trends data:', result.message);
-        }
-      } catch (error) {
-        console.error('Error fetching campaign trends data:', error);
-      }
-    }
-
-    // Function to update campaign statistics
-    async function updateCampaignStats() {
-      try {
-        const response = await fetch('/api/admin/marketing-campaigns/stats');
-        const result = await response.json();
-
-        if (result.success) {
-          const data = result.data;
-
-          // Update campaign statistics
-          document.getElementById('totalCampaignsCount').textContent = data.total_campaigns;
-          document.getElementById('activeCampaignsCount').textContent = data.active_campaigns;
-          document.getElementById('avgROIPercentage').textContent = data.total_roi + '%';
-        } else {
-          console.error('Failed to load campaign stats:', result.message);
-        }
-      } catch (error) {
-        console.error('Error fetching campaign stats:', error);
-      }
-    }
 
     // Initialize with the default selection
     document.addEventListener('DOMContentLoaded', function() {
@@ -1061,12 +924,10 @@
     function startRealTimeUpdates() {
       // Initial load
       updateRealTimeStats();
-      updateCampaignStats();
 
       // Set up interval to update every 30 seconds
       realTimeUpdateInterval = setInterval(() => {
         updateRealTimeStats();
-        updateCampaignStats();
       }, 30000);
     }
 

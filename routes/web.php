@@ -745,6 +745,13 @@ Route::middleware(['auth', 'admin.role'])->group(function () {
     Route::get('/api/admin/dashboard/users', [App\Http\Controllers\Admin\AdminDashboardController::class, 'getUserStats'])->name('api.admin.dashboard.users');
     Route::get('/api/admin/dashboard/products', [App\Http\Controllers\Admin\AdminDashboardController::class, 'getProductStats'])->name('api.admin.dashboard.products');
     Route::get('/api/admin/payment/pending', [App\Http\Controllers\Admin\AdminDashboardController::class, 'getPendingPayments'])->name('api.admin.payment.pending');
+    Route::get('/api/admin/dashboard/realtime', [App\Http\Controllers\Admin\AdminDashboardController::class, 'getRealTimeStats'])->name('api.admin.dashboard.realtime');
+    Route::get('/api/admin/marketing-campaigns/stats', [App\Http\Controllers\Admin\MarketingCampaignController::class, 'getPerformanceStats'])->name('api.admin.marketing.stats');
+    Route::get('/api/admin/marketing-campaigns/trends', [App\Http\Controllers\Admin\MarketingCampaignController::class, 'getCampaignTrends'])->name('api.admin.marketing.trends');
+
+    // Marketing Campaign Management Routes
+    Route::resource('admin/marketing-campaigns', App\Http\Controllers\Admin\MarketingCampaignController::class)
+              ->names('admin.marketing_campaigns');
 
     // Test endpoint for creating a product
     Route::post('/api/admin/test-create-product', function () {

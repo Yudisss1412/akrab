@@ -36,14 +36,18 @@ class AdminDashboardController extends Controller
         
         // Get moderation counts
         $moderationCounts = $this->getModerationCounts();
-        
+
+        // Get user statistics
+        $userStats = $this->getUserStatistics($startDate);
+
         // Return JSON response
         return response()->json([
             'success' => true,
             'data' => [
                 'metrics' => $metrics,
                 'seller_stats' => $sellerStats,
-                'moderation_counts' => $moderationCounts
+                'moderation_counts' => $moderationCounts,
+                'user_stats' => $userStats
             ]
         ]);
     }
@@ -96,11 +100,12 @@ class AdminDashboardController extends Controller
                                  ->count();
         
         // Growth percentage calculation (simplified)
-        $previousPeriodStart = $startDate->copy()->subDays($startDate->diffInDays(now()));
+        $daysDiff = abs($startDate->diffInDays(now()));
+        $previousPeriodStart = $startDate->copy()->subDays($daysDiff);
         $previousGmv = Order::whereBetween('created_at', [$previousPeriodStart, $startDate])
                             ->where('status', '!=', 'cancelled')
                             ->sum('total_amount');
-        
+
         $growthPercentage = $previousGmv > 0 ? (($gmv - $previousGmv) / $previousGmv) * 100 : 0;
         
         return [
@@ -148,35 +153,44 @@ class AdminDashboardController extends Controller
     {
         // Total sellers
         $totalSellers = Seller::count();
-        
+
         // New sellers in the period
         $newSellers = Seller::where('created_at', '>=', $startDate)->count();
-        
+
         // Active sellers (sellers with orders in the period)
-        $activeSellers = Seller::whereHas('orders', function ($query) use ($startDate) {
+        // Using products relationship and then orders through order_items
+        $activeSellers = Seller::whereHas('products.orderItems.order', function ($query) use ($startDate) {
             $query->where('created_at', '>=', $startDate);
         })->count();
-        
-        // Top selling sellers
-        $topSellers = Seller::withCount(['orders as total_orders'])
-                            ->withSum(['orders as total_sales'], 'total_amount')
-                            ->orderBy('total_sales_sum', 'desc')
-                            ->limit(5)
-                            ->get()
-                            ->map(function ($seller) {
-                                return [
-                                    'id' => $seller->id,
-                                    'name' => $seller->name,
-                                    'total_orders' => $seller->total_orders_count,
-                                    'total_sales' => $seller->total_sales_sum
-                                ];
-                            });
-        
+
+        // Top selling sellers - using join to efficiently calculate total sales
+        $topSellers = DB::table('sellers')
+                        ->leftJoin('products', 'sellers.id', '=', 'products.seller_id')
+                        ->leftJoin('order_items', 'products.id', '=', 'order_items.product_id')
+                        ->select(
+                            'sellers.id',
+                            'sellers.store_name',
+                            DB::raw('COUNT(products.id) as total_products_count'),
+                            DB::raw('COALESCE(SUM(order_items.subtotal), 0) as total_sales_sum')
+                        )
+                        ->groupBy('sellers.id', 'sellers.store_name')
+                        ->orderBy('total_sales_sum', 'desc')
+                        ->limit(5)
+                        ->get()
+                        ->map(function ($seller) {
+                            return [
+                                'id' => $seller->id,
+                                'name' => $seller->store_name ?? 'Penjual Tanpa Nama',
+                                'total_products' => $seller->total_products_count,
+                                'total_sales' => $seller->total_sales_sum
+                            ];
+                        })->toArray();
+
         return [
             'total' => $totalSellers,
             'new' => $newSellers,
             'active' => $activeSellers,
-            'top_sellers' => $topSellers
+            'top_sellers' => collect($topSellers)
         ];
     }
     
@@ -189,12 +203,39 @@ class AdminDashboardController extends Controller
     {
         // For now, using dummy data since we don't have actual moderation systems
         // In a real implementation, these would come from actual reports/moderation tables
-        
+
         return [
             'violations_reported' => 24,
             'support_tickets' => 42,
             'withdrawal_requests' => 18,
             'pending_verifications' => 24
+        ];
+    }
+
+    /**
+     * Get user statistics
+     *
+     * @param  \Carbon\Carbon  $startDate
+     * @return array
+     */
+    private function getUserStatistics($startDate)
+    {
+        // Total users
+        $totalUsers = User::count();
+
+        // New users in period
+        $newUsers = User::where('created_at', '>=', $startDate)->count();
+
+        // Active users (users with orders in the period)
+        // Using orders relationship
+        $activeUsers = User::whereHas('orders', function ($query) use ($startDate) {
+            $query->where('created_at', '>=', $startDate);
+        })->count();
+
+        return [
+            'total' => $totalUsers,
+            'new' => $newUsers,
+            'active_users' => $activeUsers
         ];
     }
     
@@ -344,17 +385,17 @@ class AdminDashboardController extends Controller
             return [
                 'id' => $order->id,
                 'order_number' => $order->order_number,
-                'customer_name' => $order->user->name ?? 'Pelanggan Tidak Ditemukan',
-                'customer_phone' => $order->user->phone ?? 'Tidak Tersedia',
+                'customer_name' => isset($order->user->name) ? $order->user->name : 'Pelanggan Tidak Ditemukan',
+                'customer_phone' => isset($order->user->phone) ? $order->user->phone : 'Tidak Tersedia',
                 'total_amount' => $order->total_amount,
                 'formatted_amount' => 'Rp' . number_format($order->total_amount, 0, ',', '.'),
                 'proof_image' => $order->payment ? asset('storage/' . $order->payment->proof_image) : null,
                 'created_at' => $order->created_at->format('d M Y H:i'),
                 'payment_status' => $order->payment ? $order->payment->payment_status : 'Tidak Ditemukan',
-                'seller_name' => $order->items->first() ? ($order->items->first()->product->seller->store_name ?? 'Penjual Tidak Ditemukan') : 'Tidak Ada Produk',
+                'seller_name' => $order->items->first() ? (isset($order->items->first()->product->seller->store_name) ? $order->items->first()->product->seller->store_name : 'Penjual Tidak Ditemukan') : 'Tidak Ada Produk',
                 'items' => $order->items->map(function($item) {
                     return [
-                        'product_name' => $item->product->name ?? 'Produk Tidak Ditemukan',
+                        'product_name' => isset($item->product->name) ? $item->product->name : 'Produk Tidak Ditemukan',
                         'quantity' => $item->quantity,
                         'subtotal' => $item->subtotal,
                         'formatted_subtotal' => 'Rp' . number_format($item->subtotal, 0, ',', '.')
@@ -375,5 +416,110 @@ class AdminDashboardController extends Controller
                 'to' => $pendingPayments->lastItem()
             ]
         ]);
+    }
+
+    /**
+     * Get real-time dashboard statistics
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getRealTimeStats(Request $request)
+    {
+        // Get real-time metrics
+        $realTimeMetrics = [
+            'active_users' => $this->getActiveUsersCount(),
+            'new_orders' => $this->getNewOrdersCount(),
+            'pending_payments' => $this->getPendingPaymentsCount(),
+            'recent_activities' => $this->getRecentActivities()
+        ];
+
+        return response()->json([
+            'success' => true,
+            'data' => $realTimeMetrics
+        ]);
+    }
+
+    /**
+     * Get count of active users in the last 5 minutes
+     *
+     * @return int
+     */
+    private function getActiveUsersCount()
+    {
+        // In a real implementation, this would track user sessions or last activity
+        // For now, we'll return a simulated value
+        return rand(15, 45); // Simulated active users
+    }
+
+    /**
+     * Get count of new orders in the last 5 minutes
+     *
+     * @return int
+     */
+    private function getNewOrdersCount()
+    {
+        return Order::where('created_at', '>=', now()->subMinutes(5))
+                    ->count();
+    }
+
+    /**
+     * Get count of pending payments
+     *
+     * @return int
+     */
+    private function getPendingPaymentsCount()
+    {
+        return Order::whereHas('payment', function ($query) {
+            $query->where('payment_status', 'pending')
+                  ->orWhere('payment_status', 'pending_verification');
+        })->count();
+    }
+
+    /**
+     * Get recent activities for the dashboard
+     *
+     * @return array
+     */
+    private function getRecentActivities()
+    {
+        // Get recent orders
+        $recentOrders = Order::with(['user', 'items.product.seller'])
+                             ->orderBy('created_at', 'desc')
+                             ->limit(5)
+                             ->get()
+                             ->map(function ($order) {
+                                 return [
+                                     'type' => 'order',
+                                     'message' => "Pesanan baru dari " . (isset($order->user->name) ? $order->user->name : 'Pelanggan'),
+                                     'time' => $order->created_at->diffForHumans(),
+                                     'amount' => $order->total_amount,
+                                     'formatted_amount' => 'Rp' . number_format($order->total_amount, 0, ',', '.')
+                                 ];
+                             });
+
+        // Get recent payments
+        $recentPayments = Payment::with(['order.user'])
+                                ->where('payment_status', 'paid')
+                                ->orderBy('updated_at', 'desc')
+                                ->limit(3)
+                                ->get()
+                                ->map(function ($payment) {
+                                    return [
+                                        'type' => 'payment',
+                                        'message' => "Pembayaran diterima dari " . (isset($payment->order->user->name) ? $payment->order->user->name : 'Pelanggan'),
+                                        'time' => $payment->updated_at->diffForHumans(),
+                                        'amount' => isset($payment->order->total_amount) ? $payment->order->total_amount : 0,
+                                        'formatted_amount' => 'Rp' . number_format(isset($payment->order->total_amount) ? $payment->order->total_amount : 0, 0, ',', '.')
+                                    ];
+                                });
+
+        // Combine and sort activities by time
+        $allActivities = collect($recentOrders)->concat($recentPayments)
+                                               ->sortByDesc('time')
+                                               ->take(8)
+                                               ->values();
+
+        return $allActivities;
     }
 }

@@ -6,6 +6,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ asset('css/admin/dashboard_admin.css') }}">
   <link rel="stylesheet" href="{{ asset('css/admin_penjual/style.css') }}">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     /* Dashboard Widget Styles */
     .dashboard-grid {
@@ -14,7 +16,7 @@
       gap: 1.5rem;
       margin-top: 1rem;
     }
-    
+
     .widget {
       background: var(--white);
       border-radius: var(--ak-radius);
@@ -23,25 +25,25 @@
       overflow: hidden;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    
+
     .widget:hover {
       transform: translateY(-5px);
       box-shadow: 0 12px 25px rgba(0,0,0,.1);
     }
-    
+
     .widget-header {
       padding: 1rem;
       border-bottom: 1px solid var(--ak-border);
-      background: linear-gradient(135deg, #006E5C 0%, #a8d5c9 100%);
+      background: linear-gradient(135deg, #006E5C 0%, #008d73 100%);
       color: white;
     }
-    
+
     .widget-title {
       margin: 0;
       font-size: 1.1rem;
       font-weight: 600;
     }
-    
+
     .widget-icon {
       width: 24px;
       height: 24px;
@@ -49,46 +51,60 @@
       align-items: center;
       justify-content: center;
     }
-    
+
     .widget-content {
       padding: 1rem;
       max-height: 0;
       overflow: hidden;
       transition: max-height 0.3s ease, padding 0.3s ease;
     }
-    
+
     .widget-content.expanded {
-      max-height: 1000px;
+      max-height: 400px;
       padding: 1rem;
+      overflow-y: auto;
     }
-    
+
+    /* Specific height for widgets with charts */
+    .widget-content.with-chart {
+      max-height: 380px;
+    }
+
+    .widget-content.with-chart.expanded {
+      max-height: 380px;
+      overflow-y: auto;
+    }
+
     .metric-card {
       background: var(--bg);
       border-radius: 8px;
-      padding: 0.75rem;
-      margin-bottom: 0.75rem;
-      border-left: 3px solid var(--primary);
-      transition: background-color 0.2s ease;
+      padding: 0.85rem;
+      margin-bottom: 0.85rem;
+      border-left: 4px solid #006E5C;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
-    
+
     .metric-title {
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       color: var(--muted);
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.3rem;
+      font-weight: 500;
     }
-    
+
     .metric-value {
-      font-size: 1.25rem;
-      font-weight: 600;
+      font-size: 1.35rem;
+      font-weight: 700;
       color: var(--text);
+      line-height: 1.2;
     }
-    
+
     .shortcut-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 0.75rem;
     }
-    
+
     .shortcut-btn {
       background: var(--bg);
       border: 1px solid var(--border);
@@ -99,13 +115,13 @@
       transition: all 0.2s ease;
       color: #006E5C; /* Green color */
     }
-    
+
     .shortcut-btn:hover {
       background: var(--primary);
       color: white;
       border-color: var(--primary);
     }
-    
+
     .shortcut-icon {
       width: 24px;
       height: 24px;
@@ -114,73 +130,81 @@
       align-items: center;
       justify-content: center;
     }
-    
+
     .toggle-icon {
       transition: transform 0.3s ease;
     }
-    
+
     .toggle-icon.rotated {
       transform: rotate(180deg);
     }
-    
+
     /* Expanded state for widgets */
     .widget.expanded .toggle-icon {
       transform: rotate(180deg);
     }
-    
+
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
       gap: 0.75rem;
       margin-top: 1rem;
     }
-    
+
     .stat-card {
       background: var(--bg);
       border-radius: 8px;
-      padding: 0.75rem;
+      padding: 0.8rem;
       text-align: center;
       border: 1px solid var(--border);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    
+
+    .stat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
     .stat-value {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--primary);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #006E5C;
+      line-height: 1.2;
     }
-    
+
     .stat-label {
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       color: var(--muted);
+      margin-top: 0.25rem;
     }
-    
+
     .metric-card a {
       text-decoration: none;
       color: inherit;
     }
-    
+
     .metric-card a {
       text-decoration: none;
       color: inherit;
       display: block;
     }
-    
+
     .metric-card-container {
       margin-bottom: 0.75rem;
     }
-    
+
     .metric-link {
       display: block;
       text-decoration: none;
       color: inherit;
     }
-    
+
     .metric-link:hover .metric-card {
       background-color: var(--bg);
       transform: translateY(-2px);
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
-    
+
     .time-filter select {
       background: white;
       border: 1px solid var(--border);
@@ -189,6 +213,55 @@
       font-size: 0.8rem;
     }
 
+    /* Chart container styles */
+    .chart-container {
+      position: relative;
+      height: 180px;
+      margin-top: 15px;
+    }
+
+    /* Additional styling for campaign trends chart */
+    .campaign-trends-container {
+      padding: 10px 0;
+    }
+
+    .trend-indicator {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.8em;
+      margin-left: 8px;
+    }
+
+    .trend-up {
+      background-color: rgba(40, 167, 69, 0.2);
+      color: #28a745;
+    }
+
+    .trend-down {
+      background-color: rgba(220, 53, 69, 0.2);
+      color: #dc3545;
+    }
+
+    .stat-card.highlight {
+      border-left: 3px solid #006E5C;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+
+    .activity-item:hover {
+      background: #e9ecef !important;
+      transition: background 0.3s ease;
+    }
+
+    .metric-card:hover {
+      background-color: #e9ecef;
+      transform: translateY(-2px);
+      transition: all 0.2s ease;
+    }
+
+    .widget-header.gradient {
+      background: linear-gradient(135deg, #006E5C 0%, #008d73 100%);
+    }
 
     /* Responsive widget styles */
     @media (max-width: 768px) {
@@ -347,51 +420,25 @@
                 </div>
               </div>
             </div>
-            <div class="widget-content expanded">
+            <div class="widget-content expanded with-chart">
               <div class="metric-card">
                 <div class="metric-title">Gross Merchandise Volume (GMV)</div>
                 <div class="metric-value">Rp 2,450,780,000</div>
-                <!-- Sparkline chart for GMV -->
-                <div style="height: 40px; margin-top: 10px;">
-                  <svg width="100%" height="40" viewBox="0 0 300 40">
-                    <polyline 
-                      fill="none" 
-                      stroke="#a8d5c9" 
-                      stroke-width="2" 
-                      points="0,30 30,25 60,20 90,22 120,18 150,15 180,12 210,10 240,15 270,8 300,5" 
-                    />
-                    <polyline 
-                      fill="none" 
-                      stroke="#006E5C" 
-                      stroke-width="3" 
-                      points="0,30 30,25 60,20 90,22 120,18 150,15 180,12 210,10 240,15 270,8 300,5" 
-                    />
-                  </svg>
+                <!-- Chart.js chart for GMV -->
+                <div class="chart-container">
+                  <canvas id="gmvChart"></canvas>
                 </div>
               </div>
-              
+
               <div class="metric-card">
                 <div class="metric-title">Pendapatan Platform</div>
                 <div class="metric-value">Rp 122,539,000</div>
-                <!-- Sparkline chart for Revenue -->
-                <div style="height: 40px; margin-top: 10px;">
-                  <svg width="100%" height="40" viewBox="0 0 300 40">
-                    <polyline 
-                      fill="none" 
-                      stroke="#a8d5c9" 
-                      stroke-width="2" 
-                      points="0,35 30,32 60,30 90,28 120,25 150,22 180,20 210,18 240,15 270,12 300,10" 
-                    />
-                    <polyline 
-                      fill="none" 
-                      stroke="#006E5C" 
-                      stroke-width="3" 
-                      points="0,35 30,32 60,30 90,28 120,25 150,22 180,20 210,18 240,15 270,12 300,10" 
-                    />
-                  </svg>
+                <!-- Chart.js chart for Revenue -->
+                <div class="chart-container">
+                  <canvas id="revenueChart"></canvas>
                 </div>
               </div>
-              
+
               <div class="stats-grid">
                 <div class="stat-card">
                   <div class="stat-value">2,340</div>
@@ -420,8 +467,64 @@
               </div>
             </div>
           </div>
-          
-          <!-- Widget 2: Management & Moderation Feed -->
+
+          <!-- Widget 2: Real-Time Monitoring -->
+          <div class="widget">
+            <div class="widget-header">
+              <h3 class="widget-title">Pemantauan Real-Time</h3>
+            </div>
+            <div class="widget-content expanded with-chart">
+              <div class="stats-grid">
+                <div class="stat-card">
+                  <div class="stat-value" id="activeUsersCount">0</div>
+                  <div class="stat-label">Pengguna Aktif</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-value" id="newOrdersCount">0</div>
+                  <div class="stat-label">Pesanan Baru</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-value" id="pendingPaymentsCount">0</div>
+                  <div class="stat-label">Pembayaran Tertunda</div>
+                </div>
+              </div>
+
+              <div class="metric-card">
+                <div class="metric-title">Aktivitas Terbaru</div>
+                <div id="recentActivitiesList" style="margin-top: 10px;">
+                  <!-- Recent activities will be populated by JavaScript -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Widget 3: Campaign Performance Trends -->
+          <div class="widget">
+            <div class="widget-header">
+              <h3 class="widget-title">Tren Kinerja Kampanye</h3>
+            </div>
+            <div class="widget-content expanded with-chart">
+              <div class="chart-container campaign-trends-container">
+                <canvas id="campaignTrendsChart"></canvas>
+              </div>
+              <div class="stats-grid" style="margin-top: 15px;">
+                <div class="stat-card">
+                  <div class="stat-value" id="totalCampaignsCount">0</div>
+                  <div class="stat-label">Total Kampanye</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-value" id="activeCampaignsCount">0</div>
+                  <div class="stat-label">Kampanye Aktif</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-value" id="avgROIPercentage">0%</div>
+                  <div class="stat-label">Rata-rata ROI</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Widget 4: Management & Moderation Feed -->
           <div class="widget">
             <div class="widget-header">
               <h3 class="widget-title">Manajemen & Moderation</h3>
@@ -435,7 +538,7 @@
                   </div>
                 </a>
               </div>
-              
+
               <div class="metric-card-container">
                 <a href="{{ route('support.tickets') }}" class="metric-link">
                   <div class="metric-card">
@@ -444,7 +547,7 @@
                   </div>
                 </a>
               </div>
-              
+
               <div class="metric-card-container">
                 <a href="{{ route('withdrawal.requests') }}" class="metric-link">
                   <div class="metric-card">
@@ -455,8 +558,8 @@
               </div>
             </div>
           </div>
-          
-          <!-- Widget 3: Quick Shortcuts -->
+
+          <!-- Widget 4: Quick Shortcuts -->
           <div class="widget">
             <div class="widget-header">
               <h3 class="widget-title">Pintasan Cepat</h3>
@@ -472,7 +575,7 @@
                   </div>
                   <div>Manajemen Akun</div>
                 </a>
-                
+
                 <a href="{{ route('admin.produk.index') }}" class="shortcut-btn">
                   <div class="shortcut-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -483,7 +586,7 @@
                   </div>
                   <div>Manajemen Produk</div>
                 </a>
-                
+
 
               </div>
             </div>
@@ -545,9 +648,9 @@
           if (statCards.length >= 6) {
             statCards[0].querySelector('.stat-value').textContent = data.seller_stats.total;
             statCards[1].querySelector('.stat-value').textContent = data.seller_stats.new;
-            statCards[2].querySelector('.stat-value').textContent = '42'; // Violations - dummy data
-            statCards[3].querySelector('.stat-value').textContent = '24'; // Pending verifications - dummy data
-            statCards[4].querySelector('.stat-value').textContent = '8,950'; // Active buyers - dummy data
+            statCards[2].querySelector('.stat-value').textContent = data.moderation_counts.violations_reported;
+            statCards[3].querySelector('.stat-value').textContent = data.moderation_counts.pending_verifications;
+            statCards[4].querySelector('.stat-value').textContent = data.user_stats.active_users;
             statCards[5].querySelector('.stat-value').textContent = data.metrics.total_orders;
           }
           
@@ -623,19 +726,19 @@
           growthPercentage: '5.7'
         }
       };
-      
+
       const data = metricsData[range];
-      
+
       // Update values in the dashboard
       document.querySelector('.metric-card:nth-child(1) .metric-value').textContent = data.gmv;
       document.querySelector('.metric-card:nth-child(2) .metric-value').textContent = data.revenue;
-      
+
       // Update growth percentage
       const growthElement = document.querySelector('.metric-card:nth-child(1) .metric-title');
       if (growthElement) {
         growthElement.innerHTML = `Gross Merchandise Volume (GMV) <span style="float: right; color: green">↗ ${data.growthPercentage}%</span>`;
       }
-      
+
       // Update the stat cards
       const statCards = document.querySelectorAll('.stat-card');
       if (statCards.length >= 6) {
@@ -645,6 +748,63 @@
         statCards[3].querySelector('.stat-value').textContent = data.pendingVerification;
         statCards[4].querySelector('.stat-value').textContent = data.activeBuyers;
         statCards[5].querySelector('.stat-value').textContent = data.totalTransactions;
+      }
+    }
+
+    // Update metrics function to use API data
+    async function updateMetrics(range) {
+      try {
+        // Show loading state
+        showLoadingState();
+
+        // Fetch data from API
+        const response = await fetch(`/api/admin/dashboard/stats?range=${range}`);
+        const result = await response.json();
+
+        if (result.success) {
+          const data = result.data;
+
+          // Debug: log the data to console
+          console.log('Dashboard data received:', data);
+
+          // Update GMV
+          document.querySelector('.metric-card:nth-child(1) .metric-value').textContent = formatCurrency(data.metrics.gmv);
+
+          // Update Revenue
+          document.querySelector('.metric-card:nth-child(2) .metric-value').textContent = formatCurrency(data.metrics.revenue);
+
+          // Update growth percentage
+          const growthElement = document.querySelector('.metric-card:nth-child(1) .metric-title');
+          if (growthElement) {
+            // Add growth indicator
+            const growthIndicator = data.metrics.growth_percentage >= 0 ? '↗' : '↘';
+            growthElement.innerHTML = `Gross Merchandise Volume (GMV) <span style="float: right; color: ${data.metrics.growth_percentage >= 0 ? 'green' : 'red'}">${growthIndicator} ${Math.abs(data.metrics.growth_percentage)}%</span>`;
+          }
+
+          // Update the stat cards
+          const statCards = document.querySelectorAll('.stat-card');
+          if (statCards.length >= 6) {
+            statCards[0].querySelector('.stat-value').textContent = data.seller_stats.total;
+            statCards[1].querySelector('.stat-value').textContent = data.seller_stats.new;
+            statCards[2].querySelector('.stat-value').textContent = data.moderation_counts.violations_reported;
+            statCards[3].querySelector('.stat-value').textContent = data.moderation_counts.pending_verifications;
+            statCards[4].querySelector('.stat-value').textContent = data.user_stats.active_users;
+            statCards[5].querySelector('.stat-value').textContent = data.metrics.total_orders;
+          }
+
+          // Hide loading state
+          hideLoadingState();
+        } else {
+          console.error('Failed to load dashboard data:', result.message);
+          hideLoadingState();
+          // Fallback to static data
+          fallbackToStaticData(range);
+        }
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        hideLoadingState();
+        // Fallback to static data
+        fallbackToStaticData(range);
       }
     }
     
@@ -657,60 +817,315 @@
         maximumFractionDigits: 0
       }).format(amount);
     }
-    
-    function updateCharts(range) {
-      // Sample chart data for different time ranges
+
+    // Initialize Chart.js charts
+    let gmvChart, revenueChart, campaignTrendsChart;
+
+    function initCharts() {
+      const gmvCtx = document.getElementById('gmvChart').getContext('2d');
+      const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+
+      // Destroy existing charts if they exist
+      if (gmvChart) gmvChart.destroy();
+      if (revenueChart) revenueChart.destroy();
+      if (campaignTrendsChart) campaignTrendsChart.destroy();
+
+      // Sample data - this will be replaced with actual API data
       const chartData = {
         'today': {
-          gmv: [30, 28, 32, 29, 35, 33, 30], // 7 points for 24 hours
+          labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '23:59'],
+          gmv: [30, 28, 32, 29, 35, 33, 30],
           revenue: [15, 14, 16, 14, 18, 16, 15]
         },
         '7days': {
-          gmv: [20, 22, 18, 25, 30, 28, 32], // 7 points for 7 days
+          labels: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'],
+          gmv: [20, 22, 18, 25, 30, 28, 32],
           revenue: [10, 11, 9, 13, 15, 14, 16]
         },
         'month': {
-          gmv: [10, 12, 11, 15, 18, 16, 14, 17, 19, 22, 20, 24, 26, 23, 25, 28, 26, 30, 28, 32, 30, 33, 31, 35, 33, 36, 34, 38, 36, 40], // 30 points for 30 days
-          revenue: [5, 6, 5, 7, 9, 8, 7, 8, 9, 11, 10, 12, 13, 11, 12, 14, 13, 15, 14, 16, 15, 17, 16, 18, 17, 19, 18, 20, 19, 21]
+          labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+          gmv: [100, 120, 110, 140],
+          revenue: [50, 60, 55, 70]
         }
       };
-      
-      const data = chartData[range];
-      
-      // Update GMV chart
-      const gmvPoints = data.gmv.map((value, index) => {
-        const x = (index / (data.gmv.length - 1)) * 300;
-        const y = 40 - (value / Math.max(...data.gmv)) * 35;
-        return `${x},${y}`;
-      }).join(' ');
-      
-      // Update Revenue chart
-      const revenuePoints = data.revenue.map((value, index) => {
-        const x = (index / (data.revenue.length - 1)) * 300;
-        const y = 40 - (value / Math.max(...data.revenue)) * 35;
-        return `${x},${y}`;
-      }).join(' ');
-      
-      // Update the chart SVGs
-      const svgs = document.querySelectorAll('svg');
-      if (svgs.length >= 2) {
-        const gmvPolylines = svgs[0].querySelectorAll('polyline');
-        const revenuePolylines = svgs[1].querySelectorAll('polyline');
-        
-        if (gmvPolylines.length >= 2) {
-          gmvPolylines[1].setAttribute('points', gmvPoints);
+
+      const currentRange = document.getElementById('timeRange').value;
+      const data = chartData[currentRange];
+
+      // GMV Chart
+      gmvChart = new Chart(gmvCtx, {
+        type: 'line',
+        data: {
+          labels: data.labels,
+          datasets: [{
+            label: 'GMV (Rp)',
+            data: data.gmv,
+            borderColor: '#006E5C',
+            backgroundColor: 'rgba(0, 110, 92, 0.1)',
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              display: false // Hide y-axis labels to save space
+            },
+            x: {
+              display: true
+            }
+          }
         }
-        
-        if (revenuePolylines.length >= 2) {
-          revenuePolylines[1].setAttribute('points', revenuePoints);
+      });
+
+      // Revenue Chart
+      revenueChart = new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+          labels: data.labels,
+          datasets: [{
+            label: 'Pendapatan (Rp)',
+            data: data.revenue,
+            borderColor: '#006E5C',
+            backgroundColor: 'rgba(0, 110, 92, 0.1)',
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              display: false // Hide y-axis labels to save space
+            },
+            x: {
+              display: true
+            }
+          }
         }
+      });
+
+      // Initialize campaign trends chart with sample data
+      const campaignCtx = document.getElementById('campaignTrendsChart').getContext('2d');
+      campaignTrendsChart = new Chart(campaignCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Email', 'Social Media', 'Banner', 'Search'],
+          datasets: [{
+            label: 'Jumlah Konversi',
+            data: [65, 59, 80, 81],
+            backgroundColor: 'rgba(0, 110, 92, 0.6)',
+            borderColor: '#006E5C',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              display: false // Hide y-axis labels to save space
+            },
+            x: {
+              display: true
+            }
+          }
+        }
+      });
+    }
+
+    function updateCharts(range) {
+      // Update the charts with new data based on selected range
+      initCharts();
+
+      // Update campaign trends chart with real data
+      updateCampaignTrendsChart(range);
+
+      // Update metrics with new data based on selected range
+      updateMetrics(range);
+    }
+
+    // Function to update campaign trends chart with real data from API
+    async function updateCampaignTrendsChart(range) {
+      try {
+        const response = await fetch(`/api/admin/marketing-campaigns/trends?range=${range}`);
+        const result = await response.json();
+
+        if (result.success) {
+          const data = result.data;
+
+          // Update campaign statistics
+          updateCampaignStats();
+
+          // Prepare chart data from API response
+          const labels = data.map(item => item.campaign_type || 'Tidak Diketahui');
+          const conversionData = data.map(item => item.avg_conversions || 0);
+
+          // Update the campaign trends chart
+          if (campaignTrendsChart) {
+            campaignTrendsChart.destroy();
+          }
+
+          const campaignCtx = document.getElementById('campaignTrendsChart').getContext('2d');
+          campaignTrendsChart = new Chart(campaignCtx, {
+            type: 'bar',
+            data: {
+              labels: labels,
+              datasets: [{
+                label: 'Rata-rata Konversi',
+                data: conversionData,
+                backgroundColor: 'rgba(0, 110, 92, 0.6)',
+                borderColor: '#006E5C',
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: false
+                }
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  display: false // Hide y-axis labels to save space
+                },
+                x: {
+                  display: true
+                }
+              }
+            }
+          });
+        } else {
+          console.error('Failed to load campaign trends data:', result.message);
+        }
+      } catch (error) {
+        console.error('Error fetching campaign trends data:', error);
       }
     }
-    
+
+    // Function to update campaign statistics
+    async function updateCampaignStats() {
+      try {
+        const response = await fetch('/api/admin/marketing-campaigns/stats');
+        const result = await response.json();
+
+        if (result.success) {
+          const data = result.data;
+
+          // Update campaign statistics
+          document.getElementById('totalCampaignsCount').textContent = data.total_campaigns;
+          document.getElementById('activeCampaignsCount').textContent = data.active_campaigns;
+          document.getElementById('avgROIPercentage').textContent = data.total_roi + '%';
+        } else {
+          console.error('Failed to load campaign stats:', result.message);
+        }
+      } catch (error) {
+        console.error('Error fetching campaign stats:', error);
+      }
+    }
+
     // Initialize with the default selection
     document.addEventListener('DOMContentLoaded', function() {
-      updateMetrics('7days');
-      updateCharts('7days');
+      initCharts();
+      updateMetrics('7days');  // This will fetch and display dynamic data
+
+      // Start real-time updates
+      startRealTimeUpdates();
+    });
+
+    // Real-time updates functionality
+    let realTimeUpdateInterval;
+
+    function startRealTimeUpdates() {
+      // Initial load
+      updateRealTimeStats();
+      updateCampaignStats();
+
+      // Set up interval to update every 30 seconds
+      realTimeUpdateInterval = setInterval(() => {
+        updateRealTimeStats();
+        updateCampaignStats();
+      }, 30000);
+    }
+
+    async function updateRealTimeStats() {
+      try {
+        const response = await fetch('/api/admin/dashboard/realtime');
+        const result = await response.json();
+
+        if (result.success) {
+          const data = result.data;
+
+          // Update real-time metrics
+          document.getElementById('activeUsersCount').textContent = data.active_users;
+          document.getElementById('newOrdersCount').textContent = data.new_orders;
+          document.getElementById('pendingPaymentsCount').textContent = data.pending_payments;
+
+          // Update recent activities list
+          updateRecentActivitiesList(data.recent_activities);
+        } else {
+          console.error('Failed to load real-time data:', result.message);
+        }
+      } catch (error) {
+        console.error('Error fetching real-time data:', error);
+      }
+    }
+
+    function updateRecentActivitiesList(activities) {
+      const activitiesContainer = document.getElementById('recentActivitiesList');
+
+      if (!activities || activities.length === 0) {
+        activitiesContainer.innerHTML = '<div class="no-activities">Tidak ada aktivitas terbaru</div>';
+        return;
+      }
+
+      // Generate HTML for each activity
+      const activitiesHTML = activities.map(activity => {
+        let icon = '🛒'; // default icon
+        if (activity.type === 'payment') icon = '💰';
+
+        return `
+          <div class="activity-item" style="display: flex; align-items: center; margin-bottom: 8px; padding: 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px;">
+            <div style="margin-right: 12px; font-size: 1.3em;">${icon}</div>
+            <div style="flex: 1;">
+              <div style="font-weight: 500; font-size: 0.95em; margin-bottom: 2px;">${activity.message}</div>
+              <div style="font-size: 0.8em; color: var(--muted); margin-bottom: 2px;">${activity.time}</div>
+              ${activity.formatted_amount ? `<div style="font-weight: 600; color: #006E5C; font-size: 0.95em;">${activity.formatted_amount}</div>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      activitiesContainer.innerHTML = activitiesHTML;
+    }
+
+    // Clean up interval when page is unloaded
+    window.addEventListener('beforeunload', function() {
+      if (realTimeUpdateInterval) {
+        clearInterval(realTimeUpdateInterval);
+      }
     });
   </script>
 @endsection

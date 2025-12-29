@@ -439,7 +439,7 @@ class SellerOrderController extends Controller
         }
 
         // Ambil 3 pesanan terbaru dengan produk milik penjual ini
-        $recentOrders = Order::with(['user', 'items.product'])
+        $recentOrders = Order::with(['user', 'items.product', 'logs'])
             ->whereHas('items.product', function ($q) use ($seller) {
                 $q->where('seller_id', $seller->id);
             })
@@ -463,6 +463,34 @@ class SellerOrderController extends Controller
             $firstItem = $order->items->first();
             $product = $firstItem ? $firstItem->product : null;
 
+            // Buat timeline dari log pesanan
+            $timeline = [];
+            foreach ($order->logs as $log) {
+                $statusLabel = $statusMapping[$log->status] ?? $log->status;
+
+                // Mapping status ke dalam bahasa Indonesia
+                $statusIndonesia = [
+                    'pending_payment' => 'Menunggu Pembayaran',
+                    'processing' => 'Diproses',
+                    'shipping' => 'Dikirim',
+                    'completed' => 'Selesai',
+                    'cancelled' => 'Dibatalkan'
+                ];
+
+                $statusDisplay = $statusIndonesia[$statusLabel] ?? ucfirst(str_replace('_', ' ', $statusLabel));
+                $timeline[] = [
+                    'status' => $statusLabel,
+                    'status_display' => $statusDisplay,
+                    'timestamp' => $log->created_at->format('d M Y H:i'),
+                    'description' => $log->description
+                ];
+            }
+
+            // Urutkan timeline berdasarkan waktu
+            usort($timeline, function ($a, $b) {
+                return strtotime($a['timestamp']) - strtotime($b['timestamp']);
+            });
+
             return [
                 'id' => $order->id,
                 'order_number' => $order->order_number,
@@ -476,7 +504,9 @@ class SellerOrderController extends Controller
                 'product_image' => $product ? ($product->image ? asset('storage/' . $product->image) : asset('images/placeholder-product.jpg')) : asset('images/placeholder-product.jpg'),
                 'product_name' => $product ? $product->name : 'Produk tidak ditemukan',
                 'quantity' => $firstItem ? $firstItem->quantity : 0,
-                'subtotal' => $firstItem ? $firstItem->subtotal : 0
+                'subtotal' => $firstItem ? $firstItem->subtotal : 0,
+                // Tambahkan timeline
+                'timeline' => $timeline
             ];
         });
 

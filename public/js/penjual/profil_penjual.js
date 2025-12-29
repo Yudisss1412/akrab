@@ -257,17 +257,34 @@
     const qty  = orderEl.querySelector(".item-qty")?.textContent?.trim() || "-";
     const img  = orderEl.querySelector(".item-img")?.getAttribute("src") || "";
 
+    // Ambil data pesanan dari card (dengan asumsi data disimpan di dataset atau diambil dari sumber lain)
+    // Kita perlu mengambil data pesanan dari sumber yang menyediakan informasi timeline
+    const orderId = orderEl.dataset.orderId;
+
+    // Ambil data pesanan dari daftar pesanan yang dimuat sebelumnya
+    // Kita perlu menyimpan data pesanan di variabel global atau mengambilnya dari sumber lain
+    const orderData = window.recentOrdersData ? window.recentOrdersData.find(order => order.order_number == orderId) : null;
+
     // Header
-    const sub = `No. Invoice: INV-001 • ${meta}`;
+    const sub = `No. Invoice: ${orderData ? orderData.order_number : 'INV-001'} • ${meta}`;
     modal.querySelector("#detailSub").textContent = sub;
+
+    // Format timeline
+    let timelineHtml = '';
+    if (orderData && orderData.timeline && orderData.timeline.length > 0) {
+        const timelineItems = orderData.timeline.map(log => `${log.status_display} (${log.timestamp})`).join(' → ');
+        timelineHtml = `<dd>${timelineItems}</dd>`;
+    } else {
+        timelineHtml = '<dd>Timeline tidak tersedia</dd>';
+    }
 
     // Body (isi sesuai spesifikasi kamu)
     modal.querySelector("#detailBody").innerHTML = `
       <div class="dl" style="margin-bottom:12px">
-        <dt>Status</dt><dd><span class="badge">Selesai</span></dd>
-        <dt>Pembeli</dt><dd>Adi Saputra • 0812-3456-7890</dd>
-        <dt>Pengiriman</dt><dd>Jl. Melati No. 12, Banyuwangi • JNE REG • Resi: JNEXXXXX (tracking)</dd>
-        <dt>Pembayaran</dt><dd>Transfer VA • TRX123456 • 02 Sep 2025 10:05 • Lunas</dd>
+        <dt>Status</dt><dd><span class="badge">${orderData ? orderData.status_display : 'Selesai'}</span></dd>
+        <dt>Pembeli</dt><dd>${orderData ? orderData.customer_name : 'Adi Saputra'} • 0812-3456-7890</dd>
+        <dt>Pengiriman</dt><dd>Jl. Melati No. 12, Banyuwangi • JNE REG • Resi: ${orderData ? orderData.tracking_number : 'JNEXXXXX'} (tracking)</dd>
+        <dt>Pembayaran</dt><dd>Transfer VA • TRX123456 • ${orderData ? orderData.created_at : '02 Sep 2025 10:05'} • Lunas</dd>
       </div>
 
       <table class="table-mini" aria-label="Item">
@@ -287,7 +304,7 @@
       </table>
 
       <div class="dl" style="margin-top:10px">
-        <dt>Subtotal</dt><dd>Rp 1.250.000</dd>
+        <dt>Subtotal</dt><dd>Rp ${parseInt(orderData ? orderData.subtotal : 1250000).toLocaleString('id-ID')}</dd>
         <dt>Diskon</dt><dd>-</dd>
         <dt>Ongkir</dt><dd>Rp 0</dd>
         <dt>Pajak</dt><dd>Rp 0</dd>
@@ -296,7 +313,7 @@
 
       <div class="dl" style="margin-top:12px">
         <dt>Timeline</dt>
-        <dd>Buat (09:55) → Bayar (10:05) → Diproses (10:20) → Dikirim (13:15) → Selesai (02 Sep 18:40)</dd>
+        ${timelineHtml}
       </div>
     `;
 
@@ -506,11 +523,14 @@
     try {
       const response = await fetch('/penjual/pesanan/recent');
       const data = await response.json();
-      
+
       if (data.success && data.orders.length > 0) {
+        // Simpan data pesanan ke variabel global
+        window.recentOrdersData = data.orders;
+
         // Bersihkan konten sebelumnya
         ordersViewport.innerHTML = '';
-        
+
         // Tambahkan pesanan
         data.orders.forEach(order => {
           const orderElement = createOrderElement(order);
@@ -527,7 +547,7 @@
     const article = document.createElement('article');
     article.className = 'order-card';
     article.setAttribute('data-order-id', order.order_number);
-    
+
     // Status mapping untuk tampilan
     const statusLabels = {
       'pending_payment': 'Menunggu Pembayaran',
@@ -536,9 +556,9 @@
       'completed': 'Selesai',
       'cancelled': 'Dibatalkan'
     };
-    
+
     const statusLabel = statusLabels[order.status] || order.status;
-    
+
     article.innerHTML = `
       <div class="order-head">
         <div class="shop-name">${order.customer_name}</div>
@@ -574,10 +594,13 @@
         </div>
       </div>
     `;
-    
+
     return article;
   }
   
+  // Variabel global untuk menyimpan data pesanan
+  window.recentOrdersData = [];
+
   // Muat pesanan saat halaman dimuat
   document.addEventListener('DOMContentLoaded', loadRecentOrders);
 })();

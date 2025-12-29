@@ -111,12 +111,30 @@ class WithdrawalController extends Controller
                 'request_date' => now()
             ]);
 
+            // Hitung saldo sebelum (kita hitung berdasarkan transaksi sebelumnya untuk penjual ini)
+            $previousTransactions = \App\Models\SellerTransaction::where('seller_id', $seller->id)
+                ->where('transaction_date', '<=', now())
+                ->get();
+
+            $balanceBefore = 0;
+            foreach ($previousTransactions as $prevTrans) {
+                if ($prevTrans->transaction_type === 'sale') {
+                    $balanceBefore += $prevTrans->amount;
+                } elseif ($prevTrans->transaction_type === 'withdrawal' && $prevTrans->status === 'completed') {
+                    $balanceBefore -= $prevTrans->amount;
+                }
+            }
+
+            $balanceAfter = $balanceBefore - $request->amount;
+
             // Buat transaksi penarikan dengan status pending
             \App\Models\SellerTransaction::create([
-                'seller_id' => $user->id,
+                'seller_id' => $seller->id,
                 'withdrawal_request_id' => $withdrawalRequest->id,
                 'transaction_type' => 'withdrawal',
                 'amount' => $request->amount,
+                'balance_before' => $balanceBefore,
+                'balance_after' => $balanceAfter,
                 'description' => "Permintaan penarikan dana",
                 'reference_type' => 'withdrawal',
                 'reference_id' => $withdrawalRequest->id,
@@ -196,8 +214,26 @@ class WithdrawalController extends Controller
             ->first();
 
         if ($transaction) {
+            // Hitung ulang saldo setelah pembatalan
+            $previousTransactions = \App\Models\SellerTransaction::where('seller_id', $transaction->seller_id)
+                ->where('transaction_date', '<=', now())
+                ->where('id', '!=', $transaction->id) // Kecualikan transaksi yang dibatalkan
+                ->get();
+
+            $balanceBefore = 0;
+            foreach ($previousTransactions as $prevTrans) {
+                if ($prevTrans->transaction_type === 'sale') {
+                    $balanceBefore += $prevTrans->amount;
+                } elseif ($prevTrans->transaction_type === 'withdrawal' && $prevTrans->status === 'completed') {
+                    $balanceBefore -= $prevTrans->amount;
+                }
+            }
+
+            $balanceAfter = $balanceBefore; // Karena transaksi dibatalkan, saldo kembali ke sebelum transaksi ini
+
             $transaction->update([
                 'status' => 'cancelled',
+                'balance_after' => $balanceAfter,
                 'description' => 'Permintaan penarikan dana dibatalkan oleh penjual'
             ]);
         }

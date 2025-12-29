@@ -799,7 +799,7 @@
     function confirmApprove() {
       if (currentApproveRequestId) {
         // Send approval request to server
-        fetch(`/admin/withdrawals/${currentApproveRequestId}/approve`, {
+        fetch(`/api/withdrawals/${currentApproveRequestId}/approve`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -849,7 +849,7 @@
       if (currentRequestId) {
         // Individual rejection
         // Send rejection request to server
-        fetch(`/admin/withdrawals/${currentRequestId}/reject`, {
+        fetch(`/api/withdrawals/${currentRequestId}/reject`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

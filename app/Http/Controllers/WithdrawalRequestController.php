@@ -148,33 +148,96 @@ class WithdrawalRequestController extends Controller
 
     public function approve(Request $request, $id)
     {
-        $withdrawal = WithdrawalRequest::with('seller')->findOrFail($id);
+        try {
+            \Log::info('Approve function called for ID: ' . $id);
 
-        $withdrawal->update([
-            'status' => 'approved'
-        ]);
+            $user = Auth::user();
+            \Log::info('User: ' . ($user ? $user->name . ' (Role: ' . ($user->role ? $user->role->name : 'null') . ')' : 'null'));
 
-        // Buat transaksi penarikan
-        \App\Models\SellerTransaction::create([
-            'seller_id' => $withdrawal->seller->id,
-            'withdrawal_request_id' => $withdrawal->id,
-            'transaction_type' => 'withdrawal',
-            'amount' => $withdrawal->amount,
-            'description' => "Penarikan dana disetujui",
-            'reference_type' => 'withdrawal',
-            'reference_id' => $withdrawal->id,
-            'status' => 'completed',
-            'transaction_date' => now(),
-        ]);
+            // Hanya admin yang bisa menyetujui permintaan penarikan
+            if (!$user || !$user->role || $user->role->name !== 'admin') {
+                \Log::info('Access denied - not admin or no role');
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Akses ditolak - hanya admin yang bisa menyetujui permintaan penarikan'
+                ], 403);
+            }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Permintaan penarikan dana berhasil disetujui'
-        ]);
+            $withdrawal = WithdrawalRequest::with('seller')->findOrFail($id);
+            \Log::info('Withdrawal found: ' . $withdrawal->id . ', Seller: ' . ($withdrawal->seller ? $withdrawal->seller->id : 'null'));
+
+            // Pastikan seller ada
+            if (!$withdrawal->seller) {
+                \Log::info('Seller not found for withdrawal ID: ' . $id);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Seller tidak ditemukan untuk permintaan penarikan ini'
+                ], 404);
+            }
+
+            $withdrawal->update([
+                'status' => 'completed'
+            ]);
+
+            // Hitung saldo sebelum (kita hitung berdasarkan transaksi sebelumnya untuk penjual ini)
+            $previousTransactions = \App\Models\SellerTransaction::where('seller_id', $withdrawal->seller->id)
+                ->where('transaction_date', '<=', now())
+                ->get();
+
+            $balanceBefore = 0;
+            foreach ($previousTransactions as $prevTrans) {
+                if ($prevTrans->transaction_type === 'sale') {
+                    $balanceBefore += $prevTrans->amount;
+                } elseif ($prevTrans->transaction_type === 'withdrawal' && $prevTrans->status === 'completed') {
+                    $balanceBefore -= $prevTrans->amount;
+                }
+            }
+
+            $balanceAfter = $balanceBefore - $withdrawal->amount;
+            \Log::info('Balance calculated - Before: ' . $balanceBefore . ', After: ' . $balanceAfter);
+
+            // Buat transaksi penarikan
+            $transaction = \App\Models\SellerTransaction::create([
+                'seller_id' => $withdrawal->seller->id,
+                'withdrawal_request_id' => $withdrawal->id,
+                'transaction_type' => 'withdrawal',
+                'amount' => $withdrawal->amount,
+                'balance_before' => $balanceBefore,
+                'balance_after' => $balanceAfter,
+                'description' => "Penarikan dana selesai",
+                'reference_type' => 'withdrawal',
+                'reference_id' => $withdrawal->id,
+                'status' => 'completed',
+                'transaction_date' => now(),
+            ]);
+
+            \Log::info('Transaction created: ' . $transaction->id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Permintaan penarikan dana berhasil diselesaikan'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error in approve function: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menyetujui permintaan penarikan: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function reject(Request $request, $id)
     {
+        $user = Auth::user();
+
+        // Hanya admin yang bisa menolak permintaan penarikan
+        if (!$user || !$user->role || $user->role->name !== 'admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akses ditolak - hanya admin yang bisa menolak permintaan penarikan'
+            ], 403);
+        }
+
         $validator = Validator::make($request->all(), [
             'rejection_reason' => 'nullable|string|max:500'
         ]);
@@ -187,8 +250,16 @@ class WithdrawalRequestController extends Controller
             ], 422);
         }
 
-        $withdrawal = WithdrawalRequest::findOrFail($id);
-        
+        $withdrawal = WithdrawalRequest::with('seller')->findOrFail($id);
+
+        // Pastikan seller ada
+        if (!$withdrawal->seller) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Seller tidak ditemukan untuk permintaan penarikan ini'
+            ], 404);
+        }
+
         $withdrawal->update([
             'status' => 'rejected',
             'rejection_reason' => $request->rejection_reason
@@ -202,7 +273,25 @@ class WithdrawalRequestController extends Controller
 
     public function process(Request $request, $id)
     {
+        $user = Auth::user();
+
+        // Hanya admin yang bisa memproses permintaan penarikan
+        if (!$user || !$user->role || $user->role->name !== 'admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akses ditolak - hanya admin yang bisa memproses permintaan penarikan'
+            ], 403);
+        }
+
         $withdrawal = WithdrawalRequest::with('seller')->findOrFail($id);
+
+        // Pastikan seller ada
+        if (!$withdrawal->seller) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Seller tidak ditemukan untuk permintaan penarikan ini'
+            ], 404);
+        }
 
         $withdrawal->update([
             'status' => 'processing'
@@ -214,11 +303,29 @@ class WithdrawalRequestController extends Controller
             ->first();
 
         if (!$existingTransaction) {
+            // Hitung saldo sebelum (kita hitung berdasarkan transaksi sebelumnya untuk penjual ini)
+            $previousTransactions = \App\Models\SellerTransaction::where('seller_id', $withdrawal->seller->id)
+                ->where('transaction_date', '<=', now())
+                ->get();
+
+            $balanceBefore = 0;
+            foreach ($previousTransactions as $prevTrans) {
+                if ($prevTrans->transaction_type === 'sale') {
+                    $balanceBefore += $prevTrans->amount;
+                } elseif ($prevTrans->transaction_type === 'withdrawal' && $prevTrans->status === 'completed') {
+                    $balanceBefore -= $prevTrans->amount;
+                }
+            }
+
+            $balanceAfter = $balanceBefore - $withdrawal->amount;
+
             \App\Models\SellerTransaction::create([
                 'seller_id' => $withdrawal->seller->id,
                 'withdrawal_request_id' => $withdrawal->id,
                 'transaction_type' => 'withdrawal',
                 'amount' => $withdrawal->amount,
+                'balance_before' => $balanceBefore,
+                'balance_after' => $balanceAfter,
                 'description' => "Penarikan dana sedang diproses",
                 'reference_type' => 'withdrawal',
                 'reference_id' => $withdrawal->id,

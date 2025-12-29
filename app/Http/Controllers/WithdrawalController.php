@@ -70,42 +70,45 @@ class WithdrawalController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'amount' => 'required|numeric|min:10000', // Minimal 10.000 IDR
-            'bank_account' => 'required|string|max:255'
-        ]);
-
-        $user = Auth::user();
-
-        // Hanya penjual yang bisa membuat permintaan
-        if (!$user || !$user->role || $user->role->name !== 'seller') {
-            return response()->json([
-                'message' => 'Akses ditolak'
-            ], 403);
-        }
-
-        // Ambil ID penjual dari tabel sellers berdasarkan user_id
-        $seller = \App\Models\Seller::where('user_id', $user->id)->first();
-        if (!$seller) {
-            return response()->json([
-                'message' => 'Seller record tidak ditemukan'
-            ], 403);
-        }
-
-        // Ambil saldo penjual
-        $balance = $this->getSellerBalance($seller->id);
-
-        if ($request->amount > $balance) {
-            return response()->json([
-                'message' => 'Saldo tidak mencukupi'
-            ], 400);
-        }
-
-        DB::beginTransaction();
-
         try {
+            $request->validate([
+                'amount' => 'required|numeric|min:10000', // Minimal 10.000 IDR
+                'bank_account' => 'required|string|max:255'
+            ]);
+
+            $user = Auth::user();
+
+            // Hanya penjual yang bisa membuat permintaan
+            if (!$user || !$user->role || $user->role->name !== 'seller') {
+                return response()->json([
+                    'message' => 'Akses ditolak'
+                ], 403);
+            }
+
+            // Ambil ID penjual dari tabel sellers berdasarkan user_id
+            $seller = \App\Models\Seller::where('user_id', $user->id)->first();
+            if (!$seller) {
+                return response()->json([
+                    'message' => 'Seller record tidak ditemukan'
+                ], 403);
+            }
+
+            // Ambil saldo penjual
+            \Log::info('Menghitung saldo untuk seller ID: ' . $seller->id);
+            $balance = $this->getSellerBalance($seller->id);
+            \Log::info('Saldo ditemukan: ' . $balance);
+
+            if ($request->amount > $balance) {
+                \Log::info('Saldo tidak mencukupi. Saldo: ' . $balance . ', Diminta: ' . $request->amount);
+                return response()->json([
+                    'message' => 'Saldo tidak mencukupi'
+                ], 400);
+            }
+
+            DB::beginTransaction();
+
             $withdrawalRequest = WithdrawalRequest::create([
-                'seller_id' => $user->id,
+                'seller_id' => $seller->id,
                 'amount' => $request->amount,
                 'bank_account' => $request->bank_account,
                 'request_date' => now()
@@ -150,6 +153,8 @@ class WithdrawalController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollback();
+
+            \Log::error('Error in store withdrawal: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
 
             return response()->json([
                 'message' => 'Terjadi kesalahan saat membuat permintaan penarikan dana: ' . $e->getMessage()

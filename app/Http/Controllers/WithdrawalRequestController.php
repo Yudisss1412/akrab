@@ -350,7 +350,7 @@ class WithdrawalRequestController extends Controller
         $withdrawals = WithdrawalRequest::whereIn('id', $request->ids)->get();
         
         foreach ($withdrawals as $withdrawal) {
-            $withdrawal->update(['status' => 'approved']);
+            $withdrawal->update(['status' => 'completed']);
         }
 
         return response()->json([

@@ -1128,7 +1128,7 @@ function createStarsHTML($rating) {
     </div>
 </div>
 
-<script>
+{{-- <script>
 // Check if products are already loaded from server, if so, use them instead of fetching from API
 document.addEventListener('DOMContentLoaded', function() {
     // If products are already rendered from server, attach event listeners to them
@@ -1211,7 +1211,7 @@ function openProdukModal(idx, productId) {
                 const modalImg = document.getElementById('modal-img');
                 const modalPrice = document.getElementById('modal-price');
                 const modalDesc = document.getElementById('modal-desc');
-                const modalSpecs = document.getElementById('modal-specs');
+                // const modalSpecs = document.getElementById('modal-specs');
                 const modalThumbs = document.getElementById('modal-thumbs');
 
                 modalProduct.textContent = produk.name || 'Nama Produk Tidak Tersedia';
@@ -1227,50 +1227,50 @@ function openProdukModal(idx, productId) {
                 modalDesc.textContent = produk.description || produk.desc || 'Deskripsi tidak tersedia';
 
                 // Clear and populate specifications
-                modalSpecs.innerHTML = '';
-                if (produk.spesifikasi || produk.specifications) {
-                    const specs = produk.spesifikasi || produk.specifications;
+                // modalSpecs.innerHTML = '';
+                // if (produk.spesifikasi || produk.specifications) {
+                //     const specs = produk.spesifikasi || produk.specifications;
 
-                    // Handle both object and array formats
-                    if (typeof specs === 'object' && specs !== null && !Array.isArray(specs)) {
-                        // If it's an object format: { key: value }
-                        Object.entries(specs).forEach(([key, value]) => {
-                            if (value !== null && value !== undefined && value !== '') {
-                                const li = document.createElement('li');
-                                li.innerHTML = `<strong>${key}:</strong> ${value}`;
-                                modalSpecs.appendChild(li);
-                            }
-                        });
-                    } else if (Array.isArray(specs)) {
-                        // If it's an array format: [ { key: 'Kategori', value: 'Kuliner' }, ... ]
-                        specs.forEach(spec => {
-                            if (typeof spec === 'object' && spec.key && spec.value !== undefined) {
-                                const li = document.createElement('li');
-                                li.innerHTML = `<strong>${spec.key}:</strong> ${spec.value}`;
-                                modalSpecs.appendChild(li);
-                            } else if (typeof spec === 'string' && spec.includes(':')) {
-                                // If it's a string like "Kategori: Kuliner"
-                                const [key, ...valueParts] = spec.split(':');
-                                const value = valueParts.join(':').trim();
-                                const li = document.createElement('li');
-                                li.innerHTML = `<strong>${key.trim()}:</strong> ${value}`;
-                                modalSpecs.appendChild(li);
-                            }
-                        });
-                    } else {
-                        // For any other format, just try to display it properly
-                        const specsStr = String(specs);
-                        specsStr.split('\n').forEach(spec => {
-                            if (spec && spec.includes(':')) {
-                                const [key, ...valueParts] = spec.split(':');
-                                const value = valueParts.join(':').trim();
-                                const li = document.createElement('li');
-                                li.innerHTML = `<strong>${key.trim()}:</strong> ${value}`;
-                                modalSpecs.appendChild(li);
-                            }
-                        });
-                    }
-                }
+                //     // Handle both object and array formats
+                //     if (typeof specs === 'object' && specs !== null && !Array.isArray(specs)) {
+                //         // If it's an object format: { key: value }
+                //         Object.entries(specs).forEach(([key, value]) => {
+                //             if (value !== null && value !== undefined && value !== '') {
+                //                 const li = document.createElement('li');
+                //                 li.innerHTML = `<strong>${key}:</strong> ${value}`;
+                //                 modalSpecs.appendChild(li);
+                //             }
+                //         });
+                //     } else if (Array.isArray(specs)) {
+                //         // If it's an array format: [ { key: 'Kategori', value: 'Kuliner' }, ... ]
+                //         specs.forEach(spec => {
+                //             if (typeof spec === 'object' && spec.key && spec.value !== undefined) {
+                //                 const li = document.createElement('li');
+                //                 li.innerHTML = `<strong>${spec.key}:</strong> ${spec.value}`;
+                //                 modalSpecs.appendChild(li);
+                //             } else if (typeof spec === 'string' && spec.includes(':')) {
+                //                 // If it's a string like "Kategori: Kuliner"
+                //                 const [key, ...valueParts] = spec.split(':');
+                //                 const value = valueParts.join(':').trim();
+                //                 const li = document.createElement('li');
+                //                 li.innerHTML = `<strong>${key.trim()}:</strong> ${value}`;
+                //                 modalSpecs.appendChild(li);
+                //             }
+                //         });
+                //     } else {
+                //         // For any other format, just try to display it properly
+                //         const specsStr = String(specs);
+                //         specsStr.split('\n').forEach(spec => {
+                //             if (spec && spec.includes(':')) {
+                //                 const [key, ...valueParts] = spec.split(':');
+                //                 const value = valueParts.join(':').trim();
+                //                 const li = document.createElement('li');
+                //                 li.innerHTML = `<strong>${key.trim()}:</strong> ${value}`;
+                //                 modalSpecs.appendChild(li);
+                //             }
+                //         });
+                //     }
+                // }
 
                 // Set up thumbnail images
                 modalThumbs.innerHTML = '';
@@ -1485,7 +1485,7 @@ document.addEventListener('DOMContentLoaded', function() {
         lastTouchEnd = now;
     }, false);
 });
-</script>
+</script> --}}
 <script src="{{ asset('js/customer/cust_welcome.js') }}?v=22"></script>
 @endsection
 

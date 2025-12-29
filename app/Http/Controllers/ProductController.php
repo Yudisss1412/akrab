@@ -108,10 +108,31 @@ class ProductController extends Controller
     private function formatSingleProduct($product)
     {
         // Format spesifikasi produk
+        // $specs = [];
+        // if ($product->specifications) {
+        //     foreach ($product->specifications as $key => $value) {
+        //         $specs[] = ['nama' => $key, 'nilai' => $value];
+        //     }
+        // }
         $specs = [];
-        if ($product->specifications) {
+
+        if (is_array($product->specifications)) {
             foreach ($product->specifications as $key => $value) {
-                $specs[] = ['nama' => $key, 'nilai' => $value];
+
+                // Jika array numerik → list biasa
+                if (is_int($key)) {
+                    $specs[] = [
+                        'nama' => 'Spesifikasi',
+                        'nilai' => $value
+                    ];
+                }
+                // Jika associative array → key : value
+                else {
+                    $specs[] = [
+                        'nama' => $key,
+                        'nilai' => $value
+                    ];
+                }
             }
         }
 

@@ -254,15 +254,28 @@ function openProdukModal(idx, productId) {
       if (produk.specifications || produk.spesifikasi || produk.specs) {
         const specs = produk.specifications || produk.spesifikasi || produk.specs;
         if (Array.isArray(specs)) {
+          // specs.forEach(spec => {
+          //   const li = document.createElement('li');
+          //   if (typeof spec === 'object' && spec.key && spec.value) {
+          //     li.textContent = `${spec.key}: ${spec.value}`;
+          //   } else if (typeof spec === 'string') {
+          //     li.textContent = spec;
+          //   } else {
+          //     li.textContent = String(spec);
+          //   }
+          //   modalSpecs.appendChild(li);
+          // });
           specs.forEach(spec => {
             const li = document.createElement('li');
-            if (typeof spec === 'object' && spec.key && spec.value) {
-              li.textContent = `${spec.key}: ${spec.value}`;
-            } else if (typeof spec === 'string') {
-              li.textContent = spec;
+
+            if (typeof spec === 'object') {
+              const label = spec.nama ?? spec.key ?? '';
+              const value = spec.nilai ?? spec.value ?? '';
+              li.textContent = label ? `${label}: ${value}` : JSON.stringify(spec);
             } else {
               li.textContent = String(spec);
             }
+
             modalSpecs.appendChild(li);
           });
         } else if (typeof specs === 'object') {

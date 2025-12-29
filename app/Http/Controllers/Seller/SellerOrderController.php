@@ -458,6 +458,11 @@ class SellerOrderController extends Controller
 
         $formattedOrders = $recentOrders->map(function ($order) use ($statusMapping) {
             $appStatus = $statusMapping[$order->status] ?? $order->status;
+
+            // Ambil item pertama dari pesanan untuk ditampilkan di card
+            $firstItem = $order->items->first();
+            $product = $firstItem ? $firstItem->product : null;
+
             return [
                 'id' => $order->id,
                 'order_number' => $order->order_number,
@@ -466,7 +471,12 @@ class SellerOrderController extends Controller
                 'status_display' => ucfirst(str_replace('_', ' ', $appStatus)),
                 'total_amount' => $order->total_amount,
                 'created_at' => $order->created_at->format('d M Y'),
-                'tracking_number' => $order->tracking_number
+                'tracking_number' => $order->tracking_number,
+                // Tambahkan informasi produk untuk ditampilkan di card
+                'product_image' => $product ? ($product->image ? asset('storage/' . $product->image) : asset('images/placeholder-product.jpg')) : asset('images/placeholder-product.jpg'),
+                'product_name' => $product ? $product->name : 'Produk tidak ditemukan',
+                'quantity' => $firstItem ? $firstItem->quantity : 0,
+                'subtotal' => $firstItem ? $firstItem->subtotal : 0
             ];
         });
 
@@ -474,6 +484,182 @@ class SellerOrderController extends Controller
             'success' => true,
             'orders' => $formattedOrders
         ]);
+    }
+
+    /**
+     * Display the seller's sales history
+     */
+    public function salesHistory(Request $request)
+    {
+        try {
+            // Hanya penjual yang bisa mengakses
+            $user = Auth::user();
+            if (!$user || !$user->role || $user->role->name !== 'seller') {
+                abort(403, 'Akses ditolak. Hanya penjual yang dapat mengakses halaman ini.');
+            }
+
+            // Ambil ID penjual dari tabel sellers berdasarkan user_id
+            $seller = Seller::where('user_id', $user->id)->first();
+            if (!$seller) {
+                abort(403, 'Akses ditolak. Seller record tidak ditemukan.');
+            }
+
+            // Query builder untuk pesanan berdasarkan produk penjual
+            $query = Order::with(['user', 'items.product', 'items.variant', 'shipping_address', 'logs', 'payment'])
+                ->whereHas('items.product', function ($q) use ($seller) {
+                    $q->where('seller_id', $seller->id);
+                })
+                ->orderBy('created_at', 'desc');
+
+            // Filter berdasarkan status jika ada
+            if ($request->has('status') && $request->status) {
+                // Mapping status aplikasi ke status database
+                $statusMapping = [
+                    'pending_payment' => 'pending',    // Menunggu Pembayaran
+                    'processing' => 'confirmed',       // Diproses
+                    'shipping' => 'shipped',           // Dikirim
+                    'completed' => 'delivered',        // Selesai
+                    'cancelled' => 'cancelled'         // Dibatalkan
+                ];
+
+                $dbStatus = $statusMapping[$request->status] ?? $request->status;
+                $query->where('status', $dbStatus);
+            }
+
+            // Filter berdasarkan pencarian jika ada
+            if ($request->has('search') && $request->search) {
+                $search = $request->search;
+                $query->where(function($q) use ($search) {
+                    $q->where('order_number', 'LIKE', "%{$search}%")
+                      ->orWhereHas('user', function ($userQuery) use ($search) {
+                          $userQuery->where('name', 'LIKE', "%{$search}%");
+                      });
+                });
+            }
+
+            // Filter berdasarkan tanggal jika ada
+            if ($request->has('date_filter') && $request->date_filter) {
+                switch ($request->date_filter) {
+                    case 'today':
+                        $query->whereDate('created_at', today());
+                        break;
+                    case 'this_week':
+                        $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
+                        break;
+                    case 'this_month':
+                        $query->whereMonth('created_at', now()->month)
+                              ->whereYear('created_at', now()->year);
+                        break;
+                    case 'this_year':
+                        $query->whereYear('created_at', now()->year);
+                        break;
+                }
+            }
+
+            // Paginate hasil
+            $orders = $query->paginate(10)->appends($request->query());
+
+            // Ambil semua pesanan milik penjual ini untuk menghitung statistik
+            $allSellerOrders = Order::whereHas('items.product', function ($q) use ($seller) {
+                $q->where('seller_id', $seller->id);
+            });
+
+            // Hitung jumlah pesanan per status dari database
+            $statusCounts = DB::table('orders')
+                ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+                ->join('products', 'order_items.product_id', '=', 'products.id')
+                ->where('products.seller_id', $seller->id)
+                ->selectRaw('orders.status, count(*) as count')
+                ->groupBy('orders.status')
+                ->pluck('count', 'orders.status');
+
+            // Mapping status database ke status aplikasi
+            $statusMapping = [
+                'pending' => 'pending_payment',    // Menunggu Pembayaran
+                'confirmed' => 'processing',       // Diproses
+                'shipped' => 'shipping',           // Dikirim
+                'delivered' => 'completed',        // Selesai
+                'cancelled' => 'cancelled'         // Dibatalkan
+            ];
+
+            // Terapkan mapping dan hitung jumlah untuk setiap status aplikasi
+            $allStatus = ['pending_payment', 'processing', 'shipping', 'completed', 'cancelled'];
+            $statusData = [];
+            foreach ($allStatus as $appStatus) {
+                $statusData[$appStatus] = 0; // Inisialisasi dengan 0
+
+                // Tambahkan jumlah dari setiap status database yang dipetakan ke status aplikasi ini
+                foreach ($statusCounts as $dbStatus => $count) {
+                    if ($statusMapping[$dbStatus] === $appStatus) {
+                        $statusData[$appStatus] += $count;
+                    }
+                }
+            }
+
+            // Hitung statistik penjualan
+            $totalSales = $allSellerOrders->sum('total_amount'); // Total penjualan keseluruhan
+
+            $totalTransactions = $allSellerOrders->count(); // Total jumlah transaksi
+
+            $monthlyRevenue = $allSellerOrders->whereMonth('created_at', now()->month)
+                                             ->whereYear('created_at', now()->year)
+                                             ->sum('total_amount'); // Pendapatan bulan ini
+
+            $avgPerTransaction = $totalTransactions > 0 ? $totalSales / $totalTransactions : 0; // Rata-rata per transaksi
+
+            // Ambil pesanan yang telah selesai untuk ditampilkan di daftar
+            $completedOrdersQuery = Order::with(['user', 'items.product', 'items.variant', 'shipping_address', 'logs', 'payment'])
+                ->whereHas('items.product', function ($q) use ($seller) {
+                    $q->where('seller_id', $seller->id);
+                })
+                ->where('status', 'delivered'); // Status 'delivered' adalah pesanan yang selesai
+
+            // Tambahkan filter yang sama seperti query utama
+            if ($request->has('search') && $request->search) {
+                $search = $request->search;
+                $completedOrdersQuery->where(function($q) use ($search) {
+                    $q->where('order_number', 'LIKE', "%{$search}%")
+                      ->orWhereHas('user', function ($userQuery) use ($search) {
+                          $userQuery->where('name', 'LIKE', "%{$search}%");
+                      });
+                });
+            }
+
+            if ($request->has('date_filter') && $request->date_filter) {
+                switch ($request->date_filter) {
+                    case 'today':
+                        $completedOrdersQuery->whereDate('created_at', today());
+                        break;
+                    case 'this_week':
+                        $completedOrdersQuery->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
+                        break;
+                    case 'this_month':
+                        $completedOrdersQuery->whereMonth('created_at', now()->month)
+                                             ->whereYear('created_at', now()->year);
+                        break;
+                    case 'this_year':
+                        $completedOrdersQuery->whereYear('created_at', now()->year);
+                        break;
+                }
+            }
+
+            $completedOrders = $completedOrdersQuery->orderBy('created_at', 'desc')
+                                                   ->paginate(10)
+                                                   ->appends($request->query());
+
+            return view('penjual.riwayat_penjualan', compact(
+                'orders',
+                'statusData',
+                'totalSales',
+                'totalTransactions',
+                'monthlyRevenue',
+                'avgPerTransaction',
+                'completedOrders'
+            ));
+        } catch (\Exception $e) {
+            \Log::error("Error in salesHistory method: " . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat memuat data riwayat penjualan.');
+        }
     }
 
     // Fungsi-fungsi lainnya...

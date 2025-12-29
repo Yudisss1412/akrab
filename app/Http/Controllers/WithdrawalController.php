@@ -84,9 +84,16 @@ class WithdrawalController extends Controller
             ], 403);
         }
 
-        // Ambil saldo penjual (dalam implementasi nyata, ini akan dari data penjualan)
-        // Untuk saat ini, kita asumsikan user memiliki metode getBalance
-        $balance = $this->getSellerBalance($user->id);
+        // Ambil ID penjual dari tabel sellers berdasarkan user_id
+        $seller = \App\Models\Seller::where('user_id', $user->id)->first();
+        if (!$seller) {
+            return response()->json([
+                'message' => 'Seller record tidak ditemukan'
+            ], 403);
+        }
+
+        // Ambil saldo penjual
+        $balance = $this->getSellerBalance($seller->id);
 
         if ($request->amount > $balance) {
             return response()->json([
@@ -104,6 +111,19 @@ class WithdrawalController extends Controller
                 'request_date' => now()
             ]);
 
+            // Buat transaksi penarikan dengan status pending
+            \App\Models\SellerTransaction::create([
+                'seller_id' => $user->id,
+                'withdrawal_request_id' => $withdrawalRequest->id,
+                'transaction_type' => 'withdrawal',
+                'amount' => $request->amount,
+                'description' => "Permintaan penarikan dana",
+                'reference_type' => 'withdrawal',
+                'reference_id' => $withdrawalRequest->id,
+                'status' => 'pending',
+                'transaction_date' => now(),
+            ]);
+
             DB::commit();
 
             return response()->json([
@@ -112,7 +132,7 @@ class WithdrawalController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollback();
-            
+
             return response()->json([
                 'message' => 'Terjadi kesalahan saat membuat permintaan penarikan dana: ' . $e->getMessage()
             ], 500);
@@ -170,6 +190,18 @@ class WithdrawalController extends Controller
             'notes' => 'Dibatalkan oleh penjual'
         ]);
 
+        // Perbarui status transaksi terkait
+        $transaction = \App\Models\SellerTransaction::where('withdrawal_request_id', $withdrawal->id)
+            ->where('transaction_type', 'withdrawal')
+            ->first();
+
+        if ($transaction) {
+            $transaction->update([
+                'status' => 'cancelled',
+                'description' => 'Permintaan penarikan dana dibatalkan oleh penjual'
+            ]);
+        }
+
         return response()->json([
             'message' => 'Permintaan penarikan dana berhasil dibatalkan'
         ]);
@@ -208,9 +240,19 @@ class WithdrawalController extends Controller
             return response()->json(['message' => 'Akses ditolak'], 403);
         }
 
-        $balance = $this->getSellerBalance($user->id);
+        // Ambil ID penjual dari tabel sellers berdasarkan user_id
+        $seller = \App\Models\Seller::where('user_id', $user->id)->first();
+        if (!$seller) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Seller record tidak ditemukan'
+            ], 403);
+        }
+
+        $balance = $this->getSellerBalance($seller->id);
 
         return response()->json([
+            'success' => true,
             'balance' => $balance
         ]);
     }
@@ -224,12 +266,25 @@ class WithdrawalController extends Controller
 
         // Hanya penjual yang bisa mengakses
         if (!$user || !$user->role || $user->role->name !== 'seller') {
+            \Log::info('Akses ditolak di getTransactionHistory: user tidak valid');
             return response()->json(['message' => 'Akses ditolak'], 403);
         }
 
-        // Dalam implementasi nyata, ini akan mengambil data dari tabel transaksi
-        // Untuk sekarang, kita buat data dummy yang dinamis berdasarkan penjualan
-        $transactions = $this->generateTransactionHistory($user->id);
+        \Log::info('User ID: ' . $user->id);
+
+        // Ambil ID penjual dari tabel sellers berdasarkan user_id
+        $seller = \App\Models\Seller::where('user_id', $user->id)->first();
+        if (!$seller) {
+            \Log::info('Seller record tidak ditemukan untuk user_id: ' . $user->id);
+            return response()->json(['message' => 'Seller record tidak ditemukan'], 403);
+        }
+
+        \Log::info('Seller ID: ' . $seller->id);
+
+        // Ambil transaksi dari tabel seller_transactions
+        $transactions = $this->generateTransactionHistory($seller->id);
+
+        \Log::info('Jumlah transaksi ditemukan: ' . count($transactions));
 
         return response()->json([
             'transactions' => $transactions
@@ -242,33 +297,9 @@ class WithdrawalController extends Controller
      */
     private function getSellerBalance($sellerId)
     {
-        // Ambil penjual
-        $seller = \App\Models\Seller::find($sellerId);
-        if (!$seller) {
-            return 0;
-        }
-
-        // Hitung total penjualan yang selesai dari produk penjual ini
-        $completedOrdersAmount = DB::table('orders')
-            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
-            ->join('products', 'order_items.product_id', '=', 'products.id')
-            ->where('products.seller_id', $sellerId)
-            ->where('orders.status', 'completed')
-            ->sum('order_items.subtotal');
-
-        // Hitung total penarikan yang sudah diproses
-        $processedWithdrawals = DB::table('withdrawal_requests')
-            ->where('seller_id', $sellerId)
-            ->whereIn('status', ['approved', 'completed'])
-            ->sum('amount');
-
-        // Hitung total biaya komisi (dalam implementasi nyata)
-        $commissionAmount = 0; // Untuk implementasi sementara
-
-        // Saldo = total penjualan - komisi - penarikan yang sudah diproses
-        $balance = $completedOrdersAmount - $commissionAmount - $processedWithdrawals;
-
-        return max(0, $balance); // Pastikan tidak minus
+        // Gunakan service untuk menghitung saldo
+        $statsService = new \App\Services\SellerStatisticsService();
+        return $statsService->calculateSellerBalance($sellerId);
     }
 
     /**
@@ -276,50 +307,44 @@ class WithdrawalController extends Controller
      */
     private function generateTransactionHistory($sellerId)
     {
-        // Dalam implementasi nyata, ini akan mengambil dari tabel transaksi yang sesuai
-        // Untuk sekarang, kita gabungkan data dari order yang selesai dan penarikan
-        $completedOrders = DB::table('orders')
-            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
-            ->join('products', 'order_items.product_id', '=', 'products.id')
-            ->select('orders.created_at', 'products.name', 'order_items.subtotal as amount')
-            ->where('products.seller_id', $sellerId)
-            ->where('orders.status', 'completed')
-            ->orderBy('orders.created_at', 'desc')
-            ->limit(5)
-            ->get();
+        try {
+            // Ambil transaksi terbaru dari model SellerTransaction
+            $transactions = \App\Models\SellerTransaction::where('seller_id', $sellerId)
+                ->orderBy('transaction_date', 'desc')
+                ->limit(10)
+                ->get();
 
-        $withdrawals = DB::table('withdrawal_requests')
-            ->select('created_at', 'notes as name', 'amount')
-            ->selectRaw("'-Penarikan Dana' as name")
-            ->where('seller_id', $sellerId)
-            ->orderBy('created_at', 'desc')
-            ->limit(5)
-            ->get();
+            $formattedTransactions = collect();
 
-        // Gabungkan dan urutkan
-        $transactions = collect();
+            foreach ($transactions as $transaction) {
+                $description = $transaction->description;
 
-        foreach ($completedOrders as $order) {
-            $transactions->push([
-                'date' => $order->created_at,
-                'description' => 'Penjualan Produk "' . ($order->name ?? 'Produk') . '"',
-                'type' => 'Pemasukan',
-                'amount' => $order->amount,
-            ]);
+                // Tambahkan informasi tambahan berdasarkan tipe transaksi
+                if ($transaction->transaction_type === 'sale') {
+                    $description = "Penjualan Produk";
+                } elseif ($transaction->transaction_type === 'withdrawal') {
+                    $description = "Penarikan Dana";
+                } elseif ($transaction->transaction_type === 'commission') {
+                    $description = "Biaya Komisi";
+                }
+
+                $formattedTransactions->push([
+                    'date' => $transaction->transaction_date,
+                    'description' => $description,
+                    'type' => $transaction->transaction_type === 'sale' ? 'Pemasukan' :
+                              ($transaction->transaction_type === 'withdrawal' ? 'Pengeluaran' : 'Biaya'),
+                    'amount' => $transaction->amount,
+                    'status' => $transaction->status,
+                ]);
+            }
+
+            // Urutkan berdasarkan tanggal terbaru
+            $formattedTransactions = $formattedTransactions->sortByDesc('date')->values();
+
+            return $formattedTransactions;
+        } catch (\Exception $e) {
+            \Log::error('Error dalam generateTransactionHistory: ' . $e->getMessage());
+            return collect(); // Kembalikan collection kosong jika ada error
         }
-
-        foreach ($withdrawals as $withdrawal) {
-            $transactions->push([
-                'date' => $withdrawal->created_at,
-                'description' => 'Penarikan Dana',
-                'type' => 'Pengeluaran',
-                'amount' => $withdrawal->amount,
-            ]);
-        }
-
-        // Urutkan berdasarkan tanggal terbaru
-        $transactions = $transactions->sortByDesc('date')->values();
-
-        return $transactions;
     }
 }

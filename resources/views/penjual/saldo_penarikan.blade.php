@@ -773,9 +773,8 @@
           return;
         }
 
-        // Perbarui saldo hanya jika API merespons dengan nilai yang bukan 0 (menunjukkan data nyata ada)
-        // Jika API merespons dengan 0, kita anggap itu sebagai nilai default dari sistem (belum ada transaksi)
-        if (data.balance !== undefined && data.balance !== null && !isNaN(data.balance) && data.balance > 0) {
+        // Perbarui saldo jika API merespons dengan nilai yang valid (termasuk nol atau negatif)
+        if (data.balance !== undefined && data.balance !== null && !isNaN(data.balance)) {
           document.getElementById('saldoAmount').textContent = formatRupiah(data.balance);
         }
         // Jika tidak ada data dari API atau saldo 0, nilai default akan tetap ditampilkan
@@ -839,14 +838,15 @@
     function populateTransactionTable(transactions) {
       const tbody = document.getElementById('transactionTableBody');
 
+      // Hapus SEMUA baris sebelum menambahkan data baru (bukan hanya yang memiliki data-dummy)
+      // Ini untuk memastikan tidak ada duplikasi
+      tbody.innerHTML = '';
+
       if (transactions.length === 0) {
         // Jika tidak ada data transaksi, biarkan data dummy tetap ada
+        // Tapi karena kita sudah hapus semua baris di atas, kita hanya kembalikan
         return;
       }
-
-      // Hapus semua baris dummy sebelum menambahkan data baru
-      const dummyRows = tbody.querySelectorAll('[data-dummy="true"]');
-      dummyRows.forEach(row => row.remove());
 
       transactions.forEach(transaction => {
         const row = document.createElement('tr');
@@ -885,9 +885,9 @@
         return;
       }
 
-      // Hapus semua baris dummy sebelum menambahkan data baru
-      const dummyRows = tbody.querySelectorAll('[data-dummy="true"]');
-      dummyRows.forEach(row => row.remove());
+      // Hapus SEMUA baris sebelum menambahkan data baru (bukan hanya yang memiliki data-dummy)
+      // Ini untuk memastikan tidak ada duplikasi
+      tbody.innerHTML = '';
 
       withdrawals.forEach(withdrawal => {
         const row = document.createElement('tr');

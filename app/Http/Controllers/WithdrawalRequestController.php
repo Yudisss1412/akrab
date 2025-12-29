@@ -148,10 +148,23 @@ class WithdrawalRequestController extends Controller
 
     public function approve(Request $request, $id)
     {
-        $withdrawal = WithdrawalRequest::findOrFail($id);
-        
+        $withdrawal = WithdrawalRequest::with('seller')->findOrFail($id);
+
         $withdrawal->update([
             'status' => 'approved'
+        ]);
+
+        // Buat transaksi penarikan
+        \App\Models\SellerTransaction::create([
+            'seller_id' => $withdrawal->seller->id,
+            'withdrawal_request_id' => $withdrawal->id,
+            'transaction_type' => 'withdrawal',
+            'amount' => $withdrawal->amount,
+            'description' => "Penarikan dana disetujui",
+            'reference_type' => 'withdrawal',
+            'reference_id' => $withdrawal->id,
+            'status' => 'completed',
+            'transaction_date' => now(),
         ]);
 
         return response()->json([
@@ -189,11 +202,30 @@ class WithdrawalRequestController extends Controller
 
     public function process(Request $request, $id)
     {
-        $withdrawal = WithdrawalRequest::findOrFail($id);
-        
+        $withdrawal = WithdrawalRequest::with('seller')->findOrFail($id);
+
         $withdrawal->update([
             'status' => 'processing'
         ]);
+
+        // Buat transaksi penarikan jika belum ada
+        $existingTransaction = \App\Models\SellerTransaction::where('withdrawal_request_id', $withdrawal->id)
+            ->where('transaction_type', 'withdrawal')
+            ->first();
+
+        if (!$existingTransaction) {
+            \App\Models\SellerTransaction::create([
+                'seller_id' => $withdrawal->seller->id,
+                'withdrawal_request_id' => $withdrawal->id,
+                'transaction_type' => 'withdrawal',
+                'amount' => $withdrawal->amount,
+                'description' => "Penarikan dana sedang diproses",
+                'reference_type' => 'withdrawal',
+                'reference_id' => $withdrawal->id,
+                'status' => 'completed', // Status transaksi tetap completed karena dana sudah dikurangi dari saldo
+                'transaction_date' => now(),
+            ]);
+        }
 
         return response()->json([
             'success' => true,

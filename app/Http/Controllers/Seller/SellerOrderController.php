@@ -338,7 +338,11 @@ class SellerOrderController extends Controller
             ->whereHas('items.product', function ($q) use ($seller) {
                 $q->where('seller_id', $seller->id);
             })
+            ->with(['items', 'items.product']) // Load items untuk membuat transaksi
             ->firstOrFail();
+
+        // Simpan status lama sebelum update
+        $oldStatus = $order->status;
 
         // Update status
         $order->update(['status' => $request->status]);
@@ -350,11 +354,41 @@ class SellerOrderController extends Controller
             'updated_by' => 'seller',
         ]);
 
+        // Jika status berubah menjadi 'delivered' (artinya pesanan selesai), buat transaksi penjualan
+        if ($request->status === 'delivered' && $oldStatus !== 'delivered') {
+            $this->createSalesTransactions($order, $seller->id);
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Status pesanan berhasil diperbarui',
             'order' => $order
         ]);
+    }
+
+    /**
+     * Membuat transaksi penjualan ketika pesanan selesai
+     */
+    private function createSalesTransactions($order, $sellerId)
+    {
+        // Buat transaksi untuk setiap item dalam pesanan
+        foreach ($order->items as $item) {
+            // Pastikan item ini milik penjual yang benar
+            if ($item->product && $item->product->seller_id == $sellerId) {
+                \App\Models\SellerTransaction::create([
+                    'seller_id' => $sellerId,
+                    'order_id' => $order->id,
+                    'order_item_id' => $item->id,
+                    'transaction_type' => 'sale',
+                    'amount' => $item->subtotal,
+                    'description' => "Penjualan produk: {$item->product->name}",
+                    'reference_type' => 'order',
+                    'reference_id' => $order->id,
+                    'status' => 'completed',
+                    'transaction_date' => now(),
+                ]);
+            }
+        }
     }
 
     /**
@@ -589,53 +623,18 @@ class SellerOrderController extends Controller
             // Paginate hasil
             $orders = $query->paginate(10)->appends($request->query());
 
-            // Ambil semua pesanan milik penjual ini untuk menghitung statistik
-            $allSellerOrders = Order::whereHas('items.product', function ($q) use ($seller) {
-                $q->where('seller_id', $seller->id);
-            });
-
-            // Hitung jumlah pesanan per status dari database
-            $statusCounts = DB::table('orders')
-                ->join('order_items', 'orders.id', '=', 'order_items.order_id')
-                ->join('products', 'order_items.product_id', '=', 'products.id')
-                ->where('products.seller_id', $seller->id)
-                ->selectRaw('orders.status, count(*) as count')
-                ->groupBy('orders.status')
-                ->pluck('count', 'orders.status');
-
-            // Mapping status database ke status aplikasi
-            $statusMapping = [
-                'pending' => 'pending_payment',    // Menunggu Pembayaran
-                'confirmed' => 'processing',       // Diproses
-                'shipped' => 'shipping',           // Dikirim
-                'delivered' => 'completed',        // Selesai
-                'cancelled' => 'cancelled'         // Dibatalkan
-            ];
-
-            // Terapkan mapping dan hitung jumlah untuk setiap status aplikasi
-            $allStatus = ['pending_payment', 'processing', 'shipping', 'completed', 'cancelled'];
-            $statusData = [];
-            foreach ($allStatus as $appStatus) {
-                $statusData[$appStatus] = 0; // Inisialisasi dengan 0
-
-                // Tambahkan jumlah dari setiap status database yang dipetakan ke status aplikasi ini
-                foreach ($statusCounts as $dbStatus => $count) {
-                    if ($statusMapping[$dbStatus] === $appStatus) {
-                        $statusData[$appStatus] += $count;
-                    }
-                }
-            }
+            // Gunakan service untuk menghitung statistik
+            $statsService = new \App\Services\SellerStatisticsService();
 
             // Hitung statistik penjualan
-            $totalSales = $allSellerOrders->sum('total_amount'); // Total penjualan keseluruhan
+            $stats = $statsService->calculateSellerStats($seller->id);
+            $totalSales = $stats['totalSales'];
+            $totalTransactions = $stats['totalTransactions'];
+            $monthlyRevenue = $stats['monthlyRevenue'];
+            $avgPerTransaction = $stats['avgPerTransaction'];
 
-            $totalTransactions = $allSellerOrders->count(); // Total jumlah transaksi
-
-            $monthlyRevenue = $allSellerOrders->whereMonth('created_at', now()->month)
-                                             ->whereYear('created_at', now()->year)
-                                             ->sum('total_amount'); // Pendapatan bulan ini
-
-            $avgPerTransaction = $totalTransactions > 0 ? $totalSales / $totalTransactions : 0; // Rata-rata per transaksi
+            // Hitung jumlah pesanan per status
+            $statusData = $statsService->calculateOrderStatusCounts($seller->id);
 
             // Ambil pesanan yang telah selesai untuk ditampilkan di daftar
             $completedOrdersQuery = Order::with(['user', 'items.product', 'items.variant', 'shipping_address', 'logs', 'payment'])

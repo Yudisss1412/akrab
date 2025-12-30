@@ -1,26 +1,3 @@
-<style>
-  .ticket-badge {
-    position: relative;
-    display: inline-block;
-    margin-right: 1rem;
-  }
-  
-  .ticket-count {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background-color: #dc3545;
-    color: white;
-    border-radius: 50%;
-    width: 18px;
-    height: 18px;
-    font-size: 10px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-</style>
 
 <header class="header compact">
   <div class="header-left">

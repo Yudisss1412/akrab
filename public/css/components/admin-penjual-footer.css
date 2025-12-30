@@ -1,0 +1,21 @@
+/* CSS untuk memastikan footer full width */
+.ak-footer {
+  width: 100%;
+  position: relative;
+}
+
+.ak-footer__inner {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1rem;
+}
+
+/* Penyesuaian mobile */
+@media (max-width: 768px) {
+  .ak-footer__inner {
+    padding: 0 0.75rem;
+  }
+}

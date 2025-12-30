@@ -12,46 +12,7 @@
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-    <style>
-        body {
-            overflow-x: hidden;
-        }
-        .content-wrapper {
-            margin-left: 280px;
-            padding: 20px;
-            transition: margin-left 0.3s ease;
-        }
-        .sidebar {
-            top: 0;
-            left: 0;
-        }
-    </style>
-    <style>
-        .custom-alert {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.8rem 1rem;
-            border: none;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .alert-content {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex: 1;
-        }
-
-        .alert-icon {
-            font-size: 1.2rem;
-        }
-
-        .alert-message {
-            flex: 1;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/layouts/seller-layout.css') }}">
 
     @stack('styles')
 </head>

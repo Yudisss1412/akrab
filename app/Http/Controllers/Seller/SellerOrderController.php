@@ -691,5 +691,301 @@ class SellerOrderController extends Controller
         }
     }
 
-    // Fungsi-fungsi lainnya...
+        /**
+     * Display complaints and returns page
+     */
+    public function complaintsAndReturns()
+    {
+        // Hanya penjual yang bisa mengakses
+        $user = Auth::user();
+        if (!$user || !$user->role || $user->role->name !== 'seller') {
+            abort(403, 'Akses ditolak. Hanya penjual yang dapat mengakses halaman ini.');
+        }
+
+        // Ambil ID penjual dari tabel sellers berdasarkan user_id
+        $seller = Seller::where('user_id', $user->id)->first();
+        if (!$seller) {
+            abort(403, 'Akses ditolak. Seller record tidak ditemukan.');
+        }
+
+        return view('penjual.komplain_retur');
+    }
+
+    /**
+     * Get complaints and returns data in JSON format for the page
+     */
+    public function getComplaintsAndReturnsJson(Request $request)
+    {
+        // Hanya penjual yang bisa mengakses
+        $user = Auth::user();
+        if (!$user || !$user->role || $user->role->name !== 'seller') {
+            return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
+        }
+
+        // Ambil ID penjual dari tabel sellers berdasarkan user_id
+        $seller = Seller::where('user_id', $user->id)->first();
+        if (!$seller) {
+            return response()->json(['success' => false, 'message' => 'Seller record tidak ditemukan'], 403);
+        }
+
+        // Ambil parameter filter
+        $filterStar = $request->input('filter_star');
+        $filterReply = $request->input('filter_reply');
+        $sortBy = $request->input('sort_by', 'newest');
+        $page = $request->input('page', 1);
+        $perPage = 10;
+
+        // Bangun query untuk reviews
+        $query = Review::with(['user', 'product'])
+            ->whereHas('product', function ($q) use ($seller) {
+                $q->where('seller_id', $seller->id);
+            });
+
+        // Filter berdasarkan bintang (rating)
+        if ($filterStar) {
+            $query->where('rating', $filterStar);
+        } else {
+            // Secara default hanya tampilkan rating rendah (1-2 bintang) sebagai komplain
+            $query->where('rating', '<=', 2);
+        }
+
+        // Filter berdasarkan status balasan
+        if ($filterReply === 'replied') {
+            $query->whereNotNull('reply')->where('reply', '!=', '');
+        } elseif ($filterReply === 'pending') {
+            $query->where(function ($q) {
+                $q->whereNull('reply')->orWhere('reply', '');
+            });
+        }
+
+        // Urutkan
+        switch ($sortBy) {
+            case 'oldest':
+                $query->orderBy('created_at', 'asc');
+                break;
+            case 'highest':
+                $query->orderBy('rating', 'desc');
+                break;
+            case 'lowest':
+                $query->orderBy('rating', 'asc');
+                break;
+            case 'newest':
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+
+        $reviews = $query->paginate($perPage);
+
+        // Format data untuk frontend
+        $formattedReviews = $reviews->map(function ($review) {
+            return [
+                'id' => $review->id,
+                'name' => $review->user->name ?? 'Pelanggan',
+                'date' => $review->created_at->format('d M Y H:i'),
+                'rating' => $review->rating,
+                'comment' => $review->review_text,
+                'replied' => !empty($review->reply),
+                'reply' => $review->reply,
+                'product' => [
+                    'id' => $review->product->id,
+                    'name' => $review->product->name,
+                    'image' => $review->product->image ? asset('storage/' . $review->product->image) : asset('images/placeholder-product.jpg'),
+                ]
+            ];
+        });
+
+        return response()->json([
+            'reviews' => $formattedReviews,
+            'pagination' => [
+                'current_page' => $reviews->currentPage(),
+                'last_page' => $reviews->lastPage(),
+                'per_page' => $reviews->perPage(),
+                'total' => $reviews->total(),
+            ]
+        ]);
+    }
+
+    /**
+     * Get returns data for the page
+     */
+    public function getReturnsData(Request $request)
+    {
+        // Hanya penjual yang bisa mengakses
+        $user = Auth::user();
+        if (!$user || !$user->role || $user->role->name !== 'seller') {
+            return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
+        }
+
+        // Ambil ID penjual dari tabel sellers berdasarkan user_id
+        $seller = Seller::where('user_id', $user->id)->first();
+        if (!$seller) {
+            return response()->json(['success' => false, 'message' => 'Seller record tidak ditemukan'], 403);
+        }
+
+        // Ambil parameter filter
+        $filterStatus = $request->input('filter_status');
+        $page = $request->input('page', 1);
+        $perPage = 10;
+
+        // Bangun query untuk returns
+        $query = ProductReturn::with(['user', 'orderItem.product'])
+            ->whereHas('orderItem.product', function ($q) use ($seller) {
+                $q->where('seller_id', $seller->id);
+            });
+
+        // Filter berdasarkan status
+        if ($filterStatus) {
+            $query->where('status', $filterStatus);
+        }
+
+        $returns = $query->orderBy('created_at', 'desc')->paginate($perPage);
+
+        // Format data untuk frontend
+        $formattedReturns = $returns->map(function ($return) {
+            // Mapping status ke label
+            $statusLabels = [
+                'pending' => 'Menunggu',
+                'approved' => 'Disetujui',
+                'rejected' => 'Ditolak',
+                'completed' => 'Selesai'
+            ];
+
+            return [
+                'id' => $return->id,
+                'customer_name' => $return->user->name ?? 'Pelanggan',
+                'created_at' => $return->created_at->format('d M Y H:i'),
+                'status' => $return->status,
+                'status_label' => $statusLabels[$return->status] ?? ucfirst($return->status),
+                'product_name' => $return->orderItem->product->name ?? 'Produk tidak ditemukan',
+                'reason' => $return->reason,
+                'description' => $return->description,
+                'refund_amount' => (float)$return->refund_amount,
+            ];
+        });
+
+        return response()->json([
+            'returns' => $formattedReturns,
+            'pagination' => [
+                'current_page' => $returns->currentPage(),
+                'last_page' => $returns->lastPage(),
+                'per_page' => $returns->perPage(),
+                'total' => $returns->total(),
+            ]
+        ]);
+    }
+
+    /**
+     * Approve a return request
+     */
+    public function approveReturn($id)
+    {
+        // Hanya penjual yang bisa mengakses
+        $user = Auth::user();
+        if (!$user || !$user->role || $user->role->name !== 'seller') {
+            return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
+        }
+
+        // Ambil ID penjual dari tabel sellers berdasarkan user_id
+        $seller = Seller::where('user_id', $user->id)->first();
+        if (!$seller) {
+            return response()->json(['success' => false, 'message' => 'Seller record tidak ditemukan'], 403);
+        }
+
+        // Ambil permintaan retur
+        $return = ProductReturn::with(['orderItem.product'])
+            ->where('id', $id)
+            ->whereHas('orderItem.product', function ($q) use ($seller) {
+                $q->where('seller_id', $seller->id);
+            })
+            ->firstOrFail();
+
+        // Perbarui status menjadi approved
+        $return->update([
+            'status' => 'approved',
+            'processed_at' => now(),
+            'processed_by' => $user->id
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Permintaan retur berhasil disetujui'
+        ]);
+    }
+
+    /**
+     * Reject a return request
+     */
+    public function rejectReturn($id)
+    {
+        // Hanya penjual yang bisa mengakses
+        $user = Auth::user();
+        if (!$user || !$user->role || $user->role->name !== 'seller') {
+            return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
+        }
+
+        // Ambil ID penjual dari tabel sellers berdasarkan user_id
+        $seller = Seller::where('user_id', $user->id)->first();
+        if (!$seller) {
+            return response()->json(['success' => false, 'message' => 'Seller record tidak ditemukan'], 403);
+        }
+
+        // Ambil permintaan retur
+        $return = ProductReturn::with(['orderItem.product'])
+            ->where('id', $id)
+            ->whereHas('orderItem.product', function ($q) use ($seller) {
+                $q->where('seller_id', $seller->id);
+            })
+            ->firstOrFail();
+
+        // Perbarui status menjadi rejected
+        $return->update([
+            'status' => 'rejected',
+            'processed_at' => now(),
+            'processed_by' => $user->id
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Permintaan retur berhasil ditolak'
+        ]);
+    }
+
+    /**
+     * Complete a return request
+     */
+    public function completeReturn($id)
+    {
+        // Hanya penjual yang bisa mengakses
+        $user = Auth::user();
+        if (!$user || !$user->role || $user->role->name !== 'seller') {
+            return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
+        }
+
+        // Ambil ID penjual dari tabel sellers berdasarkan user_id
+        $seller = Seller::where('user_id', $user->id)->first();
+        if (!$seller) {
+            return response()->json(['success' => false, 'message' => 'Seller record tidak ditemukan'], 403);
+        }
+
+        // Ambil permintaan retur
+        $return = ProductReturn::with(['orderItem.product'])
+            ->where('id', $id)
+            ->whereHas('orderItem.product', function ($q) use ($seller) {
+                $q->where('seller_id', $seller->id);
+            })
+            ->firstOrFail();
+
+        // Perbarui status menjadi completed
+        $return->update([
+            'status' => 'completed',
+            'processed_at' => now(),
+            'processed_by' => $user->id
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Retur berhasil diselesaikan'
+        ]);
+    }
 }

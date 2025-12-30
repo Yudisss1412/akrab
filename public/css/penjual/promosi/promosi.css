@@ -1,0 +1,147 @@
+/* Styling tambahan untuk formulir voucher */
+.form-card {
+  background: var(--ak-white);
+  border-radius: var(--ak-radius);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--ak-border);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--ak-text);
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--ak-border);
+  border-radius: var(--ak-radius);
+  font-size: 0.875rem;
+  transition: border-color 0.2s;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--ak-primary);
+  box-shadow: 0 0 0 3px rgba(0, 110, 92, 0.1);
+}
+
+.radio-group {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.radio-input {
+  margin: 0;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.checkbox-input {
+  margin: 0;
+}
+
+.btn {
+  border: 1px solid transparent;
+  border-radius: var(--ak-radius);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-outline {
+  border: 1px solid var(--ak-primary);
+  color: var(--ak-primary);
+  background: transparent;
+}
+
+.btn-outline:hover {
+  background: var(--ak-primary);
+  color: white;
+}
+
+.btn-primary {
+  background: var(--ak-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #005a4a;
+}
+
+.btn-success {
+  background: var(--ak-success);
+  color: white;
+}
+
+.btn-success:hover {
+  background: #059669;
+}
+
+.btn-danger {
+  background: var(--ak-danger);
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--ak-border);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .radio-group {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-card {
+    padding: 1rem;
+  }
+
+  .form-actions {
+    padding-top: 1rem;
+  }
+}

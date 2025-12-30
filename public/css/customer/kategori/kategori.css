@@ -1489,4 +1489,275 @@ body {
   .kategori-layout {
     gap: 15px;
   }
+}/* ========== Modal Produk ========== */
+.modal-detail-produk {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  overflow-y: auto;
+}
+
+.modal-content-new {
+  max-width: 420px;
+  width: 95%; /* Wider on mobile */
+  max-height: 90vh;
+  background: #fff;
+  border-radius: 25px;
+  box-shadow: 0 8px 38px rgba(0, 0, 0, 0.22);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  margin: 20px; /* Jarak dari sisi viewport */
+}
+
+.modal-title-row {
+  padding: 1.2rem 1.5rem 0.5rem 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.modal-close-new {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #f0f0f0;
+  color: #666;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+.modal-close-new:hover {
+  background: #e0e0e0;
+}
+
+.modal-body-new {
+  padding: 0 1.5rem 1.5rem 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.modal-product-image {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  border-radius: 16px;
+  background: #f8f9fa;
+}
+
+.modal-product-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.modal-product-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+}
+
+.modal-product-price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #006E5C;
+  margin: 0;
+}
+
+.modal-product-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.modal-product-sold {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.modal-product-store {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+  margin: 0.5rem 0;
+}
+
+.modal-store-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f0f0f0;
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+  color: #006E5C;
+}
+
+.modal-store-info {
+  flex: 1;
+}
+
+.modal-store-name {
+  margin: 0;
+  font-weight: 600;
+  color: #333;
+}
+
+.modal-store-location {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.modal-action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem;
+  border-radius: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.modal-action-button.primary {
+  background: #006E5C;
+  color: white;
+}
+
+.modal-action-button.outline {
+  border: 1px solid #006E5C;
+  color: #006E5C;
+}
+
+.modal-action-button.full-width {
+  width: 100%;
+}
+
+.modal-action-button:hover {
+  opacity: 0.9;
+}
+
+/* Variants section */
+.variants-section {
+  padding: 1rem 0;
+}
+
+.variant-title {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.variant-options {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.variant-option {
+  flex-shrink: 0;
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.variant-option.selected {
+  background: #006E5C;
+  color: white;
+  border-color: #006E5C;
+}
+
+/* Quantity selector */
+.quantity-selector {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.quantity-label {
+  font-weight: 600;
+}
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.quantity-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  background: white;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+.quantity-btn:hover {
+  background: #f0f0f0;
+}
+
+.quantity-display {
+  font-weight: 600;
+  min-width: 2rem;
+  text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .modal-content-new {
+    max-height: 95vh;
+    margin: 10px;
+  }
+
+  .modal-product-image {
+    height: 220px;
+  }
+
+  .modal-product-name {
+    font-size: 1.1rem;
+  }
+
+  .modal-product-price {
+    font-size: 1.3rem;
+  }
 }

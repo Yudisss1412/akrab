@@ -612,4 +612,131 @@ nav[aria-label*="Navigasi halaman"] {
   nav[aria-label*="Navigasi halaman"] {
     padding: 0.75rem;
   }
+}/* Gaya tambahan untuk overlay dan modal */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-content-custom {
+  background: white;
+  border-radius: var(--ak-radius);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--ak-border);
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow: hidden;
+  transform: scale(0.7);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  position: relative;
+}
+
+.modal-overlay.active .modal-content-custom {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.modal-header-custom {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--ak-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title-custom {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ak-text);
+}
+
+.modal-close-custom {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--ak-muted);
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close-custom:hover {
+  color: var(--ak-text);
+}
+
+.modal-body-custom {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-footer-custom {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--ak-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .modal-content-custom {
+    width: 95%;
+    max-height: 85vh;
+  }
+
+  .modal-header-custom {
+    padding: 1rem;
+  }
+
+  .modal-body-custom {
+    padding: 1rem;
+  }
+
+  .modal-footer-custom {
+    padding: 1rem;
+    flex-direction: column;
+  }
+
+  .modal-footer-custom .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content-custom {
+    width: 98%;
+    max-height: 80vh;
+  }
+
+  .modal-header-custom {
+    padding: 0.75rem;
+  }
+
+  .modal-body-custom {
+    padding: 0.75rem;
+  }
+
+  .modal-footer-custom {
+    padding: 0.75rem;
+  }
 }

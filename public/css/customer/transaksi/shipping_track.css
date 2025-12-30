@@ -1,0 +1,180 @@
+:root {
+    --ak-primary: #006E5C;
+    --ak-primary-light: #a8d5c9;
+    --ak-white: #FFFFFF;
+    --ak-background: #f0fdfa;
+    --ak-text: #1D232A;
+    --ak-muted: #6b7280;
+    --ak-border: #E5E7EB;
+    --ak-radius: 12px;
+    --ak-space: 16px;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--ak-background);
+    color: var(--ak-text);
+    padding-bottom: 60px;
+}
+
+.tracking-header {
+    background: var(--ak-white);
+    padding: 1.5rem;
+    border-radius: var(--ak-radius);
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--ak-border);
+}
+
+.tracking-card {
+    background: var(--ak-white);
+    border-radius: var(--ak-radius);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--ak-border);
+}
+
+.tracking-timeline {
+    position: relative;
+    padding-left: 2rem;
+    margin-left: 0.5rem;
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.timeline-item:before {
+    content: '';
+    position: absolute;
+    left: -2rem;
+    top: 0.5rem;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: var(--ak-primary);
+}
+
+.timeline-item:after {
+    content: '';
+    position: absolute;
+    left: -1.5rem;
+    top: 1.5rem;
+    bottom: -1.5rem;
+    width: 2px;
+    background: var(--ak-border);
+}
+
+.timeline-item:last-child:after {
+    display: none;
+}
+
+.timeline-date {
+    font-size: 0.875rem;
+    color: var(--ak-muted);
+    margin-bottom: 0.25rem;
+}
+
+.timeline-status {
+    font-weight: 600;
+    color: var(--ak-text);
+    margin-bottom: 0.25rem;
+}
+
+.timeline-description {
+    color: var(--ak-muted);
+    font-size: 0.875rem;
+}
+
+.tracking-info {
+    background: var(--ak-white);
+    border-radius: var(--ak-radius);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--ak-border);
+}
+
+.tracking-number {
+    font-weight: 600;
+    color: var(--ak-primary);
+    font-size: 1.1rem;
+}
+
+.courier-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-shipped {
+    background: rgba(139, 69, 193, 0.1);
+    color: #8b45c1;
+}
+
+.status-delivered {
+    background: rgba(34, 197, 94, 0.1);
+    color: #16a34a;
+}
+
+.status-pending {
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+}
+
+.status-cancelled {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
+.btn {
+    border: 1px solid transparent;
+    border-radius: var(--ak-radius);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-outline {
+    border: 1px solid var(--ak-primary);
+    color: var(--ak-primary);
+    background: transparent;
+}
+
+.btn-outline:hover {
+    background: var(--ak-primary);
+    color: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .tracking-timeline {
+        padding-left: 1.5rem;
+        margin-left: 0;
+    }
+
+    .timeline-item:before {
+        left: -1.5rem;
+    }
+
+    .timeline-item:after {
+        left: -1rem;
+    }
+}

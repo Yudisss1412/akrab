@@ -1,0 +1,243 @@
+:root {
+  --ak-primary: #006E5C;
+  --ak-primary-light: #a8d5c9;
+  --ak-white: #FFFFFF;
+  --ak-background: #f0fdfa;
+  --ak-text: #1D232A;
+  --ak-muted: #6b7280;
+  --ak-border: #E5E7EB;
+  --ak-radius: 12px;
+  --ak-space: 16px;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--ak-background);
+    color: var(--ak-text);
+}
+
+.page-header {
+  background: var(--ak-white);
+  border-radius: var(--ak-radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--ak-border);
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--ak-primary);
+}
+
+.btn {
+  border: 1px solid transparent;
+  border-radius: var(--ak-radius);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-outline {
+  border: 1px solid var(--ak-primary);
+  color: var(--ak-primary);
+  background: transparent;
+}
+
+.btn-outline:hover {
+  background: var(--ak-primary);
+  color: white;
+}
+
+.btn-primary {
+  background: var(--ak-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #005a4a;
+}
+
+.card {
+  background: var(--ak-white);
+  border-radius: var(--ak-radius);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--ak-border);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.card-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--ak-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ak-text);
+  margin: 0;
+}
+
+.card-content {
+  padding: 1.5rem;
+}
+
+.info-row {
+  display: flex;
+  margin-bottom: 0.75rem;
+}
+
+.info-label {
+  width: 150px;
+  font-weight: 500;
+  color: var(--ak-text);
+}
+
+.info-value {
+  flex: 1;
+  color: var(--ak-muted);
+}
+
+.product-items {
+  margin-top: 1rem;
+}
+
+.product-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--ak-border);
+}
+
+.product-item:last-child {
+  border-bottom: none;
+}
+
+.product-thumb {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--ak-radius);
+  object-fit: cover;
+  background: #f3f4f6;
+}
+
+.product-info {
+  flex: 1;
+}
+
+.product-name {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.product-variant {
+  color: var(--ak-muted);
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.product-price {
+  color: var(--ak-primary);
+  font-weight: 600;
+}
+
+.product-quantity {
+  color: var(--ak-muted);
+  font-size: 0.875rem;
+}
+
+.order-summary {
+  margin-top: 1rem;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.summary-label {
+  color: var(--ak-muted);
+}
+
+.summary-value {
+  font-weight: 500;
+  text-align: right;
+}
+
+.summary-total {
+  border-top: 1px solid var(--ak-border);
+  padding-top: 0.5rem;
+  margin-top: 0.5rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-pending-payment {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+}
+
+.status-processing {
+  background: rgba(59, 130, 246, 0.1);
+  color: #2563eb;
+}
+
+.status-shipping {
+  background: rgba(139, 69, 193, 0.1);
+  color: #8b45c1;
+}
+
+.status-completed {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+}
+
+.status-cancelled {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .info-row {
+    flex-direction: column;
+  }
+
+  .info-label {
+    width: auto;
+    margin-bottom: 0.25rem;
+  }
+
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}

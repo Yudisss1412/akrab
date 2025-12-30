@@ -1,24 +1,12 @@
-.custom-alert {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.8rem 1rem;
-    border: none;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+body {
+    overflow-x: hidden;
 }
-
-.alert-content {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex: 1;
+.content-wrapper {
+    margin-left: 280px;
+    padding: 20px;
+    transition: margin-left 0.3s ease;
 }
-
-.alert-icon {
-    font-size: 1.2rem;
-}
-
-.alert-message {
-    flex: 1;
+.sidebar {
+    top: 0;
+    left: 0;
 }

@@ -9,7 +9,6 @@
   <link rel="stylesheet" href="{{ asset('css/admin_penjual/style.css') }}">
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="{{ asset('css/penjual/profil-penjual-extra.css') }}">
 </head>
 <body>
   @include('components.admin_penjual.header')

@@ -503,3 +503,215 @@ a.btn{
   background:#fff; margin: .6rem 1rem 0; padding:.6rem .8rem; border-radius: var(--radius-sm);
 }
 .seller-reply__meta{ color:var(--text-muted); font-size:.86rem; margin-bottom:.25rem; }
+
+/* Footer positioning fix for mobile */
+@media (max-width: 768px) {
+  html, body {
+    height: 100%;
+    min-height: 100vh;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .main-layout {
+    flex: 1 0 auto !important;
+    min-height: 0;
+  }
+
+  .content-wrapper {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0;
+  }
+
+  .admin-page-content {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0;
+  }
+
+  /* Ensure footer stays at the bottom */
+  .ak-footer {
+    margin-top: auto !important;
+  }
+}
+
+/* Sesuaikan beberapa elemen admin dengan desain profil penjual */
+.admin-profile .info-list > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  padding: .4rem 0;
+  border-bottom: 1px dashed #eceff1;
+}
+
+.admin-profile .info-list > div:last-child {
+  border-bottom: none;
+}
+
+.admin-profile .info-list dt {
+  font-weight: 600;
+  flex: 1;
+}
+
+.admin-profile .info-list dd {
+  margin: 0;
+  color: var(--text-muted);
+  text-align: right;
+  flex: 1;
+}
+
+.admin-orders-viewport {
+  max-height: 500px;
+  overflow: auto;
+  margin-top: 1rem;
+}
+
+.admin-order-card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  background: #fff;
+  margin-bottom: .9rem;
+}
+
+.admin-order-card .item-desc {
+  font-size: .9rem;
+  color: var(--text-muted);
+}
+
+.admin-order-card .item-status {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: .8rem;
+  padding: .2rem .6rem;
+  border-radius: 5rem;
+  display: inline-block;
+}
+
+.status-pending {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+}
+
+.status-confirmed {
+  background: rgba(59, 130, 246, 0.1);
+  color: #2563eb;
+}
+
+.status-shipped {
+  background: rgba(139, 69, 193, 0.1);
+  color: #8b45c1;
+}
+
+.status-delivered {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+}
+
+.status-cancelled {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+.admin-order-card .item-total {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--primary-color-dark);
+}
+
+.admin-order-card .item-date {
+  font-size: .8rem;
+  color: var(--text-muted);
+  margin-top: .3rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .admin-profile .info-list > div {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .25rem;
+  }
+
+  .admin-profile .info-list dd {
+    text-align: left;
+  }
+
+  .admin-orders-viewport {
+    max-height: 400px;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-orders-viewport {
+    max-height: 300px;
+  }
+
+  .admin-order-card {
+    padding: .75rem;
+  }
+}
+
+.admin-order-card .item-desc {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  flex: 1;
+  min-width: 0; /* Memastikan elemen bisa mengecil saat teks terlalu panjang */
+}
+
+.admin-order-card .item-body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+  width: 100%; /* Memastikan lebar penuh digunakan */
+}
+
+.admin-order-card .item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  width: 100%; /* Memastikan lebar penuh digunakan */
+}
+
+/* Perbaikan untuk tampilan log personal */
+.admin-order-card .order-items {
+  width: 100%;
+}
+
+.admin-order-card .order-item {
+  display: flex;
+  flex-direction: column; /* Ubah ke kolom agar teks panjang tidak menyebabkan overflow */
+  gap: .4rem;
+  width: 100%;
+}
+
+/* Pengaturan untuk membuat header custom muncul di atas dan navbar Bootstrap muncul di bawah */
+
+/* Header custom tetap menggunakan sticky tapi kita akan menyembunyikan navbar Bootstrap */
+.ak-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1001;
+}
+
+/* Sembunyikan navbar Bootstrap asli dan buat elemen pengganti */
+body .navbar {
+  display: none !important;
+}
+
+/* Buat elemen untuk menempatkan tombol back di bawah header custom */
+.main-layout {
+  margin-top: 0;
+}
+
+/* Menjaga agar konten tidak tertutup oleh header sticky */
+.content.admin-page-content {
+  margin-top: 0;
+}

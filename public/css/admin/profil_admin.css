@@ -1,0 +1,20 @@
+/* ==========================================================================
+   PROFIL ADMIN STYLES
+   ========================================================================== */
+
+/* Memperbaiki lebar card profil admin dan log personal agar full width */
+.admin-page-content .card,
+.admin-page-content .admin-profile,
+.admin-page-content .reviews-section {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Override efek margin dan padding dari .content-wrapper untuk halaman profil admin */
+.admin-page-content .content-wrapper,
+.main-layout .content-wrapper {
+  margin-left: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+}

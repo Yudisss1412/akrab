@@ -40,203 +40,419 @@
 }
 
 .filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   flex: 1;
   min-width: 200px;
 }
 
 .filter-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   color: var(--muted);
 }
 
-.filter-control {
-  width: 100%;
+.filter-group input,
+.filter-group select {
   padding: 0.5rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--white);
+  border-radius: 6px;
+  background: white;
 }
 
-.withdrawal-card {
+.bulk-actions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+}
+
+.bulk-select {
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: white;
+}
+
+.btn-bulk {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
   background: var(--white);
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-approve {
+  background: #dcfce7;
+  color: #16a34a;
+  border-color: #16a34a;
+}
+
+.btn-reject {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #dc2626;
+}
+
+.requests-container {
+  background: white;
   border-radius: var(--ak-radius);
   border: 1px solid var(--ak-border);
+  overflow: hidden;
   box-shadow: 0 8px 20px rgba(0,0,0,.05);
-  padding: 1.5rem;
-  margin-bottom: 1rem;
 }
 
-.withdrawal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
+.table-container {
+  overflow-x: auto;
+  -ms-overflow-style: auto;  /* IE and Edge */
+  scrollbar-width: auto;     /* Firefox */
+}
+
+.table-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: #aaa;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 0.75rem 1rem;
+  text-align: left;
   border-bottom: 1px solid var(--ak-border);
 }
 
-.withdrawal-id {
+th {
+  background: var(--bg);
+  font-weight: 600;
+  color: var(--text);
+  position: sticky;
+  top: 0;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover {
+  background-color: var(--bg);
+}
+
+.seller-link {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.seller-link:hover {
+  text-decoration: underline;
+}
+
+.amount {
   font-weight: 600;
   color: var(--primary);
-}
-
-.withdrawal-date {
-  color: var(--muted);
-  font-size: 0.875rem;
-}
-
-.withdrawal-info {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.info-item {
-  margin-bottom: 0.5rem;
-}
-
-.info-label {
-  font-weight: 600;
-  color: var(--muted);
-  font-size: 0.875rem;
-}
-
-.info-value {
-  margin-top: 0.25rem;
-}
-
-.withdrawal-amount {
-  font-weight: 700;
-  font-size: 1.2rem;
-  color: var(--primary);
-  text-align: right;
 }
 
 .status-badge {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  border-radius: 1rem;
-  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
   font-weight: 500;
-  text-transform: capitalize;
 }
 
 .status-pending {
-  background: rgba(245, 158, 11, 0.1);
+  background-color: #fef3c7;
   color: #d97706;
 }
 
 .status-approved {
-  background: rgba(34, 197, 94, 0.1);
+  background-color: #dcfce7;
   color: #16a34a;
 }
 
 .status-rejected {
-  background: rgba(239, 68, 68, 0.1);
+  background-color: #fee2e2;
   color: #dc2626;
 }
 
-.status-completed {
-  background: rgba(34, 197, 94, 0.1);
-  color: #16a34a;
+.status-failed {
+  background-color: #fecaca;
+  color: #b91c1c;
 }
 
 .action-buttons {
   display: flex;
   gap: 0.5rem;
-  margin-top: 1rem;
 }
 
-.btn {
-  border: 1px solid transparent;
-  border-radius: var(--radius);
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 500;
+.btn-action {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: white;
   cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
-  display: inline-block;
-  text-align: center;
+  font-size: 0.8rem;
 }
 
-.btn-outline {
-  border: 1px solid var(--primary);
-  color: var(--primary);
-  background: transparent;
+.btn-approve {
+  color: #16a34a;
 }
 
-.btn-outline:hover {
+.btn-reject {
+  color: #dc2626;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  display: none;
+}
+
+.modal-overlay.show {
+  display: flex;
+}
+
+.modal-box {
+  background: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.modal-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+textarea.form-control {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+  min-height: 100px;
+  resize: vertical;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 110, 92, 0.1);
+}
+
+.btn-modal {
   background: var(--primary);
   color: white;
-}
-
-.btn-success {
-  background: var(--success);
-  color: white;
-}
-
-.btn-success:hover {
-  background: #059669;
-}
-
-.btn-danger {
-  background: var(--danger);
-  color: white;
-}
-
-.btn-danger:hover {
-  background: #c82333;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  font-size: 1rem;
+  margin-top: 0.5rem;
 }
 
 .pagination {
-  margin-top: 1.5rem;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
-/* Responsive adjustments */
+.pagination-info {
+  color: var(--muted);
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.pagination-controls {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  min-width: auto;
+}
+
+.page-btn {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  cursor: pointer;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.page-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.page-btn:hover:not(:disabled):not(.active) {
+  background-color: var(--bg);
+}
+
+/* Mobile Responsive Table Container */
 @media (max-width: 768px) {
-  .filters {
-    flex-direction: column;
+  .table-container {
+    margin: 0 -1rem;
+    padding: 0 1rem;
   }
 
-  .filter-group {
-    min-width: 100%;
+  .table-container table {
+    min-width: 600px;
   }
 
-  .withdrawal-info {
-    grid-template-columns: 1fr;
+  .requests-container {
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
   }
 
-  .withdrawal-footer {
+  th, td {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Mobile Responsive Pagination */
+@media (max-width: 768px) {
+  .pagination {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1rem;
   }
 
-  .action-buttons {
+  .pagination-info {
     width: 100%;
-    justify-content: flex-end;
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+
+  .pagination-controls {
+    width: 100%;
+    justify-content: center;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;     /* Firefox */
+  }
+
+  .pagination-controls::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+
+  /* Limit the width of controls on small screens */
+  .pagination-controls .page-btn {
+    flex-shrink: 0; /* Prevent button shrinking */
   }
 }
 
 @media (max-width: 480px) {
-  .page-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
+  .pagination {
+    gap: 0.5rem;
   }
 
-  .tabs {
-    overflow-x: auto;
+  .pagination-controls {
     justify-content: flex-start;
   }
+}
 
-  .tab {
-    white-space: nowrap;
-  }
+.export-btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Notification styles - Match Bootstrap styling, centered */
+.notification {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) translateY(20px);
+  z-index: 9999;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.notification.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) translateY(0);
+}
+
+.notification .alert {
+  margin-bottom: 0;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  min-width: 300px;
+  text-align: center;
 }

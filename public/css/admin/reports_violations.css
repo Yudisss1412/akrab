@@ -41,28 +41,12 @@
   box-shadow: 0 8px 20px rgba(0,0,0,.05);
 }
 
-.table {
-  margin: 0;
-}
-
-.table th {
-  background-color: rgba(0, 110, 92, 0.05);
-  color: #495057;
-  font-weight: 600;
-  border-top: none;
-}
-
-.table-hover tbody tr:hover {
-  background-color: rgba(0, 110, 92, 0.05);
-}
-
 .status-badge {
   display: inline-block;
   padding: 0.25rem 0.75rem;
   border-radius: 1rem;
   font-size: 0.75rem;
   font-weight: 500;
-  text-transform: capitalize;
 }
 
 .status-pending {
@@ -70,19 +54,9 @@
   color: #d97706;
 }
 
-.status-under-review {
+.status-investigating {
   background: rgba(59, 130, 246, 0.1);
   color: #2563eb;
-}
-
-.status-verified {
-  background: rgba(34, 197, 94, 0.1);
-  color: #16a34a;
-}
-
-.status-rejected {
-  background: rgba(239, 68, 68, 0.1);
-  color: #dc2626;
 }
 
 .status-resolved {
@@ -90,17 +64,169 @@
   color: #16a34a;
 }
 
-.priority-high {
+.status-dismissed {
+  background: rgba(239, 68, 68, 0.1);
   color: #dc2626;
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+}
+
+.pagination-info {
+  color: var(--ak-muted);
+  font-size: 0.875rem;
+}
+
+.pagination-nav {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pagination-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--ak-border);
+  background: var(--ak-white);
+  border-radius: var(--ak-radius);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: var(--ak-primary);
+  color: white;
+  border-color: var(--ak-primary);
+}
+
+.pagination-btn.active {
+  background: var(--ak-primary);
+  color: white;
+  border-color: var(--ak-primary);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--ak-border);
+}
+
+th {
+  background: var(--bg);
   font-weight: 600;
+  color: var(--text);
+  position: sticky;
+  top: 0;
 }
 
-.priority-medium {
-  color: #d97706;
+tr:last-child td {
+  border-bottom: none;
 }
 
-.priority-low {
-  color: #16a34a;
+tr:hover {
+  background-color: var(--bg);
+}
+
+.sort-indicator {
+  display: inline-block;
+  margin-left: 0.25rem;
+  font-size: 0.8rem;
+  opacity: 0.5;
+}
+
+.sort-asc .sort-indicator::after {
+  content: " ↑";
+  opacity: 1;
+}
+
+.sort-desc .sort-indicator::after {
+  content: " ↓";
+  opacity: 1;
+}
+
+.status-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.status-pending {
+  background-color: #fffbeb;
+  color: #f59e0b;
+}
+
+.status-verified {
+  background-color: #ecfdf5;
+  color: #10b981;
+}
+
+.status-resolved {
+  background-color: #eff6ff;
+  color: #3b82f6;
+}
+
+.status-rejected {
+  background-color: #fef2f2;
+  color: #ef4444;
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+}
+
+.pagination-info {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.pagination-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.page-btn {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.page-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.page-btn:hover:not(:disabled):not(.active) {
+  background-color: var(--bg);
 }
 
 .action-buttons {
@@ -108,63 +234,237 @@
   gap: 0.5rem;
 }
 
-.btn {
-  border-radius: var(--radius);
-  padding: 0.5rem 1rem;
-  font-weight: 500;
-  transition: var(--transition);
-  border: 1px solid transparent;
+.btn-action {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: white;
   cursor: pointer;
-  text-decoration: none;
-  display: inline-block;
-  text-align: center;
+  font-size: 0.8rem;
 }
 
-.btn-outline {
-  border: 1px solid var(--primary);
+.btn-view {
   color: var(--primary);
-  background: transparent;
 }
 
-.btn-outline:hover {
-  background: var(--primary);
-  color: white;
+.btn-resolve {
+  color: #10b981;
 }
 
-.pagination {
-  margin-top: 1.5rem;
-  display: flex;
-  justify-content: center;
+.btn-reject {
+  color: #ef4444;
 }
 
-/* Responsive adjustments */
+.modern-date-input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: white;
+  font-size: 0.9rem;
+  color: var(--text);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.modern-date-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 110, 92, 0.1);
+}
+
+/* Modern date picker styling */
+.modern-date-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.modern-date-input::-webkit-calendar-picker-indicator:hover {
+  background-color: var(--bg);
+}
+
+/* Styling for the date picker dropdown */
+.modern-date-input::-webkit-datetime-edit {
+  padding: 2px 4px;
+}
+
+/* Custom date picker appearance (where supported) */
+.modern-date-input::-webkit-inner-spin-button,
+.modern-date-input::-webkit-calendar-picker-indicator {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Fallback for Firefox */
+.modern-date-input {
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
+}
+/* CSS untuk ukuran modal di mobile dan tablet */
 @media (max-width: 768px) {
-  .filters {
-    flex-direction: column;
+  .modal-dialog {
+    margin: 0.5rem;
+    max-width: calc(100% - 1rem);
   }
 
-  .filter-group {
-    min-width: 100%;
+  .modal-content {
+    border-radius: 12px;
   }
 
-  .action-buttons {
-    flex-direction: column;
+  .modal-body {
+    padding: 1rem;
   }
 
-  .btn {
-    width: 100%;
-    margin-bottom: 0.5rem;
+  /* Penyesuaian untuk tabel di mobile */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
-}
 
-@media (max-width: 480px) {
+  table {
+    min-width: 600px; /* Membuat tabel bisa di-scroll horizontal */
+  }
+
+  /* Penyesuaian ukuran elemen di mobile */
   .page-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1rem;
+    gap: 0.75rem;
   }
 
-  .table-responsive {
+  .btn {
+    font-size: 0.875rem;
+  }
+
+  .active-filters-info {
+    flex: 1;
     overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  th, td {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .modal-dialog {
+    margin: 0.25rem;
+    max-width: calc(100% - 0.5rem);
+  }
+
+  .modal-body {
+    padding: 0.75rem;
+  }
+
+  th, td {
+    padding: 0.4rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Penyesuaian posisi modal agar lebih ke atas di mobile */
+@media (max-width: 768px) {
+  .modal-dialog {
+    margin: 1rem auto 0; /* Memberikan margin atas dan menghilangkan margin bawah */
+    max-height: 85vh; /* Membatasi tinggi maksimal modal */
+  }
+}
+
+/* Card view untuk mobile dan tablet */
+@media (max-width: 991.98px) {
+  .card-view-container {
+    padding: 0.5rem;
+  }
+
+  .card {
+    border: 1px solid var(--ak-border);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  .row > div {
+    padding-bottom: 0.25rem;
+  }
+
+  .status-badge {
+    font-size: 0.75rem;
+  }
+
+  .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* Tabel untuk desktop */
+@media (min-width: 992px) {
+  .d-lg-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .d-lg-table th, .d-lg-table td {
+    padding: 0.75rem 1rem;
+  }
+}
+
+/* Pagination untuk mobile */
+@media (max-width: 991.98px) {
+  .pagination {
+    padding: 0 0.5rem;
+  }
+
+  .pagination-controls {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0.25rem 0;
+    justify-content: flex-start !important;
+  }
+
+  .page-btn {
+    min-width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    margin: 0 1px;
+  }
+
+  .pagination-info {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Penyesuaian untuk tampilan desktop - memperbaiki lebar modal agar tidak seperti mobile */
+@media (min-width: 992px) {
+  .modal-dialog {
+    max-width: 500px; /* Ukuran yang lebih proporsional untuk desktop */
+    margin: 1.75rem auto;
+  }
+}
+
+/* Penyesuaian untuk tampilan tablet */
+@media (min-width: 769px) and (max-width: 991px) {
+  .modal-dialog {
+    max-width: 600px;
+    margin: 2rem auto;
+  }
+}
+
+/* Penyesuaian untuk tampilan mobile */
+@media (max-width: 768px) {
+  .modal-dialog {
+    margin: 0.5rem;
+    max-width: calc(100% - 1rem);
   }
 }

@@ -1,0 +1,183 @@
+.order-detail-page .page-header h1 a.btn {
+  margin-right: 1rem;
+  vertical-align: middle;
+  background: var(--ak-primary);
+  color: white;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+/* Tambahkan gaya tambahan untuk detail pesanan jika diperlukan */
+.order-card {
+  background: white;
+  border-radius: var(--ak-radius);
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--ak-border);
+  margin-bottom: 1.5rem;
+}
+
+.order-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--ak-border);
+}
+
+.order-card-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ak-primary);
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.status-badge.pending {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+}
+
+.status-badge.processing {
+  background: rgba(59, 130, 246, 0.1);
+  color: #2563eb;
+}
+
+.status-badge.shipping {
+  background: rgba(139, 69, 193, 0.1);
+  color: #8b45c1;
+}
+
+.status-badge.completed {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+}
+
+.status-badge.cancelled {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+.order-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.order-info-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.order-info-label {
+  font-size: 0.875rem;
+  color: var(--ak-muted);
+  margin-bottom: 0.25rem;
+}
+
+.order-info-value {
+  font-weight: 500;
+  color: var(--ak-text);
+}
+
+.order-items {
+  margin-top: 1.5rem;
+}
+
+.order-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--ak-border);
+}
+
+.order-item:last-child {
+  border-bottom: none;
+}
+
+.item-thumb {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #f3f4f6;
+}
+
+.item-info {
+  flex: 1;
+}
+
+.item-name {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.item-quantity {
+  color: var(--ak-muted);
+  font-size: 0.875rem;
+}
+
+.order-total {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--ak-border);
+  text-align: right;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ak-primary);
+}
+
+.action-buttons {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.btn {
+  border: 1px solid transparent;
+  border-radius: var(--ak-radius);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-primary {
+  background: var(--ak-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #005a4a;
+}
+
+.btn-outline {
+  border: 1px solid var(--ak-primary);
+  color: var(--ak-primary);
+  background: transparent;
+}
+
+.btn-outline:hover {
+  background: var(--ak-primary);
+  color: white;
+}

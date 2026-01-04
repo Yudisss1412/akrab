@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ asset('css/admin_penjual/style.css') }}">
   <link rel="stylesheet" href="{{ asset('css/penjual/detail-pesanan.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/penjual/detail_pesanan.css') }}">
 </head>
 <body>
   @include('components.admin_penjual.header')
@@ -18,7 +19,7 @@
         <!-- Page Header -->
         <section class="page-header">
           <h1>
-            <a href="{{ route('penjual.pesanan') }}" class="btn btn-sm" style="margin-right: 1rem; vertical-align: middle; background: var(--ak-primary); color: white; border: none; width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;">
+            <a href="{{ route('penjual.pesanan') }}" class="btn btn-sm btn-back">
               <i class="fas fa-arrow-left"></i>
             </a>
             Detail Pesanan

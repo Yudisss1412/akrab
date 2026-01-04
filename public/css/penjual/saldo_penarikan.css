@@ -58,244 +58,272 @@ body {
   color: var(--ak-primary);
 }
 
-/* Balance card */
-.balance-card {
+/* Saldo card */
+.saldo-card {
   background: var(--ak-white);
   border-radius: var(--ak-radius);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  border: 1px solid var(--ak-border);
   padding: 1.5rem;
   margin-bottom: 1.5rem;
-  text-align: center;
-}
-
-.balance-title {
-  font-size: 1rem;
-  color: var(--ak-muted);
-  margin-bottom: 0.5rem;
-}
-
-.balance-amount {
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--ak-primary);
-  margin: 0;
-}
-
-.balance-actions {
-  margin-top: 1rem;
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-/* Withdrawal form */
-.withdrawal-form {
-  background: var(--ak-white);
-  border-radius: var(--ak-radius);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   border: 1px solid var(--ak-border);
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
 }
 
-.form-group {
-  margin-bottom: 1rem;
-}
-
-.form-label {
-  display: block;
-  font-weight: 500;
-  color: var(--ak-text);
-  margin-bottom: 0.5rem;
-}
-
-.form-control {
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--ak-border);
-  border-radius: var(--ak-radius);
+.saldo-title {
   font-size: 0.875rem;
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--ak-primary);
-  box-shadow: 0 0 0 3px rgba(0, 110, 92, 0.1);
-}
-
-.form-actions {
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--ak-border);
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-}
-
-/* Transaction history */
-.transactions-section {
-  background: var(--ak-white);
-  border-radius: var(--ak-radius);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  border: 1px solid var(--ak-border);
-  margin-bottom: 1.5rem;
-  overflow: hidden;
-}
-
-.transactions-header {
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid var(--ak-border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.transactions-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--ak-text);
-  margin: 0;
-}
-
-.transactions-viewport {
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-.transaction-card {
-  border: 1px solid var(--ak-border);
-  border-radius: var(--ak-radius);
-  padding: 1rem;
-  margin: 1rem;
-  background: var(--ak-white);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.transaction-info {
-  flex: 1;
-}
-
-.transaction-type {
-  font-weight: 600;
-  margin-bottom: 0.25rem;
-}
-
-.transaction-date {
   color: var(--ak-muted);
-  font-size: 0.875rem;
+  margin: 0 0 0.5rem 0;
 }
 
-.transaction-amount {
+.saldo-amount {
+  font-size: 2.5rem;
   font-weight: 700;
-  font-size: 1.1rem;
-  color: var(--ak-primary);
-}
-
-.transaction-amount.debit {
-  color: var(--ak-danger);
-}
-
-.transaction-amount.credit {
-  color: var(--ak-success);
-}
-
-.status-badge {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  border-radius: 1rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-  text-transform: capitalize;
-}
-
-.status-pending {
-  background: rgba(245, 158, 11, 0.1);
-  color: #d97706;
-}
-
-.status-approved {
-  background: rgba(34, 197, 94, 0.1);
-  color: #16a34a;
-}
-
-.status-rejected {
-  background: rgba(239, 68, 68, 0.1);
-  color: #dc2626;
-}
-
-.status-completed {
-  background: rgba(34, 197, 94, 0.1);
-  color: #16a34a;
-}
-
-/* Button styles */
-.btn {
-  border: 1px solid transparent;
-  border-radius: var(--ak-radius);
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
-  display: inline-block;
-  text-align: center;
-}
-
-.btn-outline {
-  border: 1px solid var(--ak-primary);
-  color: var(--ak-primary);
-  background: transparent;
-}
-
-.btn-outline:hover {
-  background: var(--ak-primary);
-  color: white;
+  color: var(--ak-text);
+  margin: 0 0 1.5rem 0;
 }
 
 .btn-primary {
   background: var(--ak-primary);
   color: white;
+  border: none;
+  border-radius: var(--ak-radius);
+  padding: 0.75rem 1.25rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
 }
 
 .btn-primary:hover {
   background: #005a4a;
 }
 
-.btn-success {
-  background: var(--ak-success);
-  color: white;
-}
-
-.btn-success:hover {
-  background: #059669;
-}
-
-.btn-danger {
-  background: var(--ak-danger);
-  color: white;
-}
-
-.btn-danger:hover {
-  background: #dc2626;
-}
-
-/* Loading and Empty States */
-.loading, .empty-state {
-  background: var(--ak-white);
-  border-radius: var(--ak-radius);
-  padding: 2rem;
-  text-align: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  border: 1px solid var(--ak-border);
+/* Tab navigation */
+.tab-nav {
+  display: flex;
+  border-bottom: 1px solid var(--ak-border);
   margin-bottom: 1.5rem;
 }
 
-.empty-state {
+.tab-item {
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  font-weight: 500;
   color: var(--ak-muted);
+}
+
+.tab-item.active {
+  border-bottom: 3px solid var(--ak-primary);
+  color: var(--ak-primary);
+}
+
+/* Tab content */
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Card */
+.card {
+  background: var(--ak-white);
+  border-radius: var(--ak-radius);
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--ak-border);
+}
+
+.card h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ak-primary);
+}
+
+/* Table styles */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  color: var(--ak-muted);
+  border-bottom: 1px solid var(--ak-border);
+}
+
+.data-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--ak-border);
+}
+
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.text-green {
+  color: var(--ak-success);
+  font-weight: 500;
+}
+
+.text-red {
+  color: var(--ak-danger);
+  font-weight: 500;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.badge-success {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--ak-success);
+}
+
+.badge-pending {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--ak-warning);
+}
+
+.badge-failed {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--ak-danger);
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 1.5rem;
+  padding: 0.5rem 0;
+}
+
+.pagination a, .pagination span {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border: none;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  min-width: 32px;
+  text-align: center;
+  color: var(--ak-text);
+}
+
+.pagination a:hover {
+  background-color: #f0fdfa;
+  color: var(--ak-primary);
+}
+
+.pagination .active {
+  background: var(--ak-primary);
+  color: white !important;
+  box-shadow: 0 2px 4px rgba(0, 110, 92, 0.3);
+}
+
+.pagination .disabled {
+  color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.pagination a:first-child, .pagination a:last-child {
+  padding: 0.25rem 0.625rem;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: var(--ak-white);
+  border-radius: var(--ak-radius);
+  width: 90%;
+  max-width: 500px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--ak-primary);
+}
+
+.close-modal {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--ak-muted);
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--ak-text);
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--ak-border);
+  border-radius: var(--ak-radius);
+  font-size: 1rem;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--ak-primary);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
 }
 
 /* Responsive */
@@ -304,49 +332,106 @@ body {
     padding: 0 1rem;
   }
 
-  .balance-actions {
-    flex-direction: column;
+  .page-header,
+  .saldo-card,
+  .card {
+    padding: 1rem;
+    margin-bottom: 1rem;
   }
 
-  .form-actions {
-    flex-direction: column;
+  .saldo-amount {
+    font-size: 2rem;
   }
 
-  .transaction-card {
+  .tab-nav {
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    justify-content: flex-start;
+  }
+
+  .tab-item {
+    white-space: nowrap;
+    padding: 0.75rem 1rem;
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+  }
+
+  .card {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px; /* Ensures table has enough space for content */
+    white-space: nowrap;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+  }
+
+  .data-table th {
+    font-size: 0.75rem;
+    padding: 0.75rem 0.5rem;
+  }
+
+  .data-table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.8125rem;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .pagination a,
+  .pagination span {
+    padding: 0.375rem 0.5rem;
+    min-width: 28px;
+    font-size: 0.8125rem;
+  }
+
+  .modal-content {
+    width: 95%;
+    padding: 1rem;
+  }
+
+  .form-group {
+    margin-bottom: 0.75rem;
+  }
+
+  .form-control {
+    padding: 0.625rem;
+  }
+
+  .modal-footer {
     flex-direction: column;
-    align-items: flex-start;
     gap: 0.5rem;
   }
 
-  .transaction-amount {
-    align-self: flex-end;
-  }
-}
-
-@media (max-width: 480px) {
-  .page-header {
-    padding: 1rem;
+  .btn-primary {
+    width: 100%;
+    justify-content: center;
   }
 
-  .page-header h1 {
-    font-size: 1.25rem;
+  .saldo-card {
+    text-align: center;
   }
 
-  .balance-card {
-    padding: 1rem;
-  }
-
-  .balance-amount {
-    font-size: 1.5rem;
-  }
-
-  .withdrawal-form {
-    padding: 1rem;
-  }
-
-  .transactions-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
+  .saldo-card .btn-primary {
+    display: block;
+    margin: 1rem auto 0;
+    width: 100%;
+    max-width: 250px;
   }
 }

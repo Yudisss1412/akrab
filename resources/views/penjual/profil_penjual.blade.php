@@ -7,6 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ asset('css/penjual/profil_penjual.css') }}">
   <link rel="stylesheet" href="{{ asset('css/admin_penjual/style.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/penjual/profil_penjual_custom.css') }}">
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
@@ -23,9 +24,9 @@
         <div class="seller-identity">
           <div class="avatar" aria-hidden="true">
             @if($seller->profile_image)
-              <img src="{{ asset('storage/' . $seller->profile_image) }}" alt="{{ $seller->store_name ?? $user->name }}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+              <img src="{{ asset('storage/' . $seller->profile_image) }}" alt="{{ $seller->store_name ?? $user->name }}" class="avatar-img">
             @else
-              <span>{{ strtoupper(substr($seller->store_name ?? $user->name, 0, 1)) }}</span>
+              <span class="avatar-initial">{{ strtoupper(substr($seller->store_name ?? $user->name, 0, 1)) }}</span>
             @endif
             <i class="dot online"></i>
           </div>
@@ -40,6 +41,12 @@
           <a href="{{ route('edit.profil.penjual') }}" id="btnEditProfile" class="btn btn-primary btn-sm">
             Edit Profil
           </a>
+          <button type="button" class="btn btn-sm" style="background: #fff; color: #dc3545; border-color: #dc3545;" onclick="showLogoutModal()">
+            Logout
+          </button>
+          <form id="logoutForm" method="POST" action="{{ route('logout') }}" style="display: none;">
+            @csrf
+          </form>
         </div>
       </div>
 
@@ -232,6 +239,44 @@
           }
         }, 100); // Delay kecil untuk memastikan elemen sudah ada di DOM
       });
+    </script>
+
+    <!-- Modal Konfirmasi Logout -->
+    <div id="logoutModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
+      <div class="modal-content" style="background: white; padding: 1.5rem; border-radius: var(--radius-lg); width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+        <h3 style="margin-top: 0; color: #dc3545;">Konfirmasi Logout</h3>
+        <p>Apakah Anda yakin ingin keluar dari akun Anda?</p>
+        <div style="display: flex; gap: 0.5rem; justify-content: center; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-sm" onclick="hideLogoutModal()" style="flex: 1; background: #f8f9fa; color: #6c757d; border-color: #dee2e6;">
+            Batal
+          </button>
+          <button type="button" class="btn btn-primary btn-sm" onclick="confirmLogout()" style="flex: 1;">
+            Ya, Logout
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function showLogoutModal() {
+        document.getElementById('logoutModal').style.display = 'flex';
+      }
+
+      function hideLogoutModal() {
+        document.getElementById('logoutModal').style.display = 'none';
+      }
+
+      function confirmLogout() {
+        document.getElementById('logoutForm').submit();
+      }
+
+      // Menutup modal jika pengguna mengklik di luar konten modal
+      window.onclick = function(event) {
+        const modal = document.getElementById('logoutModal');
+        if (event.target === modal) {
+          hideLogoutModal();
+        }
+      }
     </script>
 
     <script src="{{ asset('js/penjual/profil_penjual.js') }}"></script>

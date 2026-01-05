@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ asset('css/customer/transaksi/invoice_additional.css') }}">
     <style>
     :root {
       --ak-primary: #006E5C;
@@ -19,7 +20,7 @@
       --ak-radius: 12px;
       --ak-space: 16px;
     }
-    
+
     body {
         font-family: 'Poppins', sans-serif;
         background-color: var(--ak-background);
@@ -27,7 +28,7 @@
         margin: 0;
         padding: 20px;
     }
-    
+
     .invoice-container {
         max-width: 800px;
         margin: 0 auto;
@@ -36,30 +37,30 @@
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         overflow: hidden;
     }
-    
+
     .invoice-header {
         background: var(--ak-white);
         padding: 1.5rem;
         border-bottom: 1px solid var(--ak-border);
     }
-    
+
     .invoice-title {
         font-size: 1.5rem;
         font-weight: 600;
         color: var(--ak-primary);
         margin: 0;
     }
-    
+
     .invoice-number {
         font-size: 1rem;
         color: var(--ak-muted);
         margin-top: 0.25rem;
     }
-    
+
     .invoice-content {
         padding: 2rem;
     }
-    
+
     .section-title {
         font-weight: 600;
         color: var(--ak-primary);
@@ -67,46 +68,46 @@
         padding-bottom: 0.5rem;
         border-bottom: 1px solid var(--ak-border);
     }
-    
+
     .detail-row {
         display: flex;
         justify-content: space-between;
         margin-bottom: 0.5rem;
         padding: 0.25rem 0;
     }
-    
+
     .detail-label {
         color: var(--ak-muted);
         font-weight: 500;
     }
-    
+
     .detail-value {
         font-weight: 500;
     }
-    
+
     .parties {
         display: flex;
         gap: 2rem;
         margin: 1.5rem 0;
     }
-    
+
     .party {
         flex: 1;
     }
-    
+
     .party h3 {
         font-size: 1rem;
         font-weight: 600;
         color: var(--ak-primary);
         margin-bottom: 0.75rem;
     }
-    
+
     .items-table {
         width: 100%;
         border-collapse: collapse;
         margin: 1.5rem 0;
     }
-    
+
     .items-table th {
         text-align: left;
         padding: 0.75rem;
@@ -114,19 +115,19 @@
         font-weight: 600;
         color: var(--ak-text);
     }
-    
+
     .items-table td {
         padding: 0.75rem;
         border-bottom: 1px solid var(--ak-border);
         vertical-align: top;
     }
-    
+
     .item-info {
         display: flex;
         align-items: flex-start;
         gap: 0.75rem;
     }
-    
+
     .item-image {
         width: 50px;
         height: 50px;
@@ -134,46 +135,46 @@
         border-radius: 4px;
         background: #f3f4f6;
     }
-    
+
     .item-details h4 {
         margin: 0 0 0.25rem 0;
         font-size: 0.9rem;
         font-weight: 500;
     }
-    
+
     .item-meta {
         margin: 0;
         font-size: 0.8rem;
         color: var(--ak-muted);
     }
-    
+
     .text-right {
         text-align: right;
     }
-    
+
     .text-center {
         text-align: center;
     }
-    
+
     .summary-row {
         display: flex;
         justify-content: space-between;
         padding: 0.5rem 0;
     }
-    
+
     .summary-row.total {
         font-weight: 600;
         border-top: 1px solid var(--ak-border);
         margin-top: 0.5rem;
         padding-top: 0.75rem;
     }
-    
+
     .summary-divider {
         height: 1px;
         background: var(--ak-border);
         margin: 0.75rem 0;
     }
-    
+
     .status.paid {
         display: inline-block;
         padding: 0.25rem 0.75rem;
@@ -183,7 +184,7 @@
         background: rgba(34, 197, 94, 0.1);
         color: #16a34a;
     }
-    
+
     .status.unpaid {
         display: inline-block;
         padding: 0.25rem 0.75rem;
@@ -193,14 +194,14 @@
         background: rgba(239, 68, 68, 0.1);
         color: #dc2626;
     }
-    
+
     .print-actions {
         padding: 1.5rem;
         background: var(--ak-white);
         border-top: 1px solid var(--ak-border);
         text-align: center;
     }
-    
+
     .btn {
         border: 1px solid transparent;
         border-radius: var(--ak-radius);
@@ -224,6 +225,12 @@
         background: var(--ak-primary);
         color: white;
     }
+
+    .logo {
+        height: 40px; /* Mengurangi ukuran logo */
+        width: auto;
+        max-width: 120px; /* Membatasi lebar maksimum logo */
+    }
     </style>
 </head>
 <body>
@@ -235,7 +242,7 @@
                     <div class="invoice-number">#{{ $order->order_number ?? 'N/A' }}</div>
                 </div>
                 <div>
-                    <img src="{{ asset('src/Logo_UMKM.png') }}" alt="AKRAB" class="logo" style="height: 60px;">
+                    <img src="{{ asset('src/Logo_UMKM.png') }}" alt="AKRAB" class="logo">
                 </div>
             </div>
         </div>
@@ -299,7 +306,7 @@
                                         @if($item->product && $item->product->main_image)
                                             <img src="{{ asset('storage/' . $item->product->main_image) }}" alt="{{ $item->product->name }}" class="item-image">
                                         @else
-                                            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                            <div class="bg-light rounded d-flex align-items-center justify-content-center item-image-placeholder">
                                                 <i class="bi bi-image"></i>
                                             </div>
                                         @endif

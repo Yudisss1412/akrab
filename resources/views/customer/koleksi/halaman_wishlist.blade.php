@@ -4,6 +4,7 @@
 
 @push('styles')
   <link rel="stylesheet" href="{{ asset('css/customer/koleksi/halaman_wishlist.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/customer/koleksi/halaman_wishlist_additional.css') }}">
 @endpush
 
 @section('content')
@@ -18,7 +19,7 @@
         <h1 class="wl-title">Wishlist</h1>
       </div>
 
-      <div class="wl-toolbar" id="wlToolbar" style="display: none;">
+      <div class="wl-toolbar" id="wlToolbar">
         <select id="wlFilter" class="wl-select" aria-label="Urutkan">
           <option value="terbaru" selected>Terbaru</option>
           <option value="termurah">Termurah</option>
@@ -75,9 +76,9 @@
     document.addEventListener('DOMContentLoaded', function() {
       const toolbar = document.getElementById('wlToolbar');
       const wishlistData = window.__WISHLIST__;
-      
+
       if (wishlistData && wishlistData.length > 0) {
-        toolbar.style.display = 'block';
+        toolbar.classList.add('wl-toolbar-for-js');
       }
     });
   </script>

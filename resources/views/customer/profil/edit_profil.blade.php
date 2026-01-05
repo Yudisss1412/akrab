@@ -8,6 +8,7 @@
 
 @push('styles')
   <link rel="stylesheet" href="{{ asset('css/customer/profil/edit_profil.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/customer/profil/edit_profil_additional.css') }}">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 @endpush
 
@@ -110,7 +111,7 @@
         const reader = new FileReader();
         reader.onload = function(e) {
           const previewContainer = document.getElementById('avatarPreview');
-          previewContainer.innerHTML = '<img src="' + e.target.result + '" alt="Avatar" style="width:72px; height:72px; border-radius:50%; object-fit:cover;">';
+          previewContainer.innerHTML = '<img src="' + e.target.result + '" alt="Avatar" class="avatar-preview-image">';
         }
         reader.readAsDataURL(file);
       }

@@ -62,6 +62,49 @@
     box-shadow: 0 0 0 3px rgba(0, 110, 92, 0.1);
 }
 
+/* Styling untuk dropdown select */
+.form-select {
+    width: 100%;
+    padding: 0.75rem 2.5rem 0.75rem 1rem; /* Tambahkan padding kanan untuk ikon dropdown */
+    border: 1px solid var(--border-color, #e9ecef);
+    border-radius: 10px;
+    font-size: 1rem;
+    background-color: #fff;
+    color: var(--text-color, #333);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    -webkit-appearance: none; /* Sembunyikan dropdown default Safari/Chrome */
+    -moz-appearance: none;    /* Sembunyikan dropdown default Firefox */
+    appearance: none;         /* Sembunyikan dropdown default */
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.2em;
+    min-height: 46px; /* Menyesuaikan tinggi dengan input text */
+}
+
+.form-select:focus {
+    outline: none;
+    border-color: var(--primary-color-dark, #006E5C);
+    box-shadow: 0 0 0 3px rgba(0, 110, 92, 0.1);
+}
+
+.form-select:hover {
+    border-color: var(--primary-color, #a8d5c9);
+}
+
+.form-select option {
+    padding: 0.5rem;
+    background-color: #fff;
+    color: var(--text-color, #333);
+}
+
+.form-select option:hover {
+    background-color: var(--primary-color, #a8d5c9);
+    color: var(--primary-color-dark, #006E5C);
+}
+
+/* Alternatif styling untuk .form-control.select jika digunakan */
 .form-control.select {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
     background-position: right 0.5rem center;

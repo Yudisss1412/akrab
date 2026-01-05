@@ -8,6 +8,7 @@
 
 @push('styles')
   <link rel="stylesheet" href="{{ asset('css/customer/ulasan/create.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/customer/ulasan/create_additional.css') }}">
 @endpush
 
 @section('content')
@@ -64,7 +65,7 @@
               </div>
               <p>Drag & drop foto di sini, atau klik untuk memilih</p>
               <p class="upload-hint">Maksimal 5 foto, ukuran maksimal 5MB per foto</p>
-              <input type="file" id="mediaInput" name="media[]" accept="image/*" multiple style="display: none;">
+              <input type="file" id="mediaInput" name="media[]" accept="image/*" multiple class="media-input-hidden">
               <button type="button" class="btn btn-outline" id="browseMediaBtn">Pilih Foto</button>
             </div>
           </div>

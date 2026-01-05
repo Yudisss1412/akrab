@@ -3437,3 +3437,153 @@ main[role="main"] {
     display: none !important;
   }
 }
+
+/* Styling untuk bintang rating agar konsisten dengan halaman welcome */
+.produk-page .produk-card-stars .star,
+.produk-page .produk-card-stars svg,
+#rekom-grid .produk-card-stars .star,
+#rekom-grid .produk-card-stars svg,
+#populer-grid .produk-card-stars .star,
+#populer-grid .produk-card-stars svg,
+#produk-grid .produk-card-stars .star,
+#produk-grid .produk-card-stars svg {
+  color: #ddd !important; /* Warna bintang kosong */
+  fill: #ddd !important; /* Warna fill bintang kosong untuk SVG */
+}
+
+.produk-page .produk-card-stars .star.filled,
+.produk-page .produk-card-stars svg.filled,
+#rekom-grid .produk-card-stars .star.filled,
+#rekom-grid .produk-card-stars svg.filled,
+#populer-grid .produk-card-stars .star.filled,
+#populer-grid .produk-card-stars svg.filled,
+#produk-grid .produk-card-stars .star.filled,
+#produk-grid .produk-card-stars svg.filled {
+  color: #FFD700 !important; /* Warna bintang terisi (kuning emas) */
+  fill: #FFD700 !important; /* Warna fill bintang terisi untuk SVG */
+}
+
+.produk-page .produk-card-stars .star.half,
+.produk-page .produk-card-stars svg.half,
+#rekom-grid .produk-card-stars .star.half,
+#rekom-grid .produk-card-stars svg.half,
+#populer-grid .produk-card-stars .star.half,
+#populer-grid .produk-card-stars svg.half,
+#produk-grid .produk-card-stars .star.half,
+#produk-grid .produk-card-stars svg.half {
+  color: #FFD700 !important; /* Warna bintang setengah terisi */
+  fill: #FFD700 !important; /* Warna fill bintang setengah terisi untuk SVG */
+  position: relative;
+}
+
+.produk-page .produk-card-stars .star.half:before,
+#rekom-grid .produk-card-stars .star.half:before,
+#populer-grid .produk-card-stars .star.half:before,
+#produk-grid .produk-card-stars .star.half:before {
+  content: "★";
+  position: absolute;
+  left: 0;
+  width: 50%;
+  overflow: hidden;
+  color: #ddd !important; /* Warna setengah bintang yang tidak terisi */
+}
+
+/* Less bulky button styling for "Lihat Detail" and "+Keranjang" buttons */
+.produk-page .produk-card-actions .btn-lihat,
+.produk-page .produk-card-actions .btn-add,
+#rekom-grid .btn-lihat, .btn-lihat,
+#rekom-grid .btn-add, .btn-add,
+#populer-grid .btn-lihat, .btn-lihat,
+#populer-grid .btn-add, .btn-add,
+#produk-grid .btn-lihat, .btn-lihat,
+#produk-grid .btn-add, .btn-add {
+  padding: .4rem .6rem !important;
+  min-height: 36px !important;
+  font-size: 13px !important;
+}
+
+/* Responsive adjustments for buttons on smaller screens */
+@media (max-width: 992px) {
+  .produk-page .produk-card-actions .btn-lihat,
+  .produk-page .produk-card-actions .btn-add,
+  #rekom-grid .btn-lihat, .btn-lihat,
+  #rekom-grid .btn-add, .btn-add,
+  #populer-grid .btn-lihat, .btn-lihat,
+  #populer-grid .btn-add, .btn-add,
+  #produk-grid .btn-lihat, .btn-lihat,
+  #produk-grid .btn-add, .btn-add {
+    padding: .35rem .5rem !important;
+    min-height: 34px !important;
+    font-size: 12px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .produk-page .produk-card-actions .btn-lihat,
+  .produk-page .produk-card-actions .btn-add,
+  #rekom-grid .btn-lihat, .btn-lihat,
+  #rekom-grid .btn-add, .btn-add,
+  #populer-grid .btn-lihat, .btn-lihat,
+  #populer-grid .btn-add, .btn-add,
+  #produk-grid .btn-lihat, .btn-lihat,
+  #produk-grid .btn-add, .btn-add {
+    padding: .3rem .45rem !important;
+    min-height: 32px !important;
+    font-size: 11px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .produk-page .produk-card-actions .btn-lihat,
+  .produk-page .produk-card-actions .btn-add,
+  #rekom-grid .btn-lihat, .btn-lihat,
+  #rekom-grid .btn-add, .btn-add,
+  #populer-grid .btn-lihat, .btn-lihat,
+  #populer-grid .btn-add, .btn-add,
+  #produk-grid .btn-lihat, .btn-lihat,
+  #produk-grid .btn-add, .btn-add {
+    padding: .25rem .4rem !important;
+    min-height: 30px !important;
+    font-size: 10px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .produk-page .produk-card-actions .btn-lihat,
+  .produk-page .produk-card-actions .btn-add,
+  #rekom-grid .btn-lihat, .btn-lihat,
+  #rekom-grid .btn-add, .btn-add,
+  #populer-grid .btn-lihat, .btn-lihat,
+  #populer-grid .btn-add, .btn-add,
+  #produk-grid .btn-lihat, .btn-lihat,
+  #produk-grid .btn-add, .btn-add {
+    padding: .2rem .35rem !important;
+    min-height: 28px !important;
+    font-size: 10px !important;
+  }
+}
+
+/* Override untuk bintang rating - styling akhir dengan prioritas tertinggi */
+/* Ganti warna bintang yang dihasilkan oleh JS dan PHP dengan warna yang benar */
+.produk-page .produk-card .produk-card-stars svg path,
+#rekom-grid .produk-card .produk-card-stars svg path,
+#populer-grid .produk-card .produk-card-stars svg path,
+#produk-grid .produk-card .produk-card-stars svg path {
+  fill: #D1D5DB !important; /* Warna default bintang kosong */
+}
+
+/* Override untuk bintang terisi - ganti kuning terang ke kuning emas */
+.produk-page .produk-card .produk-card-stars svg.filled path,
+#rekom-grid .produk-card .produk-card-stars svg.filled path,
+#populer-grid .produk-card .produk-card-stars svg.filled path,
+#produk-grid .produk-card .produk-card-stars svg.filled path {
+  fill: #FFD700 !important; /* Warna bintang terisi (kuning emas) */
+}
+
+/* Override untuk bintang setengah terisi */
+.produk-page .produk-card .produk-card-stars svg.half path,
+#rekom-grid .produk-card .produk-card-stars svg.half path,
+#populer-grid .produk-card .produk-card-stars svg.half path,
+#produk-grid .produk-card .produk-card-stars svg.half path {
+  fill: #FFD700 !important; /* Warna bintang setengah terisi */
+}

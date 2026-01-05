@@ -4,6 +4,7 @@
 
 @push('styles')
   <link rel="stylesheet" href="{{ asset('css/customer/koleksi/halaman_ulasan.css') }}" />
+  <link rel="stylesheet" href="{{ asset('css/customer/koleksi/halaman_ulasan_additional.css') }}" />
 @endpush
 
 @section('content')
@@ -29,9 +30,9 @@
         <div class="review-list" id="reviewList">
           <!-- Reviews will be loaded here -->
         </div>
-        <div class="empty-state" id="emptyState" style="display: none;">
-          <div class="empty-img" style="width: 100px; height: 100px; background-color: #eee; margin: 0 auto 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-            <span style="font-size: 40px;">⭐</span>
+        <div class="empty-state" id="emptyState">
+          <div class="empty-img">
+            <span class="empty-star">⭐</span>
           </div>
           <p class="empty-text">Belum ada ulasan produk.</p>
           <a href="{{ route('cust.welcome') }}" class="btn btn-primary">Belanja Sekarang</a>
@@ -79,10 +80,10 @@
               </svg>
               <p class="drop-text">Seret & lepas foto di sini</p>
               <p class="drop-hint">atau <span class="browse-link">pilih dari komputer</span></p>
-              <input type="file" id="fileInput" accept="image/*" multiple style="display: none;">
+              <input type="file" id="fileInput" accept="image/*" multiple class="file-input-hidden">
             </div>
           </div>
-          <div class="preview-container" id="previewContainer" style="display: none;">
+          <div class="preview-container" id="previewContainer">
             <div class="preview-header">
               <span>Foto yang dipilih:</span>
               <button type="button" class="clear-all-btn" id="clearAllBtn">Hapus Semua</button>

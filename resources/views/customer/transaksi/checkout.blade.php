@@ -8,6 +8,7 @@
 
 @push('styles')
   <link rel="stylesheet" href="{{ asset('css/customer/transaksi/checkout.css') }}"/>
+  <link rel="stylesheet" href="{{ asset('css/customer/transaksi/checkout_additional.css') }}"/>
 @endpush
 
 @section('content')
@@ -41,7 +42,7 @@
         <input type="hidden" name="shipping_method" value="reguler" id="hiddenShippingMethod" />
 
         <!-- Debug: Menampilkan data yang dikirim -->
-        <div style="display: none;">
+        <div class="checkout-debug-hidden">
           <input type="hidden" name="debug_trace" value="checkout_form" />
         </div>
 
@@ -61,7 +62,12 @@
             document.addEventListener('DOMContentLoaded', function() {
               document.getElementById('alamatCard').style.display = 'none';
               document.getElementById('alamatFormSection').style.display = 'block';
-              document.getElementById('editAlamatBtn').innerHTML = '<i class="bi bi-save"></i>';
+              document.getElementById('editAlamatBtn').innerHTML = '<i class="bi bi-check"></i>';
+            });
+          @else
+            // Jika tidak ada error, pastikan form alamat disembunyikan saat halaman dimuat
+            document.addEventListener('DOMContentLoaded', function() {
+              document.getElementById('alamatFormSection').style.display = 'none';
             });
           @endif
         </script>
@@ -201,7 +207,7 @@
                     <span>Rp {{ number_format($subTotal, 0, ',', '.') }}</span>
                   </div>
                   <!-- Sembunyikan biaya pengiriman sampai pengguna memilih metode pengiriman -->
-                  <div class="detail-row" style="display: none;">
+                  <div class="detail-row checkout-shipping-cost-hidden">
                     <span>Biaya Pengiriman</span>
                     <span id="shippingCost">Rp {{ number_format($shippingCost, 0, ',', '.') }}</span>
                   </div>

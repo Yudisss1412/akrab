@@ -8,67 +8,7 @@
 
 @push('styles')
   <link rel="stylesheet" href="{{ asset('css/customer/profil/profil_pembeli.css') }}">
-  <style>
-    .order-actions {
-      display: flex !important;
-      justify-content: space-between !important;
-      align-items: center !important;
-      width: 100% !important;
-    }
-
-    .left-actions {
-      display: flex !important;
-      gap: 0.5rem !important;
-    }
-
-    .right-actions {
-      display: flex !important;
-    }
-
-    .btn-report {
-      background: none !important;
-      border: none !important;
-      color: #006E5C !important;
-      text-decoration: underline !important;
-      cursor: pointer !important;
-      padding: 0.5rem 0 !important;
-      font-size: 0.85rem !important;
-      font-weight: 500 !important;
-      white-space: nowrap !important;
-      display: inline-block !important;
-    }
-
-    .btn-report:hover {
-      color: #005a4a !important;
-    }
-
-    .btn-review {
-      background: #006E5C !important;
-      border: none !important;
-      color: white !important;
-      text-decoration: none !important;
-      cursor: pointer !important;
-      padding: 0.5rem 1rem !important;
-      font-size: 0.85rem !important;
-      font-weight: 500 !important;
-      border-radius: 4px !important;
-      white-space: nowrap !important;
-      display: inline-block !important;
-      margin-left: 0.5rem !important;
-    }
-
-    .btn-review:hover {
-      background: #005a4a !important;
-      color: white !important;
-    }
-
-    .action-buttons {
-      display: flex !important;
-      flex-direction: row !important;
-      gap: 0.5rem !important;
-      align-items: center !important;
-    }
-  </style>
+  <link rel="stylesheet" href="{{ asset('css/customer/profil/profil_pembeli_additional.css') }}">
 @endpush
 
 @section('content')
@@ -277,7 +217,7 @@
               <span class="setting-label">Newsletter Mingguan</span>
             </div>
 
-            <button class="btn btn-primary" style="margin-top: 1rem;">Simpan Preferensi</button>
+            <button class="btn btn-primary save-preferences-btn">Simpan Preferensi</button>
           </div>
 
           <!-- Privasi & Data -->
@@ -1160,18 +1100,18 @@
           // Show a message informing user that tickets are available on the dedicated page
           listDiv.innerHTML = `
             <div class="ticket-info-content">
-              <div class="ticket-info-card card" style="text-align: center; padding: 2rem;">
-                <div style="margin-bottom: 1rem;">
-                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: var(--primary-color-dark); margin: 0 auto 1rem auto; display: block;">
+              <div class="ticket-info-card card ticket-info-card-centered">
+                <div class="ticket-info-card-content">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="ticket-info-svg">
                     <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     <path d="M14 2V8H20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     <path d="M16 13H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     <path d="M16 17H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     <path d="M10 9H9H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
-                  <h3 style="margin-top: 0; color: var(--primary-color-dark);">Tiket Bantuan</h3>
+                  <h3 class="ticket-info-title">Tiket Bantuan</h3>
                 </div>
-                <p style="margin-bottom: 1.5rem; color: #666;">Semua tiket bantuan Anda tersedia di halaman khusus Tiket Bantuan.</p>
+                <p class="ticket-info-text">Semua tiket bantuan Anda tersedia di halaman khusus Tiket Bantuan.</p>
               </div>
             </div>
           `;
@@ -1380,7 +1320,7 @@
 
   <!-- Modal Sesi Login Aktif -->
   <div id="activeSessionModal" class="modal">
-    <div class="modal-content" style="width: 90%; max-width: 600px;">
+    <div class="modal-content modal-content-centered">
       <div class="modal-header">
         <h3>Sesi Login Aktif</h3>
         <span class="close" id="closeActiveSessionModal">&times;</span>

@@ -6,8 +6,8 @@
   --muted: var(--grey-text-color); /* warna teks muted, disamakan dengan halaman utama */
   --brand: var(--primary-color-dark); /* aksen hijau tua, disamakan dengan halaman utama */
   --ok: #059669; /* warna hijau untuk tombol bantu, disamakan dengan halaman lain */
-  --star-filled: #FFF600; /* warna bintang terisi, disamakan dengan halaman produk */
-  --star-empty: #FFF600; /* warna bintang kosong, disamakan dengan halaman produk */
+  --star-filled: #FFD700; /* warna bintang terisi (kuning emas), disamakan dengan halaman welcome */
+  --star-empty: #D1D5DB; /* warna bintang kosong (abu-abu), disamakan dengan halaman welcome */
   --radius: 12px; /* radius card, disamakan dengan halaman profil */
   --shadow: 0 6px 20px rgba(0,0,0,.06); /* shadow card, disamakan dengan halaman profil */
 }
@@ -606,6 +606,25 @@ form { padding: 16px; }
   height: 100%;
   display: block;
   pointer-events: none; /* Mencegah SVG mengganggu event klik */
+}
+
+/* Override untuk bintang rating - styling akhir dengan prioritas tertinggi */
+/* Ganti warna bintang yang dihasilkan oleh JS dan PHP dengan warna yang benar */
+.review-card .stars .star-svg path,
+.review-card .stars svg path {
+  fill: var(--star-empty) !important; /* Warna default bintang kosong */
+}
+
+/* Override untuk bintang terisi - ganti kuning terang ke kuning emas */
+.review-card .stars .star-svg.filled path,
+.review-card .stars svg.filled path {
+  fill: var(--star-filled) !important; /* Warna bintang terisi (kuning emas) */
+}
+
+/* Override untuk bintang setengah terisi */
+.review-card .stars .star-svg.half path,
+.review-card .stars svg.half path {
+  fill: var(--star-filled) !important; /* Warna bintang setengah terisi */
 }
 
 .form-actions {

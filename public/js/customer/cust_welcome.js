@@ -150,234 +150,53 @@ document.addEventListener('DOMContentLoaded', function() {
         // No products from server, load via JS
         renderProdukPopuler();
     } else {
-        // Products are already loaded from server, attach event listeners only
-        produkCards.forEach((card, idx) => {
-            const lihatDetailBtn = card.querySelector('.btn-lihat');
-            const addToCartBtn = card.querySelector('.btn-add');
+    }
 
-            if (lihatDetailBtn) {
-                lihatDetailBtn.addEventListener('click', function() {
-                    const productId = this.getAttribute('data-product-id');
-                    // Use the productId directly instead of idx
-                    openProdukModal(idx, productId);
-                });
-            }
+});
 
-            if (addToCartBtn) {
-                addToCartBtn.addEventListener('click', function() {
-                    const productId = this.getAttribute('data-product-id');
-                    addToCart(productId);
-                });
-            }
-        });
+// Ensure modal is closed on page load and prevent any automatic triggering
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('modal-detail-produk');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto'; // Ensure scrolling is enabled
+    }
+
+    // Additional check to make sure no element is automatically triggering the modal
+    setTimeout(() => {
+        if (modal && modal.style.display !== 'none') {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+    }, 100); // Small delay to ensure all initial events are processed
+});
+
+// Only enable "Tambah ke Keranjang" event listener initially to prevent auto-triggering of modal
+document.addEventListener('click', function(e) {
+    // Handle "Tambah ke Keranjang" button clicks (these are less likely to cause modal issues)
+    if (e.target.classList.contains('btn-add') && !e.target.classList.contains('processed')) {
+        console.log('Tambah ke Keranjang button clicked via event delegation');
+        const button = e.target;
+        const productId = button.getAttribute('data-product-id');
+
+        // Mark this button as processed to prevent duplicate events
+        button.classList.add('processed');
+
+        if (productId) {
+            e.preventDefault();
+            e.stopPropagation(); // Prevent event bubbling
+            console.log('Adding to cart product ID:', productId);
+            addToCart(productId);
+        } else {
+            console.warn('No product ID found on add to cart button');
+        }
     }
 });
 
-// ----- Modal Handling -----
-const modal = document.getElementById('modal-detail-produk');
-const modalImg = document.getElementById('modal-img');
-const modalProduct = document.getElementById('modal-product');
-const modalPrice = document.getElementById('modal-price');
-const modalDesc = document.getElementById('modal-desc');
-const modalSpecs = document.getElementById('modal-specs');
-const modalThumbs = document.getElementById('modal-thumbs');
-const modalAddCart = document.getElementById('modal-addcart-btn');
-const modalLihatDetail = document.getElementById('modal-lihatdetail-btn');
-const modalCloseBtn = document.getElementById('modal-close-btn');
 
-let currentProduk = null;
 
-// Buka modal via event delegation
-document.addEventListener('click', function(e) {
-  if (e.target.classList.contains('lihat-detail-btn')) {
-    const idx = e.target.getAttribute('data-idx');
-    const productId = e.target.getAttribute('data-product-id');
-    openProdukModal(idx, productId);
-  }
-});
 
-// Tutup dengan klik di area overlay
-if (modal) {
-  modal.addEventListener('mousedown', function(e) {
-    if (e.target === modal) closeProdukModal();
-  });
-}
 
-// Tutup dengan tombol close (jika ditampilkan di CSS)
-if (modalCloseBtn) {
-  modalCloseBtn.addEventListener('click', closeProdukModal);
-}
-
-// Tutup dengan tombol Esc
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closeProdukModal();
-});
-
-function openProdukModal(idx, productId) {
-  if (!modal) return;
-
-  // Since we load real products, we need to get them again or store them
-  // For now, we'll fetch the specific product data
-  fetch(`/api/products/${productId}`)
-    .then(async response => {
-      // Check if response is ok before parsing JSON
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      // Check content type before parsing JSON
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        const text = await response.text();
-        console.error('Response is not JSON:', text);
-        throw new Error('Response is not JSON');
-      }
-
-      return response.json();
-    })
-    .then(produk => {
-      currentProduk = produk;
-
-      modalProduct.textContent = produk.name;
-      modalImg.src = produk.image || 'src/product_1.png'; // Use placeholder if no image
-      modalImg.alt = produk.name;
-      // Format the price using our global function
-      if (typeof produk.price === 'number') {
-        modalPrice.textContent = window.formatPrice ? window.formatPrice(produk.price) : produk.price;
-      } else {
-        modalPrice.textContent = produk.price || 'Rp 0';
-      }
-      modalDesc.textContent = produk.description || produk.desc || 'Deskripsi tidak tersedia';
-
-      // Spesifikasi
-      modalSpecs.innerHTML = '';
-      if (produk.specifications || produk.spesifikasi || produk.specs) {
-        const specs = produk.specifications || produk.spesifikasi || produk.specs;
-        if (Array.isArray(specs)) {
-          // specs.forEach(spec => {
-          //   const li = document.createElement('li');
-          //   if (typeof spec === 'object' && spec.key && spec.value) {
-          //     li.textContent = `${spec.key}: ${spec.value}`;
-          //   } else if (typeof spec === 'string') {
-          //     li.textContent = spec;
-          //   } else {
-          //     li.textContent = String(spec);
-          //   }
-          //   modalSpecs.appendChild(li);
-          // });
-          specs.forEach(spec => {
-            const li = document.createElement('li');
-
-            if (typeof spec === 'object') {
-              const label = spec.nama ?? spec.key ?? '';
-              const value = spec.nilai ?? spec.value ?? '';
-              li.textContent = label ? `${label}: ${value}` : JSON.stringify(spec);
-            } else {
-              li.textContent = String(spec);
-            }
-
-            modalSpecs.appendChild(li);
-          });
-        } else if (typeof specs === 'object') {
-          Object.entries(specs).forEach(([key, value]) => {
-            const li = document.createElement('li');
-            li.textContent = `${key}: ${value}`;
-            modalSpecs.appendChild(li);
-          });
-        }
-      }
-
-      // Thumbnail - for now using single image, but could be extended
-      modalThumbs.innerHTML = '';
-      const thumb = document.createElement('img');
-      thumb.src = produk.image || 'src/product_1.png'; // Use placeholder if no image
-      thumb.alt = `Thumbnail`;
-      thumb.classList.add('active');
-      thumb.onclick = () => {
-        modalImg.src = produk.image || 'src/product_1.png';
-        [...modalThumbs.children].forEach(img => img.classList.remove('active'));
-        thumb.classList.add('active');
-      };
-      modalThumbs.appendChild(thumb);
-
-      // Store product ID in the add to cart button for easy access
-      if (modalAddCart) {
-        modalAddCart.setAttribute('data-product-id', productId);
-      }
-
-      // Store product ID in the detail button for easy access
-      if (modalLihatDetail) {
-        modalLihatDetail.setAttribute('data-product-id', productId);
-      }
-
-      modal.style.display = 'flex';
-      document.body.style.overflow = 'hidden';
-    })
-    .catch(error => {
-      console.error('Error loading product details:', error);
-      // Fallback to current product card data if available
-      const productCard = document.querySelector(`[data-product-id="${productId}"]`);
-      if (productCard) {
-        const productName = productCard.querySelector('.produk-card-name').textContent;
-        const productSub = productCard.querySelector('.produk-card-sub').textContent;
-        const productPrice = productCard.querySelector('.produk-card-price').textContent;
-
-        const produk = {
-          name: productName,
-          image: productCard.querySelector('img').src,
-          price: productPrice,
-          description: productSub,
-          rating: Math.floor(Math.random() * 3) + 3, // Random rating between 3-5
-          specifications: []
-        };
-
-        currentProduk = produk;
-        modalProduct.textContent = produk.name;
-        modalImg.src = produk.image;
-        modalImg.alt = produk.name;
-        modalPrice.textContent = produk.price;
-        modalDesc.textContent = produk.description;
-        modalSpecs.innerHTML = '';
-
-        // Store product ID in the detail button for easy access
-        if (modalLihatDetail) {
-          modalLihatDetail.setAttribute('data-product-id', productId);
-        }
-      } else {
-        // Last resort fallback
-        const produk = {
-          name: "Produk Tidak Ditemukan",
-          image: "src/product_1.png",
-          rating: Math.floor(Math.random() * 3) + 3, // Random rating between 3-5
-          price: window.formatPrice ? window.formatPrice(0) : "Rp 0,00",
-          description: "Produk tidak ditemukan di sistem.",
-          specifications: []
-        };
-
-        currentProduk = produk;
-        modalProduct.textContent = produk.name;
-        modalImg.src = produk.image;
-        modalImg.alt = produk.name;
-        modalPrice.textContent = produk.price;
-        modalDesc.textContent = produk.description;
-        modalSpecs.innerHTML = '';
-
-        // Store product ID in the detail button for easy access
-        if (modalLihatDetail) {
-          modalLihatDetail.setAttribute('data-product-id', productId);
-        }
-      }
-
-      modal.style.display = 'flex';
-      document.body.style.overflow = 'hidden';
-    });
-}
-
-function closeProdukModal() {
-  if (!modal) return;
-  modal.style.display = 'none';
-  document.body.style.overflow = '';
-}
 
 // Add to cart functionality
 if (modalAddCart) {
@@ -414,7 +233,7 @@ async function addToCart(productId) {
 
   // Get CSRF token from the meta tag in the layout
   const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-  
+
   if (!csrfToken) {
     showNotification('Terjadi masalah dengan keamanan, silakan refresh halaman', 'error');
     return;
@@ -428,16 +247,33 @@ async function addToCart(productId) {
         'X-CSRF-TOKEN': csrfToken,
         'X-Requested-With': 'XMLHttpRequest' // Important for Laravel to recognize AJAX requests
       },
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         product_id: productId,
         quantity: 1 // Default quantity
       })
     });
 
+    // Check if response is JSON before parsing
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const textResponse = await response.text();
+      console.error('Non-JSON response received:', textResponse);
+      throw new Error('Server did not return JSON');
+    }
+
     const result = await response.json();
 
     if (response.ok && result.success) {
       showNotification(result.message || 'Produk berhasil ditambahkan ke keranjang', 'success');
+
+      // Update cart count in header via API if function exists
+      if (typeof updateCartCount === 'function') {
+        try {
+          updateCartCount();
+        } catch (updateError) {
+          console.warn('Could not update cart count:', updateError);
+        }
+      }
     } else {
       showNotification(result.message || 'Gagal menambahkan ke keranjang', 'error');
     }

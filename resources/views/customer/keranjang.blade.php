@@ -95,6 +95,9 @@
               @forelse($cartItems as $item)
               <div class="product-item-card" data-item-id="{{ $item['id'] ?? $item->id }}">
                 <div class="product-item-thumb-container">
+                  <div class="check">
+                    <input type="checkbox" class="item-check" checked data-item-id="{{ $item['id'] ?? $item->id }}">
+                  </div>
                   <div class="product-item-thumb">
                     <img src="{{ ($item['product'] ?? $item->product)->main_image ? asset('storage/' . ($item['product'] ?? $item->product)->main_image) : asset('src/placeholder.png') }}" alt="{{ ($item['product'] ?? $item->product)->name }}">
                   </div>
@@ -104,13 +107,12 @@
                 </div>
                 <div class="product-item-details">
                   <h3 class="product-item-name">{{ ($item['product'] ?? $item->product)->name }}</h3>
+                  <div class="product-sku">SKU: {{ ($item['product'] ?? $item->product)->sku ?? 'N/A' }}</div>
+                  @if($item['product_variant'] ?? $item->productVariant ?? null)
+                  <div class="product-variant">Varian: {{ ($item['product_variant'] ?? $item->productVariant)->name }}</div>
+                  @endif
                   <div class="product-item-price">
-                    @php
-                      $basePrice = ($item['product'] ?? $item->product)->price;
-                      $variantPrice = ($item['product_variant'] ?? $item->productVariant ?? null) ? ($item['product_variant'] ?? $item->productVariant)->additional_price : 0;
-                      $itemPrice = $basePrice + $variantPrice;
-                    @endphp
-                    Rp {{ number_format($itemPrice, 0, ',', '.') }}
+                    Harga Satuan: Rp {{ number_format((($item['product'] ?? $item->product)->price + (($item['product_variant'] ?? $item->productVariant ?? null) ? ($item['product_variant'] ?? $item->productVariant)->additional_price : 0)), 0, ',', '.') }}
                   </div>
                   <div class="product-item-qty">
                     <div class="qty-controls">
@@ -118,6 +120,9 @@
                       <input type="number" class="qty-input" value="{{ $item['quantity'] ?? $item->quantity }}" min="0" max="99" data-item-id="{{ $item['id'] ?? $item->id }}">
                       <button class="qty-btn plus" data-item-id="{{ $item['id'] ?? $item->id }}">+</button>
                     </div>
+                  </div>
+                  <div class="product-item-subtotal">
+                    Subtotal: Rp {{ number_format((($item['product'] ?? $item->product)->price + (($item['product_variant'] ?? $item->productVariant ?? null) ? ($item['product_variant'] ?? $item->productVariant)->additional_price : 0)) * ($item['quantity'] ?? $item->quantity), 0, ',', '.') }}
                   </div>
                 </div>
               </div>

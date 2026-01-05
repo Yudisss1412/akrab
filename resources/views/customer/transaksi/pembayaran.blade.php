@@ -106,30 +106,13 @@
                       </svg>
                     </div>
                     <div class="option-text">
-                      <h3>Transfer Bank</h3>
+                      <h3>Pembayaran Online</h3>
                       <p>Transfer Bank, Kartu Kredit, dan lainnya (via Midtrans)</p>
                     </div>
                   </div>
                 </label>
               </div>
 
-              <div class="payment-option">
-                <input type="radio" id="eWallet" name="paymentMethod" value="e_wallet">
-                <label for="eWallet" class="option-content">
-                  <div class="option-header">
-                    <div class="option-icon">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <circle cx="12" cy="12" r="9" stroke="#006E5C" stroke-width="2"/>
-                        <path d="M12 8V12L15 14" stroke="#006E5C" stroke-width="2" stroke-linecap="round"/>
-                      </svg>
-                    </div>
-                    <div class="option-text">
-                      <h3>Dompet Digital</h3>
-                      <p>OVO, GoPay, DANA, ShopeePay, dan lainnya (via Midtrans)</p>
-                    </div>
-                  </div>
-                </label>
-              </div>
 
               <div class="payment-option">
                 <input type="radio" id="cod" name="paymentMethod" value="cod">

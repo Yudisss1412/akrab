@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ asset('css/customer/transaksi/shipping_track_additional.css') }}">
     <style>
         :root {
             --ak-primary: #006E5C;
@@ -153,38 +154,6 @@
             padding: 0.5rem 1rem;
             border-radius: 6px;
             display: inline-block;
-        }
-
-        /* Styling untuk notifikasi */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            border-radius: 8px;
-            color: white;
-            font-weight: 500;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            z-index: 9999;
-            transform: translateX(400px);
-            transition: transform 0.3s ease-in-out;
-            max-width: 350px;
-        }
-
-        .notification.show {
-            transform: translateX(0);
-        }
-
-        .notification.success {
-            background: linear-gradient(135deg, #00c853, #009624);
-        }
-
-        .notification.error {
-            background: linear-gradient(135deg, #ff5252, #e53935);
-        }
-
-        .notification.info {
-            background: linear-gradient(135deg, #2979ff, #2962ff);
         }
     </style>
 </head>

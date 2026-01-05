@@ -108,49 +108,6 @@ body {
   color: var(--gray-500);
 }
 
-/* Responsive Grid Layout for Shipping Page */
-.shipping-layout {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 30px;
-  margin-top: 20px;
-  align-items: start;
-}
-
-/* Main Content Left */
-.main-column {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-/* Sidebar Right */
-.sidebar-right {
-  position: relative;
-}
-
-/* Desktop Layout (>= 1024px) - Sidebar becomes sticky */
-@media (min-width: 1024px) {
-  .shipping-layout {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 30px;
-    align-items: start;
-  }
-
-  .sidebar-right {
-    position: sticky;
-    top: 100px; /* Adjust according to your header height */
-  }
-}
-
-/* Mobile Layout (< 1024px) - Sidebar moves to bottom */
-@media (max-width: 1023px) {
-  .shipping-layout {
-    display: flex;
-    flex-direction: column;
-  }
-}
 
 /* Payment Summary Card (used in sidebar) */
 .payment-summary-card {
@@ -239,6 +196,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  width: 100%;
 }
 
 .shipping-option {
@@ -248,6 +206,8 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .shipping-option:hover {
@@ -276,6 +236,7 @@ body {
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 8px;
+  width: 100%;
 }
 
 .option-info h3 {
@@ -508,35 +469,6 @@ body {
   backdrop-filter: none; /* Ensure no transparency effects */
 }
 
-.shipping-option {
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 16px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  position: relative;
-}
-
-.shipping-option:hover {
-  border-color: var(--primary-color);
-  box-shadow: 0 4px 12px rgba(0, 110, 92, 0.1);
-}
-
-.shipping-option.selected {
-  border-color: var(--primary-color-dark);
-  background: white !important;
-  box-shadow: 0 0 0 2px var(--primary-color) !important;
-}
-
-.shipping-option.selected::after {
-  content: '✓';
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  color: var(--primary-color-dark);
-  font-weight: 700;
-  font-size: 18px;
-}
 
 .option-header {
   display: flex;
@@ -649,8 +581,8 @@ body {
 
 /* New Stepper Layout for Shipping */
 .pengiriman-content {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 30px;
 }
 
@@ -667,15 +599,19 @@ body {
 /* Desktop Layout (>= 1024px) - Sidebar becomes sticky */
 @media (min-width: 1024px) {
   .pengiriman-content {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
+    display: flex;
+    flex-direction: row;
     gap: 30px;
-    align-items: start;
   }
 
   .pengiriman-right {
     position: sticky;
     top: 100px; /* Adjust according to your header height */
+    flex: 1;
+  }
+
+  .pengiriman-left {
+    flex: 2;
   }
 }
 

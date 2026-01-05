@@ -117,11 +117,11 @@
             </ul>
           </section>
 
-          <!-- Button Lihat Riwayat Pesanan -->
-          <div class="cod-order-history-btn-container">
-            <a href="/customer/riwayat-pesanan" class="btn btn-primary">
-              Lihat Riwayat Pesanan
-            </a>
+          <!-- Button Konfirmasi Pesanan -->
+          <div class="cod-order-actions">
+            <button class="btn btn-primary" id="confirmOrderBtn" onclick="confirmOrder()">
+              Saya Paham & Siapkan Pesanan
+            </button>
           </div>
         </div>
 
@@ -154,7 +154,7 @@
             </div>
 
             <button class="btn btn-primary btn-confirm-order" id="confirmOrderBtn" onclick="confirmOrder()">
-              Konfirmasi Pesanan
+              Saya Paham & Siapkan Pesanan
             </button>
           </section>
         </div>
@@ -195,21 +195,21 @@
         if (data.success) {
           // Tampilkan notifikasi sukses
           showNotification('success', 'Pesanan berhasil dikonfirmasi! Barang akan segera diproses. Pembayaran akan dilakukan saat barang diterima.');
-          // Alihkan ke dashboard pembeli seperti yang diminta
+          // Alihkan ke halaman riwayat pesanan
           setTimeout(() => {
-            window.location.href = '{{ route("cust.welcome") }}';
+            window.location.href = '/customer/riwayat-pesanan';
           }, 2000); // Tunggu 2 detik sebelum redirect agar notifikasi bisa terbaca
         } else {
           showNotification('error', data.message || 'Terjadi kesalahan saat memproses pesanan.');
           confirmBtn.disabled = false;
-          confirmBtn.innerHTML = 'Konfirmasi Pesanan';
+          confirmBtn.innerHTML = 'Saya Paham & Siapkan Pesanan';
         }
       })
       .catch(error => {
         console.error('Error:', error);
         showNotification('error', 'Terjadi kesalahan saat memproses pesanan. Silakan coba lagi atau hubungi admin jika masalah terus berlanjut.');
         confirmBtn.disabled = false;
-        confirmBtn.innerHTML = 'Konfirmasi Pesanan';
+        confirmBtn.innerHTML = 'Saya Paham & Siapkan Pesanan';
       });
     }
 
@@ -315,97 +315,5 @@
     }
   </script>
 
-  <style>
-    .notification-toast {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) translateY(-20px);
-      z-index: 9999;
-      min-width: 300px;
-      max-width: 400px;
-      padding: 16px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      opacity: 0;
-      transition: all 0.3s ease;
-      background: white;
-      border-left: 4px solid;
-    }
-
-    .notification-toast.show {
-      opacity: 1;
-      transform: translate(-50%, -50%) translateY(0);
-    }
-
-    .notification-success {
-      border-left-color: #28a745;
-      background-color: #f8fff9;
-      color: #155724;
-    }
-
-    .notification-error {
-      border-left-color: #dc3545;
-      background-color: #fff8f8;
-      color: #721c24;
-    }
-
-    .notification-content {
-      display: flex;
-      align-items: center;
-      flex: 1;
-    }
-
-    .notification-icon {
-      font-size: 20px;
-      font-weight: bold;
-      margin-right: 12px;
-      min-width: 24px;
-      text-align: center;
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-    }
-
-    .notification-success .notification-icon {
-      background-color: #d4edda;
-      color: #28a745;
-    }
-
-    .notification-error .notification-icon {
-      background-color: #f8d7da;
-      color: #dc3545;
-    }
-
-    .notification-message {
-      flex: 1;
-      font-size: 14px;
-      line-height: 1.4;
-    }
-
-    .notification-close {
-      background: none;
-      border: none;
-      font-size: 20px;
-      cursor: pointer;
-      color: #6c757d;
-      padding: 0;
-      margin-left: 12px;
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .notification-close:hover {
-      color: #000;
-    }
-  </style>
+  <link rel="stylesheet" href="{{ asset('css/customer/transaksi/payment/cod.css') }}">
 @endpush

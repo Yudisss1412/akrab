@@ -233,7 +233,7 @@
   </style>
 
   <!-- Produk Detail Modal HTML -->
-  <div class="modal-detail-produk" id="modal-detail-produk" style="display: none;">
+  <div class="modal-detail-produk" id="modal-detail-produk">
     <div class="modal-content-new">
       <div class="modal-title-row">
         <span id="modal-product"></span>
@@ -427,7 +427,7 @@
                       <h3 class="product-name">{{ $product['name'] }}</h3>
                       <p class="product-description">{{ Str::limit($product['description'], 100) }}</p>
                       <div class="product-price">{{ $product['price'] }}</div>
-                      <button class="btn btn-primary view-product" data-product-id="{{ $product['id'] }}">Pratinjau</button>
+                      <a href="{{ route('produk.detail', $product['id']) }}" class="btn btn-primary">Lihat Detail</a>
                     </div>
                   </div>
                 @endforeach
@@ -623,16 +623,16 @@
                   const sanitizedPrice = (product.price || 'Rp 0').toString().replace(/[&<>"']/g, '');
                   priceDiv.textContent = sanitizedPrice.substring(0, 50);
 
-                  const button = document.createElement('button');
-                  button.className = 'btn btn-primary view-product';
-                  button.setAttribute('data-product-id', product.id);
-                  button.textContent = 'Pratinjau';
+                  const link = document.createElement('a');
+                  link.href = `/produk_detail/${product.id}`;
+                  link.className = 'btn btn-primary';
+                  link.textContent = 'Lihat Detail';
 
                   // Append elements in order
                   infoDiv.appendChild(nameH3);
                   infoDiv.appendChild(descP);
                   infoDiv.appendChild(priceDiv);
-                  infoDiv.appendChild(button);
+                  infoDiv.appendChild(link);
                   productCard.appendChild(img);
                   productCard.appendChild(infoDiv);
 
@@ -846,16 +846,16 @@
                   const sanitizedPrice = (product.price || 'Rp 0').toString().replace(/[&<>"']/g, '');
                   priceDiv.textContent = sanitizedPrice.substring(0, 50);
 
-                  const button = document.createElement('button');
-                  button.className = 'btn btn-primary view-product';
-                  button.setAttribute('data-product-id', product.id || 1);
-                  button.textContent = 'Pratinjau';
+                  const link = document.createElement('a');
+                  link.href = `/produk_detail/${product.id}`;
+                  link.className = 'btn btn-primary';
+                  link.textContent = 'Lihat Detail';
 
                   // Append elements in order
                   infoDiv.appendChild(nameH3);
                   infoDiv.appendChild(descP);
                   infoDiv.appendChild(priceDiv);
-                  infoDiv.appendChild(button);
+                  infoDiv.appendChild(link);
                   productCard.appendChild(img);
                   productCard.appendChild(infoDiv);
 
@@ -1143,7 +1143,7 @@
   </script>
 
   <!-- Modal Produk -->
-  <div class="modal-detail-produk" id="modal-detail-produk" style="display: none;">
+  <div class="modal-detail-produk" id="modal-detail-produk">
     <div class="modal-overlay"></div>
     <div class="modal-content-new">
         <div class="modal-title-row">
@@ -1181,13 +1181,6 @@
 
     let currentProduk = null;
 
-    // Buka modal via event delegation
-    document.addEventListener('click', function(e) {
-      if (e.target.classList.contains('view-product')) {
-        const productId = e.target.getAttribute('data-product-id') || e.target.closest('.product-card').getAttribute('data-product-id') || 1;
-        openProdukModal(null, productId);
-      }
-    });
 
     // Tutup dengan klik di area overlay
     if (modal) {
@@ -1206,270 +1199,6 @@
       if (e.key === 'Escape') closeProdukModal();
     });
 
-    function openProdukModal(idx, productId) {
-      if (!modal) return;
-
-      // Try to find product data in global allProductData first (since we're using dummy data)
-      if (typeof allProductData !== 'undefined' && allProductData.length > 0) {
-        const product = allProductData.find(p => p.id == productId);
-
-        if (product) {
-          // Use product data from global variable
-          currentProduk = product;
-
-          // Sanitize product data for modal
-          const sanitizedName = (product.name || '').toString().replace(/[&<>"']/g, '');
-          const sanitizedPrice = (product.price || '').toString().replace(/[&<>"']/g, '');
-          const sanitizedDesc = (product.description || '').toString().replace(/[&<>"']/g, '');
-
-          modalProduct.textContent = sanitizedName.substring(0, 200);
-          modalImg.src = product.image;
-          modalImg.alt = sanitizedName.substring(0, 100);
-          modalPrice.textContent = sanitizedPrice.substring(0, 50);
-          modalDesc.textContent = sanitizedDesc.substring(0, 500);
-
-          // Specifications
-          modalSpecs.innerHTML = '';
-          const specs = product.specifications || product.spesifikasi || product.specs || [];
-
-          if (specs.length > 0) {
-            // Handle both object/array formats
-            if (Array.isArray(specs)) {
-              specs.forEach(spec => {
-                const li = document.createElement('li');
-                if (typeof spec === 'object' && spec.key && spec.value) {
-                  // If it's an object with key-value pairs
-                  const strong = document.createElement('strong');
-                  // Sanitize key and value to prevent syntax errors
-                  const sanitizedKey = spec.key.toString().replace(/[&<>"']/g, '').substring(0, 100);
-                  const sanitizedValue = spec.value.toString().replace(/[&<>"']/g, '').substring(0, 200);
-                  strong.textContent = sanitizedKey + ':';
-                  li.appendChild(strong);
-                  li.appendChild(document.createTextNode(' ' + sanitizedValue));
-                } else if (typeof spec === 'string' && spec.includes(':')) {
-                  // If it's a string with colon separator
-                  const [key, ...valueParts] = spec.split(':');
-                  const value = valueParts.join(':');
-                  const strong = document.createElement('strong');
-                  // Sanitize key and value to prevent syntax errors
-                  const sanitizedKey = key.trim().replace(/[&<>"']/g, '').substring(0, 100);
-                  const sanitizedValue = value.trim().replace(/[&<>"']/g, '').substring(0, 200);
-                  strong.textContent = sanitizedKey + ':';
-                  li.appendChild(strong);
-                  li.appendChild(document.createTextNode(' ' + sanitizedValue));
-                } else {
-                  // Just the spec as text
-                  const sanitizedSpec = spec.toString().replace(/[&<>"']/g, '').substring(0, 200);
-                  li.textContent = sanitizedSpec;
-                }
-                modalSpecs.appendChild(li);
-              });
-            } else if (typeof specs === 'object') {
-              // Handle object format: { key: value }
-              Object.entries(specs).forEach(([key, value]) => {
-                const li = document.createElement('li');
-                const strong = document.createElement('strong');
-                // Sanitize key and value to prevent syntax errors
-                const sanitizedKey = key.toString().replace(/[&<>"']/g, '').substring(0, 100);
-                const sanitizedValue = value.toString().replace(/[&<>"']/g, '').substring(0, 200);
-                strong.textContent = sanitizedKey + ':';
-                li.appendChild(strong);
-                li.appendChild(document.createTextNode(' ' + sanitizedValue));
-                modalSpecs.appendChild(li);
-              });
-            }
-          } else {
-            // Add default specifications if none provided
-            const li = document.createElement('li');
-            const defaultSpecDesc = (product.description || 'Spesifikasi tidak tersedia').toString().replace(/[&<>"']/g, '');
-            li.textContent = defaultSpecDesc.substring(0, 200);
-            modalSpecs.appendChild(li);
-          }
-
-          // Thumbnails - using main image for now, but could be extended with multiple images
-          modalThumbs.innerHTML = '';
-          const thumb = document.createElement('img');
-          thumb.src = product.image;
-          const thumbAlt = (product.name || 'Thumbnail').toString().replace(/[&<>"']/g, '');
-          thumb.alt = thumbAlt.substring(0, 100);
-          thumb.classList.add('active');
-          thumb.onclick = () => {
-            modalImg.src = product.image;
-            [...modalThumbs.children].forEach(img => img.classList.remove('active'));
-            thumb.classList.add('active');
-          };
-          modalThumbs.appendChild(thumb);
-
-          // Store product ID in the add to cart button for easy access
-          if (modalAddCart) {
-            modalAddCart.setAttribute('data-product-id', productId);
-          }
-
-          modal.style.display = 'flex';
-          document.body.style.overflow = 'hidden';
-          return; // Exit early if product found in global data
-        }
-      }
-
-      // If product not found in global data, fetch from API as fallback
-      fetch('/api/products/' + productId)
-        .then(response => response.json())
-        .then(produk => {
-          currentProduk = produk;
-
-          // Sanitize product data from API for modal
-          const apiProductName = (produk.name || '').toString().replace(/[&<>"']/g, '');
-          const apiProductPrice = (produk.price || '').toString().replace(/[&<>"']/g, '');
-          const apiProductDesc = (produk.description || '').toString().replace(/[&<>"']/g, '');
-
-          modalProduct.textContent = apiProductName.substring(0, 200);
-          modalImg.src = produk.image;
-          modalImg.alt = apiProductName.substring(0, 100);
-          modalPrice.textContent = apiProductPrice.substring(0, 50);
-          modalDesc.textContent = apiProductDesc.substring(0, 500);
-
-          // Specifications
-          // Add store name as first specification
-          const storeLi = document.createElement('li');
-          storeLi.innerHTML = '<strong>Toko:</strong> <a href="/toko/' + encodeURIComponent(produk.seller?.name || produk.seller?.store_name || produk.seller_id || 'toko-tidak-ditemukan') + '">' + (produk.seller?.name || produk.seller?.store_name || 'Toko Umum') + '</a>';
-          modalSpecs.appendChild(storeLi);
-
-          (produk.specifications || produk.spesifikasi || []).forEach(spec => {
-            const sanitizedSpec = spec.toString().replace(/[&<>"']/g, '');
-            const li = document.createElement('li');
-            li.textContent = sanitizedSpec.substring(0, 200);
-            modalSpecs.appendChild(li);
-          });
-
-          // Thumbnails - for now using single image, but could be extended
-          modalThumbs.innerHTML = '';
-          const thumb = document.createElement('img');
-          thumb.src = produk.image;
-          const thumbAlt = (produk.name || 'Thumbnail').toString().replace(/[&<>"']/g, '');
-          thumb.alt = thumbAlt.substring(0, 100);
-          thumb.classList.add('active');
-          thumb.onclick = () => {
-            modalImg.src = produk.image;
-            [...modalThumbs.children].forEach(img => img.classList.remove('active'));
-            thumb.classList.add('active');
-          };
-          modalThumbs.appendChild(thumb);
-
-          // Store product ID in the add to cart button for easy access
-          if (modalAddCart) {
-            modalAddCart.setAttribute('data-product-id', productId);
-          }
-
-          modal.style.display = 'flex';
-          document.body.style.overflow = 'hidden';
-        })
-        .catch(error => {
-          console.error('Error loading product details:', error);
-
-          // Attempt to find product data in the visible DOM as fallback
-          const productCard = document.querySelector('[data-product-id="' + productId + '"]');
-          if (productCard) {
-            const productName = productCard.querySelector('.product-name')?.textContent;
-            const productImage = productCard.querySelector('.product-image')?.src;
-            const productDesc = productCard.querySelector('.product-description')?.textContent;
-            const productPrice = productCard.querySelector('.product-price')?.textContent;
-            const productStore = productCard.closest('.main-content') ?
-                                productCard.querySelector('.product-toko a')?.textContent ||
-                                productCard.querySelector('.toko-link')?.textContent || 'Toko Umum' : 'Toko Umum';
-
-            if (productName && productImage && productPrice) {
-              // Sanitize the data from DOM as fallback
-              const fallbackName = productName.toString().replace(/[&<>"']/g, '');
-              const fallbackPrice = productPrice.toString().replace(/[&<>"']/g, '');
-              const fallbackDesc = (productDesc || 'Deskripsi produk tidak tersedia').toString().replace(/[&<>"']/g, '');
-              const fallbackStore = productStore.toString().replace(/[&<>"']/g, '');
-
-              // Use the data from the DOM
-              modalProduct.textContent = fallbackName.substring(0, 200);
-
-              // Clear and rebuild specifications list
-              modalSpecs.innerHTML = '';
-              const storeLinkLi = document.createElement('li');
-              storeLinkLi.innerHTML = '<strong>Toko:</strong> <a href="/toko/' + encodeURIComponent(fallbackStore) + '">' + fallbackStore + '</a>';
-              modalSpecs.appendChild(storeLinkLi);
-
-              modalImg.src = productImage;
-              modalImg.alt = fallbackName.substring(0, 100);
-              modalPrice.textContent = fallbackPrice.substring(0, 50);
-              modalDesc.textContent = fallbackDesc.substring(0, 500);
-
-              const li = document.createElement('li');
-              const fallbackSpec = (productDesc || 'Spesifikasi tidak tersedia').toString().replace(/[&<>"']/g, '');
-              li.textContent = fallbackSpec.substring(0, 200);
-              modalSpecs.appendChild(li);
-
-              modalThumbs.innerHTML = '';
-              const thumb = document.createElement('img');
-              thumb.src = productImage;
-              const thumbAlt = fallbackName.substring(0, 100);
-              thumb.alt = thumbAlt;
-              thumb.classList.add('active');
-              thumb.onclick = () => {
-                modalImg.src = productImage;
-                [...modalThumbs.children].forEach(img => img.classList.remove('active'));
-                thumb.classList.add('active');
-              };
-              modalThumbs.appendChild(thumb);
-
-              // Store product ID in the add to cart button for easy access
-              if (modalAddCart) {
-                modalAddCart.setAttribute('data-product-id', productId);
-              }
-
-              modal.style.display = 'flex';
-              document.body.style.overflow = 'hidden';
-              return; // Exit after using fallback data
-            }
-          }
-
-          // Final fallback to dummy data if product not found at all
-          const produk = {
-            name: "Produk Tidak Ditemukan",
-            seller: { name: "Toko Umum" },
-            image: asset('src/product_1.png'),
-            price: "Rp 0",
-            description: "Produk tidak ditemukan di sistem.",
-            specifications: []
-          };
-
-          currentProduk = produk;
-          const dummyName = produk.name.toString().replace(/[&<>"']/g, '');
-          const dummyStore = (produk.seller?.name || produk.seller?.store_name || 'Toko Umum').toString().replace(/[&<>"']/g, '');
-          const dummyPrice = produk.price.toString().replace(/[&<>"']/g, '');
-          const dummyDesc = produk.description.toString().replace(/[&<>"']/g, '');
-
-          modalProduct.textContent = dummyName.substring(0, 200);
-
-          // Add store link for dummy data
-          const dummyStoreLi = document.createElement('li');
-          dummyStoreLi.innerHTML = '<strong>Toko:</strong> <a href="/toko/' + encodeURIComponent(dummyStore) + '">' + dummyStore + '</a>';
-          modalSpecs.innerHTML = '';
-          modalSpecs.appendChild(dummyStoreLi);
-
-          modalImg.src = produk.image;
-          modalImg.alt = dummyName.substring(0, 100);
-          modalPrice.textContent = dummyPrice.substring(0, 50);
-          modalDesc.textContent = dummyDesc.substring(0, 500);
-
-          const dummySpecLi = document.createElement('li');
-          dummySpecLi.textContent = 'Spesifikasi tidak tersedia';
-          modalSpecs.appendChild(dummySpecLi);
-
-          modal.style.display = 'flex';
-          document.body.style.overflow = 'hidden';
-        });
-    }
-
-    function closeProdukModal() {
-      if (!modal) return;
-      modal.style.display = 'none';
-      document.body.style.overflow = '';
-    }
 
     // Add to cart functionality
     if (modalAddCart) {
@@ -1479,15 +1208,6 @@
       };
     }
 
-    if (modalLihatDetail) {
-      modalLihatDetail.onclick = () => {
-        if (currentProduk && currentProduk.id) {
-          window.location.href = '/produk_detail/' + currentProduk.id;
-        } else {
-          alert('Menuju halaman detail produk (demo)');
-        }
-      };
-    }
 
     // Function to add item to cart
     async function addToCart(productId) {

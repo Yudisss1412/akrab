@@ -114,6 +114,25 @@ class CartManager {
     });
   }
 
+
+  toggleSelectAll(checked) {
+    const checkboxes = document.querySelectorAll('.item-check:not(#selectAllTop)');
+    checkboxes.forEach(checkbox => {
+      checkbox.checked = checked;
+    });
+    this.calculateTotal();
+  }
+
+  updateSelectAllCheckbox() {
+    const checkboxes = document.querySelectorAll('.item-check:not(#selectAllTop)');
+    const selectAllCheckbox = document.getElementById('selectAllTop');
+    if (selectAllCheckbox) {
+      const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+      selectAllCheckbox.checked = allChecked;
+    }
+    this.calculateTotal();
+  }
+
   async incrementQuantity(button) {
     const input = button.previousElementSibling;
     let value = parseInt(input.value) || 0;
@@ -166,10 +185,10 @@ class CartManager {
     } else if (value < 0) {
       value = 0;
     }
-    
+
     input.value = value;
-    
-    // If quantity is 0, remove the item
+
+    // If quantity reaches 0, remove the item
     if (value <= 0) {
       const row = input.closest('tr');
       if (row) {
@@ -190,24 +209,6 @@ class CartManager {
     } else if (value < 0) {
       input.value = 0;
     }
-  }
-
-  toggleSelectAll(checked) {
-    const checkboxes = document.querySelectorAll('.item-check:not(#selectAllTop)');
-    checkboxes.forEach(checkbox => {
-      checkbox.checked = checked;
-    });
-    this.calculateTotal();
-  }
-
-  updateSelectAllCheckbox() {
-    const checkboxes = document.querySelectorAll('.item-check:not(#selectAllTop)');
-    const selectAllCheckbox = document.getElementById('selectAllTop');
-    if (selectAllCheckbox) {
-      const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
-      selectAllCheckbox.checked = allChecked;
-    }
-    this.calculateTotal();
   }
 
   async updateItemQuantity(input) {

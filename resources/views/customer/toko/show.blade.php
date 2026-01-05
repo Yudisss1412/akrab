@@ -8,6 +8,7 @@
 
 @push('styles')
   <link href="{{ asset('css/customer/toko/show.css') }}?v=1" rel="stylesheet"/>
+  <link href="{{ asset('css/customer/toko/show_additional.css') }}?v=1" rel="stylesheet"/>
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 @endpush
@@ -230,12 +231,8 @@
         console.error('Leaflet library not loaded');
         const mapElement = document.getElementById('toko-map');
         if (mapElement) {
-          mapElement.style.display = 'flex';
-          mapElement.style.alignItems = 'center';
-          mapElement.style.justifyContent = 'center';
-          mapElement.style.backgroundColor = '#f8f9fa';
-          mapElement.style.border = '1px solid #e9ecef';
-          mapElement.innerHTML = '<div style="text-align: center; color: #6c757d;"><i>Map library not loaded</i></div>';
+          mapElement.classList.add('map-fallback');
+          mapElement.innerHTML = '<div class="map-fallback-content"><i>Map library not loaded</i></div>';
         }
         return;
       }
@@ -328,12 +325,8 @@
         } catch (initError) {
           console.error('Error saat menginisialisasi peta:', initError);
           // Jika terjadi error saat inisialisasi peta, setel tampilan fallback
-          mapElement.style.display = 'flex';
-          mapElement.style.alignItems = 'center';
-          mapElement.style.justifyContent = 'center';
-          mapElement.style.backgroundColor = '#f8f9fa';
-          mapElement.style.border = '1px solid #e9ecef';
-          mapElement.innerHTML = '<div style="text-align: center; color: #6c757d;"><i>Map not available</i></div>';
+          mapElement.classList.add('map-fallback');
+          mapElement.innerHTML = '<div class="map-fallback-content"><i>Map not available</i></div>';
         }
       }, 100); // Delay kecil untuk memastikan elemen sudah ada di DOM
     });

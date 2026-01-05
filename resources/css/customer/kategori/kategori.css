@@ -1,0 +1,226 @@
+/* ========== Modal Produk ========== */
+.modal-detail-produk {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  overflow-y: auto;
+}
+
+.modal-content-new {
+  max-width: 420px;
+  width: 95%; /* Wider on mobile */
+  max-height: 90vh;
+  background: #fff;
+  border-radius: 25px;
+  box-shadow: 0 8px 38px rgba(0, 0, 0, 0.22);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  margin: 20px; /* Jarak dari sisi viewport */
+}
+
+.modal-title-row {
+  padding: 1.2rem 1.5rem 0.5rem 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.close {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #aaa;
+  cursor: pointer;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  background-color: #f0f0f0;
+  cursor: pointer;
+}
+
+.modal-img-section {
+  display: flex;
+  flex-direction: column;
+  background: #fafbfc;
+  padding: 0 0 1.2rem 0;
+  flex-shrink: 0; /* Prevents the image section from shrinking */
+}
+
+.modal-img-main {
+  width: 90%;
+  max-width: 220px;
+  height: auto;
+  object-fit: cover;
+  border-radius: 16px;
+  background: #e5e5e5;
+  margin: 0.5rem auto 0.7rem auto; /* Center the image */
+}
+
+.modal-thumbs-new {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+  justify-content: center; /* Center thumbs */
+}
+
+.modal-thumbs-new img {
+  width: 48px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid #eee;
+  background: #eaeaea;
+  cursor: pointer;
+  transition: border 0.18s;
+}
+
+.modal-thumbs-new img.active {
+  border-color: var(--primary-color-dark);
+}
+
+.modal-body-scrollable {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 1.5rem 1.1rem 1.5rem;
+}
+
+.modal-price-new {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary-color-dark);
+  margin: 0 0 0.6rem 0;
+}
+
+.modal-desc-box-new {
+  background: #f2fbf7;
+  border-radius: 15px;
+  padding: 1rem 1.3rem 0.8rem 1.3rem;
+  margin: 0 0 1.1rem 0;
+  color: #444;
+  font-size: 1rem;
+}
+
+.modal-desc {
+  margin: 0 0 0.7rem 0;
+}
+
+.modal-detail-list {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.modal-detail-list li {
+  margin-bottom: 0.2rem;
+  font-size: 1rem;
+}
+
+.modal-actions {
+  display: flex;
+  flex-direction: column; /* Stack buttons on mobile */
+  gap: 0.8rem;
+  padding: 0 1.5rem 1.2rem 1.5rem;
+  width: 100%;
+}
+
+.modal-btn {
+  flex: 1;
+  border: none;
+  padding: 0.8rem 0; /* Increase padding for better touch target */
+  font-size: 1.07rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.12s;
+  width: 100%;
+}
+
+.modal-btn:hover {
+  transform: translateY(-1px);
+}
+
+.modal-btn-primary {
+  background: var(--primary-color-dark);
+  color: #fff;
+}
+
+.modal-btn-primary:hover {
+  background: var(--primary-color);
+  color: var(--primary-color-dark);
+}
+
+.modal-btn-secondary {
+  background: #fff;
+  border: 1.5px solid var(--primary-color-dark);
+  color: var(--primary-color-dark);
+}
+
+/* Responsive modal for mobile */
+@media (max-width: 576px) {
+  .modal-content-new {
+    width: 98%;
+    margin: 10px;
+    max-height: 95vh;
+  }
+
+  .modal-title-row {
+    padding: 1rem 1.2rem 0.3rem 1.2rem;
+    font-size: 1.1rem;
+  }
+
+  .modal-img-main {
+    max-width: 180px;
+    margin: 0.5rem auto 0.5rem auto;
+  }
+
+  .modal-body-scrollable {
+    padding: 0 1.2rem 0.8rem 1.2rem;
+  }
+
+  .modal-price-new {
+    font-size: 1.2rem;
+  }
+
+  .modal-desc-box-new {
+    padding: 0.8rem 1rem 0.6rem 1rem;
+  }
+
+  .modal-actions {
+    padding: 0 1.2rem 1rem 1.2rem;
+    gap: 0.6rem;
+  }
+
+  .modal-btn {
+    padding: 0.7rem 0;
+    font-size: 1rem;
+  }
+}
+
+/* CSS untuk modal yang disembunyikan */
+.modal-detail-produk {
+  display: none;
+}

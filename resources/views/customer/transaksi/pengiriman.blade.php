@@ -8,6 +8,7 @@
 
 @push('styles')
   <link rel="stylesheet" href="{{ asset('css/customer/transaksi/pengiriman.css') }}"/>
+  <link rel="stylesheet" href="{{ asset('css/customer/transaksi/pengiriman_additional.css') }}"/>
 @endpush
 
 @section('content')
@@ -41,73 +42,26 @@
           <section class="alamat-section">
             <div class="section-header">
               <h2>Alamat Pengiriman</h2>
-              <button type="button" class="btn-edit" id="editAlamatBtn">
-                <i class="bi bi-pencil"></i>
-              </button>
             </div>
 
-            <div class="alamat-card" id="alamatCard">
+            <div class="alamat-card">
               <div class="alamat-content">
                 <div class="primary-badge">Utama</div>
                 @if(isset($order) && $order && $order->shipping_address)
-                  <h3 id="alamatNama">{{ $order->shipping_address->recipient_name }}</h3>
-                  <div id="alamatDetail">
+                  <h3>{{ $order->shipping_address->recipient_name }}</h3>
+                  <div>
                     <span class="alamat-line">{{ $order->shipping_address->full_address }}</span><br />
                     <span class="alamat-line">{{ $order->shipping_address->district }}, {{ $order->shipping_address->city }}</span><br />
                     <span class="alamat-line">{{ $order->shipping_address->province }}</span>
                   </div>
-                  <p class="alamat-phone" id="alamatPhone">{{ $order->shipping_address->phone }}</p>
+                  <p class="alamat-phone">{{ $order->shipping_address->phone }}</p>
                 @else
-                  <h3 id="alamatNama">Alamat tidak ditemukan</h3>
-                  <div id="alamatDetail">
+                  <h3>Alamat tidak ditemukan</h3>
+                  <div>
                     <span class="alamat-line">Alamat pengiriman tidak ditemukan</span>
                   </div>
-                  <p class="alamat-phone" id="alamatPhone">-</p>
+                  <p class="alamat-phone">-</p>
                 @endif
-              </div>
-            </div>
-
-            <!-- Form untuk alamat pengiriman -->
-            <div class="alamat-form" id="alamatFormSection" style="display: none;">
-              <div class="form-group field">
-                <input type="text" id="recipient_name" name="recipient_name"
-                       value="{{ old('recipient_name', $order->shipping_address->recipient_name ?? '') }}" required placeholder=" " />
-                <label for="recipient_name">Nama Penerima</label>
-              </div>
-
-              <div class="form-group field">
-                <input type="tel" id="phone" name="phone"
-                       value="{{ old('phone', $order->shipping_address->phone ?? '') }}" required placeholder=" " />
-                <label for="phone">Nomor Telepon</label>
-              </div>
-
-              <div class="form-group field">
-                <input type="text" id="province" name="province"
-                       value="{{ old('province', $order->shipping_address->province ?? '') }}" required placeholder=" " />
-                <label for="province">Provinsi</label>
-              </div>
-
-              <div class="form-group field">
-                <input type="text" id="city" name="city"
-                       value="{{ old('city', $order->shipping_address->city ?? '') }}" required placeholder=" " />
-                <label for="city">Kota/Kabupaten</label>
-              </div>
-
-              <div class="form-group field">
-                <input type="text" id="district" name="district"
-                       value="{{ old('district', $order->shipping_address->district ?? '') }}" required placeholder=" " />
-                <label for="district">Kecamatan</label>
-              </div>
-
-              <div class="form-group field">
-                <input type="text" id="ward" name="ward"
-                       value="{{ old('ward', $order->shipping_address->ward ?? '') }}" required placeholder=" " />
-                <label for="ward">Kelurahan</label>
-              </div>
-
-              <div class="form-group field">
-                <textarea id="full_address" name="full_address" rows="3" required placeholder=" ">{{ old('full_address', $order->shipping_address->full_address ?? '') }}</textarea>
-                <label for="full_address">Alamat Lengkap</label>
               </div>
             </div>
           </section>
@@ -338,54 +292,6 @@
         }).format(amount).replace('Rp', '').trim();
       }
 
-      // Edit alamat functionality
-      const editBtn = document.getElementById('editAlamatBtn');
-      const alamatCard = document.getElementById('alamatCard');
-      const alamatFormSection = document.getElementById('alamatFormSection');
-
-      if (editBtn) {
-        // Gunakan state untuk melacak mode tombol
-        let isEditMode = false;
-
-        editBtn.addEventListener('click', function() {
-          if (!isEditMode) {
-            // Mode edit: tampilkan form, sembunyikan card
-            alamatCard.style.display = 'none';
-            alamatFormSection.style.display = 'block';
-            editBtn.innerHTML = '<i class="bi bi-check"></i>';
-            isEditMode = true;
-          } else {
-            // Mode simpan: validasi dan kirim ke server untuk update temporary data
-            const recipientName = document.getElementById('recipient_name').value;
-            const phone = document.getElementById('phone').value;
-            const province = document.getElementById('province').value;
-            const city = document.getElementById('city').value;
-            const district = document.getElementById('district').value;
-            const ward = document.getElementById('ward').value;
-            const fullAddress = document.getElementById('full_address').value;
-
-            if (!recipientName || !phone || !province || !city || !district || !ward || !fullAddress) {
-              alert('Mohon lengkapi semua field alamat');
-              return;
-            }
-
-            // Simpan alamat hanya di sisi klien (tidak dikirim ke server)
-            // Karena sistem kita hanya untuk sementara di sesi checkout ini
-            document.getElementById('alamatNama').textContent = recipientName || 'Nama tidak tersedia';
-            document.getElementById('alamatDetail').innerHTML = fullAddress ? fullAddress.replace(/,/g, '<br>') : 'Alamat tidak lengkap';
-            document.getElementById('alamatPhone').textContent = phone || 'Nomor telepon tidak tersedia';
-
-            // Kembali ke tampilan card
-            alamatCard.style.display = 'block';
-            alamatFormSection.style.display = 'none';
-            editBtn.innerHTML = '<i class="bi bi-pencil"></i>';
-            isEditMode = false;
-
-            // Tampilkan notifikasi sukses
-            alert('Alamat berhasil diperbarui untuk checkout saat ini');
-          }
-        });
-      }
 
       // Toggle ringkasan belanja section
       const toggleBtn = document.getElementById('toggleRingkasan');

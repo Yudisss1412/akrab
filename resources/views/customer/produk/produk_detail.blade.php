@@ -159,69 +159,7 @@ function createStarsHTML($rating, $size = 20) {
 @endsection
 
 @push('scripts')
-  <style>
-    .wishlist-link-row {
-      margin-top: 15px;
-      text-align: center;
-    }
-
-    .btn-wishlist-page {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 10px 16px;
-      border: 1px solid var(--primary-color-dark);
-      border-radius: 8px;
-      background-color: #fff;
-      color: var(--primary-color-dark);
-      text-decoration: none;
-      font-weight: 600;
-      transition: all 0.2s;
-    }
-
-    .btn-wishlist-page:hover {
-      background-color: var(--primary-color-dark);
-      color: #fff;
-    }
-
-    .notification {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, 500%) scale(0.9);
-      padding: 16px 24px;
-      border-radius: 8px;
-      color: #fff;
-      z-index: 9999;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-      font-size: 15px;
-      max-width: 420px;
-      width: max-content;
-      word-wrap: break-word;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 300px;
-      text-align: center;
-    }
-    .notification.show {
-      transform: translate(-50%, 500%) scale(1);
-    }
-    .notification-success {
-      background-color: #10b981;
-    }
-    .notification-error {
-      background-color: #ef4444;
-    }
-    .notification-info {
-      background-color: #3b82f6;
-    }
-    .notification-icon {
-      font-size: 20px;
-    }
-  </style>
+  <link rel="stylesheet" href="{{ asset('css/customer/produk/produk_detail_additional.css') }}">
   <script>
     // Basic functionality for quantity selector and wishlist
     // Create notification function

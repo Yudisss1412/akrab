@@ -83,15 +83,19 @@
 .cart-table {
   width: 100%;
   border: none;
-  border-spacing: 0;
+  border-collapse: collapse;
   background: #fff;
-  overflow: hidden;
+  overflow-x: auto;
+  table-layout: fixed; /* Menetapkan lebar kolom tetap sesuai dengan yang ditentukan */
+  margin: 0;
+  padding: 0;
+  position: relative; /* Tambahkan posisi relatif untuk menghindari masalah tampilan */
 }
 
 /* Header Tabel */
 .cart-table thead th {
-  padding: 0.8rem 1rem;
-  text-align: left;
+  padding: 0.8rem 0.5rem;
+  text-align: center;
   background-color: var(--primary-color);
   color: var(--primary-color-dark);
   font-weight: 600;
@@ -99,38 +103,47 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   border: none;
+  vertical-align: middle;
+  box-sizing: border-box;
+}
+
+.cart-table thead th:nth-child(1) {
+  width: 8%; /* Checkbox kolom */
+  text-align: center;
+  padding: 0.8rem 0.5rem; /* Sesuaikan padding untuk kolom kecil */
 }
 
 .cart-table thead th:nth-child(2) {
-  width: auto; /* Produk kolom - biarkan fleksibel */
+  width: 42%; /* Produk kolom - biarkan fleksibel */
+  text-align: left;
+  padding: 0.8rem 1rem; /* Sesuaikan padding untuk kolom produk */
 }
 
 .cart-table thead th:nth-child(3) {
-  width: 120px; /* Harga satuan kolom */
+  width: 15%; /* Harga satuan kolom - menyesuaikan untuk keseimbangan */
   text-align: right;
+  padding: 0.8rem 1rem;
 }
 
 .cart-table thead th:nth-child(4) {
-  width: 130px; /* Jumlah kolom */
+  width: 15%; /* Jumlah kolom - meningkatkan lebar untuk menampung tombol dan input */
   text-align: center;
+  padding: 0.8rem 0.5rem; /* Sesuaikan padding untuk kolom jumlah */
 }
 
 .cart-table thead th:nth-child(5) {
-  width: 120px; /* Subtotal kolom */
+  width: 20%; /* Subtotal kolom */
   text-align: right;
-}
-
-.cart-table thead th:last-child {
-  width: 60px; /* Aksi kolom */
-  text-align: center;
+  padding: 0.8rem 1rem;
 }
 
 /* Body Tabel */
 .cart-table tbody td {
-  padding: 1rem;
+  padding: 0.5rem 0.5rem; /* Sesuaikan padding untuk konsistensi */
   border: none;
   border-bottom: 1px solid var(--border-color);
   vertical-align: middle;
+  box-sizing: border-box; /* Tambahkan box-sizing untuk konsistensi */
 }
 
 .cart-table tbody tr:last-child td {
@@ -143,32 +156,32 @@
 }
 
 .cart-table tbody td:nth-child(1) {
-  width: 50px; /* Checkbox kolom */
+  width: 8%; /* Checkbox kolom */
   text-align: center;
+  padding: 0.5rem 0.25rem; /* Sesuaikan padding dengan header */
 }
 
 .cart-table tbody td:nth-child(2) {
-  width: auto; /* Produk kolom - biarkan fleksibel */
+  width: 42%; /* Produk kolom - biarkan fleksibel */
+  padding: 0.5rem 1rem; /* Sesuaikan padding dengan header */
 }
 
 .cart-table tbody td:nth-child(3) {
-  width: 120px; /* Harga satuan kolom */
+  width: 15%; /* Harga satuan kolom - menyesuaikan untuk keseimbangan */
   text-align: right;
+  padding: 0.5rem 1rem; /* Sesuaikan padding dengan header */
 }
 
 .cart-table tbody td:nth-child(4) {
-  width: 130px; /* Jumlah kolom */
+  width: 15%; /* Jumlah kolom - meningkatkan lebar untuk menampung tombol dan input */
   text-align: center;
+  padding: 0.5rem 0.25rem; /* Sesuaikan padding dengan header */
 }
 
 .cart-table tbody td:nth-child(5) {
-  width: 120px; /* Subtotal kolom */
+  width: 20%; /* Subtotal kolom */
   text-align: right;
-}
-
-.cart-table tbody td:nth-child(6) {
-  width: 60px; /* Aksi kolom */
-  text-align: center;
+  padding: 0.5rem 1rem; /* Sesuaikan padding dengan header */
 }
 
 /* Kolom Checkbox */
@@ -225,6 +238,93 @@
   border-color: var(--primary-color-dark);
 }
 
+/* Kolom Jumlah - hanya untuk header tabel */
+thead .qty-col {
+  text-align: center;
+  vertical-align: middle;
+  padding: 0.8rem 0.5rem !important; /* Gunakan padding yang sesuai untuk header */
+  width: 15%; /* Sesuaikan lebar dengan persentase */
+  overflow: visible; /* Pastikan tidak ada overflow yang disembunyikan */
+  box-sizing: border-box; /* Pastikan perhitungan lebar termasuk padding */
+  min-width: 0; /* Tambahkan min-width untuk mencegah kolom menyusut berlebihan */
+}
+
+/* Kolom Jumlah - hanya untuk body tabel */
+tbody .qty-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px; /* Kembali ke gap yang lebih standar */
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+  padding: 0.5rem 0.25rem !important; /* Sesuaikan padding dengan body tabel */
+  width: 15%; /* Sesuaikan lebar dengan persentase */
+  overflow: visible; /* Pastikan tidak ada overflow yang disembunyikan */
+  box-sizing: border-box; /* Pastikan perhitungan lebar termasuk padding */
+  min-width: 0; /* Tambahkan min-width untuk mencegah kolom menyusut berlebihan */
+}
+
+
+.qty-btn {
+  width: 24px; /* Mengurangi ukuran tombol */
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+  border: 1px solid var(--border-color);
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px; /* Mengurangi ukuran font */
+  font-weight: bold;
+  color: var(--text);
+  transition: all 0.2s ease;
+  user-select: none;
+  flex-shrink: 0;
+  padding: 0;
+  margin: 0 1px; /* Tambahkan sedikit margin untuk jarak antar elemen */
+  line-height: 1;
+  box-sizing: border-box;
+  position: static; /* Gunakan position static untuk menghindari masalah tampilan */
+  vertical-align: middle; /* Pastikan elemen sejajar secara vertikal */
+}
+
+.qty-btn:hover {
+  background-color: var(--primary-color);
+  color: var(--primary-color-dark);
+  border-color: var(--primary-color-dark);
+}
+
+.qty-input {
+  width: 30px;
+  height: 24px;
+  min-width: 30px;
+  min-height: 24px;
+  text-align: center;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 10px; /* Mengurangi ukuran font */
+  transition: border-color 0.2s ease;
+  flex-shrink: 0;
+  padding: 0 !important; /* Menghapus padding untuk mengurangi space */
+  margin: 0 1px; /* Tambahkan sedikit margin untuk jarak antar elemen */
+  box-sizing: border-box;
+  line-height: 1;
+  vertical-align: middle; /* Pastikan elemen sejajar secara vertikal */
+  background-color: white;
+  position: static; /* Gunakan position static untuk menghindari masalah tampilan */
+}
+
+.qty-input:focus {
+  outline: none;
+  border-color: var(--primary-color-dark);
+  box-shadow: 0 0 0 2px rgba(0, 110, 92, 0.2);
+}
+
 /* Kolom Produk */
 .product-col {
   display: flex;
@@ -239,8 +339,8 @@
 }
 
 .product-thumb {
-  width: 96px;
-  height: 96px;
+  width: 70px;
+  height: 70px;
   object-fit: cover;
   border-radius: 12px;
   border: 1px solid var(--border-color);
@@ -251,8 +351,8 @@
   overflow: hidden;
   transition: all 0.2s ease;
   flex-shrink: 0;
-  min-width: 96px; /* Pastikan ukuran tetap */
-  min-height: 96px;
+  min-width: 70px; /* Pastikan ukuran tetap */
+  min-height: 70px;
 }
 
 .product-thumb:hover {
@@ -280,14 +380,14 @@
 
 .product-name {
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--text);
   line-height: 1.4;
 }
 
 .product-sku {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: #6c757d;
 }
 
@@ -310,72 +410,8 @@
   color: var(--text-dark);
   white-space: nowrap; /* Prevent price text from wrapping */
   overflow: hidden; /* Hide overflow */
-  min-width: 100px; /* Set a minimum width to prevent compression */
-}
-
-/* Kolom Jumlah */
-.qty-col {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  white-space: nowrap;
-}
-
-.qty-btn {
-  width: 44px; /* Touch target optimization */
-  height: 44px;
-  min-width: 44px;
-  min-height: 44px;
-  border: 1px solid var(--border-color);
-  background: white;
-  border-radius: 4px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: bold;
-  color: var(--text);
-  transition: all 0.2s ease;
-  user-select: none;
-  flex-shrink: 0;
-  padding: 0;
-  margin: 0;
-  line-height: 1;
-  box-sizing: border-box;
-}
-
-.qty-btn:hover {
-  background-color: var(--primary-color);
-  color: var(--primary-color-dark);
-  border-color: var(--primary-color-dark);
-}
-
-.qty-input {
-  width: 44px; /* Touch target optimization */
-  height: 44px;
-  min-width: 44px;
-  min-height: 44px;
-  text-align: center;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  font-weight: 600;
-  font-size: 14px;
-  transition: border-color 0.2s ease;
-  flex-shrink: 0;
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
-  line-height: 1;
-  vertical-align: middle;
-  background-color: white;
-}
-
-.qty-input:focus {
-  outline: none;
-  border-color: var(--primary-color-dark);
-  box-shadow: 0 0 0 2px rgba(0, 110, 92, 0.2);
+  min-width: 80px; /* Mengurangi lebar minimum kolom */
+  font-size: 0.85rem; /* Mengurangi ukuran font */
 }
 
 /* Kolom Subtotal */
@@ -383,9 +419,26 @@
   text-align: right;
   font-weight: 700;
   color: var(--primary-color-dark);
-  font-size: 1.1rem;
+  font-size: 0.9rem; /* Sedikit mengurangi ukuran font untuk menghemat ruang */
   white-space: nowrap; /* Prevent subtotal text from wrapping */
-  min-width: 100px; /* Set a minimum width to prevent compression */
+  width: 140px; /* Meningkatkan lebar kolom agar cukup untuk menampilkan subtotal panjang */
+  padding: 0.5rem !important; /* Kembali ke padding normal */
+  overflow: hidden; /* Mencegah overflow */
+  text-overflow: ellipsis; /* Menambahkan ellipsis jika teks terlalu panjang */
+}
+
+
+/* Kolom Subtotal */
+.subtotal-col {
+  text-align: right;
+  font-weight: 700;
+  color: var(--primary-color-dark);
+  font-size: 0.9rem; /* Sedikit mengurangi ukuran font untuk menghemat ruang */
+  white-space: nowrap; /* Prevent subtotal text from wrapping */
+  width: 140px; /* Meningkatkan lebar kolom agar cukup untuk menampilkan subtotal panjang */
+  padding: 0.5rem !important; /* Kembali ke padding normal */
+  overflow: hidden; /* Mencegah overflow */
+  text-overflow: ellipsis; /* Menambahkan ellipsis jika teks terlalu panjang */
 }
 
 /* Kolom Aksi */
@@ -713,17 +766,25 @@
     flex: 0 0 auto; /* Don't grow, but can shrink if needed */
   }
 
+  .product-item-price,
+  .product-item-subtotal {
+    font-weight: 700;
+    color: var(--primary-color-dark);
+    font-size: 0.9rem;
+    text-align: right;
+  }
+
   .qty-controls {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 2px; /* Mengurangi gap untuk mengurangi space putih */
   }
 
   .qty-btn {
-    width: 32px;
-    height: 32px;
-    min-width: 32px;
-    min-height: 32px;
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    min-height: 30px;
     border: 1px solid var(--border-color);
     background: white;
     border-radius: 4px;
@@ -750,10 +811,10 @@
   }
 
   .qty-input {
-    width: 40px;
-    height: 32px;
-    min-width: 40px;
-    min-height: 32px;
+    width: 36px;
+    height: 30px;
+    min-width: 36px;
+    min-height: 30px;
     text-align: center;
     border: 1px solid var(--border-color);
     border-radius: 4px;
@@ -761,8 +822,8 @@
     font-size: 14px;
     transition: border-color 0.2s ease;
     flex-shrink: 0;
-    padding: 0;
-    margin: 0 2px;
+    padding: 0 !important; /* Menghapus padding untuk mengurangi space putih */
+    margin: 0 1px;
     box-sizing: border-box;
     line-height: 1;
     vertical-align: middle;
@@ -774,6 +835,25 @@
     border-color: var(--primary-color-dark);
     box-shadow: 0 0 0 2px rgba(0, 110, 92, 0.2);
   }
+
+
+  .product-item-price {
+    font-weight: 700;
+    color: var(--primary-color-dark);
+    font-size: 0.95rem;
+    white-space: nowrap; /* Prevent price from wrapping */
+    min-width: 0; /* Allow flex shrink */
+    flex: 0 0 auto; /* Don't grow, but can shrink if needed */
+  }
+
+  .product-item-price,
+  .product-item-subtotal {
+    font-weight: 700;
+    color: var(--primary-color-dark);
+    font-size: 0.9rem;
+    text-align: right;
+  }
+
 
   .delete-btn-mobile {
     position: absolute;

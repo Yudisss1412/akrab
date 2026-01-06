@@ -578,62 +578,58 @@ function createDirectionsModal(userCoords, sellerData) {
 }
 
 function showDirectionsOnMap(userCoords, sellerData) {
-  // Kita akan menggunakan Leaflet untuk menampilkan peta dan rute
-  // Karena kita tidak bisa menyisipkan Leaflet langsung tanpa library,
-  // kita buat implementasi sederhana dengan iframe OpenStreetMap
+  // Buka Google Maps directions di tab baru karena iframe bisa diblokir
+  const gmapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${userCoords.latitude},${userCoords.longitude}&destination=${sellerData.lat},${sellerData.lng}&travelmode=driving`;
 
+  // Tampilkan pesan dan tombol untuk membuka Google Maps
   const mapContainer = document.getElementById('directions-map');
-
-  // Buat URL OpenStreetMap directions
-  const osmUrl = `https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=${userCoords.latitude},${userCoords.longitude};${sellerData.lat},${sellerData.lng}#map=13/${sellerData.lat}/${sellerData.lng}`;
-
-  // Tambahkan loading indicator
   mapContainer.innerHTML = `
     <div style="
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100%;
       background-color: #f8f9fa;
+      padding: 20px;
+      text-align: center;
     ">
       <div style="
-        text-align: center;
+        font-size: 24px;
+        margin-bottom: 15px;
+      ">🗺️</div>
+      <h3 style="
+        color: #333;
+        margin: 0 0 10px 0;
+      ">Rute ke Toko</h3>
+      <p style="
         color: #666;
+        margin: 0 0 20px 0;
+        line-height: 1.5;
+      ">Klik tombol di bawah untuk membuka rute di Google Maps</p>
+      <button id="open-gmaps-btn" style="
+        background-color: #4285F4;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
       ">
-        <div class="spinner" style="
-          width: 40px;
-          height: 40px;
-          border: 4px solid #e0e0e0;
-          border-top: 4px solid #006E5C;
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-          margin: 0 auto 15px;
-        "></div>
-        <p>Memuat peta rute...</p>
-      </div>
+        <span>🚗</span>
+        Buka di Google Maps
+      </button>
     </div>
-    <style>
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-    </style>
   `;
 
-  // Tunggu sebentar lalu ganti dengan iframe
-  setTimeout(() => {
-    mapContainer.innerHTML = `
-      <iframe
-        src="${osmUrl}"
-        width="100%"
-        height="100%"
-        style="border: none;"
-        title="Peta Rute"
-        loading="lazy"
-        onload="this.style.opacity='1';"
-      ></iframe>
-    `;
-  }, 1000); // Tunggu 1 detik untuk loading
+  // Tambahkan event listener ke tombol
+  document.getElementById('open-gmaps-btn').addEventListener('click', function() {
+    window.open(gmapsUrl, '_blank');
+  });
 }
 
 // Tambahkan tombol Get Directions ke halaman toko saat DOM siap

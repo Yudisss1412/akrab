@@ -320,6 +320,58 @@ form{margin-top:18px}
   width:100%;height:100%;display:block;
 }
 
+/* Address search suggestions */
+.address-search-container {
+  margin-top: 0.5rem;
+  position: relative;
+}
+
+.search-suggestions {
+  position: absolute;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  max-height: 200px;
+  overflow-y: auto;
+  width: 100%;
+  z-index: 1000;
+  display: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-top: 0.25rem;
+}
+
+.search-suggestions.show {
+  display: block;
+}
+
+.search-suggestions .suggestion-item {
+  padding: 0.75rem;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+  transition: background-color 0.2s;
+}
+
+.search-suggestions .suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.search-suggestions .suggestion-item:hover {
+  background-color: #f0fdfa;
+}
+
+.search-suggestions .suggestion-item .suggestion-title {
+  font-weight: 600;
+  color: var(--text);
+  display: block;
+}
+
+.search-suggestions .suggestion-item .suggestion-address {
+  font-size: 0.875rem;
+  color: var(--muted);
+  display: block;
+  margin-top: 0.125rem;
+}
+
 /* Footer positioning fix for mobile */
 @media (max-width: 768px) {
   html, body {

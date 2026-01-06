@@ -69,11 +69,18 @@
               <textarea id="address" name="address" rows="3" required placeholder=" ">{{ old('address', auth()->user()->address ?? 'Alamat belum diisi') }}</textarea>
               <label for="address">Alamat</label>
               <p class="error-message" id="address-error"></p>
+              <div class="address-search-container">
+                <button type="button" id="searchAddressBtn" class="btn btn-secondary">Cari Alamat</button>
+                <div id="searchSuggestions" class="search-suggestions"></div>
+              </div>
             </div>
 
             <div class="map-container">
               <label>Lokasi pada Peta</label>
               <div id="map"></div>
+              <!-- Hidden fields to store coordinates -->
+              <input type="hidden" id="lat" name="lat" value="{{ old('lat', auth()->user()->lat) }}">
+              <input type="hidden" id="lng" name="lng" value="{{ old('lng', auth()->user()->lng) }}">
             </div>
 
             <div class="form-group field">
@@ -148,8 +155,97 @@
       // Tambahkan marker kosong sebagai default
       let marker = L.marker([-6.200000, 106.816666]).addTo(map);
 
-      // Ambil alamat dari form
+      // Ambil elemen dari form
       const addressInput = document.getElementById('address');
+      const latInput = document.getElementById('lat');
+      const lngInput = document.getElementById('lng');
+      const searchBtn = document.getElementById('searchAddressBtn');
+      const searchSuggestions = document.getElementById('searchSuggestions');
+
+      // Fungsi untuk mencari alamat menggunakan Nominatim
+      async function searchAddress(query) {
+        if (!query.trim()) {
+          searchSuggestions.classList.remove('show');
+          return;
+        }
+
+        try {
+          // Gunakan Nominatim API untuk mencari alamat
+          const encodedQuery = encodeURIComponent(query);
+          const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodedQuery}&limit=5&addressdetails=1`;
+
+          const response = await fetch(url, {
+            headers: {
+              'User-Agent': 'EcommerceAkrab/1.0 (contact@ecommerceakrab.com)'
+            }
+          });
+
+          const results = await response.json();
+
+          // Tampilkan hasil pencarian
+          displaySearchResults(results);
+        } catch (error) {
+          console.error('Error saat mencari alamat:', error);
+          searchSuggestions.classList.remove('show');
+        }
+      }
+
+      // Tampilkan hasil pencarian alamat
+      function displaySearchResults(results) {
+        searchSuggestions.innerHTML = '';
+
+        if (results.length === 0) {
+          const noResult = document.createElement('div');
+          noResult.className = 'suggestion-item';
+          noResult.textContent = 'Alamat tidak ditemukan';
+          searchSuggestions.appendChild(noResult);
+          searchSuggestions.classList.add('show');
+          return;
+        }
+
+        results.forEach(result => {
+          const suggestionItem = document.createElement('div');
+          suggestionItem.className = 'suggestion-item';
+          suggestionItem.innerHTML = `
+            <span class="suggestion-title">${result.display_name || result.name || 'Lokasi'}</span>
+            <span class="suggestion-address">${result.address?.road || result.address?.village || result.address?.city || result.address?.state || 'Alamat tidak lengkap'}</span>
+          `;
+
+          suggestionItem.addEventListener('click', () => {
+            // Isi alamat ke form
+            addressInput.value = result.display_name;
+
+            // Update peta ke lokasi yang dipilih
+            updateMapFromCoordinates(parseFloat(result.lat), parseFloat(result.lon), result.display_name);
+
+            // Sembunyikan hasil pencarian
+            searchSuggestions.classList.remove('show');
+          });
+
+          searchSuggestions.appendChild(suggestionItem);
+        });
+
+        searchSuggestions.classList.add('show');
+      }
+
+      // Fungsi untuk memperbarui peta berdasarkan koordinat
+      function updateMapFromCoordinates(lat, lng, displayName) {
+        // Hapus marker lama
+        map.removeLayer(marker);
+
+        // Set peta ke lokasi baru
+        map.setView([lat, lng], 15);
+
+        // Tambahkan marker baru
+        marker = L.marker([lat, lng]).addTo(map);
+
+        // Tambahkan popup dengan nama lokasi
+        marker.bindPopup(displayName).openPopup();
+
+        // Update hidden fields dengan koordinat baru
+        latInput.value = lat;
+        lngInput.value = lng;
+      }
 
       // Fungsi untuk memperbarui peta berdasarkan alamat
       async function updateMapFromAddress() {
@@ -181,6 +277,10 @@
 
             // Tambahkan popup dengan nama lokasi
             marker.bindPopup(result.data.display_name).openPopup();
+
+            // Update hidden fields dengan koordinat baru
+            latInput.value = result.data.lat;
+            lngInput.value = result.data.lng;
           } else {
             console.error('Geocoding gagal:', result.message);
           }
@@ -189,17 +289,48 @@
         }
       }
 
-      // Panggil fungsi update peta saat alamat berubah (dengan debounce)
+      // Event listener untuk pencarian alamat
       let debounceTimer;
       addressInput.addEventListener('input', function() {
         clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(updateMapFromAddress, 1000); // Tunggu 1 detik setelah user berhenti mengetik
+        debounceTimer = setTimeout(() => {
+          searchAddress(addressInput.value);
+        }, 500); // Tunggu 0.5 detik setelah user berhenti mengetik
+      });
+
+      // Sembunyikan hasil pencarian saat klik di luar
+      document.addEventListener('click', function(event) {
+        if (!searchSuggestions.contains(event.target) && event.target !== addressInput) {
+          searchSuggestions.classList.remove('show');
+        }
+      });
+
+      // Panggil fungsi update peta saat alamat berubah (dengan debounce)
+      addressInput.addEventListener('blur', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(updateMapFromAddress, 1000); // Tunggu 1 detik setelah user selesai mengedit
       });
 
       // Jika ada alamat saat halaman dimuat, coba geocode
       if (addressInput.value.trim()) {
         setTimeout(updateMapFromAddress, 500); // Beri sedikit waktu untuk memuat data
       }
+
+      // Tambahkan fitur drag and drop marker untuk akurasi lebih lanjut
+      marker.on('dragend', function(event) {
+        const newLatLng = event.target.getLatLng();
+        map.setView(newLatLng, 15);
+
+        // Update hidden fields dengan koordinat baru dari drag
+        latInput.value = newLatLng.lat;
+        lngInput.value = newLatLng.lng;
+
+        // Update popup dengan informasi bahwa lokasi telah disesuaikan
+        marker.bindPopup(`Lokasi disesuaikan: ${newLatLng.lat.toFixed(6)}, ${newLatLng.lng.toFixed(6)}`).openPopup();
+      });
+
+      // Buat marker bisa digeser
+      marker.dragging.enable();
     });
   </script>
 

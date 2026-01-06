@@ -83,7 +83,9 @@
     }
     if (val.length < 10) return setState(addr, false, 'Alamat terlalu pendek (≥ 10 karakter).');
     if (val.length > 120) return setState(addr, false, 'Alamat terlalu panjang (≤ 120 karakter).');
-    if (val.split(/\s+/).length < 3) return setState(addr, false, 'Cantumkan detail yang cukup (jalan, nomor, kota).');
+    // Split by both spaces and commas to handle different address formats
+    const addressComponents = val.split(/[\s,]+/).filter(component => component.trim() !== '');
+    if (addressComponents.length < 3) return setState(addr, false, 'Cantumkan detail yang cukup (jalan, nomor, kota).');
     return setState(addr, true);
   }
   function validatePhone(isForSubmission = false){

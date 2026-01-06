@@ -189,7 +189,9 @@
       setState(addr, false, 'Alamat terlalu panjang (≤ 120 karakter).');
       return false;
     }
-    if (val.split(/\s+/).length < 3) {
+    // Split by both spaces and commas to handle different address formats
+    const addressComponents = val.split(/[\s,]+/).filter(component => component.trim() !== '');
+    if (addressComponents.length < 3) {
       setState(addr, false, 'Cantumkan detail yang cukup (jalan, nomor, kota).');
       return false;
     }

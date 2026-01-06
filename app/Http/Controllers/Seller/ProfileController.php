@@ -123,14 +123,24 @@ class ProfileController extends Controller
             'bank_account_name' => $request->input('accountHolder'),
         ];
 
-        // Jika alamat berubah, coba geocode dan simpan koordinat
-        if ($request->input('address') !== $user->address) {
-            $address = $request->input('address');
-            $coordinates = $this->getCoordinatesFromAddress($address);
+        // Handle coordinates - prioritize coordinates sent from form if available
+        $lat = $request->input('lat');
+        $lng = $request->input('lng');
 
-            if ($coordinates) {
-                $updateData['lat'] = $coordinates['lat'];
-                $updateData['lng'] = $coordinates['lng'];
+        if ($lat && $lng) {
+            // Use coordinates sent from the form (from the map)
+            $updateData['lat'] = $lat;
+            $updateData['lng'] = $lng;
+        } else {
+            // If no coordinates sent from form, try geocoding the address
+            if ($request->input('address') !== $user->address) {
+                $address = $request->input('address');
+                $coordinates = $this->getCoordinatesFromAddress($address);
+
+                if ($coordinates) {
+                    $updateData['lat'] = $coordinates['lat'];
+                    $updateData['lng'] = $coordinates['lng'];
+                }
             }
         }
 

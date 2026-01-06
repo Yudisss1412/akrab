@@ -2,9 +2,11 @@
 
 @section('title', 'Buat Tiket Bantuan Baru')
 
-@section('content')
+@push('styles')
 <link rel="stylesheet" href="{{ asset('css/customer/tickets/create.css') }}">
+@endpush
 
+@section('content')
 <div class="ticket-form-container">
     <div class="ticket-form-card">
         <div class="ticket-form-header">

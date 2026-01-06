@@ -125,16 +125,139 @@
 }
 
 .priority-high {
-    color: #dc2626;
+    background: rgba(239, 68, 68, 0.1);
+    color: #b91c1c;
     font-weight: 600;
 }
 
 .priority-medium {
+    background: rgba(245, 158, 11, 0.1);
     color: #d97706;
 }
 
 .priority-low {
-    color: #16a34a;
+    background: rgba(16, 185, 129, 0.1);
+    color: #065f46;
+}
+
+.priority-urgent {
+    background: rgba(220, 38, 38, 0.1);
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.category-technical {
+    background: rgba(59, 130, 246, 0.1);
+    color: #2563eb;
+}
+
+.category-billing {
+    background: rgba(16, 185, 129, 0.1);
+    color: #065f46;
+}
+
+.category-account {
+    background: rgba(236, 72, 153, 0.1);
+    color: #be123c;
+}
+
+.category-product {
+    background: rgba(139, 92, 246, 0.1);
+    color: #7c3aed;
+}
+
+.category-other {
+    background: rgba(107, 114, 128, 0.1);
+    color: #6b7280;
+}
+
+.badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 50rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.ticket-details-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--border-color, #e9ecef);
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.ticket-details-title {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary-color-dark, #006E5C);
+}
+
+.ticket-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.detail-item {
+    margin-bottom: 1rem;
+}
+
+.detail-label {
+    display: block;
+    font-weight: 600;
+    color: var(--muted-color, #6c757d);
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.detail-value {
+    display: block;
+    word-break: break-word;
+}
+
+.actions-container {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn {
+    border-radius: 10px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary {
+    background: var(--primary-color-dark, #006E5C);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #005a4a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 110, 92, 0.25);
+}
+
+.btn-secondary {
+    background: var(--secondary-color, #fff);
+    color: var(--text-color, #333);
+    border: 1px solid var(--border-color, #e9ecef);
+}
+
+.btn-secondary:hover {
+    background: #f8f9fa;
+    border-color: #dee2e6;
 }
 
 .ticket-replies {

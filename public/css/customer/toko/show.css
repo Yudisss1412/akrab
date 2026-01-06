@@ -116,7 +116,15 @@
 
 .toko-actions {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
+
+.toko-actions .btn {
+  margin: 0; /* Reset margin jika ada */
+}
+
 
 /* Filter Produk */
 .toko-filter-bar {

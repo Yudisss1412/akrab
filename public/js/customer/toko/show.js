@@ -607,20 +607,11 @@ function showDirectionsOnMap(userCoords, sellerData) {
         margin: 0 0 20px 0;
         line-height: 1.5;
       ">Klik tombol di bawah untuk membuka rute di Google Maps</p>
-      <button id="open-gmaps-btn" style="
-        background-color: #4285F4;
-        color: white;
-        border: none;
-        padding: 12px 24px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 16px;
-        font-weight: 500;
-        display: flex;
+      <button id="open-gmaps-btn" class="btn btn-primary" style="
+        display: inline-flex;
         align-items: center;
         gap: 8px;
       ">
-        <span>🚗</span>
         Buka di Google Maps
       </button>
     </div>
@@ -637,28 +628,19 @@ document.addEventListener('DOMContentLoaded', function() {
   // Cek apakah ini halaman toko
   const tokoIdentity = document.querySelector('.toko-identity');
   if (tokoIdentity) {
-    // Tambahkan tombol Get Directions
-    const tokoHeader = document.querySelector('.toko-header') || document.querySelector('.toko-identity');
-    if (tokoHeader) {
+    // Tambahkan tombol Get Directions ke dalam container yang sama dengan tombol 'Ikuti Toko'
+    const tokoActions = document.querySelector('.toko-actions');
+    if (tokoActions) {
       const directionsButton = document.createElement('button');
-      directionsButton.innerHTML = '🚗 Lihat Rute';
-      directionsButton.className = 'btn-get-directions';
-      directionsButton.style.cssText = `
-        background-color: #006E5C;
-        color: white;
-        border: none;
-        padding: 10px 15px;
-        border-radius: 8px;
-        cursor: pointer;
-        margin-left: 10px;
-        font-size: 14px;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-      `;
+      directionsButton.innerHTML = 'Lihat Rute';
+      directionsButton.className = 'btn btn-primary btn-get-directions';
+      directionsButton.style.marginLeft = '10px';
+      // Tambahkan display flex untuk memastikan gap bekerja jika diperlukan
+      directionsButton.style.display = 'inline-flex';
+      directionsButton.style.alignItems = 'center';
 
       directionsButton.addEventListener('click', showDirectionsModal);
-      tokoHeader.appendChild(directionsButton);
+      tokoActions.appendChild(directionsButton);
     }
   }
 });

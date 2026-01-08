@@ -74,9 +74,11 @@
                     Rp {{ number_format($totalPrice, 0, ',', '.') }}
                   </td>
                   <td class="qty-col" data-label="Jumlah">
-                    <button class="qty-btn minus" data-item-id="{{ $item['id'] ?? $item->id }}">-</button>
-                    <input type="number" class="qty-input" value="{{ $item['quantity'] ?? $item->quantity }}" min="0" max="99" data-item-id="{{ $item['id'] ?? $item->id }}">
-                    <button class="qty-btn plus" data-item-id="{{ $item['id'] ?? $item->id }}">+</button>
+                    <div class="qty-controls">
+                      <button class="qty-btn minus" data-item-id="{{ $item['id'] ?? $item->id }}">-</button>
+                      <input type="number" class="qty-input" value="{{ $item['quantity'] ?? $item->quantity }}" min="0" max="99" data-item-id="{{ $item['id'] ?? $item->id }}">
+                      <button class="qty-btn plus" data-item-id="{{ $item['id'] ?? $item->id }}">+</button>
+                    </div>
                   </td>
                   <td class="subtotal-col" data-label="Subtotal">Rp {{ number_format($totalPrice * ($item['quantity'] ?? $item->quantity), 0, ',', '.') }}</td>
                 </tr>

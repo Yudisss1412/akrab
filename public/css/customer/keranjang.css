@@ -162,7 +162,7 @@
 }
 
 .cart-table tbody td:nth-child(2) {
-  width: 42%; /* Produk kolom - biarkan fleksibel */
+  width: 5%; /* Produk kolom - biarkan fleksibel */
   padding: 0.5rem 1rem; /* Sesuaikan padding dengan header */
 }
 
@@ -179,9 +179,9 @@
 }
 
 .cart-table tbody td:nth-child(5) {
-  width: 20%; /* Subtotal kolom */
+  width: 2%; /* Subtotal kolom */
   text-align: right;
-  padding: 0.5rem 1rem; /* Sesuaikan padding dengan header */
+  padding: 0.5rem 0.5rem; /* Sesuaikan padding dengan header */
 }
 
 /* Kolom Checkbox */
@@ -244,7 +244,7 @@ thead .qty-col {
   vertical-align: middle;
   padding: 0.8rem 0.5rem !important; /* Gunakan padding yang sesuai untuk header */
   width: 15%; /* Sesuaikan lebar dengan persentase */
-  overflow: visible; /* Pastikan tidak ada overflow yang disembunyikan */
+  overflow: hidden; /* Pastikan tidak ada overflow yang disembunyikan */
   box-sizing: border-box; /* Pastikan perhitungan lebar termasuk padding */
   min-width: 0; /* Tambahkan min-width untuk mencegah kolom menyusut berlebihan */
 }
@@ -254,23 +254,30 @@ tbody .qty-col {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2px; /* Kembali ke gap yang lebih standar */
+  gap: 1px; /* Kembali ke gap yang lebih standar */
   text-align: center;
   vertical-align: middle;
   white-space: nowrap;
   padding: 0.5rem 0.25rem !important; /* Sesuaikan padding dengan body tabel */
   width: 15%; /* Sesuaikan lebar dengan persentase */
-  overflow: visible; /* Pastikan tidak ada overflow yang disembunyikan */
+  overflow: hidden; /* Pastikan tidak ada overflow yang disembunyikan */
   box-sizing: border-box; /* Pastikan perhitungan lebar termasuk padding */
   min-width: 0; /* Tambahkan min-width untuk mencegah kolom menyusut berlebihan */
 }
 
 
+.qty-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+}
+
 .qty-btn {
-  width: 24px; /* Mengurangi ukuran tombol */
-  height: 24px;
-  min-width: 24px;
-  min-height: 24px;
+  width: 20px; /* Mengurangi ukuran tombol */
+  height: 20px;
+  min-width: 20px;
+  min-height: 20px;
   border: 1px solid var(--border-color);
   background: white;
   border-radius: 4px;
@@ -299,10 +306,10 @@ tbody .qty-col {
 }
 
 .qty-input {
-  width: 30px;
-  height: 24px;
-  min-width: 30px;
-  min-height: 24px;
+  width: 24px;
+  height: 20px;
+  min-width: 24px;
+  min-height: 20px;
   text-align: center;
   border: 1px solid var(--border-color);
   border-radius: 4px;
@@ -777,14 +784,14 @@ tbody .qty-col {
   .qty-controls {
     display: flex;
     align-items: center;
-    gap: 2px; /* Mengurangi gap untuk mengurangi space putih */
+    gap: 1px; /* Mengurangi gap untuk mengurangi space putih */
   }
 
   .qty-btn {
-    width: 30px;
-    height: 30px;
-    min-width: 30px;
-    min-height: 30px;
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    min-height: 20px;
     border: 1px solid var(--border-color);
     background: white;
     border-radius: 4px;
@@ -792,7 +799,7 @@ tbody .qty-col {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    font-size: 10px;
     font-weight: bold;
     color: var(--text);
     transition: all 0.2s ease;
@@ -811,15 +818,15 @@ tbody .qty-col {
   }
 
   .qty-input {
-    width: 36px;
-    height: 30px;
-    min-width: 36px;
-    min-height: 30px;
+    width: 24px;
+    height: 20px;
+    min-width: 24px;
+    min-height: 20px;
     text-align: center;
     border: 1px solid var(--border-color);
     border-radius: 4px;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 10px;
     transition: border-color 0.2s ease;
     flex-shrink: 0;
     padding: 0 !important; /* Menghapus padding untuk mengurangi space putih */

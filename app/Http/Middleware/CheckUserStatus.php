@@ -7,17 +7,27 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Middleware untuk memeriksa status pengguna
+ *
+ * Middleware ini memastikan bahwa hanya pengguna dengan status aktif
+ * yang dapat mengakses rute yang dilindungi oleh middleware ini.
+ * Jika pengguna memiliki status 'suspended', mereka akan dikeluarkan
+ * dari sistem dan diarahkan ke halaman login.
+ */
 class CheckUserStatus
 {
     /**
-     * Handle an incoming request.
+     * Menangani permintaan masuk
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param Request $request Objek permintaan HTTP
+     * @param Closure $next Fungsi closure untuk melanjutkan permintaan
+     * @return Response Respons HTTP
      */
     public function handle(Request $request, Closure $next): Response
     {
         if (Auth::check() && Auth::user()->status === 'suspended') {
-            // Logout user and redirect to login
+            // Logout pengguna dan arahkan ke login
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();

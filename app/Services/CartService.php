@@ -9,14 +9,21 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Cookie;
 
+/**
+ * Layanan Keranjang
+ *
+ * Layanan ini menangani semua operasi terkait keranjang belanja dalam
+ * sistem e-commerce AKRAB, termasuk menambahkan, menghapus, dan memperbarui
+ * item dalam keranjang, baik untuk pengguna yang login maupun yang tidak.
+ */
 class CartService
 {
-    protected $sessionKey = 'cart';
+    protected $sessionKey = 'cart';  // Kunci session untuk menyimpan data keranjang
 
     /**
      * Mendapatkan item-item di keranjang
-     * 
-     * @return \Illuminate\Support\Collection
+     *
+     * @return \Illuminate\Support\Collection Koleksi item-item di keranjang
      */
     public function getCartItems()
     {
@@ -25,7 +32,7 @@ class CartService
             $cartItems = Carts::with(['product', 'productVariant'])
                 ->where('user_id', Auth::id())
                 ->get();
-            
+
             // Format data agar konsisten dengan format session (array)
             return $cartItems->map(function ($item) {
                 $product = $item->product; // Relasi product sudah dimuat dengan with()

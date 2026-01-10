@@ -6,13 +6,13 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Default Database Connection Name
+    | Nama Koneksi Database Default
     |--------------------------------------------------------------------------
     |
-    | Here you may specify which of the database connections below you wish
-    | to use as your default connection for database operations. This is
-    | the connection which will be utilized unless another connection
-    | is explicitly specified when you execute a query / statement.
+    | Di sini Anda dapat menentukan koneksi database mana dari yang ada di bawah
+    | yang ingin Anda gunakan sebagai koneksi default untuk operasi database.
+    | Ini adalah koneksi yang akan digunakan kecuali koneksi lain secara
+    | eksplisit ditentukan ketika Anda mengeksekusi query / pernyataan.
     |
     */
 
@@ -20,34 +20,34 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Database Connections
+    | Koneksi Database
     |--------------------------------------------------------------------------
     |
-    | Below are all of the database connections defined for your application.
-    | An example configuration is provided for each database system which
-    | is supported by Laravel. You're free to add / remove connections.
+    | Di bawah ini adalah semua koneksi database yang didefinisikan untuk aplikasi Anda.
+    | Contoh konfigurasi disediakan untuk setiap sistem database yang
+    | didukung oleh Laravel. Anda bebas menambahkan / menghapus koneksi.
     |
     */
 
     'connections' => [
 
         'sqlite' => [
-            'driver' => 'sqlite',
-            'url' => env('DB_URL'),
-            'database' => env('DB_DATABASE', database_path('database.sqlite')),
-            'prefix' => '',
-            'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
-            'busy_timeout' => null,
-            'journal_mode' => null,
-            'synchronous' => null,
+            'driver' => 'sqlite',  // Driver database SQLite
+            'url' => env('DB_URL'),  // URL koneksi database (jika disediakan)
+            'database' => env('DB_DATABASE', database_path('database.sqlite')),  // Nama file database
+            'prefix' => '',  // Prefiks tabel (jika ada)
+            'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),  // Aktifkan constraint foreign key
+            'busy_timeout' => null,  // Timeout saat database sibuk
+            'journal_mode' => null,  // Mode journal untuk transaksi
+            'synchronous' => null,  // Mode sinkronisasi untuk keamanan data
         ],
 
         'mysql' => [
-            'driver' => 'mysql',
-            'url' => env('DB_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE', 'laravel'),
+            'driver' => 'mysql',  // Driver database MySQL
+            'url' => env('DB_URL'),  // URL koneksi database (jika disediakan)
+            'host' => env('DB_HOST', '127.0.0.1'),  // Host database
+            'port' => env('DB_PORT', '3306'),  // Port database
+            'database' => env('DB_DATABASE', 'laravel'),  // Nama database
             'username' => env('DB_USERNAME', 'root'),
             'password' => env('DB_PASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),

@@ -6,10 +6,16 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Facade;
 
+/**
+ * Service Provider Aplikasi
+ *
+ * Service provider ini digunakan untuk mendaftarkan dan menginisialisasi
+ * layanan-layanan utama dalam aplikasi e-commerce AKRAB.
+ */
 class AppServiceProvider extends ServiceProvider
 {
     /**
-     * Register any application services.
+     * Mendaftarkan layanan-layanan aplikasi
      */
     public function register(): void
     {
@@ -17,19 +23,20 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * Bootstrap any application services.
+     * Menginisialisasi layanan-layanan aplikasi
      */
     public function boot(): void
     {
+        // Menambahkan ekstensi blade.view untuk file tampilan
         View::addExtension('blade.view', 'blade');
     }
-    
+
     /**
-     * Register any application services after loading.
+     * Mendaftarkan facade-facade aplikasi setelah loading
      */
     public function registerFacades(): void
     {
-        // Register Intervention Image Facade if needed
+        // Mendaftarkan Facade Intervention Image jika diperlukan
         Facade::clearResolvedInstances();
     }
 }

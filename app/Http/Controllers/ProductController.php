@@ -8,10 +8,21 @@ use App\Models\Subcategory;
 use App\Models\Seller;
 use Illuminate\Http\Request;
 
+/**
+ * Controller Produk
+ *
+ * Controller ini menangani semua operasi terkait produk dalam sistem e-commerce AKRAB,
+ * termasuk menampilkan daftar produk, detail produk, pencarian produk, dan filter
+ * berdasarkan kategori. Controller ini juga menyediakan endpoint API untuk mengambil
+ * data produk dalam format JSON.
+ */
 class ProductController extends Controller
 {
     /**
-     * Tampilkan halaman daftar produk
+     * Menampilkan halaman daftar produk
+     *
+     * @param Request $request Objek request HTTP
+     * @return \Illuminate\View\View Tampilan halaman produk
      */
     public function index(Request $request)
     {
@@ -103,7 +114,10 @@ class ProductController extends Controller
     }
 
     /**
-     * Format single product data consistently for both views and APIs
+     * Format data produk tunggal secara konsisten untuk tampilan dan API
+     *
+     * @param Product $product Objek produk
+     * @return array Data produk yang telah diformat
      */
     private function formatSingleProduct($product)
     {
@@ -282,16 +296,19 @@ class ProductController extends Controller
     }
 
     /**
-     * Cari produk berdasarkan nama
+     * Mencari produk berdasarkan nama
+     *
+     * @param Request $request Objek request HTTP
+     * @return \Illuminate\View\View Tampilan hasil pencarian produk
      */
     public function search(Request $request)
     {
         $query = $request->input('q');
-        
+
         $products = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images'])
                         ->where('name', 'LIKE', "%{$query}%")
                         ->get();
-        
+
         // Tambahkan average rating dan review count ke setiap produk
         $products = $products->map(function($product) {
             $product->setAttribute('average_rating', $product->averageRating);
@@ -301,12 +318,15 @@ class ProductController extends Controller
             $product->setAttribute('rating', $product->averageRating);
             return $product;
         });
-        
+
         return view('customer.produk.halaman_produk', compact('products'));
     }
 
     /**
-     * Tampilkan produk berdasarkan kategori
+     * Menampilkan produk berdasarkan kategori
+     *
+     * @param string $category Nama kategori
+     * @return \Illuminate\View\View Tampilan produk berdasarkan kategori
      */
     public function byCategory($category)
     {
@@ -317,7 +337,7 @@ class ProductController extends Controller
                         });
 
         $products = $query->get();
-        
+
         // Tambahkan average rating dan review count ke setiap produk
         $products = $products->map(function($product) {
             $product->setAttribute('average_rating', $product->averageRating);
@@ -326,12 +346,16 @@ class ProductController extends Controller
             $product->setAttribute('subcategory_name', $product->subcategory ? $product->subcategory->name : ($product->subcategory ?? 'Umum'));
             return $product;
         });
-        
+
         return view('customer.produk.halaman_produk', compact('products'));
     }
-    
+
     /**
-     * Tampilkan halaman kategori berdasarkan nama kategori
+     * Menampilkan halaman kategori berdasarkan nama kategori
+     *
+     * @param string $categoryName Nama kategori
+     * @param Request|null $request Objek request HTTP
+     * @return \Illuminate\View\View Tampilan halaman kategori
      */
     public function showCategoryPage($categoryName, Request $request = null)
     {
@@ -1034,44 +1058,49 @@ class ProductController extends Controller
     }
     
     /**
-     * Format product images for display
+     * Format gambar produk untuk ditampilkan
+     *
+     * @param Product $product Objek produk
+     * @return array Array path gambar produk
      */
     private function formatProductImages($product)
     {
         $images = [];
-        
+
         // Tambahkan gambar utama jika ada
         if ($product->main_image) {
             $images[] = asset('storage/' . $product->main_image);
         }
-        
+
         // Tambahkan gambar tambahan dari tabel product_images
         foreach ($product->images as $productImage) {
             $images[] = asset('storage/' . $productImage->image_path);
         }
-        
+
         // Jika tidak ada gambar sama sekali, gunakan placeholder
         if (empty($images)) {
             $images[] = asset('src/placeholder.png');
         }
-        
+
         return $images;
     }
 
     /**
-     * Update old products that don't have seller_id assigned
-     * This is for migration purposes to connect orphaned products to valid sellers
+     * Memperbarui produk lama yang tidak memiliki seller_id yang ditetapkan
+     * Ini untuk tujuan migrasi untuk menghubungkan produk-produk yang tidak memiliki penjual ke penjual yang valid
+     *
+     * @return \Illuminate\Http\JsonResponse Respons JSON yang menunjukkan hasil operasi
      */
     public function updateProductSellerRelationships()
     {
-        // Get all products that don't have a seller_id assigned
+        // Dapatkan semua produk yang tidak memiliki seller_id yang ditetapkan
         $productsWithoutSeller = Product::whereNull('seller_id')->get();
 
         $updatedCount = 0;
 
         foreach ($productsWithoutSeller as $product) {
-            // Find a default seller to assign to this product
-            // For example, we can use the first seller in the system
+            // Temukan penjual default untuk ditetapkan ke produk ini
+            // Sebagai contoh, kita bisa menggunakan penjual pertama dalam sistem
             $defaultSeller = \App\Models\Seller::first();
 
             if ($defaultSeller) {

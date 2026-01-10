@@ -1,33 +1,38 @@
+{{-- Extends layout utama --}}
 @extends('layouts.app')
 
+{{-- Set judul halaman --}}
 @section('title', 'Keranjang Belanja — AKRAB')
 
+{{-- Sertakan header halaman --}}
 @section('header')
   @include('components.customer.header.header')
 @endsection
 
+{{-- Tambahkan stylesheet khusus untuk halaman keranjang --}}
 @push('styles')
   <link rel="stylesheet" href="{{ asset('css/customer/keranjang.css') }}" />
 @endpush
 
+{{-- Konten utama halaman --}}
 @section('content')
   <main class="cart-page shell">
     <div class="container">
-      <!-- Header Halaman -->
+      {{-- Header Halaman --}}
       <div class="page-header">
         <h1 class="page-title">Keranjang Belanja</h1>
         <a href="{{ url()->previous() ?: route('cust.welcome') }}" class="continue-shopping-link">
           ← Lanjut Belanja
         </a>
       </div>
-      
-      <!-- Layout Dua Kolom -->
+
+      {{-- Layout Dua Kolom --}}
       <div class="cart-layout">
-        <!-- Kolom Kiri: Daftar Produk -->
+        {{-- Kolom Kiri: Daftar Produk --}}
         <div class="cart-products">
-          <!-- Kartu Produk -->
+          {{-- Kartu Produk --}}
           <div class="products-card">
-            <!-- Tabel Produk - Desktop Version -->
+            {{-- Tabel Produk - Desktop Version --}}
             <table class="cart-table">
               <thead>
                 <tr>

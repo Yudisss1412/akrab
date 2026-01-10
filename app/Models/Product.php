@@ -6,49 +6,71 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
+/**
+ * Model Product
+ *
+ * Model ini merepresentasikan entitas produk dalam sistem e-commerce AKRAB.
+ * Setiap produk memiliki informasi seperti nama, deskripsi, harga, stok, berat,
+ * kategori, penjual, dan informasi tambahan seperti spesifikasi, warna, ukuran,
+ * bahan, dan fitur. Model ini juga menangani pembuatan SKU unik otomatis
+ * dan menyediakan berbagai relasi ke model lain seperti kategori, penjual,
+ * ulasan, dan gambar produk.
+ */
 class Product extends Model
 {
     use HasFactory;
 
+    /**
+     * Atribut yang dapat diisi secara massal
+     *
+     * @var array
+     */
     protected $fillable = [
-        'name',
-        'description',
-        'price',
-        'stock',
-        'weight',
-        'category_id',
-        'subcategory',
-        'seller_id',
-        'status',
-        'specifications',
-        'material',
-        'size',
-        'color',
-        'brand',
-        'features',
-        'min_order',
-        'origin',
-        'warranty',
-        'view_count',
-        'discount_price',
-        'discount_start_date',
-        'discount_end_date',
-        'sku',
+        'name',                      // Nama produk
+        'description',               // Deskripsi produk
+        'price',                     // Harga produk
+        'stock',                     // Stok produk
+        'weight',                    // Berat produk dalam gram
+        'category_id',               // ID kategori produk
+        'subcategory',               // Subkategori produk (string)
+        'seller_id',                 // ID penjual yang menjual produk
+        'status',                    // Status produk (aktif, tidak aktif, draft)
+        'specifications',            // Spesifikasi produk (array)
+        'material',                  // Bahan produk
+        'size',                      // Ukuran produk
+        'color',                     // Warna produk
+        'brand',                     // Merek produk
+        'features',                  // Fitur-fitur produk (array)
+        'min_order',                 // Jumlah minimum pemesanan
+        'origin',                    // Asal produk
+        'warranty',                  // Garansi produk
+        'view_count',                // Jumlah dilihat
+        'discount_price',            // Harga diskon
+        'discount_start_date',       // Tanggal mulai diskon
+        'discount_end_date',         // Tanggal akhir diskon
+        'sku',                       // Kode SKU produk
     ];
 
     /**
-     * Boot the model and set up event listeners
+     * Boot model dan atur listener event
+     *
+     * Metode ini dijalankan saat model di-boot, digunakan untuk mengatur
+     * listener event seperti creating dan updating untuk menghasilkan
+     * SKU unik secara otomatis.
      */
     protected static function boot()
     {
         parent::boot();
 
+        // Listener saat membuat produk baru
         static::creating(function ($product) {
+            // Jika SKU belum diisi, hasilkan SKU unik
             if (empty($product->sku)) {
                 $product->sku = $product->generateUniqueSku();
             }
         });
 
+        // Listener saat memperbarui produk
         static::updating(function ($product) {
             // Jika SKU diubah atau ingin digenerate ulang, pastikan tetap unik
             if (!empty($product->sku)) {
@@ -66,7 +88,9 @@ class Product extends Model
     }
 
     /**
-     * Generate unique SKU for the product
+     * Menghasilkan SKU unik untuk produk
+     *
+     * @return string SKU unik yang dihasilkan
      */
     private function generateUniqueSku()
     {
@@ -85,7 +109,9 @@ class Product extends Model
     }
 
     /**
-     * Generate base SKU format
+     * Menghasilkan format dasar SKU
+     *
+     * @return string Format dasar SKU
      */
     private function generateBaseSku()
     {
@@ -102,34 +128,53 @@ class Product extends Model
         return $namePart . $sellerId . $timestamp;
     }
 
+    /**
+     * Konfigurasi casting atribut
+     *
+     * @var array
+     */
     protected $casts = [
-        'specifications' => 'array',
-        'features' => 'array',
-        'additional_images' => 'array',
-        'discount_start_date' => 'date',
-        'discount_end_date' => 'date',
+        'specifications' => 'array',      // Casting spesifikasi ke array
+        'features' => 'array',            // Casting fitur ke array
+        'additional_images' => 'array',   // Casting gambar tambahan ke array
+        'discount_start_date' => 'date',  // Casting tanggal mulai diskon ke date
+        'discount_end_date' => 'date',    // Casting tanggal akhir diskon ke date
     ];
 
-    // Relasi ke kategori
+    /**
+     * Relasi ke kategori produk
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
 
-    // Relasi ke subkategori
+    /**
+     * Relasi ke subkategori produk
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function subcategory()
     {
         return $this->belongsTo(Subcategory::class, 'subcategory_id');
     }
 
-    // Relasi ke penjual
+    /**
+     * Relasi ke penjual produk
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function seller()
     {
         return $this->belongsTo(Seller::class, 'seller_id');
     }
 
     /**
-     * Get the seller name safely
+     * Mendapatkan nama penjual secara aman
+     *
+     * @return string Nama toko penjual atau 'Unknown Seller' jika tidak ditemukan
      */
     public function getSellerNameAttribute()
     {
@@ -137,7 +182,9 @@ class Product extends Model
     }
 
     /**
-     * Get the seller's bank account info
+     * Mendapatkan informasi nomor rekening bank penjual
+     *
+     * @return string|null Nomor rekening bank penjual atau null jika tidak ditemukan
      */
     public function getSellerBankAccountAttribute()
     {
@@ -145,7 +192,9 @@ class Product extends Model
     }
 
     /**
-     * Get the seller's bank name
+     * Mendapatkan nama bank penjual
+     *
+     * @return string|null Nama bank penjual atau null jika tidak ditemukan
      */
     public function getSellerBankNameAttribute()
     {
@@ -153,74 +202,120 @@ class Product extends Model
     }
 
     /**
-     * Get the seller's account holder name
+     * Mendapatkan nama pemilik rekening bank penjual
+     *
+     * @return string|null Nama pemilik rekening bank penjual atau null jika tidak ditemukan
      */
     public function getSellerAccountHolderNameAttribute()
     {
         return $this->seller ? $this->seller->account_holder_name : null;
     }
 
-    // Relasi ke varian produk
+    /**
+     * Relasi ke varian produk
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function variants()
     {
         return $this->hasMany(ProductVariant::class);
     }
 
-    // Relasi ke item keranjang
+    /**
+     * Relasi ke item keranjang
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function cartItems()
     {
         return $this->hasMany(Carts::class);
     }
 
-    // Relasi ke item pesanan
+    /**
+     * Relasi ke item pesanan
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
     }
 
-    // Relasi ke ulasan
+    /**
+     * Relasi ke ulasan produk
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function reviews()
     {
         return $this->hasMany(Review::class);
     }
 
-    // Relasi ke ulasan yang disetujui
+    /**
+     * Relasi ke ulasan yang disetujui
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function approvedReviews()
     {
         return $this->hasMany(Review::class)->where('status', 'approved');
     }
 
-    // Relasi ke wishlist
+    /**
+     * Relasi ke wishlist
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function wishlists()
     {
         return $this->hasMany(Wishlist::class);
     }
 
-    // Relasi ke gambar produk
+    /**
+     * Relasi ke gambar produk
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function images()
     {
         return $this->hasMany(ProductImage::class);
     }
 
-    // Method untuk mendapatkan rata-rata rating
+    /**
+     * Mendapatkan rata-rata rating produk
+     *
+     * @return float Rata-rata rating dari ulasan yang disetujui
+     */
     public function getAverageRatingAttribute()
     {
         return $this->reviews()->where('status', 'approved')->avg('rating') ?? 0;
     }
 
-    // Method untuk mendapatkan jumlah ulasan
+    /**
+     * Mendapatkan jumlah ulasan produk
+     *
+     * @return int Jumlah ulasan yang disetujui
+     */
     public function getReviewsCountAttribute()
     {
         return $this->approvedReviews()->count();
     }
 
-    // Relasi ke promosi produk
+    /**
+     * Relasi ke promosi produk
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function productPromotions()
     {
         return $this->hasMany(ProductPromotion::class);
     }
 
-    // Method untuk mendapatkan promosi aktif untuk produk ini
+    /**
+     * Mendapatkan promosi aktif untuk produk ini
+     *
+     * @return \App\Models\ProductPromotion|null Promosi aktif atau null jika tidak ada
+     */
     public function getActivePromotionAttribute()
     {
         return $this->productPromotions()
@@ -233,7 +328,11 @@ class Product extends Model
                    ->first();
     }
 
-    // Method untuk mendapatkan gambar utama dari product_images
+    /**
+     * Mendapatkan gambar utama dari tabel product_images
+     *
+     * @return string|null Path gambar utama atau null jika tidak ditemukan
+     */
     public function getMainImageAttribute()
     {
         // Coba akses kolom is_primary, tapi hindari error jika tidak ada
@@ -255,7 +354,11 @@ class Product extends Model
         return $firstImage ? $firstImage->image_path : null;
     }
 
-    // Method untuk mendapatkan semua gambar (utama dan tambahan)
+    /**
+     * Mendapatkan semua gambar produk (utama dan tambahan)
+     *
+     * @return array Array path gambar produk
+     */
     public function getAllImagesAttribute()
     {
         $images = [];
@@ -267,7 +370,11 @@ class Product extends Model
         return $images;
     }
 
-    // Accessor untuk rating produk (sama dengan average_rating)
+    /**
+     * Accessor untuk rating produk (sama dengan average_rating)
+     *
+     * @return float Rata-rata rating produk
+     */
     public function getRatingAttribute()
     {
         return $this->average_rating;

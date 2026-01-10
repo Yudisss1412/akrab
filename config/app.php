@@ -4,12 +4,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Application Name
+    | Nama Aplikasi
     |--------------------------------------------------------------------------
     |
-    | This value is the name of your application, which will be used when the
-    | framework needs to place the application's name in a notification or
-    | other UI elements where an application name needs to be displayed.
+    | Nilai ini adalah nama aplikasi Anda, yang akan digunakan ketika framework
+    | perlu menempatkan nama aplikasi dalam notifikasi atau elemen UI lainnya
+    | di mana nama aplikasi perlu ditampilkan.
     |
     */
 
@@ -17,12 +17,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Application Environment
+    | Lingkungan Aplikasi
     |--------------------------------------------------------------------------
     |
-    | This value determines the "environment" your application is currently
-    | running in. This may determine how you prefer to configure various
-    | services the application utilizes. Set this in your ".env" file.
+    | Nilai ini menentukan "lingkungan" tempat aplikasi Anda saat ini berjalan.
+    | Ini dapat menentukan bagaimana Anda ingin mengkonfigurasi berbagai layanan
+    | yang digunakan aplikasi. Atur ini di file ".env" Anda.
     |
     */
 
@@ -30,12 +30,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Application Debug Mode
+    | Mode Debug Aplikasi
     |--------------------------------------------------------------------------
     |
-    | When your application is in debug mode, detailed error messages with
-    | stack traces will be shown on every error that occurs within your
-    | application. If disabled, a simple generic error page is shown.
+    | Ketika aplikasi Anda dalam mode debug, pesan kesalahan terperinci dengan
+    | stack trace akan ditampilkan pada setiap kesalahan yang terjadi dalam
+    | aplikasi Anda. Jika dinonaktifkan, halaman kesalahan generik sederhana ditampilkan.
     |
     */
 
@@ -43,12 +43,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Application URL
+    | URL Aplikasi
     |--------------------------------------------------------------------------
     |
-    | This URL is used by the console to properly generate URLs when using
-    | the Artisan command line tool. You should set this to the root of
-    | the application so that it's available within Artisan commands.
+    | URL ini digunakan oleh konsol untuk menghasilkan URL dengan benar ketika
+    | menggunakan alat baris perintah Artisan. Anda harus mengaturnya ke root
+    | aplikasi sehingga tersedia dalam perintah Artisan.
     |
     */
 
@@ -56,12 +56,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Application Timezone
+    | Zona Waktu Aplikasi
     |--------------------------------------------------------------------------
     |
-    | Here you may specify the default timezone for your application, which
-    | will be used by the PHP date and date-time functions. The timezone
-    | is set to "UTC" by default as it is suitable for most use cases.
+    | Di sinilah Anda dapat menentukan zona waktu default untuk aplikasi Anda,
+    | yang akan digunakan oleh fungsi tanggal dan waktu PHP. Zona waktu
+    | diatur ke "UTC" secara default karena cocok untuk sebagian besar kasus.
     |
     */
 
@@ -69,12 +69,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Application Locale Configuration
+    | Konfigurasi Lokal Aplikasi
     |--------------------------------------------------------------------------
     |
-    | The application locale determines the default locale that will be used
-    | by Laravel's translation / localization methods. This option can be
-    | set to any locale for which you plan to have translation strings.
+    | Lokal aplikasi menentukan lokal default yang akan digunakan
+    | oleh metode terjemahan / lokalisasi Laravel. Opsi ini dapat
+    | diatur ke lokal apa pun yang memiliki string terjemahan.
     |
     */
 

@@ -142,8 +142,76 @@
   padding: 0.5rem 0.5rem; /* Sesuaikan padding untuk konsistensi */
   border: none;
   border-bottom: 1px solid var(--border-color);
-  vertical-align: middle;
+  vertical-align: middle; /* Sejajarkan konten ke tengah secara vertikal */
   box-sizing: border-box; /* Tambahkan box-sizing untuk konsistensi */
+  display: table-cell; /* Pastikan elemen tetap sebagai cell tabel */
+  align-items: center; /* Sejajarkan item ke tengah secara vertikal */
+}
+
+/* Khusus untuk kolom jumlah, gunakan padding yang seimbang untuk penyejajaran yang lebih baik */
+tbody .qty-col {
+  padding: 0.5rem 0.25rem !important; /* Gunakan padding yang seimbang untuk penyejajaran vertikal */
+}
+
+/* Aturan khusus untuk sel kolom jumlah agar konten sejajar secara vertikal */
+tbody tr td.qty-col,
+tbody .qty-col {
+  display: table-cell !important; /* Kembali ke tampilan tabel untuk penyejajaran yang benar */
+  align-items: unset !important; /* Reset align-items karena bukan flex container */
+  justify-content: unset !important; /* Reset justify-content karena bukan flex container */
+  vertical-align: middle !important; /* Sejajarkan konten ke tengah secara vertikal */
+  height: auto !important; /* Biarkan tinggi menyesuaikan konten */
+  align-content: unset !important; /* Reset align-content karena bukan flex container */
+  position: relative !important; /* Tambahkan posisi relatif untuk kontrol lebih lanjut */
+  padding-top: 0.5rem !important; /* Gunakan padding normal untuk penyejajaran yang seimbang */
+  padding-bottom: 0.5rem !important; /* Gunakan padding normal untuk penyejajaran yang seimbang */
+  text-align: center !important; /* Pusatkan konten secara horizontal */
+  overflow: visible !important; /* Pastikan tidak ada overflow yang menyembunyikan controls */
+}
+
+/* Aturan untuk memastikan qty controls berada di tengah secara vertikal */
+.qty-controls {
+  position: absolute !important; /* Gunakan posisi absolut untuk kontrol presisi */
+  display: flex !important; /* Gunakan flex agar penyejajaran bekerja dengan baik */
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 1px !important;
+  width: auto !important; /* Gunakan lebar otomatis sesuai konten */
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  flex: 0 0 auto !important; /* Hindari flex agar tidak mempengaruhi tata letak */
+  flex-wrap: nowrap !important; /* Mencegah wrapping elemen */
+  min-width: 0 !important; /* Memungkinkan elemen menyusut jika ruang terbatas */
+  padding: 0 1px !important; /* Kurangi padding agar lebih rapat */
+  justify-content: space-around !important; /* Distribusikan ruang antar elemen secara merata */
+  align-content: center !important; /* Pastikan elemen sejajar di tengah */
+  height: auto !important; /* Biarkan tinggi menyesuaikan konten */
+  vertical-align: middle !important; /* Pastikan sejajar secara vertikal */
+  top: 50% !important; /* Posisi tengah secara vertikal */
+  left: 50% !important; /* Posisi tengah secara horizontal */
+  transform: translate(-50%, -50%) !important; /* Geser ke tengah dengan transform */
+  margin: 0 !important; /* Reset margin untuk menghindari pergeseran */
+  align-self: auto !important; /* Reset align-self untuk menghindari pergeseran */
+  flex-direction: row !important; /* Pastikan arah flex adalah baris */
+  line-height: 1 !important; /* Pastikan line-height konsisten */
+  z-index: 2 !important; /* Pastikan controls tetap di atas elemen lain */
+}
+
+/* Atur agar tombol dan input tetap sejajar secara vertikal */
+.qty-btn, .qty-input {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  position: relative !important;
+  vertical-align: middle !important;
+  align-self: center !important; /* Pastikan elemen sejajar ke tengah */
+  flex: 0 0 auto !important; /* Pastikan elemen tidak membesar */
+  align-items: center !important; /* Pastikan konten dalam tombol sejajar ke tengah */
+  justify-content: center !important; /* Pastikan konten dalam tombol sejajar ke tengah */
+  line-height: 1 !important; /* Pastikan line-height tetap konsisten */
+  height: 16px !important; /* Tetapkan tinggi eksak agar konsisten */
+  display: flex !important; /* Gunakan flex untuk penyejajaran yang lebih baik */
+  align-content: center !important; /* Pastikan konten sejajar di tengah */
+  position: static !important; /* Gunakan posisi static untuk menghindari konflik dengan posisi absolut dari parent */
 }
 
 .cart-table tbody tr:last-child td {
@@ -252,19 +320,22 @@ thead .qty-col {
 
 /* Kolom Jumlah - hanya untuk body tabel */
 tbody .qty-col {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1px; /* Kembali ke gap yang lebih standar */
-  text-align: center;
-  vertical-align: middle;
-  white-space: nowrap;
+  display: flex !important;
+  align-items: center !important; /* Sejajarkan konten ke tengah secara vertikal */
+  justify-content: center !important;
+  gap: 1px !important; /* Kembali ke gap yang lebih standar */
+  text-align: center !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
   padding: 0.5rem 0.25rem !important; /* Sesuaikan padding dengan body tabel */
-  width: 15%; /* Mengurangi lebar kolom untuk mencegah menutupi kolom harga satuan */
-  overflow: visible; /* Ubah ke visible agar qty controls tidak tersembunyi */
-  box-sizing: border-box; /* Pastikan perhitungan lebar termasuk padding */
-  min-width: 0; /* Tambahkan min-width untuk mencegah kolom menyusut berlebihan */
-  position: relative; /* Tambahkan posisi relatif untuk mengelola z-index */
+  width: 15% !important; /* Mengurangi lebar kolom untuk mencegah menutupi kolom harga satuan */
+  overflow: visible !important; /* Ubah ke visible agar qty controls tidak tersembunyi */
+  box-sizing: border-box !important; /* Pastikan perhitungan lebar termasuk padding */
+  min-width: 0 !important; /* Tambahkan min-width untuk mencegah kolom menyusut berlebihan */
+  position: relative !important; /* Tambahkan posisi relatif untuk mengelola z-index */
+  height: 100% !important; /* Pastikan kolom mengisi tinggi penuh */
+  vertical-align: middle !important; /* Pastikan sel sejajar secara vertikal */
+  align-content: center !important; /* Pastikan konten selaras di tengah */
 }
 
 /* Pastikan qty controls tetap dalam batas kolom */
@@ -332,6 +403,11 @@ tbody .qty-col {
   display: flex !important; /* Gunakan flex untuk konsistensi */
   align-items: center !important; /* Sejajarkan konten secara vertikal */
   justify-content: center !important; /* Sejajarkan konten secara horizontal */
+  height: 16px !important; /* Tetapkan tinggi eksak agar konsisten */
+  box-sizing: border-box !important; /* Pastikan perhitungan termasuk border dan padding */
+  vertical-align: middle !important; /* Sejajarkan secara vertikal ke tengah */
+  position: relative !important; /* Pastikan posisi relatif untuk penyesuaian lebih lanjut */
+  top: 0 !important; /* Reset posisi vertikal */
 }
 
 .qty-input {
@@ -360,6 +436,10 @@ tbody .qty-col {
   height: 16px !important; /* Mengurangi tinggi input agar sama dengan tombol */
   min-width: 20px !important;
   min-height: 16px !important;
+  display: flex !important; /* Gunakan flex untuk konsistensi penyejajaran */
+  align-items: center !important; /* Sejajarkan konten secara vertikal */
+  justify-content: center !important; /* Sejajarkan konten secara horizontal */
+  box-sizing: border-box !important; /* Pastikan perhitungan termasuk border dan padding */
 }
 
 .qty-input:focus {
@@ -375,7 +455,7 @@ tbody .qty-col {
   z-index: 1;
   overflow: visible; /* Pastikan semua elemen dalam controls terlihat */
   display: flex !important;
-  align-items: center !important;
+  align-items: center !important; /* Sejajarkan elemen-elemen di tengah vertikal */
   justify-content: center !important;
   gap: 1px !important;
   width: 100% !important;
@@ -387,6 +467,8 @@ tbody .qty-col {
   padding: 0 1px !important; /* Kurangi padding agar lebih rapat */
   justify-content: space-around !important; /* Distribusikan ruang antar elemen secara merata */
   align-content: center !important; /* Pastikan elemen sejajar di tengah */
+  height: 100% !important; /* Pastikan controls mengisi tinggi penuh dari cell */
+  vertical-align: middle !important; /* Sejajarkan secara vertikal ke tengah */
 }
 
 /* Kolom Produk */

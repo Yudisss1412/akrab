@@ -93,6 +93,13 @@ class SellerOrderController extends Controller
             // Paginate hasil
             $orders = $query->paginate(10)->appends($request->query());
 
+            // Filter items hanya untuk produk penjual ini
+            foreach ($orders as $order) {
+                $order->items = $order->items->filter(function ($item) use ($seller) {
+                    return $item->product->seller_id == $seller->id;
+                });
+            }
+
             // Debug: lihat apakah seller_id valid dan berapa banyak produk yang dimiliki (fungsi index)
             \Log::info("Seller ID (index function): " . $seller->id);
             $productCount = DB::table('products')->where('seller_id', $seller->id)->count();
@@ -280,6 +287,11 @@ class SellerOrderController extends Controller
             })
             ->firstOrFail();
 
+        // Filter items hanya untuk produk penjual ini
+        $order->items = $order->items->filter(function ($item) use ($seller) {
+            return $item->product->seller_id == $seller->id;
+        });
+
         return view('penjual.detail_pesanan', compact('order'));
     }
 
@@ -307,6 +319,11 @@ class SellerOrderController extends Controller
                 $q->where('seller_id', $seller->id);
             })
             ->firstOrFail();
+
+        // Filter items hanya untuk produk penjual ini
+        $order->items = $order->items->filter(function ($item) use ($seller) {
+            return $item->product->seller_id == $seller->id;
+        });
 
         return view('penjual.detail_pesanan', compact('order'));
     }
@@ -340,6 +357,11 @@ class SellerOrderController extends Controller
             })
             ->with(['items', 'items.product']) // Load items untuk membuat transaksi
             ->firstOrFail();
+
+        // Filter items hanya untuk produk penjual ini
+        $order->items = $order->items->filter(function ($item) use ($seller) {
+            return $item->product->seller_id == $seller->id;
+        });
 
         // Simpan status lama sebelum update
         $oldStatus = $order->status;
@@ -416,11 +438,17 @@ class SellerOrderController extends Controller
         }
 
         // Ambil pesanan dengan produk milik penjual ini
-        $order = Order::where('id', $id)
+        $order = Order::with(['items.product']) // Load items untuk filtering
+            ->where('id', $id)
             ->whereHas('items.product', function ($q) use ($seller) {
                 $q->where('seller_id', $seller->id);
             })
             ->firstOrFail();
+
+        // Filter items hanya untuk produk penjual ini
+        $order->items = $order->items->filter(function ($item) use ($seller) {
+            return $item->product->seller_id == $seller->id;
+        });
 
         // Siapkan data untuk update
         $updateData = [
@@ -480,6 +508,13 @@ class SellerOrderController extends Controller
             ->orderBy('created_at', 'desc')
             ->limit(3)
             ->get();
+
+        // Filter items hanya untuk produk penjual ini
+        foreach ($recentOrders as $order) {
+            $order->items = $order->items->filter(function ($item) use ($seller) {
+                return $item->product->seller_id == $seller->id;
+            });
+        }
 
         // Mapping status database ke status aplikasi
         $statusMapping = [
@@ -623,6 +658,13 @@ class SellerOrderController extends Controller
             // Paginate hasil
             $orders = $query->paginate(10)->appends($request->query());
 
+            // Filter items hanya untuk produk penjual ini
+            foreach ($orders as $order) {
+                $order->items = $order->items->filter(function ($item) use ($seller) {
+                    return $item->product->seller_id == $seller->id;
+                });
+            }
+
             // Gunakan service untuk menghitung statistik
             $statsService = new \App\Services\SellerStatisticsService();
 
@@ -675,6 +717,13 @@ class SellerOrderController extends Controller
             $completedOrders = $completedOrdersQuery->orderBy('created_at', 'desc')
                                                    ->paginate(10)
                                                    ->appends($request->query());
+
+            // Filter items hanya untuk produk penjual ini
+            foreach ($completedOrders as $order) {
+                $order->items = $order->items->filter(function ($item) use ($seller) {
+                    return $item->product->seller_id == $seller->id;
+                });
+            }
 
             return view('penjual.riwayat_penjualan', compact(
                 'orders',

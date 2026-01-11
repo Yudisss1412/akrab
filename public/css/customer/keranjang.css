@@ -108,31 +108,31 @@
 }
 
 .cart-table thead th:nth-child(1) {
-  width: 8%; /* Checkbox kolom */
+  width: 6%; /* Checkbox kolom */
   text-align: center;
   padding: 0.8rem 0.5rem; /* Sesuaikan padding untuk kolom kecil */
 }
 
 .cart-table thead th:nth-child(2) {
-  width: 42%; /* Produk kolom - biarkan fleksibel */
+  width: 37%; /* Produk kolom - mengurangi lebar untuk memberi ruang pada kolom harga satuan */
   text-align: left;
   padding: 0.8rem 1rem; /* Sesuaikan padding untuk kolom produk */
 }
 
 .cart-table thead th:nth-child(3) {
-  width: 15%; /* Harga satuan kolom - menyesuaikan untuk keseimbangan */
+  width: 15%; /* Harga satuan kolom - meningkatkan lebar untuk mencegah tertutup */
   text-align: right;
   padding: 0.8rem 1rem;
 }
 
 .cart-table thead th:nth-child(4) {
-  width: 15%; /* Jumlah kolom - meningkatkan lebar untuk menampung tombol dan input */
+  width: 15%; /* Jumlah kolom - mengurangi lebar untuk mencegah menutupi kolom harga satuan */
   text-align: center;
   padding: 0.8rem 0.5rem; /* Sesuaikan padding untuk kolom jumlah */
 }
 
 .cart-table thead th:nth-child(5) {
-  width: 20%; /* Subtotal kolom */
+  width: 13%; /* Subtotal kolom - mengurangi lebar untuk memberi ruang pada kolom harga satuan */
   text-align: right;
   padding: 0.8rem 1rem;
 }
@@ -156,30 +156,30 @@
 }
 
 .cart-table tbody td:nth-child(1) {
-  width: 8%; /* Checkbox kolom */
+  width: 6%; /* Checkbox kolom - sedikit mengurangi lebar */
   text-align: center;
   padding: 0.5rem 0.25rem; /* Sesuaikan padding dengan header */
 }
 
 .cart-table tbody td:nth-child(2) {
-  width: 5%; /* Produk kolom - biarkan fleksibel */
+  width: 37%; /* Produk kolom - mengurangi lebar untuk memberi ruang pada kolom harga satuan */
   padding: 0.5rem 1rem; /* Sesuaikan padding dengan header */
 }
 
 .cart-table tbody td:nth-child(3) {
-  width: 15%; /* Harga satuan kolom - menyesuaikan untuk keseimbangan */
+  width: 15%; /* Harga satuan kolom - meningkatkan lebar untuk mencegah tertutup */
   text-align: right;
   padding: 0.5rem 1rem; /* Sesuaikan padding dengan header */
 }
 
 .cart-table tbody td:nth-child(4) {
-  width: 15%; /* Jumlah kolom - meningkatkan lebar untuk menampung tombol dan input */
+  width: 18%; /* Jumlah kolom - meningkatkan lebar untuk menampung tombol dan input */
   text-align: center;
   padding: 0.5rem 0.25rem; /* Sesuaikan padding dengan header */
 }
 
 .cart-table tbody td:nth-child(5) {
-  width: 2%; /* Subtotal kolom */
+  width: 13%; /* Subtotal kolom - mengurangi lebar untuk memberi ruang pada kolom harga satuan */
   text-align: right;
   padding: 0.5rem 0.5rem; /* Sesuaikan padding dengan header */
 }
@@ -243,10 +243,11 @@ thead .qty-col {
   text-align: center;
   vertical-align: middle;
   padding: 0.8rem 0.5rem !important; /* Gunakan padding yang sesuai untuk header */
-  width: 15%; /* Sesuaikan lebar dengan persentase */
-  overflow: hidden; /* Pastikan tidak ada overflow yang disembunyikan */
+  width: 18%; /* Sesuaikan lebar dengan persentase - harus sama dengan body */
+  overflow: visible; /* Ubah ke visible agar tidak menyembunyikan elemen */
   box-sizing: border-box; /* Pastikan perhitungan lebar termasuk padding */
   min-width: 0; /* Tambahkan min-width untuk mencegah kolom menyusut berlebihan */
+  position: relative; /* Tambahkan posisi relatif untuk mengelola z-index */
 }
 
 /* Kolom Jumlah - hanya untuk body tabel */
@@ -259,22 +260,34 @@ tbody .qty-col {
   vertical-align: middle;
   white-space: nowrap;
   padding: 0.5rem 0.25rem !important; /* Sesuaikan padding dengan body tabel */
-  width: 15%; /* Sesuaikan lebar dengan persentase */
-  overflow: hidden; /* Pastikan tidak ada overflow yang disembunyikan */
+  width: 15%; /* Mengurangi lebar kolom untuk mencegah menutupi kolom harga satuan */
+  overflow: visible; /* Ubah ke visible agar qty controls tidak tersembunyi */
   box-sizing: border-box; /* Pastikan perhitungan lebar termasuk padding */
   min-width: 0; /* Tambahkan min-width untuk mencegah kolom menyusut berlebihan */
+  position: relative; /* Tambahkan posisi relatif untuk mengelola z-index */
 }
 
-
+/* Pastikan qty controls tetap dalam batas kolom */
 .qty-controls {
-  display: flex;
-  align-items: center;
+  position: relative;
+  width: 100%;
+  max-width: 100%; /* Batasi lebar maksimum agar tidak keluar dari kolom */
+  box-sizing: border-box;
+  display: inline-flex;
   justify-content: center;
+  align-items: center;
+  flex: 0 0 auto; /* Mencegah qty controls dari membesar melebihi ukuran yang diperlukan */
   gap: 1px;
+  min-width: 0; /* Memungkinkan elemen menyusut jika ruang terbatas */
+  flex-wrap: nowrap; /* Mencegah wrapping elemen */
+  overflow: visible; /* Pastikan tidak ada elemen yang tersembunyi */
+  z-index: 1;
+  padding: 0 2px; /* Tambahkan sedikit padding untuk mencegah tombol menyentuh batas */
+  justify-content: space-between; /* Distribusikan ruang antar elemen */
 }
 
 .qty-btn {
-  width: 20px; /* Mengurangi ukuran tombol */
+  width: 20px; /* Mengurangi ukuran tombol untuk menghemat ruang */
   height: 20px;
   min-width: 20px;
   min-height: 20px;
@@ -282,10 +295,10 @@ tbody .qty-col {
   background: white;
   border-radius: 4px;
   cursor: pointer;
-  display: inline-flex;
+  display: flex; /* Gunakan flexbox untuk konsistensi */
   align-items: center;
   justify-content: center;
-  font-size: 10px; /* Mengurangi ukuran font */
+  font-size: 10px; /* Mengurangi ukuran font untuk menghemat ruang */
   font-weight: bold;
   color: var(--text);
   transition: all 0.2s ease;
@@ -295,8 +308,10 @@ tbody .qty-col {
   margin: 0 1px; /* Tambahkan sedikit margin untuk jarak antar elemen */
   line-height: 1;
   box-sizing: border-box;
-  position: static; /* Gunakan position static untuk menghindari masalah tampilan */
+  position: relative; /* Gunakan position relative untuk menghindari masalah tampilan */
   vertical-align: middle; /* Pastikan elemen sejajar secara vertikal */
+  z-index: 1; /* Pastikan tombol tetap terlihat */
+  flex: 0 0 auto; /* Mencegah tombol dari membesar */
 }
 
 .qty-btn:hover {
@@ -305,16 +320,22 @@ tbody .qty-col {
   border-color: var(--primary-color-dark);
 }
 
+/* Aturan tambahan untuk memastikan tombol tidak menutupi kolom lain */
+.qty-btn, .qty-input {
+  flex: 0 0 auto; /* Mencegah elemen dari membesar dan menutupi kolom lain */
+  max-width: 100%; /* Batasi lebar maksimum */
+}
+
 .qty-input {
-  width: 24px;
-  height: 20px;
+  width: 24px; /* Mengurangi lebar input untuk menghemat ruang */
+  height: 20px; /* Mengurangi tinggi input untuk menghemat ruang */
   min-width: 24px;
   min-height: 20px;
   text-align: center;
   border: 1px solid var(--border-color);
   border-radius: 4px;
   font-weight: 600;
-  font-size: 10px; /* Mengurangi ukuran font */
+  font-size: 10px; /* Mengurangi ukuran font untuk menghemat ruang */
   transition: border-color 0.2s ease;
   flex-shrink: 0;
   padding: 0 !important; /* Menghapus padding untuk mengurangi space */
@@ -323,13 +344,36 @@ tbody .qty-col {
   line-height: 1;
   vertical-align: middle; /* Pastikan elemen sejajar secara vertikal */
   background-color: white;
-  position: static; /* Gunakan position static untuk menghindari masalah tampilan */
+  position: relative; /* Gunakan position relative untuk menghindari masalah tampilan */
+  z-index: 1; /* Pastikan input tidak tertutup oleh elemen lain */
+  text-overflow: clip; /* Pastikan teks tidak overflow */
+  overflow: hidden; /* Mencegah overflow */
 }
 
 .qty-input:focus {
   outline: none;
   border-color: var(--primary-color-dark);
   box-shadow: 0 0 0 2px rgba(0, 110, 92, 0.2);
+  z-index: 2; /* Tingkatkan z-index saat fokus untuk menghindari tertutup */
+}
+
+/* Pastikan qty controls tidak tertutup oleh elemen lain */
+.qty-controls {
+  position: relative;
+  z-index: 1;
+  overflow: visible; /* Pastikan semua elemen dalam controls terlihat */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  flex: 1 1 auto; /* Biarkan controls menyesuaikan ukuran dengan fleksibel */
+  flex-wrap: nowrap; /* Mencegah wrapping elemen */
+  min-width: 0; /* Memungkinkan elemen menyusut jika ruang terbatas */
+  padding: 0 2px; /* Tambahkan sedikit padding untuk mencegah tombol menyentuh batas */
+  justify-content: space-between; /* Distribusikan ruang antar elemen */
 }
 
 /* Kolom Produk */
@@ -428,9 +472,9 @@ tbody .qty-col {
   color: var(--primary-color-dark);
   font-size: 0.9rem; /* Sedikit mengurangi ukuran font untuk menghemat ruang */
   white-space: nowrap; /* Prevent subtotal text from wrapping */
-  width: 140px; /* Meningkatkan lebar kolom agar cukup untuk menampilkan subtotal panjang */
+  width: 13%; /* Mengurangi lebar kolom untuk memberi ruang pada kolom harga satuan */
   padding: 0.5rem !important; /* Kembali ke padding normal */
-  overflow: hidden; /* Mencegah overflow */
+  overflow: visible; /* Ubah ke visible agar teks tidak tersembunyi */
   text-overflow: ellipsis; /* Menambahkan ellipsis jika teks terlalu panjang */
 }
 
@@ -442,9 +486,9 @@ tbody .qty-col {
   color: var(--primary-color-dark);
   font-size: 0.9rem; /* Sedikit mengurangi ukuran font untuk menghemat ruang */
   white-space: nowrap; /* Prevent subtotal text from wrapping */
-  width: 140px; /* Meningkatkan lebar kolom agar cukup untuk menampilkan subtotal panjang */
+  width: 13%; /* Mengurangi lebar kolom untuk memberi ruang pada kolom harga satuan */
   padding: 0.5rem !important; /* Kembali ke padding normal */
-  overflow: hidden; /* Mencegah overflow */
+  overflow: visible; /* Ubah ke visible agar teks tidak tersembunyi */
   text-overflow: ellipsis; /* Menambahkan ellipsis jika teks terlalu panjang */
 }
 
@@ -782,9 +826,19 @@ tbody .qty-col {
   }
 
   .qty-controls {
-    display: flex;
+    display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 1px; /* Mengurangi gap untuk mengurangi space putih */
+    min-width: 0; /* Memungkinkan elemen menyusut jika ruang terbatas */
+    flex-wrap: nowrap; /* Mencegah wrapping elemen */
+    width: 100%; /* Gunakan lebar penuh dari container */
+    max-width: 100%; /* Batasi lebar maksimum agar tidak keluar dari kolom */
+    box-sizing: border-box; /* Pastikan padding dan border dihitung dalam lebar */
+    overflow: visible; /* Pastikan tidak ada elemen yang tersembunyi */
+    position: relative; /* Gunakan posisi relatif untuk mengelola z-index */
+    flex: 0 0 auto; /* Mencegah qty controls dari membesar melebihi ukuran yang diperlukan */
+    z-index: 1;
   }
 
   .qty-btn {
@@ -806,9 +860,12 @@ tbody .qty-col {
     user-select: none;
     flex-shrink: 0;
     padding: 0;
-    margin: 0;
+    margin: 0 1px; /* Tambahkan margin untuk jarak antar elemen */
     line-height: 1;
     box-sizing: border-box;
+    position: relative; /* Gunakan position relative untuk menghindari masalah tampilan */
+    vertical-align: middle;
+    z-index: 1; /* Pastikan tombol tetap terlihat */
   }
 
   .qty-btn:hover {
@@ -835,12 +892,15 @@ tbody .qty-col {
     line-height: 1;
     vertical-align: middle;
     background-color: white;
+    position: relative; /* Gunakan position relative untuk menghindari masalah tampilan */
+    z-index: 1; /* Pastikan input tidak tertutup oleh elemen lain */
   }
 
   .qty-input:focus {
     outline: none;
     border-color: var(--primary-color-dark);
     box-shadow: 0 0 0 2px rgba(0, 110, 92, 0.2);
+    z-index: 2; /* Tingkatkan z-index saat fokus untuk menghindari tertutup */
   }
 
 

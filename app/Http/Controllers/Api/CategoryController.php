@@ -100,7 +100,7 @@ class CategoryController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Kategori berhasil diperbarui',
+                'message' => 'Data Sudah Berhasil Di Ubah',
                 'category' => $category
             ]);
         } catch (ValidationException $e) {

@@ -1450,9 +1450,34 @@
                 var categoryName = document.getElementById('editCategoryName').value.trim();
                 var categoryDescription = document.getElementById('editCategoryDescription').value.trim();
 
+                // Clear previous error messages
+                var errorElements = document.querySelectorAll('.error-message');
+                errorElements.forEach(el => el.remove());
+
+                var hasErrors = false;
+
+                // Validate category name
                 if (categoryName === '') {
-                  alert('Nama kategori tidak boleh kosong!');
-                  return;
+                  hasErrors = true;
+                  var nameField = document.getElementById('editCategoryName');
+                  var errorDiv = document.createElement('div');
+                  errorDiv.className = 'error-message text-danger mt-1';
+                  errorDiv.textContent = 'Nama kategori wajib diisi.';
+                  nameField.parentNode.insertBefore(errorDiv, nameField.nextSibling);
+                }
+
+                // Validate description length (optional, but could be added)
+                if (categoryDescription.length > 500) {
+                  hasErrors = true;
+                  var descField = document.getElementById('editCategoryDescription');
+                  var errorDiv = document.createElement('div');
+                  errorDiv.className = 'error-message text-danger mt-1';
+                  errorDiv.textContent = 'Deskripsi maksimal 500 karakter.';
+                  descField.parentNode.insertBefore(errorDiv, descField.nextSibling);
+                }
+
+                if (hasErrors) {
+                  return; // Stop execution if there are errors
                 }
 
                 // Disable tombol submit untuk mencegah double submission
@@ -1490,7 +1515,24 @@
                     // Refresh halaman untuk memperbarui daftar kategori
                     location.reload();
                   } else {
-                    alert('Gagal mengedit kategori: ' + (data.message || 'Data tidak valid'));
+                    // Clear previous error messages
+                    var errorElements = document.querySelectorAll('.error-message');
+                    errorElements.forEach(el => el.remove());
+
+                    // Display server-side errors
+                    if (data.errors) {
+                      for (const field in data.errors) {
+                        var fieldElement = document.getElementById('editCategory' + field.charAt(0).toUpperCase() + field.slice(1));
+                        if (fieldElement) {
+                          var errorDiv = document.createElement('div');
+                          errorDiv.className = 'error-message text-danger mt-1';
+                          errorDiv.textContent = data.errors[field][0];
+                          fieldElement.parentNode.insertBefore(errorDiv, fieldElement.nextSibling);
+                        }
+                      }
+                    } else {
+                      alert('Gagal mengedit kategori: ' + (data.message || 'Data tidak valid'));
+                    }
                   }
                 })
                 .catch(function(error) {

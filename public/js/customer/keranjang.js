@@ -104,7 +104,7 @@ class CartManager {
     });
 
     // Event listener untuk tombol hapus
-    document.querySelectorAll('.delete-btn').forEach(button => {
+    document.querySelectorAll('.delete-btn, .delete-btn-float, .delete-btn-mobile').forEach(button => {
       button.addEventListener('click', (e) => {
         const row = e.target.closest('tr');
         if (row) {

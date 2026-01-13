@@ -260,41 +260,6 @@ class ReviewController extends Controller
         ]);
     }
 
-    /**
-     * Delete user's review
-     */
-    public function deleteReview($reviewId)
-    {
-        $review = Review::where('id', $reviewId)
-                        ->where('user_id', Auth::id())
-                        ->first();
-
-        if (!$review) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Ulasan tidak ditemukan atau Anda tidak memiliki izin untuk menghapus ulasan ini'
-            ], 404);
-        }
-
-        // Delete media files if they exist
-        if ($review->media) {
-            $mediaPaths = json_decode($review->media, true);
-            foreach ($mediaPaths as $path) {
-                $fullPath = storage_path('app/public/' . $path);
-                if (file_exists($fullPath)) {
-                    unlink($fullPath);
-                }
-            }
-        }
-
-        // Delete the review
-        $review->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Ulasan berhasil dihapus'
-        ]);
-    }
 
     /**
      * Menampilkan halaman untuk memberikan ulasan untuk semua item dalam pesanan

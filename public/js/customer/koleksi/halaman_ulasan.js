@@ -696,14 +696,14 @@ function setupModalEventListeners() {
     console.log('Edit review form not found');
   }
   
-  // Setup delete button
-  const deleteReviewBtn = $q('#deleteReview');
-  console.log('Delete review button:', deleteReviewBtn);
-  if (deleteReviewBtn) {
-    deleteReviewBtn.addEventListener('click', handleDeleteReview);
-    console.log('Delete review button event listener added');
+  // Setup cancel button
+  const cancelEditBtn = $q('#cancelEdit');
+  console.log('Cancel edit button:', cancelEditBtn);
+  if (cancelEditBtn) {
+    cancelEditBtn.addEventListener('click', handleCancelEdit);
+    console.log('Cancel edit button event listener added');
   } else {
-    console.log('Delete review button not found');
+    console.log('Cancel edit button not found');
   }
   
   // Setup drag and drop functionality
@@ -758,45 +758,45 @@ function handleFormSubmit(e) {
   saveReviewChanges();
 }
 
-// Fungsi terpisah untuk menangani hapus ulasan
-function handleDeleteReview() {
-  if (confirm('Apakah Anda yakin ingin menghapus ulasan ini?')) {
-    const reviewId = document.getElementById('reviewId').value.trim();
-    if (reviewId) {
-      deleteReviewFromServer(reviewId)
-        .then(response => {
-          if (response.success) {
-            // Close modal and remove the review from the UI
-            closeReviewModal();
-            
-            // Remove the review from local data
-            removeFromLocalData(reviewId);
-            
-            // Show success message
-            alert('Ulasan berhasil dihapus');
-          } else {
-            console.error('Error deleting review:', response.message);
-            alert('Gagal menghapus ulasan: ' + response.message);
-          }
-        })
-        .catch(error => {
-          console.error('Error deleting review:', error);
-          alert('Terjadi kesalahan saat menghapus ulasan');
-        });
-    }
-  }
+// Fungsi terpisah untuk menangani pembatalan edit ulasan
+function handleCancelEdit() {
+  // Tutup modal tanpa menyimpan perubahan
+  closeReviewModal();
+
+  // Reset form ke kondisi awal
+  resetEditForm();
 }
 
-// Function to delete review from server
-async function deleteReviewFromServer(reviewId) {
-  const response = await fetch(`/api/reviews/${reviewId}`, {
-    method: 'DELETE',
-    headers: {
-      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').content : ''
-    }
+// Fungsi untuk mereset form edit ulasan
+function resetEditForm() {
+  // Reset form fields
+  const reviewText = document.getElementById('reviewText');
+  if (reviewText) {
+    reviewText.value = '';
+  }
+
+  // Reset stars
+  const stars = document.querySelectorAll('.star');
+  stars.forEach(star => {
+    star.classList.remove('selected');
   });
-  
-  return await response.json();
+
+  // Clear image previews
+  const previewContainer = document.getElementById('imagePreviews');
+  if (previewContainer) {
+    previewContainer.innerHTML = '';
+  }
+
+  // Reset hidden fields
+  const reviewId = document.getElementById('reviewId');
+  if (reviewId) {
+    reviewId.value = '';
+  }
+
+  const productName = document.getElementById('productName');
+  if (productName) {
+    productName.value = '';
+  }
 }
 
 // Function to remove the review from local data
@@ -941,7 +941,7 @@ function saveReviewChanges() {
         console.log('Updated rating:', rating);
         
         // Show success message
-        alert('Ulasan berhasil diperbarui');
+        alert('Ulasan Sudah Berhasil Di Ubah');
       } else {
         console.error('Error saving review:', response.message);
         alert('Gagal menyimpan ulasan: ' + response.message);
@@ -967,13 +967,14 @@ function saveReviewChanges() {
 
 // Function to update review on server
 async function updateReviewOnServer(reviewId, rating, reviewText, files) {
-  const formData = new FormData();
-  formData.append('rating', rating);
-  formData.append('review_text', reviewText);
-  formData.append('_token', document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').content : '');
-  
-  // Add files to form data if any
-  if (files.length > 0) {
+  // If there are files to upload, use FormData approach
+  if (files && files.length > 0) {
+    const formData = new FormData();
+    formData.append('rating', rating);
+    formData.append('review_text', reviewText);
+    formData.append('_token', document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').content : '');
+
+    // Add files to form data if any
     for (let i = 0; i < files.length; i++) {
       // If the file is an actual File object, add it. Otherwise, it might be a placeholder
       if (files[i] instanceof File) {
@@ -986,14 +987,33 @@ async function updateReviewOnServer(reviewId, rating, reviewText, files) {
         console.log('File is a placeholder with dataURL - need to handle image update separately if implemented');
       }
     }
+
+    formData.append('_method', 'PUT'); // Spoof PUT method
+
+    const response = await fetch(`/api/reviews/${reviewId}`, {
+      method: 'POST', // Using POST with _method spoofing for file uploads
+      body: formData
+      // Note: Don't set Content-Type header when using FormData, browser sets it automatically with proper boundary
+    });
+
+    return await response.json();
+  } else {
+    // If no files, use JSON approach which is simpler
+    const response = await fetch(`/api/reviews/${reviewId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').content : '',
+        'X-HTTP-Method-Override': 'PUT' // Alternative method override
+      },
+      body: JSON.stringify({
+        rating: rating,
+        review_text: reviewText
+      })
+    });
+
+    return await response.json();
   }
-  
-  const response = await fetch(`/api/reviews/${reviewId}`, {
-    method: 'POST', // Using POST with _method PUT for Laravel compatibility
-    body: formData
-  });
-  
-  return await response.json();
 }
 
 // Function to update local data after successful API call
@@ -1003,19 +1023,65 @@ function updateLocalReviewData(reviewId, rating, reviewText, reviewData) {
   if (reviewIndex !== -1) {
     // Update the review data
     data.dinilai[reviewIndex].rating = rating;
-    if (reviewData.review_text) {
+    if (reviewText) {
       // Update kv array with the new review text
-      data.dinilai[reviewIndex].kv = [['Ulasan', reviewData.review_text]];
+      data.dinilai[reviewIndex].kv = [['Ulasan', reviewText]];
     }
-    
+
+    // Update media/images if available
+    if (reviewData.media && reviewData.media.length > 0) {
+      data.dinilai[reviewIndex].images = reviewData.media.map(mediaPath => ({
+        name: mediaPath.split('/').pop(),
+        size: 0,
+        type: 'image',
+        url: `/storage/${mediaPath}`
+      }));
+    }
+
     // Re-render the affected review card
     if (currentEditCard) {
       // Update card rating display
       updateCardRating(currentEditCard, rating);
-      
-      // For now we won't update the review text in the card to avoid complex DOM manipulation
-      // The card shows kv pairs, which we've already updated in the data
+
+      // Update card text content
+      updateCardText(currentEditCard, reviewText);
+
+      // Update card images if any
+      if (reviewData.media && reviewData.media.length > 0) {
+        // Convert media paths to the format expected by updateCardImages
+        const imageObjects = reviewData.media.map(mediaPath => ({
+          name: mediaPath.split('/').pop(),
+          url: `/storage/${mediaPath}`,
+          type: 'image'
+        }));
+        updateCardImages(currentEditCard, imageObjects);
+      }
     }
+  }
+}
+
+// Function to update review text in the card
+function updateCardText(cardElement, newText) {
+  if (!cardElement || !newText) return;
+
+  // Find the element that displays the review text (usually in the .rev-cont section)
+  const contentSection = cardElement.querySelector('.rev-cont');
+  if (contentSection) {
+    // Look for the specific element that shows the review text
+    let textElement = contentSection.querySelector('.review-text-content');
+    if (!textElement) {
+      // If specific element doesn't exist, try to find a generic text container
+      textElement = contentSection.querySelector('p');
+      if (!textElement) {
+        // If no p tag, create a new element
+        textElement = document.createElement('p');
+        textElement.className = 'review-text-content';
+        contentSection.appendChild(textElement);
+      }
+    }
+
+    // Update the text content
+    textElement.textContent = newText;
   }
 }
 
@@ -1506,15 +1572,15 @@ document.addEventListener('DOMContentLoaded', async ()=>{  // Changed to async
     const ratingContainer = $q('#rating');
     const editReviewForm = $q('#editReviewForm');
     const closeModalBtn = $q('#closeModal');
-    const deleteReviewBtn = $q('#deleteReview');
-    
+    const cancelEditBtn = $q('#cancelEdit');
+
     console.log('Modal elements found:', {
       modal: modal ? 'YES' : 'NO',
       modalOverlay: modalOverlay ? 'YES' : 'NO',
       ratingContainer: ratingContainer ? 'YES' : 'NO',
       editReviewForm: editReviewForm ? 'YES' : 'NO',
       closeModalBtn: closeModalBtn ? 'YES' : 'NO',
-      deleteReviewBtn: deleteReviewBtn ? 'YES' : 'NO'
+      cancelEditBtn: cancelEditBtn ? 'YES' : 'NO'
     });
     
     // Setup modal event listeners AFTER reviews are rendered

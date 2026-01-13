@@ -92,7 +92,7 @@
           </div>
         </div>
         <div class="form-actions">
-          <button type="button" class="btn btn-secondary" id="deleteReview">Hapus</button>
+          <button type="button" class="btn btn-secondary" id="cancelEdit">Batal</button>
           <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
         </div>
       </form>

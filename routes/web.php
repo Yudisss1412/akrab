@@ -335,9 +335,6 @@ Route::get('/api/staff', function () {
 // API endpoint for updating user's review
 Route::put('/api/reviews/{reviewId}', [App\Http\Controllers\ReviewController::class, 'updateReview'])->name('api.update_review');
 
-// API endpoint for deleting user's review
-Route::delete('/api/reviews/{reviewId}', [App\Http\Controllers\ReviewController::class,
-'deleteReview'])->name('api.delete_review');
 
 Route::get('/halaman_wishlist', function () {
     // Ambil data wishlist dari database untuk user yang sedang login

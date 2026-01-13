@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // validasi dasar
         if (emailValue === '') {
-            emailError.textContent = 'Harap isi bidang ini.';
+            emailError.textContent = 'Harap di isi dengan benar!';
             emailError.classList.add('visible');
             emailInput.classList.add('invalid');
             isFormValid = false;
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (passwordValue === '') {
-            passwordError.textContent = 'Harap isi bidang ini.';
+            passwordError.textContent = 'Harap di isi dengan benar!';
             passwordError.classList.add('visible');
             passwordInput.classList.add('invalid');
             isFormValid = false;
@@ -157,9 +157,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else if (responseData.errors && responseData.errors.password) {
                     passwordError.textContent = responseData.errors.password[0];
                 } else {
-                    emailError.textContent = 'Email atau sandi salah.';
+                    emailError.textContent = 'Email/Password Anda Salah';
                 }
-                
+
                 emailError.classList.add('visible');
                 emailInput.classList.add('invalid');
                 passwordInput.classList.add('invalid');

@@ -67,15 +67,15 @@ class AuthController extends Controller
         if ($request->expectsJson() || $request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Kredensial yang diberikan tidak cocok dengan catatan kami.',
+                'message' => 'Email/Password Anda Salah',
                 'errors' => [
-                    'email' => ['Kredensial yang diberikan tidak cocok dengan catatan kami.']
+                    'email' => ['Email/Password Anda Salah']
                 ]
             ], 422);
         }
 
         return back()->withErrors([
-            'email' => 'Kredensial yang diberikan tidak cocok dengan catatan kami.',
+            'email' => 'Email/Password Anda Salah',
         ])->onlyInput('email');
     }
 

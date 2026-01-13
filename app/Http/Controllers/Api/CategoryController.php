@@ -68,14 +68,7 @@ class CategoryController extends Controller
         try {
             $category = Category::findOrFail($id);
 
-            // Cek apakah kategori punya produk
-            if ($category->products()->count() > 0) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Kategori tidak bisa dihapus karena masih punya produk'
-                ], 422);
-            }
-
+            // Langsung hapus kategori, tanpa cek produk
             $category->delete();
 
             return response()->json([

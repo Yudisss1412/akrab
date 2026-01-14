@@ -167,6 +167,10 @@ class TicketController extends Controller
                 return view('admin.ticket_detail', compact('ticket'));
             } elseif (auth()->id() === $ticket->user_id) {
                 // Customer view - user accessing their own ticket
+                // Load replies for customer view
+                $ticket->load(['replies' => function($query) {
+                    $query->with(['user', 'user.role'])->orderBy('created_at', 'asc');
+                }]);
                 return view('customer.tickets.detail', compact('ticket'));
             } else {
                 // Unauthorized access

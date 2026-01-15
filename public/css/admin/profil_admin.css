@@ -18,3 +18,35 @@
   padding: 0 !important;
   width: 100% !important;
 }
+
+/* Styling untuk info-list di profil admin agar seragam dengan profil penjual */
+.admin-profile .info-list {
+  margin: .2rem 0 0;
+  display: grid;
+  grid-template-columns: 160px 1fr; /* Sama seperti profil penjual */
+  gap: 8px 14px;
+  font-size: 14px;
+}
+
+.admin-profile .info-list > div {
+  display: contents; /* Agar dt dan dd mengikuti grid layout */
+}
+
+.admin-profile .info-list dt {
+  font-weight: 600;
+  color: var(--text-muted);
+  margin: 0;
+  grid-column: 1; /* Menempatkan dt di kolom pertama */
+  text-align: left;
+  font-size: 0.8rem;
+}
+
+.admin-profile .info-list dd {
+  margin: 0;
+  color: var(--text-dark);
+  grid-column: 2; /* Menempatkan dd di kolom kedua */
+  text-align: left;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  font-size: 0.8rem;
+}

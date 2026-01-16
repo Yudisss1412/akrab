@@ -92,7 +92,7 @@
         <i class="bi bi-gear"></i>
         <span>Pengaturan Akun</span>
       </a>
-      <a href="#" class="nav-item js-logout" id="logoutBtn">
+      <a href="{{ route('logout') }}" class="nav-item js-logout" id="logoutBtn" data-logout-url="{{ route('logout') }}">
         <i class="bi bi-box-arrow-right"></i>
         <span>Keluar</span>
       </a>
@@ -302,6 +302,11 @@
           </div>
         </div>
       </div>
+
+      <!-- Form Logout (disembunyikan) -->
+      <form id="logoutForm" action="{{ route('logout') }}" method="POST" style="display: none;">
+        @csrf
+      </form>
     </div>
   </div>
 @endsection

@@ -106,19 +106,13 @@ document.addEventListener('click', function(e){
   const link = e.target.closest('a.js-logout');
   if (!link) return;
 
-  // (opsional) bersihkan jejak login di storage
-  try {
-    const keep = new Set(['akrab_wishlist']);
-    Object.keys(localStorage).forEach(k=>{
-      if (!keep.has(k) && /^(akrab_|token|access_token|refresh_token|user|remember)/i.test(k)) {
-        localStorage.removeItem(k);
-      }
-    });
-    sessionStorage.clear();
-  } catch {}
+  e.preventDefault(); // Mencegah redirect langsung
 
-  // Penting: JANGAN panggil e.preventDefault(),
-  // biarkan browser lanjut ke link.href ({{ route('welcome') }})
+  // Tampilkan modal konfirmasi logout
+  const logoutModal = document.getElementById('logoutModal');
+  if (logoutModal) {
+    logoutModal.classList.add('show');
+  }
 });
 
 // Tambahkan animasi halus saat halaman dimuat
@@ -241,14 +235,24 @@ document.addEventListener('DOMContentLoaded', function() {
       
       if (confirmLogout && logoutModal) {
         confirmLogout.addEventListener('click', function() {
-          // In a real application, redirect to the logout route
-          // Using the href from the original logout link
-          let logoutLink = document.querySelector('.js-logout');
-          if (logoutLink && logoutLink.href) {
-            window.location.href = logoutLink.href;
+          // Bersihkan jejak login di storage
+          try {
+            const keep = new Set(['akrab_wishlist']);
+            Object.keys(localStorage).forEach(k=>{
+              if (!keep.has(k) && /^(akrab_|token|access_token|refresh_token|user|remember)/i.test(k)) {
+                localStorage.removeItem(k);
+              }
+            });
+            sessionStorage.clear();
+          } catch {}
+
+          // Redirect to the logout route
+          let logoutLink = document.querySelector('#logoutBtn');
+          if (logoutLink && logoutLink.dataset.logoutUrl) {
+            window.location.href = logoutLink.dataset.logoutUrl;
           } else {
             // Fallback to default logout route if not found
-            window.location.href = '/logout';  // Adjust this URL to match your actual logout route
+            window.location.href = '/logout';
           }
         });
       }
@@ -385,13 +389,16 @@ document.addEventListener('DOMContentLoaded', function() {
     if (defaultSection?.id === 'account-settings') {
       initializeModalListeners();
     }
-    
+
+    // Initialize logout modal listeners (since logout button is always available)
+    initializeLogoutModalListeners();
+
     // Close modal when clicking outside of it using event delegation
     document.addEventListener('click', function(event) {
       const changePasswordModal = document.getElementById('changePasswordModal');
       const deactivateAccountModal = document.getElementById('deactivateAccountModal');
       const logoutModal = document.getElementById('logoutModal');
-      
+
       // Only close if clicking on the backdrop (not on modal content)
       if (changePasswordModal && event.target === changePasswordModal) {
         changePasswordModal.classList.remove('show');
@@ -399,6 +406,75 @@ document.addEventListener('DOMContentLoaded', function() {
       if (deactivateAccountModal && event.target === deactivateAccountModal) {
         deactivateAccountModal.classList.remove('show');
       }
+      if (logoutModal && event.target === logoutModal) {
+        logoutModal.classList.remove('show');
+      }
+    });
+  }
+
+  // Function to initialize logout modal listeners
+  function initializeLogoutModalListeners() {
+    const logoutBtn = document.getElementById('logoutBtn');
+    const logoutModal = document.getElementById('logoutModal');
+    const closeLogoutModal = document.getElementById('closeLogoutModal');
+    const cancelLogout = document.getElementById('cancelLogout');
+    const confirmLogout = document.getElementById('confirmLogout');
+
+    if (logoutBtn && logoutModal) {
+      logoutBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        logoutModal.classList.add('show');
+      });
+    }
+
+    if (closeLogoutModal && logoutModal) {
+      closeLogoutModal.addEventListener('click', function() {
+        logoutModal.classList.remove('show');
+      });
+    }
+
+    if (cancelLogout && logoutModal) {
+      cancelLogout.addEventListener('click', function() {
+        logoutModal.classList.remove('show');
+      });
+    }
+
+    if (confirmLogout && logoutModal) {
+      confirmLogout.addEventListener('click', function() {
+        // Bersihkan jejak login di storage
+        try {
+          const keep = new Set(['akrab_wishlist']);
+          Object.keys(localStorage).forEach(k=>{
+            if (!keep.has(k) && /^(akrab_|token|access_token|refresh_token|user|remember)/i.test(k)) {
+              localStorage.removeItem(k);
+            }
+          });
+          sessionStorage.clear();
+        } catch {}
+
+        // Lakukan POST request ke route logout menggunakan fetch
+        let logoutLink = document.querySelector('#logoutBtn');
+        let logoutUrl;
+        if (logoutLink && logoutLink.dataset.logoutUrl) {
+          logoutUrl = logoutLink.dataset.logoutUrl;
+        } else {
+          // Fallback to default logout route if not found
+          logoutUrl = '/logout';
+        }
+
+        // Submit form logout permanen
+        const logoutForm = document.getElementById('logoutForm');
+        if (logoutForm) {
+          logoutForm.submit();
+        } else {
+          // Jika form tidak ditemukan, fallback ke redirect ke route logout
+          window.location.href = logoutUrl;
+        }
+      });
+    }
+
+    // Close modal when clicking outside of it using event delegation
+    document.addEventListener('click', function(event) {
       if (logoutModal && event.target === logoutModal) {
         logoutModal.classList.remove('show');
       }

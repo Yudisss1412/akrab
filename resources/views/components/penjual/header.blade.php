@@ -1,7 +1,7 @@
 
 <header class="header compact">
   <div class="header-left">
-    <a href="{{ route('cust.welcome') }}" aria-label="Ke beranda">
+    <a href="{{ route('dashboard.penjual') }}" aria-label="Ke beranda">
       <img class="logo" src="{{ asset('src/Logo_UMKM.png') }}" alt="AKRAB" />
     </a>
   </div>

@@ -1,9 +1,19 @@
 
 <header class="ak-navbar">
   <div class="ak-navbar__inner">
-    <a href="{{ route('cust.welcome') }}" aria-label="Ke beranda">
-      <img class="ak-logo" src="{{ asset('src/Logo_UMKM.png') }}" alt="AKRAB" />
-    </a>
+    @if(auth()->check() && auth()->user()->role && auth()->user()->role->name === 'admin')
+      <a href="{{ route('dashboard.admin') }}" aria-label="Ke beranda">
+        <img class="ak-logo" src="{{ asset('src/Logo_UMKM.png') }}" alt="AKRAB" />
+      </a>
+    @elseif(auth()->check() && auth()->user()->role && auth()->user()->role->name === 'seller')
+      <a href="{{ route('dashboard.penjual') }}" aria-label="Ke beranda">
+        <img class="ak-logo" src="{{ asset('src/Logo_UMKM.png') }}" alt="AKRAB" />
+      </a>
+    @else
+      <a href="{{ route('dashboard.penjual') }}" aria-label="Ke beranda">
+        <img class="ak-logo" src="{{ asset('src/Logo_UMKM.png') }}" alt="AKRAB" />
+      </a>
+    @endif
     <div class="header-right">
       @if(auth()->check() && auth()->user()->role && auth()->user()->role->name === 'admin')
         <a class="profile-ico" href="{{ route('profil.admin') }}" aria-label="Profil Admin">

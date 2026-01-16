@@ -1,7 +1,9 @@
 <!-- Header khusus pelanggan tanpa searchbar -->
 <header class="header compact">
   <div class="header-left">
-    <img class="logo" src="{{ asset('src/Logo_UMKM.png') }}" alt="AKRAB Logo" />
+    <a href="{{ route('cust.welcome') }}">
+      <img class="logo" src="{{ asset('src/Logo_UMKM.png') }}" alt="AKRAB Logo" />
+    </a>
   </div>
   
   <div class="header-center">

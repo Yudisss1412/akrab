@@ -245,7 +245,9 @@
 <!-- Header khusus pelanggan untuk halaman utama -->
 <header class="header">
   <div class="header-left">
-    <img class="logo" src="{{ asset('src/Logo_UMKM.png') }}" alt="AKRAB Logo" />
+    <a href="{{ route('cust.welcome') }}">
+      <img class="logo" src="{{ asset('src/Logo_UMKM.png') }}" alt="AKRAB Logo" />
+    </a>
   </div>
 
   <div class="header-center">

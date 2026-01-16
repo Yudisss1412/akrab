@@ -758,7 +758,7 @@ body {
 
   /* Sembunyikan filter secara default di mobile */
   .produk-filter-container {
-    display: none !important;
+    display: block !important;
   }
 
   .produk-filter-container.show {
@@ -873,7 +873,7 @@ body {
   }
 
   .produk-filter-container {
-    display: none !important;
+    display: block !important;
   }
 
   /* Di desktop, tampilkan filter secara normal (tidak disembunyikan) */

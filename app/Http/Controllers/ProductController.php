@@ -319,7 +319,34 @@ class ProductController extends Controller
             return $product;
         });
 
-        return view('customer.produk.halaman_produk', compact('products'));
+        // Ambil kategori-kategori yang sesuai dengan dashboard customer
+        // Kita akan coba beberapa variasi nama kategori
+        $mainCategories = [
+            'Kuliner', 'Fashion', 'Kerajinan Tangan',
+            'Produk Berkebun', 'Produk Kesehatan',
+            'Mainan', 'Hampers'
+        ];
+
+        // Cari kategori-kategori yang ada di database termasuk variasi nama
+        $categories = Category::where(function($query) use ($mainCategories) {
+            foreach ($mainCategories as $category) {
+                $query->orWhere('name', $category);
+            }
+
+        })
+        ->orderByRaw("CASE
+            WHEN name = 'Kuliner' THEN 1
+            WHEN name = 'Fashion' THEN 2
+            WHEN name = 'Kerajinan Tangan' THEN 3
+            WHEN name = 'Produk Berkebun' THEN 4
+            WHEN name = 'Produk Kesehatan' THEN 5
+            WHEN name = 'Mainan' THEN 6
+            WHEN name = 'Hampers' THEN 7
+            ELSE 8
+        END")
+        ->get();
+
+        return view('customer.produk.halaman_produk', compact('products', 'categories'));
     }
 
     /**
@@ -1114,5 +1141,189 @@ class ProductController extends Controller
             'message' => "Berhasil mengupdate {$updatedCount} produk yang tidak memiliki penjual",
             'updated_count' => $updatedCount
         ]);
+    }
+
+    /**
+     * API endpoint untuk pencarian produk
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiSearch(Request $request)
+    {
+        $search = $request->get('search');
+        $category = $request->get('kategori');
+        $subcategory = $request->get('subkategori');
+        $minPrice = $request->get('min_price');
+        $maxPrice = $request->get('max_price');
+        $rating = $request->get('rating');
+        $sort = $request->get('sort', 'popular');
+
+        $query = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images'])
+                        ->whereHas('seller'); // Hanya produk dengan seller yang valid
+
+        // Tambahkan pencarian jika ada
+        if ($search) {
+            $query->where('name', 'LIKE', "%{$search}%");
+        }
+
+        // Tambahkan filter kategori jika ada
+        if ($category && $category !== 'all') {
+            $query->whereHas('category', function($q) use ($category) {
+                $q->where('name', $category);
+            });
+        }
+
+        // Tambahkan filter subkategori jika ada
+        if ($subcategory) {
+            $query->whereHas('subcategory', function($q) use ($subcategory) {
+                $q->where('name', $subcategory);
+            });
+        }
+
+        // Tambahkan filter harga minimum jika ada
+        if ($minPrice) {
+            $query->where('price', '>=', $minPrice);
+        }
+
+        // Tambahkan filter harga maksimum jika ada
+        if ($maxPrice) {
+            $query->where('price', '<=', $maxPrice);
+        }
+
+        // Tambahkan filter rating jika ada
+        if ($rating) {
+            $query = $query->whereHas('approvedReviews', function($q) use ($rating) {
+                $q->selectRaw('product_id')
+                  ->groupBy('product_id')
+                  ->havingRaw('AVG(rating) >= ?', [$rating]);
+            });
+        }
+
+        // Tambahkan sorting
+        switch ($sort) {
+            case 'newest':
+                $query->orderBy('created_at', 'desc');
+                break;
+            case 'price-low':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price-high':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'rating':
+                $query->orderByRaw('COALESCE(average_rating, 0) DESC');
+                break;
+            default: // popular
+                $query->orderByRaw('(COALESCE(average_rating, 0) * 10) + COALESCE(review_count, 0) DESC');
+                break;
+        }
+
+        $products = $query->get();
+
+        // Tambahkan average rating dan review count ke setiap produk
+        $products = $products->map(function($product) {
+            $product->setAttribute('average_rating', $product->averageRating);
+            $product->setAttribute('review_count', $product->reviews_count);
+            $product->setAttribute('formatted_images', $this->formatProductImages($product));
+            $product->setAttribute('rating', $product->averageRating);
+            $product->setAttribute('harga', $product->price);
+            $product->setAttribute('toko', $product->seller && is_object($product->seller) ? $product->seller->store_name : 'Toko Umum');
+            return $product;
+        });
+
+        return response()->json($products);
+    }
+
+    /**
+     * API endpoint untuk filter produk (semua produk dengan opsi filter)
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiFilter(Request $request)
+    {
+        $search = $request->get('search');
+        $category = $request->get('kategori');
+        $subcategory = $request->get('subkategori');
+        $minPrice = $request->get('min_price');
+        $maxPrice = $request->get('max_price');
+        $rating = $request->get('rating');
+        $sort = $request->get('sort', 'popular');
+
+        $query = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images'])
+                        ->whereHas('seller'); // Hanya produk dengan seller yang valid
+
+        // Tambahkan pencarian jika ada
+        if ($search) {
+            $query->where('name', 'LIKE', "%{$search}%");
+        }
+
+        // Tambahkan filter kategori jika ada
+        if ($category && $category !== 'all') {
+            $query->whereHas('category', function($q) use ($category) {
+                $q->where('name', $category);
+            });
+        }
+
+        // Tambahkan filter subkategori jika ada
+        if ($subcategory) {
+            $query->whereHas('subcategory', function($q) use ($subcategory) {
+                $q->where('name', $subcategory);
+            });
+        }
+
+        // Tambahkan filter harga minimum jika ada
+        if ($minPrice) {
+            $query->where('price', '>=', $minPrice);
+        }
+
+        // Tambahkan filter harga maksimum jika ada
+        if ($maxPrice) {
+            $query->where('price', '<=', $maxPrice);
+        }
+
+        // Tambahkan filter rating jika ada
+        if ($rating) {
+            $query = $query->whereHas('approvedReviews', function($q) use ($rating) {
+                $q->selectRaw('product_id')
+                  ->groupBy('product_id')
+                  ->havingRaw('AVG(rating) >= ?', [$rating]);
+            });
+        }
+
+        // Tambahkan sorting
+        switch ($sort) {
+            case 'newest':
+                $query->orderBy('created_at', 'desc');
+                break;
+            case 'price-low':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price-high':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'rating':
+                $query->orderByRaw('COALESCE(average_rating, 0) DESC');
+                break;
+            default: // popular
+                $query->orderByRaw('(COALESCE(average_rating, 0) * 10) + COALESCE(review_count, 0) DESC');
+                break;
+        }
+
+        $products = $query->get();
+
+        // Tambahkan average rating dan review count ke setiap produk
+        $products = $products->map(function($product) {
+            $product->setAttribute('average_rating', $product->averageRating);
+            $product->setAttribute('review_count', $product->reviews_count);
+            $product->setAttribute('formatted_images', $this->formatProductImages($product));
+            $product->setAttribute('rating', $product->averageRating);
+            $product->setAttribute('harga', $product->price);
+            $product->setAttribute('toko', $product->seller && is_object($product->seller) ? $product->seller->store_name : 'Toko Umum');
+            return $product;
+        });
+
+        return response()->json($products);
     }
 }

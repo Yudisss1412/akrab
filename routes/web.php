@@ -166,6 +166,8 @@ Route::post('/api/cart/sync', [App\Http\Controllers\CartController::class, 'sync
 // API routes for products
 Route::get('/api/products/popular', [App\Http\Controllers\ProductController::class, 'popular']);
 Route::get('/api/products/{id}', [App\Http\Controllers\ProductController::class, 'apiShow']);
+Route::get('/api/products/search', [App\Http\Controllers\ProductController::class, 'apiSearch']);
+Route::get('/api/products/filter', [App\Http\Controllers\ProductController::class, 'apiFilter']);
 
 Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'index'])->name('checkout');
 Route::post('/checkout', [App\Http\Controllers\CheckoutController::class, 'process'])->name('checkout.process');

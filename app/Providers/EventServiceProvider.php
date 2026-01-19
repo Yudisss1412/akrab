@@ -2,9 +2,7 @@
 
 namespace App\Providers;
 
-use Illuminate\Auth\Events\Login;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use App\Listeners\CheckUserStatusListener;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -14,9 +12,7 @@ class EventServiceProvider extends ServiceProvider
      * @var array<class-string, array<int, class-string>>
      */
     protected $listen = [
-        Login::class => [
-            CheckUserStatusListener::class,
-        ],
+        // No event listeners currently registered
     ];
 
     /**

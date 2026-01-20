@@ -249,10 +249,84 @@
       }
     }
 
+    // Add notification styles if not already present
+    if (!document.querySelector('#notification-styles')) {
+        const style = document.createElement('style');
+        style.id = 'notification-styles';
+        style.textContent =
+            '.notification {' +
+            'position: fixed;' +
+            'top: 50%;' +
+            'left: 50%;' +
+            'transform: translate(-50%, -50%) scale(0.9);' +
+            'padding: 20px 30px;' +
+            'border-radius: 12px;' +
+            'color: white;' +
+            'font-weight: 500;' +
+            'z-index: 10000;' +
+            'opacity: 0;' +
+            'transition: opacity 0.3s ease, transform 0.3s ease;' +
+            'max-width: 400px;' +
+            'word-wrap: break-word;' +
+            'box-shadow: 0 10px 25px rgba(0,0,0,0.2);' +
+            'text-align: center;' +
+            'min-width: 300px;' +
+            '}' +
+            '.notification.success {' +
+            'background-color: #10b981;' + /* Green */
+            '}' +
+            '.notification.error {' +
+            'background-color: #ef4444;' + /* Red */
+            '}' +
+            '.notification.info {' +
+            'background-color: #3b82f6;' + /* Blue */
+            '}' +
+            '.notification.warning {' +
+            'background-color: #f59e0b;' + /* Yellow/Orange */
+            '}' +
+            '.notification.show {' +
+            'opacity: 1;' +
+            'transform: translate(-50%, -50%) scale(1);' +
+            '}';
+        document.head.appendChild(style);
+    }
+
+    // Function to show notification
+    function showNotification(message, type = 'info') {
+      // Remove existing notification if present
+      const existingNotification = document.querySelector('.notification');
+      if (existingNotification) {
+        existingNotification.remove();
+      }
+
+      // Create notification element
+      const notification = document.createElement('div');
+      notification.className = 'notification ' + type;
+      notification.textContent = message;
+
+      // Add to body
+      document.body.appendChild(notification);
+
+      // Show notification
+      setTimeout(() => {
+        notification.classList.add('show');
+      }, 100);
+
+      // Remove notification after 3 seconds
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+          }
+        }, 300);
+      }, 3000);
+    }
+
     // Function to update order status
     function updateOrderStatus(orderId, newStatus) {
       if (confirm('Apakah Anda yakin ingin mengubah status pesanan ini?')) {
-        fetch(`/penjual/pesanan/${orderId}/status`, {
+        fetch('/penjual/pesanan/' + orderId + '/status', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -265,16 +339,16 @@
         .then(response => response.json())
         .then(data => {
           if (data.success) {
-            alert(data.message);
+            showNotification(data.message, 'success');
             // Refresh page to show updated status
             location.reload();
           } else {
-            alert('Gagal mengubah status: ' + (data.message || 'Unknown error'));
+            showNotification('Gagal mengubah status: ' + (data.message || 'Unknown error'), 'error');
           }
         })
         .catch(error => {
           console.error('Error:', error);
-          alert('Terjadi kesalahan saat mengubah status pesanan');
+          showNotification('Terjadi kesalahan saat mengubah status pesanan', 'error');
         });
       }
     }
@@ -416,7 +490,7 @@
         'Apakah Anda yakin ingin mengirimkan pesanan ini dengan nomor resi: ' + trackingNumber + '?',
         function() {
           // This function is called when user confirms
-          fetch(`/penjual/pesanan/${orderId}/shipping`, {
+          fetch('/penjual/pesanan/' + orderId + '/shipping', {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
@@ -432,17 +506,17 @@
           .then(response => response.json())
           .then(data => {
             if (data.success) {
-              alert(data.message);
+              showNotification(data.message, 'success');
               closeShippingModal();
               // Refresh page to show updated status
               location.reload();
             } else {
-              alert('Gagal mengirimkan pesanan: ' + (data.message || 'Unknown error'));
+              showNotification('Gagal mengirimkan pesanan: ' + (data.message || 'Unknown error'), 'error');
             }
           })
           .catch(error => {
             console.error('Error:', error);
-            alert('Terjadi kesalahan saat mengirimkan pesanan');
+            showNotification('Terjadi kesalahan saat mengirimkan pesanan', 'error');
           });
         }
       );

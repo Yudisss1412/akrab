@@ -151,8 +151,104 @@
   <script>
     // Function to update order status
     function updateOrderStatus(orderId, newStatus) {
-      if (confirm('Apakah Anda yakin ingin mengubah status pesanan ini?')) {
-        fetch(`/penjual/pesanan/${orderId}/status`, {
+      // Remove existing modal if present
+      const existingModal = document.querySelector('.confirmation-modal');
+      if (existingModal) {
+        existingModal.remove();
+      }
+
+      // Create modal HTML
+      const modalHtml = `
+        <div class="confirmation-modal" style="
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 9999;
+          font-family: inherit;
+        ">
+          <div class="modal-content" style="
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+          ">
+            <div class="modal-icon" style="
+              width: 60px;
+              height: 60px;
+              border-radius: 50%;
+              background: #fef3c7;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin: 0 auto 16px;
+            ">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+            </div>
+            <h3 class="modal-title" style="
+              font-size: 18px;
+              font-weight: 600;
+              color: #1f2937;
+              margin: 0 0 8px;
+            ">Konfirmasi</h3>
+            <p class="modal-message" style="
+              color: #6b7280;
+              margin: 0 0 24px;
+              line-height: 1.5;
+            ">Apakah Anda yakin ingin mengubah status pesanan ini?</p>
+            <div class="modal-actions" style="
+              display: flex;
+              gap: 12px;
+              justify-content: center;
+            ">
+              <button id="cancel-btn" class="btn btn-secondary" style="
+                padding: 10px 20px;
+                border: 1px solid #d1d5db;
+                border-radius: 8px;
+                background: white;
+                color: #6b7280;
+                cursor: pointer;
+                font-weight: 500;
+                transition: all 0.2s;
+              ">Batal</button>
+              <button id="confirm-btn" class="btn btn-primary" style="
+                padding: 10px 20px;
+                border: none;
+                border-radius: 8px;
+                background: var(--primary-color-dark, #005a4a);
+                color: white;
+                cursor: pointer;
+                font-weight: 500;
+                transition: all 0.2s;
+              ">Ya, Ubah</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Add modal to body
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+      // Get modal elements
+      const modal = document.querySelector('.confirmation-modal');
+      const confirmBtn = document.getElementById('confirm-btn');
+      const cancelBtn = document.getElementById('cancel-btn');
+
+      // Add event listeners
+      confirmBtn.addEventListener('click', () => {
+        fetch(\`/penjual/pesanan/\${orderId}/status\`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -162,8 +258,16 @@
             status: newStatus
           })
         })
-        .then(response => response.json())
-        .then(data => {
+        .then(async response => {
+          if (!response.ok) {
+            // Handle HTTP errors (4xx, 5xx)
+            const errorText = await response.text();
+            console.error('HTTP Error:', response.status, errorText);
+            alert(\`Terjadi kesalahan saat mengubah status pesanan (\${response.status}): \${errorText}\`);
+            return;
+          }
+
+          const data = await response.json();
           if (data.success) {
             alert(data.message);
             // Refresh page to show updated status
@@ -174,9 +278,29 @@
         })
         .catch(error => {
           console.error('Error:', error);
-          alert('Terjadi kesalahan saat mengubah status pesanan');
+          alert('Terjadi kesalahan saat mengubah status pesanan: ' + error.message);
         });
-      }
+
+        modal.remove();
+      });
+
+      const closeModal = () => modal.remove();
+
+      cancelBtn.addEventListener('click', closeModal);
+
+      // Close modal when clicking outside
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          closeModal();
+        }
+      });
+
+      // Close modal with Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeModal();
+        }
+      });
     }
   </script>
 </body>

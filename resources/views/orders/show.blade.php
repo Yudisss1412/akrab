@@ -581,18 +581,18 @@
                         <button class="btn btn-outline w-100 mb-2" data-bs-toggle="modal" data-bs-target="#addTrackingModal">
                             Masukkan Nomor Resi
                         </button>
-                        <button class="btn btn-primary w-100 mb-2">Konfirmasi Pembayaran</button>
-                        <button class="btn btn-outline w-100">Batalkan Pesanan</button>
+                        <button class="btn btn-primary w-100 mb-2" onclick="updateOrderStatus({{ $order->id }}, 'confirmed')">Konfirmasi Pembayaran</button>
+                        <button class="btn btn-outline w-100" onclick="updateOrderStatus({{ $order->id }}, 'cancelled')">Batalkan Pesanan</button>
                         @elseif($order->status === 'confirmed')
                         <button class="btn btn-outline w-100 mb-2" data-bs-toggle="modal" data-bs-target="#addTrackingModal">
                             Masukkan Nomor Resi
                         </button>
-                        <button class="btn btn-primary w-100">Konfirmasi Pesanan & Beri Tahu Pembeli</button>
+                        <button class="btn btn-primary w-100" onclick="updateOrderStatus({{ $order->id }}, 'shipped')">Konfirmasi Pesanan & Beri Tahu Pembeli</button>
                         @elseif($order->status === 'shipped')
-                        <button class="btn btn-primary w-100 mb-2">Tandai Selesai</button>
-                        <button class="btn btn-outline w-100">Perbarui Status & Beri Tahu Pembeli</button>
+                        <button class="btn btn-primary w-100 mb-2" onclick="updateOrderStatus({{ $order->id }}, 'delivered')">Tandai Selesai</button>
+                        <button class="btn btn-outline w-100" onclick="updateOrderStatus({{ $order->id }}, 'delivered')">Perbarui Status & Beri Tahu Pembeli</button>
                         @elseif($order->status === 'delivered')
-                        <button class="btn btn-outline w-100">Ucapkan Terima Kasih & Beri Tahu Pembeli</button>
+                        <button class="btn btn-outline w-100" onclick="updateOrderStatus({{ $order->id }}, 'delivered')">Ucapkan Terima Kasih & Beri Tahu Pembeli</button>
                         @endif
                     </div>
                 </div>
@@ -689,10 +689,67 @@
             }, 5000);
         }
 
+        function updateOrderStatus(orderId, newStatus) {
+            let confirmationMessage = '';
+            switch(newStatus) {
+                case 'confirmed':
+                    confirmationMessage = 'Apakah Anda yakin ingin mengkonfirmasi pembayaran untuk pesanan ini?';
+                    break;
+                case 'shipped':
+                    confirmationMessage = 'Apakah Anda yakin ingin mengubah status pesanan menjadi dikirim?';
+                    break;
+                case 'delivered':
+                    confirmationMessage = 'Apakah Anda yakin ingin menandai pesanan sebagai selesai?';
+                    break;
+                case 'cancelled':
+                    confirmationMessage = 'Apakah Anda yakin ingin membatalkan pesanan ini?';
+                    break;
+                default:
+                    confirmationMessage = 'Apakah Anda yakin ingin mengubah status pesanan ini?';
+            }
+
+            if (confirm(confirmationMessage)) {
+                // Kirim permintaan ke server untuk mengubah status pesanan
+                fetch('/penjual/pesanan/' + orderId + '/status', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        status: newStatus
+                    })
+                })
+                .then(async response => {
+                    if (!response.ok) {
+                        // Handle HTTP errors (4xx, 5xx)
+                        const errorText = await response.text();
+                        console.error('HTTP Error:', response.status, errorText);
+                        showNotification(`Terjadi kesalahan saat mengubah status pesanan (${response.status}): ${errorText}`, 'error');
+                        return;
+                    }
+
+                    const data = await response.json();
+                    if (data.success) {
+                        showNotification(data.message, 'success');
+                        setTimeout(() => {
+                            location.reload(); // Refresh halaman untuk menampilkan status terbaru
+                        }, 1500);
+                    } else {
+                        showNotification('Gagal mengubah status: ' + (data.message || 'Terjadi kesalahan'), 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Terjadi kesalahan saat mengubah status pesanan', 'error');
+                });
+            }
+        }
+
         function reportUndeliveredOrder(orderNumber) {
             if (confirm('Apakah Anda yakin ingin melaporkan bahwa pesanan ini belum diterima?')) {
                 // Kirim permintaan ke server untuk mengubah status kembali ke 'shipped'
-                fetch(`/api/orders/${orderNumber}/report-undelivered`, {
+                fetch('/api/orders/' + orderNumber + '/report-undelivered', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

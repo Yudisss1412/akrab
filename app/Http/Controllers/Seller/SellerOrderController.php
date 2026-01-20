@@ -333,59 +333,110 @@ class SellerOrderController extends Controller
      */
     public function updateStatus(Request $request, $id)
     {
-        // Validasi input - menerima status dalam format database
-        $request->validate([
-            'status' => 'required|in:pending,confirmed,shipped,delivered,cancelled'
+        \Log::info('Update status called', [
+            'user_id' => auth()->id(),
+            'order_id' => $id,
+            'status' => $request->status ?? 'null',
+            'request_data' => $request->all()
         ]);
 
-        // Hanya penjual yang bisa mengakses
-        $user = Auth::user();
-        if (!$user || !$user->role || $user->role->name !== 'seller') {
-            return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
+        try {
+            // Validasi input - menerima status dalam format database
+            $request->validate([
+                'status' => 'required|in:pending,confirmed,shipped,delivered,cancelled'
+            ]);
+
+            // Hanya penjual yang bisa mengakses
+            $user = Auth::user();
+            if (!$user || !$user->role || $user->role->name !== 'seller') {
+                \Log::warning('Access denied - not a seller', ['user_id' => $user?->id, 'role' => $user?->role?->name]);
+                return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
+            }
+
+            // Ambil ID penjual dari tabel sellers berdasarkan user_id
+            $seller = Seller::where('user_id', $user->id)->first();
+            if (!$seller) {
+                \Log::warning('Seller record not found', ['user_id' => $user->id]);
+                return response()->json(['success' => false, 'message' => 'Akses ditolak. Seller record tidak ditemukan.'], 403);
+            }
+
+            // Ambil pesanan dengan produk milik penjual ini
+            $order = Order::where('id', $id)
+                ->whereHas('items.product', function ($q) use ($seller) {
+                    $q->where('seller_id', $seller->id);
+                })
+                ->with(['items', 'items.product']) // Load items untuk membuat transaksi
+                ->first();
+
+            if (!$order) {
+                \Log::warning('Order not found or does not belong to seller', [
+                    'order_id' => $id,
+                    'seller_id' => $seller->id
+                ]);
+                return response()->json(['success' => false, 'message' => 'Pesanan tidak ditemukan atau tidak termasuk dalam produk Anda'], 404);
+            }
+
+            // Filter items hanya untuk produk penjual ini
+            $filteredItems = $order->items->filter(function ($item) use ($seller) {
+                return $item->product->seller_id == $seller->id;
+            });
+
+            // Simpan status lama sebelum update
+            $oldStatus = $order->status;
+
+            \Log::info('Updating order status', [
+                'order_id' => $order->id,
+                'old_status' => $oldStatus,
+                'new_status' => $request->status
+            ]);
+
+            // Update status saja, bukan seluruh model
+            $order->status = $request->status;
+            $order->save();
+
+            // Tambahkan log transisi status
+            $order->logs()->create([
+                'status' => $request->status,
+                'description' => "Status pesanan diubah menjadi {$request->status} oleh penjual",
+                'updated_by' => 'seller',
+            ]);
+
+            // Jika status berubah menjadi 'delivered' (artinya pesanan selesai), buat transaksi penjualan
+            if ($request->status === 'delivered' && $oldStatus !== 'delivered') {
+                $this->createSalesTransactions($order, $seller->id);
+            }
+
+            \Log::info('Order status updated successfully', [
+                'order_id' => $order->id,
+                'new_status' => $order->status
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Status pesanan berhasil diperbarui',
+                'order' => $order
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Validation error in updateStatus', [
+                'errors' => $e->validator->errors()->toArray(),
+                'request_data' => $request->all()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak valid: ' . json_encode($e->validator->errors()->toArray())
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('Error in updateStatus', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => auth()->id(),
+                'order_id' => $id
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mengubah status pesanan: ' . $e->getMessage()
+            ], 500);
         }
-
-        // Ambil ID penjual dari tabel sellers berdasarkan user_id
-        $seller = Seller::where('user_id', $user->id)->first();
-        if (!$seller) {
-            return response()->json(['success' => false, 'message' => 'Akses ditolak. Seller record tidak ditemukan.'], 403);
-        }
-
-        // Ambil pesanan dengan produk milik penjual ini
-        $order = Order::where('id', $id)
-            ->whereHas('items.product', function ($q) use ($seller) {
-                $q->where('seller_id', $seller->id);
-            })
-            ->with(['items', 'items.product']) // Load items untuk membuat transaksi
-            ->firstOrFail();
-
-        // Filter items hanya untuk produk penjual ini
-        $order->items = $order->items->filter(function ($item) use ($seller) {
-            return $item->product->seller_id == $seller->id;
-        });
-
-        // Simpan status lama sebelum update
-        $oldStatus = $order->status;
-
-        // Update status
-        $order->update(['status' => $request->status]);
-
-        // Tambahkan log transisi status
-        $order->logs()->create([
-            'status' => $request->status,
-            'description' => "Status pesanan diubah menjadi {$request->status} oleh penjual",
-            'updated_by' => 'seller',
-        ]);
-
-        // Jika status berubah menjadi 'delivered' (artinya pesanan selesai), buat transaksi penjualan
-        if ($request->status === 'delivered' && $oldStatus !== 'delivered') {
-            $this->createSalesTransactions($order, $seller->id);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Status pesanan berhasil diperbarui',
-            'order' => $order
-        ]);
     }
 
     /**
@@ -418,69 +469,115 @@ class SellerOrderController extends Controller
      */
     public function updateShipping(Request $request, $id)
     {
-        // Validasi input
-        $request->validate([
-            'tracking_number' => 'required|string|max:255',
-            'shipping_courier' => 'nullable|string|max:255',
-            'shipping_carrier' => 'nullable|string|max:255'
+        \Log::info('Update shipping called', [
+            'user_id' => auth()->id(),
+            'order_id' => $id,
+            'request_data' => $request->all()
         ]);
 
-        // Hanya penjual yang bisa mengakses
-        $user = Auth::user();
-        if (!$user || !$user->role || $user->role->name !== 'seller') {
-            return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
+        try {
+            // Validasi input
+            $request->validate([
+                'tracking_number' => 'required|string|max:255',
+                'shipping_courier' => 'nullable|string|max:255',
+                'shipping_carrier' => 'nullable|string|max:255'
+            ]);
+
+            // Hanya penjual yang bisa mengakses
+            $user = Auth::user();
+            if (!$user || !$user->role || $user->role->name !== 'seller') {
+                \Log::warning('Access denied - not a seller', ['user_id' => $user?->id, 'role' => $user?->role?->name]);
+                return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
+            }
+
+            // Ambil ID penjual dari tabel sellers berdasarkan user_id
+            $seller = Seller::where('user_id', $user->id)->first();
+            if (!$seller) {
+                \Log::warning('Seller record not found', ['user_id' => $user->id]);
+                return response()->json(['success' => false, 'message' => 'Akses ditolak. Seller record tidak ditemukan.'], 403);
+            }
+
+            // Ambil pesanan dengan produk milik penjual ini
+            $order = Order::with(['items.product']) // Load items untuk filtering
+                ->where('id', $id)
+                ->whereHas('items.product', function ($q) use ($seller) {
+                    $q->where('seller_id', $seller->id);
+                })
+                ->first();
+
+            if (!$order) {
+                \Log::warning('Order not found or does not belong to seller', [
+                    'order_id' => $id,
+                    'seller_id' => $seller->id
+                ]);
+                return response()->json(['success' => false, 'message' => 'Pesanan tidak ditemukan atau tidak termasuk dalam produk Anda'], 404);
+            }
+
+            // Filter items hanya untuk produk penjual ini
+            $order->items = $order->items->filter(function ($item) use ($seller) {
+                return $item->product->seller_id == $seller->id;
+            });
+
+            // Siapkan data untuk update
+            $updateData = [
+                'status' => 'shipped',
+                'tracking_number' => $request->tracking_number,
+            ];
+
+            // Hanya update shipping_carrier jika disediakan
+            if (!empty($request->shipping_carrier)) {
+                $updateData['shipping_carrier'] = $request->shipping_carrier;
+            }
+
+            // Hanya update shipping_courier jika disediakan (jika tidak kosong)
+            if (!empty($request->shipping_courier)) {
+                $updateData['shipping_courier'] = $request->shipping_courier;
+            }
+
+            \Log::info('Updating order shipping info', [
+                'order_id' => $order->id,
+                'update_data' => $updateData
+            ]);
+
+            // Update status menjadi shipped dan tambahkan nomor resi
+            // Gunakan update() pada query builder untuk menghindari masalah dengan relasi
+            Order::where('id', $order->id)->update($updateData);
+
+            // Tambahkan log transisi status
+            $order->logs()->create([
+                'status' => 'shipped',
+                'description' => "Pesanan dikirim dengan nomor resi {$request->tracking_number}",
+                'updated_by' => 'seller',
+            ]);
+
+            \Log::info('Order shipping updated successfully', ['order_id' => $order->id]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pesanan berhasil dikirim dengan nomor resi: ' . $request->tracking_number,
+                'order' => $order
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Validation error in updateShipping', [
+                'errors' => $e->validator->errors()->toArray(),
+                'request_data' => $request->all()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak valid: ' . json_encode($e->validator->errors()->toArray())
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('Error in updateShipping', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => auth()->id(),
+                'order_id' => $id
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mengirimkan pesanan: ' . $e->getMessage()
+            ], 500);
         }
-
-        // Ambil ID penjual dari tabel sellers berdasarkan user_id
-        $seller = Seller::where('user_id', $user->id)->first();
-        if (!$seller) {
-            return response()->json(['success' => false, 'message' => 'Akses ditolak. Seller record tidak ditemukan.'], 403);
-        }
-
-        // Ambil pesanan dengan produk milik penjual ini
-        $order = Order::with(['items.product']) // Load items untuk filtering
-            ->where('id', $id)
-            ->whereHas('items.product', function ($q) use ($seller) {
-                $q->where('seller_id', $seller->id);
-            })
-            ->firstOrFail();
-
-        // Filter items hanya untuk produk penjual ini
-        $order->items = $order->items->filter(function ($item) use ($seller) {
-            return $item->product->seller_id == $seller->id;
-        });
-
-        // Siapkan data untuk update
-        $updateData = [
-            'status' => 'shipped',
-            'tracking_number' => $request->tracking_number,
-        ];
-
-        // Hanya update shipping_carrier jika disediakan
-        if (!empty($request->shipping_carrier)) {
-            $updateData['shipping_carrier'] = $request->shipping_carrier;
-        }
-
-        // Hanya update shipping_courier jika disediakan (jika tidak kosong)
-        if (!empty($request->shipping_courier)) {
-            $updateData['shipping_courier'] = $request->shipping_courier;
-        }
-
-        // Update status menjadi shipped dan tambahkan nomor resi
-        $order->update($updateData);
-
-        // Tambahkan log transisi status
-        $order->logs()->create([
-            'status' => 'shipped',
-            'description' => "Pesanan dikirim dengan nomor resi {$request->tracking_number}",
-            'updated_by' => 'seller',
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Pesanan berhasil dikirim dengan nomor resi',
-            'order' => $order
-        ]);
     }
 
     /**

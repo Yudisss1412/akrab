@@ -228,10 +228,186 @@
       }
     });
 
+    // Add notification styles if not already present
+    if (!document.querySelector('#notification-styles')) {
+        const style = document.createElement('style');
+        style.id = 'notification-styles';
+        style.textContent = `
+            .notification {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) scale(0.9);
+                padding: 20px 30px;
+                border-radius: 12px;
+                color: white;
+                font-weight: 500;
+                z-index: 10000;
+                opacity: 0;
+                transition: opacity 0.3s ease, transform 0.3s ease;
+                max-width: 400px;
+                word-wrap: break-word;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+                text-align: center;
+                min-width: 300px;
+            }
+
+            .notification.success {
+                background-color: #10b981; /* Green */
+            }
+
+            .notification.error {
+                background-color: #ef4444; /* Red */
+            }
+
+            .notification.info {
+                background-color: #3b82f6; /* Blue */
+            }
+
+            .notification.warning {
+                background-color: #f59e0b; /* Yellow/Orange */
+            }
+
+            .notification.show {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    // Function to show notification
+    function showNotification(message, type = 'info') {
+        // Hapus notifikasi sebelumnya jika ada
+        const existingNotification = document.querySelector('.notification');
+        if (existingNotification) {
+            existingNotification.remove();
+        }
+
+        // Buat elemen notifikasi
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+
+        // Tambahkan ke body
+        document.body.appendChild(notification);
+
+        // Tampilkan notifikasi
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 100);
+
+        // Hapus notifikasi setelah 3 detik
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }, 3000);
+    }
+
     // Function to update order status
     function updateOrderStatus(orderId, newStatus) {
-      if (confirm('Apakah Anda yakin ingin mengubah status pesanan ini?')) {
-        fetch(`/penjual/pesanan/${orderId}/status`, {
+      // Remove existing modal if present
+      const existingModal = document.querySelector('.confirmation-modal');
+      if (existingModal) {
+        existingModal.remove();
+      }
+
+      // Create modal HTML
+      const modalHtml = `
+        <div class="confirmation-modal" style="
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 9999;
+          font-family: inherit;
+        ">
+          <div class="modal-content" style="
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+          ">
+            <div class="modal-icon" style="
+              width: 60px;
+              height: 60px;
+              border-radius: 50%;
+              background: #fef3c7;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin: 0 auto 16px;
+            ">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+            </div>
+            <h3 class="modal-title" style="
+              font-size: 18px;
+              font-weight: 600;
+              color: #1f2937;
+              margin: 0 0 8px;
+            ">Konfirmasi</h3>
+            <p class="modal-message" style="
+              color: #6b7280;
+              margin: 0 0 24px;
+              line-height: 1.5;
+            ">Apakah Anda yakin ingin mengubah status pesanan ini?</p>
+            <div class="modal-actions" style="
+              display: flex;
+              gap: 12px;
+              justify-content: center;
+            ">
+              <button id="cancel-btn" class="btn btn-secondary" style="
+                padding: 10px 20px;
+                border: 1px solid #d1d5db;
+                border-radius: 8px;
+                background: white;
+                color: #6b7280;
+                cursor: pointer;
+                font-weight: 500;
+                transition: all 0.2s;
+              ">Batal</button>
+              <button id="confirm-btn" class="btn btn-primary" style="
+                padding: 10px 20px;
+                border: none;
+                border-radius: 8px;
+                background: var(--primary-color-dark, #005a4a);
+                color: white;
+                cursor: pointer;
+                font-weight: 500;
+                transition: all 0.2s;
+              ">Ya, Ubah</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Add modal to body
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+      // Get modal elements
+      const modal = document.querySelector('.confirmation-modal');
+      const confirmBtn = document.getElementById('confirm-btn');
+      const cancelBtn = document.getElementById('cancel-btn');
+
+      // Add event listeners
+      confirmBtn.addEventListener('click', () => {
+        fetch('/penjual/pesanan/' + orderId + '/status', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -241,24 +417,32 @@
             status: newStatus
           })
         })
-        .then(response => response.json())
-        .then(data => {
+        .then(async response => {
+          if (!response.ok) {
+            // Handle HTTP errors (4xx, 5xx)
+            const errorText = await response.text();
+            console.error('HTTP Error:', response.status, errorText);
+            showNotification('Terjadi kesalahan saat mengubah status pesanan (' + response.status + '): ' + errorText, 'error');
+            return;
+          }
+
+          const data = await response.json();
           if (data.success) {
             // Update status badge in the UI without page reload
-            const statusBadge = document.querySelector(`#order-${orderId} .status-badge`);
+            const statusBadge = document.querySelector('#order-' + orderId + ' .status-badge');
             if (statusBadge) {
               statusBadge.textContent = getStatusText(data.order.status);
               statusBadge.className = 'status-badge ' + getStatusClass(data.order.status);
             }
 
             // Update status in dropdown if present
-            const statusSelect = document.querySelector(`#order-${orderId} .status-select`);
+            const statusSelect = document.querySelector('#order-' + orderId + ' .status-select');
             if (statusSelect) {
               statusSelect.value = data.order.status;
             }
 
             // Update timestamp if present
-            const updatedAtElement = document.querySelector(`#order-${orderId} .updated-at`);
+            const updatedAtElement = document.querySelector('#order-' + orderId + ' .updated-at');
             if (updatedAtElement) {
               updatedAtElement.textContent = new Date().toLocaleString('id-ID');
             }
@@ -266,16 +450,36 @@
             // Refresh status counts to update the tab badges
             updateOrderStatusCounts();
 
-            alert(data.message);
+            showNotification(data.message, 'success');
           } else {
-            alert('Gagal mengubah status: ' + (data.message || 'Unknown error'));
+            showNotification('Gagal mengubah status: ' + (data.message || 'Unknown error'), 'error');
           }
         })
         .catch(error => {
           console.error('Error:', error);
-          alert('Terjadi kesalahan saat mengubah status pesanan');
+          showNotification('Terjadi kesalahan saat mengubah status pesanan: ' + error.message, 'error');
         });
-      }
+
+        modal.remove();
+      });
+
+      const closeModal = () => modal.remove();
+
+      cancelBtn.addEventListener('click', closeModal);
+
+      // Close modal when clicking outside
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          closeModal();
+        }
+      });
+
+      // Close modal with Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeModal();
+        }
+      });
     }
 
     // Helper functions to convert status to readable text and appropriate CSS class
@@ -319,12 +523,12 @@
           console.log('Updating order status counts:', data.status_counts);
           // Update badge untuk setiap status
           for (const [status, count] of Object.entries(data.status_counts)) {
-            const badgeElement = document.querySelector(`.tab-item[data-status="${status}"] .badge`);
+            const badgeElement = document.querySelector('.tab-item[data-status="' + status + '"] .badge');
             if (badgeElement) {
-              console.log(`Updating ${status} badge to ${count}`);
+              console.log('Updating ' + status + ' badge to ' + count);
               badgeElement.textContent = count;
             } else {
-              console.log(`Badge element not found for status: ${status}`);
+              console.log('Badge element not found for status: ' + status);
             }
           }
         } else {
@@ -477,7 +681,7 @@
       }
 
       if (!csrfToken) {
-        alert('CSRF token tidak ditemukan. Harap refresh halaman.');
+        showNotification('CSRF token tidak ditemukan. Harap refresh halaman.', 'error');
         return;
       }
 
@@ -487,7 +691,7 @@
         'Apakah Anda yakin ingin mengirimkan pesanan ini dengan nomor resi: ' + trackingNumber + '?',
         function() {
           // This function is called when user confirms
-          fetch(`/penjual/pesanan/${orderId}/shipping`, {
+          fetch('/penjual/pesanan/' + orderId + '/shipping', {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
@@ -501,17 +705,17 @@
           .then(response => response.json())
           .then(data => {
             if (data.success) {
-              alert(data.message);
+              showNotification(data.message, 'success');
               closeShippingModal();
               // Refresh page to show updated status
               location.reload();
             } else {
-              alert('Gagal mengirimkan pesanan: ' + (data.message || 'Unknown error'));
+              showNotification('Gagal mengirimkan pesanan: ' + (data.message || 'Unknown error'), 'error');
             }
           })
           .catch(error => {
             console.error('Error:', error);
-            alert('Terjadi kesalahan saat mengirimkan pesanan');
+            showNotification('Terjadi kesalahan saat mengirimkan pesanan', 'error');
           });
         }
       );
@@ -616,7 +820,7 @@
         }
 
         if (!csrfToken) {
-          alert('CSRF token tidak ditemukan. Harap refresh halaman.');
+          showNotification('CSRF token tidak ditemukan. Harap refresh halaman.', 'error');
           return;
         }
 
@@ -652,17 +856,19 @@
             .then(response => response.json())
             .then(data => {
               if (data.success) {
-                alert(data.message);
+                showNotification(data.message, 'success');
                 ShippingModalNS.closeShippingModal();
                 // Refresh page to show updated status
-                location.reload();
+                setTimeout(() => {
+                  location.reload();
+                }, 1500);
               } else {
-                alert('Gagal mengirimkan pesanan: ' + (data.message || 'Unknown error'));
+                showNotification('Gagal mengirimkan pesanan: ' + (data.message || 'Unknown error'), 'error');
               }
             })
             .catch(error => {
               console.error('Error:', error);
-              alert('Terjadi kesalahan saat mengirimkan pesanan');
+              showNotification('Terjadi kesalahan saat mengirimkan pesanan', 'error');
             });
           }
         );

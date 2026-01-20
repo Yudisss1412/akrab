@@ -464,3 +464,269 @@ body {
   flex: 0 0 auto;
   min-width: 180px;
 }
+
+/* ========== Produk Populer Grid ========== */
+.popular-products-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 18px !important;
+  margin-bottom: 2.8rem !important;
+  width: 100% !important;
+}
+
+.produk-card {
+  position: relative !important;
+  background: var(--ak-white) !important;
+  border: 1px solid var(--ak-border) !important;
+  border-radius: var(--ak-radius) !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 12px !important;
+  transition: box-shadow .15s, border-color .15s, transform .15s !important;
+  min-height: 380px !important; /* Set minimum height for consistent card appearance */
+  height: 100% !important; /* Ensure cards fill available space in grid */
+  width: 100% !important; /* Ensure cards fill available width in grid cell */
+}
+
+.produk-card img {
+  width: 100% !important;
+  height: 145px !important;
+  object-fit: cover !important;
+  border-radius: 10px !important;
+  background: #f3f4f6 !important;
+  flex-shrink: 0 !important;
+  min-height: 145px !important; /* Ensure consistent height */
+}
+
+.produk-card-info {
+  padding: 8px 4px 6px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+}
+
+.produk-card-content {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  max-height: 180px !important; /* Limit height to prevent card from becoming too tall */
+  overflow: hidden !important; /* Hide overflow if content exceeds */
+}
+
+.produk-card-name {
+  margin: 8px 0 4px !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  color: var(--ak-primary) !important;
+  display: block !important; /* Ensure it behaves as block element */
+  white-space: nowrap !important; /* Prevent text wrapping */
+  overflow: hidden !important; /* Hide overflow */
+  text-overflow: ellipsis !important; /* Add ellipsis for long text */
+  min-height: 1.5em !important; /* Ensure consistent height */
+}
+
+.produk-card-sub {
+  font-size: 13px !important;
+  color: var(--ak-muted) !important;
+  margin-bottom: 6px !important;
+  min-height: 1.5em !important; /* Ensure consistent height */
+}
+
+.produk-card .produk-card-toko a.toko-link {
+  color: var(--ak-muted) !important;
+  text-decoration: none !important;
+  font-size: 13px !important;
+  transition: color 0.2s !important;
+  display: block !important; /* Ensure link takes full width */
+  white-space: nowrap !important; /* Prevent text wrapping */
+  overflow: hidden !important; /* Hide overflow */
+  text-overflow: ellipsis !important; /* Add ellipsis for long text */
+}
+
+.produk-card .produk-card-toko a.toko-link:hover {
+  color: var(--ak-primary) !important;
+  text-decoration: underline !important;
+}
+
+.produk-card .produk-card-toko {
+  margin-bottom: 6px !important;
+  min-height: 1.5em !important; /* Ensure consistent height */
+}
+
+.produk-card-price {
+  font-weight: 700 !important;
+  margin-bottom: 6px !important;
+  color: var(--ak-primary) !important;
+  min-height: 1.5em !important; /* Ensure consistent height */
+}
+
+.produk-card-stars {
+  display: flex !important;
+  gap: 2px !important;
+  margin-bottom: 6px !important;
+  min-height: 20px !important; /* Ensure consistent height for star ratings */
+}
+
+.produk-card-stars svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+.produk-card-actions {
+  margin-top: auto !important; /* Push actions to bottom of card */
+  margin-top: .5rem !important;
+  display: flex !important;
+  gap: .55rem !important;
+  width: 100% !important; /* Ensure actions take full width */
+  flex-shrink: 0 !important; /* Prevent this section from shrinking */
+}
+
+.produk-card-actions .btn-lihat,
+.produk-card-actions .btn-add {
+  flex: 1 !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 0.65rem 0.5rem !important; /* Reduced padding to make buttons less bulky */
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: background .15s, color .15s !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-decoration: none !important;
+  text-align: center !important;
+  min-height: 38px !important; /* Reduced height */
+  font-size: 0.85rem !important; /* Smaller font size */
+}
+
+.produk-card-actions .btn-lihat {
+  background: var(--ak-primary) !important; /* Hijau kebiruan utama */
+  color: #fff !important;
+}
+
+.produk-card-actions .btn-lihat:hover {
+  background: #005a4a !important; /* Warna lebih terang saat hover */
+  color: #fff !important;
+}
+
+.produk-card-actions .btn-add {
+  background: #f5fbf8 !important;
+  color: var(--ak-primary) !important;
+  border: 1px solid var(--ak-primary) !important;
+}
+
+.produk-card-actions .btn-add:hover {
+  background: var(--ak-primary) !important;
+  color: #fff !important;
+}
+
+/* Stock status indicators */
+.produk-card-stock.out-of-stock {
+  color: #dc3545 !important;
+  font-weight: 600 !important;
+  font-size: 0.85rem !important;
+  margin-top: 0.25rem !important;
+  min-height: 1.2em !important; /* Ensure consistent height regardless of text */
+}
+
+.produk-card-stock.low-stock {
+  color: #ffc107 !important;
+  font-weight: 500 !important;
+  font-size: 0.85rem !important;
+  margin-top: 0.25rem !important;
+  min-height: 1.2em !important; /* Ensure consistent height regardless of text */
+}
+
+.produk-card-stock.in-stock {
+  color: #28a745 !important;
+  font-weight: 500 !important;
+  font-size: 0.85rem !important;
+  margin-top: 0.25rem !important;
+  min-height: 1.2em !important; /* Ensure consistent height regardless of text */
+}
+
+/* Responsive grid layout */
+@media (max-width: 1200px) and (min-width: 993px) {
+  .popular-products-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+@media (max-width: 992px) and (min-width: 769px) {
+  .popular-products-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* Mobile layout */
+@media (max-width: 768px) {
+  .popular-products-grid {
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    gap: 0.8rem !important;
+    padding: 0.5rem 0.5rem 1.2rem 0.5rem !important;
+    margin-bottom: 2.8rem !important;
+    scroll-snap-type: x mandatory !important;
+    scrollbar-width: none !important;
+    min-height: 240px;
+    padding-right: 20px !important;
+  }
+
+  .popular-products-grid::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .produk-card {
+    padding: 10px !important;
+    margin-bottom: 0 !important;
+    min-width: 260px !important;
+    width: 260px !important;
+    flex: 0 0 260px !important;
+    scroll-snap-align: start !important;
+    margin-right: 15px !important;
+  }
+
+  .produk-card:last-child {
+    margin-right: 0 !important;
+  }
+
+  .produk-card img {
+    height: 140px !important;
+    width: 100% !important;
+    object-fit: cover !important;
+  }
+
+  .produk-card .produk-card-name {
+    font-size: 14px !important;
+    margin: 4px 0 3px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .produk-card .produk-card-harga {
+    font-size: 14px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .produk-card .produk-card-aksi {
+    flex-direction: row !important;
+    gap: 0.4rem !important;
+    padding: 0.6rem 0 0 !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .produk-card .produk-card-aksi .btn-lihat,
+  .produk-card .produk-card-aksi .btn-add {
+    flex: 1 1 auto !important;
+    margin: 0 !important;
+    padding: 0.5rem 0 !important;
+    font-size: 12px !important;
+    min-height: 36px !important;
+    word-break: keep-all !important;
+  }
+}

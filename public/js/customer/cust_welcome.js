@@ -11,10 +11,10 @@ function formatPrice(price) {
       maximumFractionDigits: 2
     }).format(numericValue);
   }
-  
+
   // Convert to number if it's a string
   const numericPrice = typeof price === 'string' ? parseFloat(price) : price;
-  
+
   // Format as Rupiah using Indonesian locale for currency
   return new Intl.NumberFormat('id-ID', {
     style: 'currency',
@@ -43,10 +43,10 @@ function createStarsHTML(num) {
 function handleImageError(img) {
   if (!img) return;
   img.onerror = null; // Prevent infinite loop if placeholder also fails
-  
+
   // Create simple SVG as fallback
   const svgString = '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="100%" height="100%" fill="#eef6f4"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#7aa29b">Gambar tidak tersedia</text></svg>';
-  
+
   img.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(svgString);
 }
 
@@ -55,7 +55,7 @@ async function loadProdukPopuler() {
   try {
     const response = await fetch('/api/products/popular'); // API endpoint to get popular products
     const data = await response.json();
-    
+
     // Format the price for each product using global formatPrice function
     const formattedData = data.map(product => ({
       ...product,
@@ -112,11 +112,11 @@ async function loadProdukPopuler() {
 async function renderProdukPopuler() {
   const grid = document.getElementById('produk-populer-grid');
   if (!grid) return;
-  
+
   // Load real product data
   const produkPopuler = await loadProdukPopuler();
   grid.innerHTML = '';
-  
+
   produkPopuler.forEach((produk, idx) => {
     const card = document.createElement('div');
     card.className = 'produk-card'; // Gunakan class yang sama dengan produk utama
@@ -143,6 +143,7 @@ async function renderProdukPopuler() {
     grid.appendChild(card);
   });
 }
+
 // Load the products when the page is ready - but only if no server-loaded products exist
 document.addEventListener('DOMContentLoaded', function() {
     const produkCards = document.querySelectorAll('.produk-card');
@@ -150,79 +151,28 @@ document.addEventListener('DOMContentLoaded', function() {
         // No products from server, load via JS
         renderProdukPopuler();
     } else {
-    }
+        // Products already loaded from server, attach event listeners
+        produkCards.forEach((card, idx) => {
+            const lihatDetailBtn = card.querySelector('.btn-lihat');
+            const addToCartBtn = card.querySelector('.btn-add');
 
-});
+            if (lihatDetailBtn) {
+                lihatDetailBtn.addEventListener('click', function() {
+                    const productId = this.getAttribute('data-product-id');
+                    // Navigate to product detail page
+                    window.location.href = `/produk_detail/${productId}`;
+                });
+            }
 
-// Ensure modal is closed on page load and prevent any automatic triggering
-document.addEventListener('DOMContentLoaded', function() {
-    const modal = document.getElementById('modal-detail-produk');
-    if (modal) {
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto'; // Ensure scrolling is enabled
-    }
-
-    // Additional check to make sure no element is automatically triggering the modal
-    setTimeout(() => {
-        if (modal && modal.style.display !== 'none') {
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
-    }, 100); // Small delay to ensure all initial events are processed
-});
-
-// Only enable "Tambah ke Keranjang" event listener initially to prevent auto-triggering of modal
-document.addEventListener('click', function(e) {
-    // Handle "Tambah ke Keranjang" button clicks (these are less likely to cause modal issues)
-    if (e.target.classList.contains('btn-add') && !e.target.classList.contains('processed')) {
-        console.log('Tambah ke Keranjang button clicked via event delegation');
-        const button = e.target;
-        const productId = button.getAttribute('data-product-id');
-
-        // Mark this button as processed to prevent duplicate events
-        button.classList.add('processed');
-
-        if (productId) {
-            e.preventDefault();
-            e.stopPropagation(); // Prevent event bubbling
-            console.log('Adding to cart product ID:', productId);
-            addToCart(productId);
-        } else {
-            console.warn('No product ID found on add to cart button');
-        }
+            if (addToCartBtn) {
+                addToCartBtn.addEventListener('click', function() {
+                    const productId = this.getAttribute('data-product-id');
+                    addToCart(productId);
+                });
+            }
+        });
     }
 });
-
-
-
-
-
-
-// Add to cart functionality
-if (modalAddCart) {
-  modalAddCart.onclick = function() {
-    const productId = this.getAttribute('data-product-id');
-    addToCart(productId);
-  };
-}
-
-if (modalLihatDetail) {
-  modalLihatDetail.onclick = () => {
-    if (currentProduk && currentProduk.id) {
-      window.location.href = `/produk_detail/${currentProduk.id}`;
-    } else {
-      // Fallback: coba ambil ID produk dari tombol itu sendiri atau dari elemen terkait
-      const productId = modalLihatDetail.getAttribute('data-product-id') ||
-                        document.querySelector('#modal-addcart-btn')?.getAttribute('data-product-id');
-
-      if (productId) {
-        window.location.href = `/produk_detail/${productId}`;
-      } else {
-        alert('Menuju halaman detail produk (demo)');
-      }
-    }
-  };
-}
 
 // Function to add item to cart
 async function addToCart(productId) {
@@ -286,7 +236,7 @@ async function addToCart(productId) {
 function showNotification(message, type = 'info') {
   // Buat elemen notifikasi di tengah layar
   const notification = document.createElement('div');
-  
+
   // Gaya untuk notifikasi di tengah layar
   Object.assign(notification.style, {
     position: 'fixed',
@@ -306,17 +256,17 @@ function showNotification(message, type = 'info') {
     opacity: '0',
     transition: 'opacity 0.3s ease-in-out'
   });
-  
+
   notification.textContent = message;
-  
+
   // Tambahkan ke body
   document.body.appendChild(notification);
-  
+
   // Tampilkan dengan efek fade-in
   setTimeout(() => {
     notification.style.opacity = '1';
   }, 10);
-  
+
   // Hapus notifikasi setelah 3 detik
   setTimeout(() => {
     notification.style.opacity = '0';

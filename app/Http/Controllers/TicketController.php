@@ -1019,4 +1019,39 @@ class TicketController extends Controller
             'updated_at' => $ticket->updated_at->toISOString()
         ]);
     }
+
+    /**
+     * API endpoint untuk mendapatkan jumlah tiket yang belum diselesaikan (open)
+     */
+    public function getOpenTicketCount()
+    {
+        try {
+            // Hanya pengguna yang login yang bisa mengakses
+            if (!auth()->check()) {
+                return response()->json(['count' => 0], 200);
+            }
+
+            $userId = auth()->id();
+
+            // Hitung jumlah tiket yang belum diselesaikan (status != 'resolved' dan != 'closed')
+            $openTicketCount = \App\Models\Ticket::where('user_id', $userId)
+                ->whereNotIn('status', ['resolved', 'closed'])
+                ->count();
+
+            return response()->json([
+                'count' => $openTicketCount
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error getting open ticket count', [
+                'user_id' => auth()->id(),
+                'error' => $e->getMessage()
+            ]);
+
+            // Kembalikan nilai default jika terjadi error
+            return response()->json([
+                'count' => 0,
+                'error' => 'Gagal mengambil jumlah tiket'
+            ], 500);
+        }
+    }
 }

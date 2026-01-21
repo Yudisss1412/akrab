@@ -159,7 +159,6 @@ function createStarsHTML($rating, $size = 20) {
 @endsection
 
 @push('scripts')
-  <link rel="stylesheet" href="{{ asset('css/customer/produk/produk_detail_additional.css') }}">
   <script>
     // Basic functionality for quantity selector and wishlist
     // Create notification function

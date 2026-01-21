@@ -8,7 +8,6 @@
 
 @push('styles')
   <link href="{{ asset('css/customer/toko/show.css') }}?v=1" rel="stylesheet"/>
-  <link href="{{ asset('css/customer/toko/show_additional.css') }}?v=1" rel="stylesheet"/>
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 @endpush

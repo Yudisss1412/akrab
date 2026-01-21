@@ -325,6 +325,7 @@ Route::post('/api/tickets/{id}/replies', [App\Http\Controllers\TicketController:
 Route::delete('/api/tickets/{ticketId}/replies/{replyId}', [App\Http\Controllers\TicketController::class, 'deleteTicketReply'])->name('api.tickets.replies.delete');
 Route::get('/api/users/{userId}/profile', [App\Http\Controllers\TicketController::class, 'getUserProfile'])->name('api.users.profile');
 Route::get('/api/tickets/{id}/status', [App\Http\Controllers\TicketController::class, 'getTicketStatus'])->name('api.tickets.status');
+Route::get('/api/tickets/open-count', [App\Http\Controllers\TicketController::class, 'getOpenTicketCount'])->name('api.tickets.open.count');
 Route::get('/api/staff', function () {
     // Return staff/admin users for ticket assignment
     $staff = \App\Models\User::whereHas('role', function($query) {

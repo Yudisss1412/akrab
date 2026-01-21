@@ -214,41 +214,65 @@ body{
   .profile-layout {
     display: grid;
     grid-template-columns: 30% 70%;
-    grid-template-rows: auto auto;
+    grid-template-rows: auto auto; /* Two rows to separate profile and navigation */
     gap: var(--gap-md); /* Reduced gap */
     width: 100%;
+    min-height: 50vh; /* Reduced minimum height to position grid higher */
   }
 
   .profile-card {
     grid-column: 1;
     grid-row: 1;
-    margin-bottom: 0; /* Remove extra margins */
+    margin-bottom: 0.25rem; /* Minimal gap between profile and navigation */
+    height: fit-content; /* Allow card to fit its content */
   }
 
   .profile-navigation {
     grid-column: 1;
-    grid-row: 2;
+    grid-row: 2; /* Put navigation in its own row */
     margin-top: 0; /* Remove extra margins */
+    margin-bottom: 0; /* Remove bottom margin */
+    height: fit-content; /* Allow navigation to fit its content */
   }
 
   .main-content {
     grid-column: 2;
-    grid-row: 1; /* Only in row 1, same as profile card */
+    grid-row: 1; /* Same row as profile card only */
     margin: 0; /* Remove any extra margins */
     height: auto; /* Allow to adjust to content */
-    overflow-y: auto; /* Enable vertical scrolling if content overflows */
-    max-height: 80vh; /* Reasonable max height to allow scrolling */
-    overflow-x: hidden; /* Keep horizontal overflow hidden */
+    min-height: 300px; /* Ensure minimum height for visual balance */
+    display: flex;
+    flex-direction: column;
   }
 
-  /* To align visually without span, set main content to start from same row as profile-card */
-  .profile-card, .main-content {
-    align-self: start; /* Align both to start of their grid area */
+  /* Specific section cards inside main content should have scroll when needed */
+  .main-content .order-history,
+  .main-content .wishlist-section,
+  .main-content .review-history,
+  .main-content .account-settings,
+  .main-content .ticket-support {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Add scroll when content exceeds available space */
+    max-height: 400px; /* Set a reasonable max height for scroll to appear */
   }
 
   /* Ensure proper stacking context */
   .profile-card, .profile-navigation, .main-content {
     width: 100%;
+  }
+
+  /* Make sure content sections inside main-content fill available space */
+  .main-content .order-history,
+  .main-content .wishlist-section,
+  .main-content .review-history,
+  .main-content .account-settings,
+  .main-content .ticket-support {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
   }
 }
 

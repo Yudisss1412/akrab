@@ -387,7 +387,7 @@ body {
   width: 100%;
   max-width: 300px; /* Consistent max width across devices */
   min-width: 240px; /* Ensure minimum width for usability */
-  height: fit-content; /* Ensure cards have consistent height based on content */
+  height: 100%; /* Ensure consistent height across all cards */
 }
 
 .product-card:hover {
@@ -407,6 +407,8 @@ body {
   display: flex;
   flex-direction: column;
   flex: 1;
+  min-height: 180px; /* Tetapkan tinggi minimum untuk menjaga konsistensi */
+  justify-content: space-between; /* Distribusikan elemen secara merata */
 }
 
 .product-name {
@@ -429,7 +431,10 @@ body {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  flex: 1;
+  height: 42px; /* Tetapkan tinggi tetap untuk dua baris teks */
+  min-height: 42px;
+  display: flex;
+  align-items: center; /* Pusatkan teks secara vertikal jika konten sedikit */
 }
 
 .product-price {

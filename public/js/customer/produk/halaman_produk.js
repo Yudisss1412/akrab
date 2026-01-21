@@ -656,6 +656,16 @@ function initFiltersFromUrl() {
       currentSort = sortParam;
     }
   }
+
+  // Initialize search query from URL (for search results page)
+  const searchParam = urlParams.get('q');
+  if (searchParam) {
+    const searchInput = document.getElementById('navbar-search');
+    if (searchInput) {
+      searchInput.value = searchParam;
+      currentSearch = searchParam;
+    }
+  }
 }
 
 async function updateContent() {
@@ -1069,6 +1079,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize filters based on URL parameters
   initFiltersFromUrl();
 
-  // Muat produk terbaru dari API saat halaman dimuat
-  updateContent();
+  // Cek apakah ini halaman hasil pencarian
+  const urlParams = new URLSearchParams(window.location.search);
+  const searchQuery = urlParams.get('q');
+
+  // Jika ini halaman pencarian, jangan panggil updateContent untuk menghindari konflik
+  // karena produk sudah ditampilkan dari server
+  if (!searchQuery) {
+    // Muat produk terbaru dari API saat halaman dimuat (hanya untuk halaman non-pencarian)
+    updateContent();
+  }
 });

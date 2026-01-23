@@ -1134,4 +1134,66 @@ class SellerOrderController extends Controller
             'message' => 'Retur berhasil diselesaikan'
         ]);
     }
+
+    /**
+     * Get urgent tasks for the seller
+     */
+    public function getUrgentTasks()
+    {
+        try {
+            // Hanya penjual yang bisa mengakses
+            $user = Auth::user();
+            if (!$user || !$user->role || $user->role->name !== 'seller') {
+                return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
+            }
+
+            // Ambil ID penjual dari tabel sellers berdasarkan user_id
+            $seller = Seller::where('user_id', $user->id)->first();
+            if (!$seller) {
+                return response()->json(['success' => false, 'message' => 'Seller record tidak ditemukan'], 403);
+            }
+
+            // Hitung jumlah pesanan yang memerlukan perhatian segera
+            $urgentTasks = [
+                'pending_orders' => 0,
+                'unreplied_chats' => 0,  // Placeholder - fitur chat mungkin tidak aktif
+                'new_complaints' => 0,   // Placeholder - mungkin dihitung dari review dengan rating rendah
+                'pending_returns' => 0
+            ];
+
+            // Hitung pesanan dengan status pending (menunggu konfirmasi pembayaran)
+            $urgentTasks['pending_orders'] = Order::whereHas('items.product', function ($q) use ($seller) {
+                $q->where('seller_id', $seller->id);
+            })
+            ->where('status', 'pending')
+            ->count();
+
+            // Hitung permintaan retur yang belum diproses
+            $urgentTasks['pending_returns'] = ProductReturn::whereHas('orderItem.product', function ($q) use ($seller) {
+                $q->where('seller_id', $seller->id);
+            })
+            ->where('status', 'requested')
+            ->count();
+
+            // Hitung komplain baru - mungkin dari review dengan rating rendah (misalnya <= 2)
+            $urgentTasks['new_complaints'] = Review::whereHas('product', function ($q) use ($seller) {
+                $q->where('seller_id', $seller->id);
+            })
+            ->where('rating', '<=', 2)
+            ->count();
+
+            return response()->json([
+                'success' => true,
+                'urgent_tasks' => $urgentTasks,
+                'total_urgent' => $urgentTasks['pending_orders'] + $urgentTasks['pending_returns'] + $urgentTasks['new_complaints']
+            ]);
+        } catch (\Exception $e) {
+            \Log::error("Error in getUrgentTasks: " . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mengambil tugas penting',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

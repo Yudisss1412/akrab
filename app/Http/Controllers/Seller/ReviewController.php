@@ -285,11 +285,25 @@ class ReviewController extends Controller
                         // Gunakan accessor main_image yang didefinisikan di model
                         $mainImage = $product->main_image;
                         if ($mainImage) {
-                            $productImage = asset('storage/' . $mainImage);
+                            $fullImagePath = storage_path('app/public/' . $mainImage);
+                            if (file_exists($fullImagePath)) {
+                                $productImage = asset('storage/' . $mainImage);
+                            } else {
+                                // Jika file tidak ditemukan, gunakan placeholder
+                                $productImage = asset('src/placeholder_produk.png');
+                                \Log::warning("Product image file not found: " . $fullImagePath);
+                            }
                         } else {
                             // Fallback ke kolom image jika tidak ada di product_images
                             if (isset($product->image) && $product->image) {
-                                $productImage = asset('storage/' . $product->image);
+                                $fullImagePath = storage_path('app/public/' . $product->image);
+                                if (file_exists($fullImagePath)) {
+                                    $productImage = asset('storage/' . $product->image);
+                                } else {
+                                    // Jika file tidak ditemukan, gunakan placeholder
+                                    $productImage = asset('src/placeholder_produk.png');
+                                    \Log::warning("Product image file not found: " . $fullImagePath);
+                                }
                             }
                         }
                     }
@@ -441,7 +455,7 @@ class ReviewController extends Controller
                 'product' => [
                     'id' => $review->product->id,
                     'name' => $review->product->name,
-                    'image' => $review->product->main_image ?
+                    'image' => $review->product->main_image && file_exists(storage_path('app/public/' . $review->product->main_image)) ?
                         asset('storage/' . $review->product->main_image) :
                         asset('src/placeholder_produk.png')
                 ],

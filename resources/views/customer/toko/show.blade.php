@@ -46,7 +46,7 @@
               <span class="toko-products">{{ $productCount }} produk</span>
             </div>
             <div class="toko-description">
-              <p>{{ $seller->description ?? 'Toko ini belum memiliki deskripsi.' }}</p>
+              <p>{{ $seller->user->shop_description ?? 'Toko ini belum memiliki deskripsi.' }}</p>
             </div>
           </div>
         </div>

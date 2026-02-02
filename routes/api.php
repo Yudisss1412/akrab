@@ -22,3 +22,6 @@ Route::get('/products/filter', [ProductController::class, 'filter'])->name('api.
 
 // Subcategory API routes
 Route::get('/subcategories/category/{categoryName}', [SubcategoryController::class, 'getSubcategoriesByCategoryName']);
+
+// Midtrans webhook
+Route::post('/midtrans/notification', [App\Http\Controllers\PaymentController::class, 'midtransNotification']);

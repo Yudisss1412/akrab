@@ -148,7 +148,7 @@ class PaymentController extends Controller
     }
 
     /**
-     * Handle callback dari payment gateway
+     * Handle callback dari payment gateway (untuk metode pembayaran selain Midtrans)
      */
     public function callback(Request $request)
     {
@@ -193,7 +193,8 @@ class PaymentController extends Controller
 
                 if (in_array($status, ['settlement', 'capture', 'success', 'paid'])) {
                     if ($fraudStatus === 'accept') {
-                        $newOrderStatus = 'paid';
+                        // Gunakan 'confirmed' agar konsisten dengan sistem penjual
+                        $newOrderStatus = 'confirmed';
                         $order->update([
                             'status' => $newOrderStatus,
                             'paid_at' => now()
@@ -561,5 +562,155 @@ class PaymentController extends Controller
             'order' => $order->fresh(),
             'payment' => $payment->fresh()
         ]);
+    }
+
+    /**
+     * Handle Midtrans payment notification
+     * This method is called by Midtrans server when payment status changes
+     */
+    public function midtransNotification(Request $request)
+    {
+        // Log the incoming notification
+        \Log::info('Midtrans notification received', [
+            'request_data' => $request->all()
+        ]);
+
+        // Get payload from Midtrans
+        $payload = $request->getContent();
+        $notification = json_decode($payload, true);
+
+        if (!$notification) {
+            \Log::error('Invalid JSON payload received from Midtrans');
+            return response()->json(['message' => 'Invalid JSON'], 400);
+        }
+
+        $orderId = $notification['order_id'];
+        $transactionStatus = $notification['transaction_status'];
+        $statusCode = $notification['status_code'];
+        $grossAmount = $notification['gross_amount'];
+        $signatureKey = $notification['signature_key'] ?? '';
+        $fraudStatus = $notification['fraud_status'] ?? 'accept';
+
+        // Verify signature key for security
+        $serverKey = config('midtrans.server_key');
+        $expectedSignature = hash('sha512', $orderId . $statusCode . $grossAmount . $serverKey);
+
+        if (!hash_equals($expectedSignature, $signatureKey)) {
+            \Log::error('Midtrans signature verification failed', [
+                'received_signature' => $signatureKey,
+                'expected_signature' => $expectedSignature,
+                'order_id' => $orderId,
+                'status_code' => $statusCode,
+                'gross_amount' => $grossAmount
+            ]);
+            return response()->json(['message' => 'Invalid signature'], 400);
+        }
+
+        // Find the order based on order_number (which is sent as order_id in Midtrans)
+        $order = Order::where('order_number', $orderId)->first();
+
+        if (!$order) {
+            \Log::error('Order not found for Midtrans notification', [
+                'order_id' => $orderId,
+                'transaction_status' => $transactionStatus
+            ]);
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        // Find the payment record associated with this order
+        $payment = Payment::where('order_id', $order->id)->first();
+
+        if (!$payment) {
+            \Log::error('Payment not found for order', [
+                'order_id' => $order->id,
+                'order_number' => $orderId
+            ]);
+            return response()->json(['message' => 'Payment not found'], 404);
+        }
+
+        // Log the status change
+        \Log::info('Processing Midtrans notification for order', [
+            'order_number' => $orderId,
+            'old_order_status' => $order->status,
+            'old_payment_status' => $payment->payment_status,
+            'transaction_status' => $transactionStatus,
+            'fraud_status' => $fraudStatus
+        ]);
+
+        // Map Midtrans status to our local order status
+        $newOrderStatus = $order->status; // Default to current status
+        $newPaymentStatus = $payment->payment_status; // Default to current status
+
+        switch ($transactionStatus) {
+            case 'settlement':
+            case 'capture':
+                if ($fraudStatus === 'accept') {
+                    $newOrderStatus = 'confirmed'; // Changed from 'paid' to 'confirmed' to match seller system
+                    $newPaymentStatus = 'success';
+                } else {
+                    $newOrderStatus = 'pending'; // Keep pending if fraud check fails
+                    $newPaymentStatus = 'pending';
+                }
+                break;
+
+            case 'pending':
+                $newOrderStatus = 'pending';
+                $newPaymentStatus = 'pending';
+                break;
+
+            case 'expire':
+                $newOrderStatus = 'cancelled';
+                $newPaymentStatus = 'expired';
+                break;
+
+            case 'cancel':
+            case 'deny':
+                $newOrderStatus = 'cancelled';
+                $newPaymentStatus = 'failed';
+                break;
+
+            case 'refund':
+            case 'partial_refund':
+            case 'chargeback':
+            case 'partial_chargeback':
+                $newOrderStatus = 'cancelled'; // Or 'refunded' if you have that status
+                $newPaymentStatus = 'refunded';
+                break;
+        }
+
+        // Update payment record
+        $payment->update([
+            'payment_status' => $newPaymentStatus,
+            'transaction_id' => $notification['transaction_id'] ?? $payment->transaction_id,
+            'payment_gateway_response' => $notification,
+            'paid_at' => in_array($transactionStatus, ['settlement', 'capture']) && $fraudStatus === 'accept' ? now() : $payment->paid_at
+        ]);
+
+        // Update order status if it's changing
+        $orderStatusChanged = $order->status !== $newOrderStatus;
+
+        if ($orderStatusChanged) {
+            $order->update([
+                'status' => $newOrderStatus,
+                'paid_at' => in_array($transactionStatus, ['settlement', 'capture']) && $fraudStatus === 'accept' ? now() : $order->paid_at
+            ]);
+
+            // Add log entry for the status change
+            $order->logs()->create([
+                'status' => $newOrderStatus,
+                'description' => "Status pesanan diubah otomatis oleh sistem Midtrans dari '{$order->status}' menjadi '{$newOrderStatus}'. Transaction status: {$transactionStatus}, Fraud status: {$fraudStatus}",
+                'updated_by' => 'system'
+            ]);
+        }
+
+        // Log the result
+        \Log::info('Midtrans notification processed successfully', [
+            'order_number' => $orderId,
+            'new_order_status' => $newOrderStatus,
+            'new_payment_status' => $newPaymentStatus,
+            'order_status_changed' => $orderStatusChanged
+        ]);
+
+        return response()->json(['message' => 'Notification received and processed'], 200);
     }
 }

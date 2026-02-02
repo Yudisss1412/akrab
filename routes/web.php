@@ -693,10 +693,12 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Payment Routes
+// Midtrans callback should be public (no auth required)
+Route::post('/payment/midtrans/callback', [App\Http\Controllers\PaymentController::class, 'callback'])->name('midtrans.callback');
+
 Route::middleware(['auth'])->group(function () {
     Route::post('/payment/process', [App\Http\Controllers\PaymentController::class, 'process'])->name('payment.process.api');
     Route::post('/payment/callback', [App\Http\Controllers\PaymentController::class, 'callback'])->name('payment.callback');
-Route::post('/payment/midtrans/callback', [App\Http\Controllers\PaymentController::class, 'callback'])->name('midtrans.callback');
     Route::get('/payment/{order}', [App\Http\Controllers\PaymentController::class, 'show'])->name('payment.show');
 
     // Endpoint untuk testing/callback simulation (development only)

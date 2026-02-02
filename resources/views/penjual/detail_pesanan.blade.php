@@ -204,7 +204,11 @@
               @endif
               <div class="action-buttons-right">
                 @if($order->status === 'pending')
-                  <button class="btn btn-primary" onclick="updateOrderStatus({{ $order->id }}, 'confirmed')">Konfirmasi Pembayaran</button>
+                  @if(isset($order->payment) && $order->payment && in_array($order->payment->payment_method, ['midtrans', 'bank_transfer', 'e_wallet']))
+                    <span class="payment-method-info" style="color: #6b7280; font-size: 0.9em; display: inline-block; padding: 8px 12px; background-color: #f3f4f6; border-radius: 6px;">Pembayaran sedang diproses - Tidak perlu konfirmasi manual</span>
+                  @else
+                    <button class="btn btn-primary" onclick="updateOrderStatus({{ $order->id }}, 'confirmed')">Konfirmasi Pembayaran</button>
+                  @endif
                 @elseif($order->status === 'confirmed')
                   <!-- Button to trigger the modal for entering tracking number -->
                   <button class="btn btn-primary" onclick="showShippingModal({{ $order->id }})">Proses Pengiriman</button>

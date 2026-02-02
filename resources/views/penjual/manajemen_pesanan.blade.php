@@ -108,7 +108,11 @@
                 @endif
                 <div class="action-buttons-right">
                   @if($order->status === 'pending')
-                    <button class="btn btn-primary" onclick="updateOrderStatus({{ $order->id }}, 'confirmed')">Konfirmasi Pembayaran</button>
+                    @if(isset($order->payment) && $order->payment && in_array($order->payment->payment_method, ['midtrans', 'bank_transfer', 'e_wallet']))
+                      <span class="payment-method-info" style="color: #6b7280; font-size: 0.9em; display: inline-block; padding: 8px 12px; background-color: #f3f4f6; border-radius: 6px;">Pembayaran sedang diproses - Tidak perlu konfirmasi manual</span>
+                    @else
+                      <button class="btn btn-primary" onclick="updateOrderStatus({{ $order->id }}, 'confirmed')">Konfirmasi Pembayaran</button>
+                    @endif
                   @elseif($order->status === 'confirmed')
                     <button class="btn btn-primary" onclick="showShippingModal({{ $order->id }})">Proses Pengiriman</button>
                   @elseif($order->status === 'shipped')
@@ -148,11 +152,11 @@
                 </svg>
               </a>
             @endif
-            
+
             @for ($i = 1; $i <= $orders->lastPage(); $i++)
               <a href="{{ $orders->url($i) }}" class="pagination-btn {{ $i == $orders->currentPage() ? 'active' : '' }}">{{ $i }}</a>
             @endfor
-            
+
             @if ($orders->hasMorePages())
               <a href="{{ $orders->nextPageUrl() }}" class="pagination-btn">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -173,7 +177,7 @@
   </div>
 
   @include('components.admin_penjual.footer')
-  
+
   <script>
     // Tab navigation functionality
     document.addEventListener('DOMContentLoaded', function() {

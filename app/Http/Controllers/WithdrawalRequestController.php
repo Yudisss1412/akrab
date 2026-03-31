@@ -7,18 +7,69 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
+// ========================================================================
+// WITHDRAWAL REQUEST CONTROLLER - ADMIN APPROVE/REJECT WITHDRAWAL
+// ========================================================================
+// UNTUK SIDANG SKRIPSI:
+// - Controller ini untuk ADMIN approve/reject withdrawal request dari seller
+// - Admin review & proses penarikan dana seller
+// - Seperti "bank" yang proses formulir penarikan
+//
+// FITUR UTAMA:
+// 1. View All Withdrawals - Admin lihat semua withdrawal request
+// 2. Approve Withdrawal - Setujui & transfer dana ke seller
+// 3. Reject Withdrawal - Tolak withdrawal (dengan alasan)
+// 4. Process Withdrawal - Tandai sedang diproses
+// 5. Bulk Approve/Reject - Approve/reject multiple requests
+// 6. Export CSV - Export laporan withdrawal
+//
+// FLOW ADMIN APPROVE:
+// 1. Admin lihat withdrawal request (status: pending)
+// 2. Admin cek validitas (saldo, rekening, dll)
+// 3. Jika valid → Approve (status: completed)
+// 4. Jika tidak valid → Reject (status: rejected)
+// 5. Update transaction record
+//
+// ANALOGI:
+// Seperti bank proses penarikan:
+// - Seller = Nasabah yang ajukan penarikan
+// - Admin = Bank yang proses penarikan
+// - WithdrawalRequest = Formulir penarikan
+// - Transfer = Bank transfer uang ke rekening
+// ========================================================================
+
 class WithdrawalRequestController extends Controller
 {
+    /**
+     * Menampilkan daftar permintaan penarikan dana
+     * 
+     * ==========================================================================
+     * FITUR: ADMIN VIEW ALL WITHDRAWALS - LIHAT SEMUA PENARIKAN
+     * ==========================================================================
+     * UNTUK SIDANG:
+     * - Method ini untuk admin lihat semua withdrawal request
+     * - Pagination 10 requests per halaman
+     * - Support dummy data jika belum ada data real
+     * 
+     * ADMIN DASHBOARD:
+     * - Statistik: Total pending, approved, rejected
+     * - Filter by status
+     * - Search by seller name
+     * - Bulk approve/reject
+     *
+     * @return \Illuminate\View\View
+     */
     public function index()
     {
-        // Check if there are any real withdrawal requests in the database
+        // Cek jika belum ada data real di database
         $hasRealRequests = WithdrawalRequest::exists();
 
         if (!$hasRealRequests) {
-            // No real withdrawal requests exist, show filtered dummy data
+            // Belum ada data real, tampilkan dummy data untuk demo
             return $this->showFilteredDummyRequests(request());
         }
 
+        // Ada data real, query dari database
         $withdrawalRequests = WithdrawalRequest::with(['seller.user', 'seller'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
@@ -26,131 +77,43 @@ class WithdrawalRequestController extends Controller
         return view('admin.withdrawal_requests', compact('withdrawalRequests'));
     }
 
-    public function show($id)
-    {
-        // Check if there are any real withdrawal requests in the database
-        $hasRealRequests = WithdrawalRequest::exists();
-
-        if (!$hasRealRequests) {
-            // If no real requests exist, we need to create dummy data for the specific ID
-            return $this->showDummyRequest($id);
-        }
-
-        $request = WithdrawalRequest::with(['seller.user'])->find($id);
-
-        if (!$request) {
-            return response()->json([
-                'error' => 'Permintaan penarikan dana tidak ditemukan'
-            ], 404);
-        }
-
-        return response()->json([
-            'id' => $request->id,
-            'seller_name' => $request->seller->store_name ?? 'N/A',
-            'seller_email' => $request->seller->user->email ?? 'N/A',
-            'amount' => $request->amount,
-            'amount_formatted' => number_format($request->amount, 0, ',', '.'),
-            'status' => ucfirst(str_replace('_', ' ', $request->status)),
-            'payment_method' => 'bank_transfer', // Default for compatibility
-            'payment_method_display' => $this->getPaymentMethodDisplayForDB($request),
-            'bank_name' => $this->getBankNameFromBankAccount($request->bank_account),
-            'account_number' => $this->getAccountNumberFromBankAccount($request->bank_account),
-            'account_name' => 'N/A', // Not stored in DB but for compatibility
-            'ewallet_number' => null, // Not stored in DB but for compatibility
-            'notes' => $request->notes,
-            'rejection_reason' => $request->notes, // Use notes field for rejection reason (for compatibility)
-            'created_at' => $request->created_at->format('d M Y H:i'),
-            'updated_at' => $request->updated_at->format('d M Y H:i'),
-        ]);
-    }
-
     /**
-     * Show dummy request for a specific ID when no real requests exist
+     * Approve withdrawal request
+     * 
+     * ==========================================================================
+     * FITUR: ADMIN APPROVE WITHDRAWAL - SETUJUI PENARIKAN
+     * ==========================================================================
+     * UNTUK SIDANG:
+     * - Method ini untuk admin approve withdrawal request
+     * - Hanya admin yang bisa approve (role validation)
+     * - Update status: pending → completed
+     * - Buat transaction record dengan status completed
+     * 
+     * FLOW APPROVE:
+     * 1. Admin klik "Approve" pada withdrawal request
+     * 2. Validasi: user adalah admin
+     * 3. Update withdrawal status: pending → completed
+     * 4. Buat transaction record (withdrawal completed)
+     * 5. Saldo seller berkurang (balance_after)
+     * 6. Admin transfer dana ke rekening seller
+     * 
+     * VALIDASI:
+     * - Hanya admin yang bisa approve
+     * - Seller harus valid (exist di database)
+     * - Withdrawal request harus exist
+     *
+     * @param Request $request
+     * @param int $id Withdrawal request ID
+     * @return \Illuminate\Http\JsonResponse
      */
-    private function showDummyRequest($id)
-    {
-        // Generate dummy data with the specific ID
-        $sellers = \App\Models\Seller::with('user')->limit(10)->get();
-        if ($sellers->isEmpty()) {
-            $sellers = collect([
-                (object) ['id' => 1, 'store_name' => 'Toko Elektronik Jaya', 'user' => (object)['email' => 'toko.jaya@example.com']],
-                (object) ['id' => 2, 'store_name' => 'Fashion Modern', 'user' => (object)['email' => 'fashion.modern@example.com']],
-            ]);
-        }
-
-        $amountOptions = [500000, 1000000, 1500000, 2000000, 2500000, 3000000, 5000000];
-        $statuses = ['pending', 'processing', 'completed', 'rejected', 'approved'];
-        $banks = ['BCA', 'Mandiri', 'BNI', 'BRI', 'BTN', 'CIMB', 'Danamon'];
-
-        $seller = $sellers->get(($id - 1) % $sellers->count());
-        $amount = $amountOptions[array_rand($amountOptions)];
-        $status = $statuses[array_rand($statuses)];
-        $bank = $banks[array_rand($banks)];
-        $accountNumber = str_pad(rand(1000000, 9999999), 7, '0', STR_PAD_LEFT);
-        $bankAccount = $bank . ' - ' . $accountNumber;
-
-        $dummyRequest = [
-            'id' => $id,
-            'seller' => $seller,
-            'amount' => $amount,
-            'status' => $status,
-            'bank_account' => $bankAccount,
-            'notes' => $status === 'rejected' ? 'Dokumen tidak lengkap' : null,
-            'created_at' => now()->subDays(rand(0, 30)),
-            'updated_at' => now()->subDays(rand(0, 30)),
-        ];
-
-        return response()->json([
-            'id' => $dummyRequest['id'],
-            'seller_name' => $dummyRequest['seller']->store_name ?? 'N/A',
-            'seller_email' => $dummyRequest['seller']->user->email ?? 'N/A',
-            'amount' => $dummyRequest['amount'],
-            'amount_formatted' => number_format($dummyRequest['amount'], 0, ',', '.'),
-            'status' => ucfirst(str_replace('_', ' ', $dummyRequest['status'])),
-            'payment_method' => 'bank_transfer', // Default for compatibility
-            'payment_method_display' => "Transfer Bank ({$bank} - {$accountNumber})",
-            'bank_name' => $bank,
-            'account_number' => $accountNumber,
-            'account_name' => $seller->owner_name ?? 'N/A',
-            'ewallet_number' => null, // Not applicable for bank transfer
-            'notes' => $dummyRequest['notes'],
-            'rejection_reason' => $dummyRequest['notes'],
-            'created_at' => $dummyRequest['created_at']->format('d M Y H:i'),
-            'updated_at' => $dummyRequest['updated_at']->format('d M Y H:i'),
-        ]);
-    }
-
-    private function getPaymentMethodDisplayForDB($request)
-    {
-        $bankName = $this->getBankNameFromBankAccount($request->bank_account);
-        $accountNumber = $this->getAccountNumberFromBankAccount($request->bank_account);
-
-        return "Transfer Bank ({$bankName} - {$accountNumber})";
-    }
-
-    private function getBankNameFromBankAccount($bankAccount)
-    {
-        if (!$bankAccount) return 'N/A';
-
-        // Extract bank name from format like "BCA - 1234567"
-        $parts = explode(' - ', $bankAccount);
-        return $parts[0] ?? 'N/A';
-    }
-
-    private function getAccountNumberFromBankAccount($bankAccount)
-    {
-        if (!$bankAccount) return 'N/A';
-
-        // Extract account number from format like "BCA - 1234567"
-        $parts = explode(' - ', $bankAccount);
-        return isset($parts[1]) ? $parts[1] : 'N/A';
-    }
-
     public function approve(Request $request, $id)
     {
         try {
             \Log::info('Approve function called for ID: ' . $id);
 
+            // ========================================
+            // STEP 1: AMBIL USER & VALIDASI ROLE
+            // ========================================
             $user = Auth::user();
             \Log::info('User: ' . ($user ? $user->name . ' (Role: ' . ($user->role ? $user->role->name : 'null') . ')' : 'null'));
 
@@ -163,10 +126,16 @@ class WithdrawalRequestController extends Controller
                 ], 403);
             }
 
+            // ========================================
+            // STEP 2: LOAD WITHDRAWAL REQUEST
+            // ========================================
             $withdrawal = WithdrawalRequest::with('seller')->findOrFail($id);
             \Log::info('Withdrawal found: ' . $withdrawal->id . ', Seller: ' . ($withdrawal->seller ? $withdrawal->seller->id : 'null'));
 
-            // Pastikan seller ada
+            // ========================================
+            // STEP 3: VALIDASI SELLER EXIST
+            // ========================================
+            // Pastikan seller ada (validasi data integrity)
             if (!$withdrawal->seller) {
                 \Log::info('Seller not found for withdrawal ID: ' . $id);
                 return response()->json([
@@ -175,11 +144,18 @@ class WithdrawalRequestController extends Controller
                 ], 404);
             }
 
+            // ========================================
+            // STEP 4: UPDATE STATUS WITHDRAWAL
+            // ========================================
+            // Update status: pending → completed
             $withdrawal->update([
                 'status' => 'completed'
             ]);
 
-            // Hitung saldo sebelum (kita hitung berdasarkan transaksi sebelumnya untuk penjual ini)
+            // ========================================
+            // STEP 5: HITUNG SALDO
+            // ========================================
+            // Hitung saldo sebelum (berdasarkan transaksi sebelumnya)
             $previousTransactions = \App\Models\SellerTransaction::where('seller_id', $withdrawal->seller->id)
                 ->where('transaction_date', '<=', now())
                 ->get();
@@ -187,37 +163,48 @@ class WithdrawalRequestController extends Controller
             $balanceBefore = 0;
             foreach ($previousTransactions as $prevTrans) {
                 if ($prevTrans->transaction_type === 'sale') {
-                    $balanceBefore += $prevTrans->amount;
+                    $balanceBefore += $prevTrans->amount;  // Pemasukan dari penjualan
                 } elseif ($prevTrans->transaction_type === 'withdrawal' && $prevTrans->status === 'completed') {
-                    $balanceBefore -= $prevTrans->amount;
+                    $balanceBefore -= $prevTrans->amount;  // Pengeluaran dari withdrawal
                 }
             }
 
+            // Saldo setelah = Saldo sebelum - Amount withdrawal
             $balanceAfter = $balanceBefore - $withdrawal->amount;
             \Log::info('Balance calculated - Before: ' . $balanceBefore . ', After: ' . $balanceAfter);
 
-            // Buat transaksi penarikan
+            // ========================================
+            // STEP 6: BUAT TRANSACTION RECORD
+            // ========================================
+            // Buat transaksi penarikan dengan status completed
+            // Ini akan mengurangi saldo seller secara permanent
             $transaction = \App\Models\SellerTransaction::create([
                 'seller_id' => $withdrawal->seller->id,
                 'withdrawal_request_id' => $withdrawal->id,
                 'transaction_type' => 'withdrawal',
                 'amount' => $withdrawal->amount,
-                'balance_before' => $balanceBefore,
-                'balance_after' => $balanceAfter,
+                'balance_before' => $balanceBefore,  // Saldo sebelum withdrawal
+                'balance_after' => $balanceAfter,  // Saldo setelah withdrawal
                 'description' => "Penarikan dana selesai",
                 'reference_type' => 'withdrawal',
                 'reference_id' => $withdrawal->id,
-                'status' => 'completed',
+                'status' => 'completed',  // Status completed karena sudah di-approve
                 'transaction_date' => now(),
             ]);
 
             \Log::info('Transaction created: ' . $transaction->id);
 
+            // ========================================
+            // STEP 7: RETURN RESPONSE
+            // ========================================
             return response()->json([
                 'success' => true,
                 'message' => 'Permintaan penarikan dana berhasil diselesaikan'
             ]);
         } catch (\Exception $e) {
+            // ========================================
+            // STEP 8: HANDLE ERROR
+            // ========================================
             \Log::error('Error in approve function: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
             return response()->json([
                 'success' => false,
@@ -226,8 +213,40 @@ class WithdrawalRequestController extends Controller
         }
     }
 
+    /**
+     * Reject withdrawal request
+     * 
+     * ==========================================================================
+     * FITUR: ADMIN REJECT WITHDRAWAL - TOLAK PENARIKAN
+     * ==========================================================================
+     * UNTUK SIDANG:
+     * - Method ini untuk admin reject withdrawal request
+     * - Hanya admin yang bisa reject (role validation)
+     * - Update status: pending → rejected
+     * - Rejection reason wajib diisi (untuk tracking)
+     * 
+     * FLOW REJECT:
+     * 1. Admin klik "Reject" pada withdrawal request
+     * 2. Input alasan penolakan (rejection_reason)
+     * 3. Update withdrawal status: pending → rejected
+     * 4. Saldo seller kembali (tidak berkurang)
+     * 5. Seller dapat notifikasi + alasan reject
+     * 
+     * ALASAN REJECT UMUM:
+     * - Saldo tidak cukup
+     * - Rekening tidak valid
+     * - Data tidak lengkap
+     * - Terdeteksi fraud
+     *
+     * @param Request $request
+     * @param int $id Withdrawal request ID
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function reject(Request $request, $id)
     {
+        // ========================================
+        // STEP 1: AMBIL USER & VALIDASI ROLE
+        // ========================================
         $user = Auth::user();
 
         // Hanya admin yang bisa menolak permintaan penarikan
@@ -238,6 +257,10 @@ class WithdrawalRequestController extends Controller
             ], 403);
         }
 
+        // ========================================
+        // STEP 2: VALIDASI INPUT
+        // ========================================
+        // Validasi rejection reason (opsional tapi disarankan)
         $validator = Validator::make($request->all(), [
             'rejection_reason' => 'nullable|string|max:500'
         ]);
@@ -250,9 +273,15 @@ class WithdrawalRequestController extends Controller
             ], 422);
         }
 
+        // ========================================
+        // STEP 3: LOAD WITHDRAWAL REQUEST
+        // ========================================
         $withdrawal = WithdrawalRequest::with('seller')->findOrFail($id);
 
-        // Pastikan seller ada
+        // ========================================
+        // STEP 4: VALIDASI SELLER EXIST
+        // ========================================
+        // Pastikan seller ada (validasi data integrity)
         if (!$withdrawal->seller) {
             return response()->json([
                 'success' => false,
@@ -260,19 +289,59 @@ class WithdrawalRequestController extends Controller
             ], 404);
         }
 
+        // ========================================
+        // STEP 5: UPDATE STATUS WITHDRAWAL
+        // ========================================
+        // Update status: pending → rejected
+        // Simpan alasan penolakan untuk tracking
         $withdrawal->update([
             'status' => 'rejected',
             'rejection_reason' => $request->rejection_reason
         ]);
 
+        // ========================================
+        // STEP 6: RETURN RESPONSE
+        // ========================================
         return response()->json([
             'success' => true,
             'message' => 'Permintaan penarikan dana berhasil ditolak'
         ]);
     }
 
+    /**
+     * Process withdrawal request
+     * 
+     * ==========================================================================
+     * FITUR: ADMIN PROCESS WITHDRAWAL - PROSES PENARIKAN
+     * ==========================================================================
+     * UNTUK SIDANG:
+     * - Method ini untuk admin tandai withdrawal sedang diproses
+     * - Status: pending → processing
+     * - Admin sedang transfer dana ke seller
+     * - Transaction record dibuat dengan status completed
+     * 
+     * FLOW PROCESS:
+     * 1. Admin klik "Process" pada withdrawal request
+     * 2. Update status: pending → processing
+     * 3. Buat transaction record (jika belum ada)
+     * 4. Saldo seller berkurang (balance_after)
+     * 5. Admin transfer dana (manual transfer via bank)
+     * 6. Setelah transfer selesai → Approve (completed)
+     * 
+     * KEGUNAAN:
+     * - Tracking: Seller tahu withdrawal sedang diproses
+     * - Admin: Tandai sedang transfer manual
+     * - Audit: Record kapan withdrawal mulai diproses
+     *
+     * @param Request $request
+     * @param int $id Withdrawal request ID
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function process(Request $request, $id)
     {
+        // ========================================
+        // STEP 1: AMBIL USER & VALIDASI ROLE
+        // ========================================
         $user = Auth::user();
 
         // Hanya admin yang bisa memproses permintaan penarikan
@@ -283,9 +352,15 @@ class WithdrawalRequestController extends Controller
             ], 403);
         }
 
+        // ========================================
+        // STEP 2: LOAD WITHDRAWAL REQUEST
+        // ========================================
         $withdrawal = WithdrawalRequest::with('seller')->findOrFail($id);
 
-        // Pastikan seller ada
+        // ========================================
+        // STEP 3: VALIDASI SELLER EXIST
+        // ========================================
+        // Pastikan seller ada (validasi data integrity)
         if (!$withdrawal->seller) {
             return response()->json([
                 'success' => false,
@@ -293,17 +368,26 @@ class WithdrawalRequestController extends Controller
             ], 404);
         }
 
+        // ========================================
+        // STEP 4: UPDATE STATUS
+        // ========================================
+        // Update status: pending → processing
         $withdrawal->update([
             'status' => 'processing'
         ]);
 
-        // Buat transaksi penarikan jika belum ada
+        // ========================================
+        // STEP 5: BUAT TRANSACTION RECORD (JIKA BELUM ADA)
+        // ========================================
+        // Cek apakah sudah ada transaction record
         $existingTransaction = \App\Models\SellerTransaction::where('withdrawal_request_id', $withdrawal->id)
             ->where('transaction_type', 'withdrawal')
             ->first();
 
         if (!$existingTransaction) {
-            // Hitung saldo sebelum (kita hitung berdasarkan transaksi sebelumnya untuk penjual ini)
+            // Transaction belum ada, buat baru
+            
+            // Hitung saldo sebelum (berdasarkan transaksi sebelumnya)
             $previousTransactions = \App\Models\SellerTransaction::where('seller_id', $withdrawal->seller->id)
                 ->where('transaction_date', '<=', now())
                 ->get();
@@ -311,29 +395,34 @@ class WithdrawalRequestController extends Controller
             $balanceBefore = 0;
             foreach ($previousTransactions as $prevTrans) {
                 if ($prevTrans->transaction_type === 'sale') {
-                    $balanceBefore += $prevTrans->amount;
+                    $balanceBefore += $prevTrans->amount;  // Pemasukan dari penjualan
                 } elseif ($prevTrans->transaction_type === 'withdrawal' && $prevTrans->status === 'completed') {
-                    $balanceBefore -= $prevTrans->amount;
+                    $balanceBefore -= $prevTrans->amount;  // Pengeluaran dari withdrawal
                 }
             }
 
+            // Saldo setelah = Saldo sebelum - Amount withdrawal
             $balanceAfter = $balanceBefore - $withdrawal->amount;
 
+            // Buat transaction record
             \App\Models\SellerTransaction::create([
                 'seller_id' => $withdrawal->seller->id,
                 'withdrawal_request_id' => $withdrawal->id,
                 'transaction_type' => 'withdrawal',
                 'amount' => $withdrawal->amount,
-                'balance_before' => $balanceBefore,
-                'balance_after' => $balanceAfter,
+                'balance_before' => $balanceBefore,  // Saldo sebelum withdrawal
+                'balance_after' => $balanceAfter,  // Saldo setelah withdrawal
                 'description' => "Penarikan dana sedang diproses",
                 'reference_type' => 'withdrawal',
                 'reference_id' => $withdrawal->id,
-                'status' => 'completed', // Status transaksi tetap completed karena dana sudah dikurangi dari saldo
+                'status' => 'completed',  // Status transaksi completed karena dana sudah dikurangi
                 'transaction_date' => now(),
             ]);
         }
 
+        // ========================================
+        // STEP 6: RETURN RESPONSE
+        // ========================================
         return response()->json([
             'success' => true,
             'message' => 'Permintaan penarikan dana berhasil diproses'

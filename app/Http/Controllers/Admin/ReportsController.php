@@ -9,6 +9,43 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
+// ========================================================================
+// ADMIN REPORTS CONTROLLER - MONITORING PELANGGARAN & KOMPLAIN
+// ========================================================================
+// UNTUK SIDANG SKRIPSI:
+// - Controller ini untuk admin handle laporan pelanggaran dari user
+// - User bisa report seller/produk yang melanggar (produk palsu, scam, dll)
+// - Admin investigate dan take action (suspend, ban, warning)
+//
+// FITUR UTAMA:
+// 1. Violation Reports - Daftar semua laporan pelanggaran
+// 2. Report Filtering - Filter by type, status, date range
+// 3. Report Investigation - Admin cek validitas laporan
+// 4. Action Management - Take action terhadap violator
+// 5. Dummy Data Support - Fallback jika belum ada data real
+//
+// JENIS PELANGGARAN:
+// - Produk palsu/kw
+// - Penipuan/scam
+// - Produk terlarang
+// - Review palsu/spam
+// - Pelanggaran hak cipta
+// - Lainnya
+//
+// STATUS LAPORAN:
+// - pending = Belum diinvestigasi
+// - investigating = Sedang diinvestigasi
+// - resolved = Sudah diselesaikan (action taken)
+// - rejected = Laporan ditolak (tidak valid)
+//
+// ANALOGI:
+// Seperti divisi compliance di mall:
+// - Terima laporan dari pengunjung
+// - Investigasi laporan
+// - Take action (warning, suspend toko, ban)
+// - Track status penyelesaian
+// ========================================================================
+
 class ReportsController extends Controller
 {
     public function __construct()

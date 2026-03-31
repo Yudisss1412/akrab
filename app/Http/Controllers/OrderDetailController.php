@@ -5,52 +5,78 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use Illuminate\Http\Request;
 
+/**
+ * OrderDetailController - Detail Pesanan
+ * 
+ * Controller ini menangani operasi terkait detail pesanan:
+ * - Menampilkan detail pesanan (show)
+ * - Menampilkan invoice pesanan (invoice)
+ * - Melaporkan pesanan yang belum diterima meski status delivered (reportUndelivered)
+ * 
+ * User dapat melihat detail pesanan berdasarkan order_number.
+ */
 class OrderDetailController extends Controller
 {
     /**
-     * Display the specified order.
-     *
-     * @param  \App\Models\Order  $order
-     * @return \Illuminate\Http\Response
+     * Menampilkan detail pesanan
+     * 
+     * Menampilkan informasi lengkap pesanan termasuk:
+     * - Data pesanan (status, total, tanggal, dll)
+     * - Item-item yang dipesan
+     * - Alamat pengiriman
+     * - Log/history status pesanan
+     * 
+     * @param string $order Order number (bukan ID)
+     * @return \Illuminate\View\View View detail pesanan
      */
     public function show($order)
     {
-        // Find order by order number instead of ID
+        // Cari pesanan berdasarkan order_number (bukan ID)
         $order = Order::where('order_number', $order)->firstOrFail();
-        
-        // Load the order with its relationships
+
+        // Load relasi yang diperlukan untuk menampilkan detail lengkap
         $order->load(['items.product', 'items.variant', 'user', 'shipping_address', 'logs']);
-        
+
         return view('orders.show', compact('order'));
     }
-    
+
     /**
-     * Display the invoice for the specified order.
-     *
-     * @param  string  $order
-     * @return \Illuminate\Http\Response
+     * Menampilkan invoice pesanan
+     * 
+     * Invoice adalah ringkasan pesanan yang dapat di-download/print
+     * untuk keperluan pembayaran atau arsip pembeli.
+     * 
+     * @param string $order Order number (bukan ID)
+     * @return \Illuminate\View\View View invoice
      */
     public function invoice($order)
     {
-        // Find order by order number instead of ID
+        // Cari pesanan berdasarkan order_number
         $order = Order::where('order_number', $order)->firstOrFail();
-        
-        // Load the order with its relationships
+
+        // Load relasi yang diperlukan untuk invoice
         $order->load(['items.product', 'items.variant', 'user', 'shipping_address']);
-        
+
         return view('customer.transaksi.invoice', compact('order'));
     }
 
     /**
-     * Report that an order marked as delivered was not actually received
+     * Melaporkan pesanan yang ditandai delivered tapi belum diterima
+     * 
+     * Fitur ini memungkinkan customer melaporkan jika status pesanan
+     * sudah 'delivered' tapi barang belum diterima secara fisik.
+     * Status akan dikembalikan ke 'shipped' untuk investigasi.
+     * 
+     * @param string $order Order number
+     * @return \Illuminate\Http\JsonResponse JSON response success/error
      */
     public function reportUndelivered($order)
     {
         try {
-            // Find the order by order number
+            // Cari pesanan berdasarkan order_number
             $orderData = Order::where('order_number', $order)->firstOrFail();
 
-            // Check if user is authorized to report this order
+            // Cek apakah user yang login adalah pemilik pesanan
             if ($orderData->user_id !== auth()->id()) {
                 return response()->json([
                     'success' => false,
@@ -58,7 +84,7 @@ class OrderDetailController extends Controller
                 ], 403);
             }
 
-            // Only allow reporting if the status is 'delivered'
+            // Hanya boleh report jika status saat ini adalah 'delivered'
             if ($orderData->status !== 'delivered') {
                 return response()->json([
                     'success' => false,
@@ -66,11 +92,13 @@ class OrderDetailController extends Controller
                 ], 400);
             }
 
-            // Update status back to 'shipped' to indicate it needs to be checked
+            // Simpan status asli sebelum diubah (untuk logging)
             $originalStatus = $orderData->status;
+            
+            // Kembalikan status ke 'shipped' untuk investigasi
             $orderData->update(['status' => 'shipped']);
 
-            // Add log entry for the status change
+            // Catat log perubahan status
             $orderData->logs()->create([
                 'status' => 'shipped',
                 'description' => 'Status pesanan dikembalikan ke shipped karena pelapor mengatakan belum menerima barang',

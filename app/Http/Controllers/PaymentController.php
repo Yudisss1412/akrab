@@ -9,40 +9,145 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
+// ========================================================================
+// PAYMENT CONTROLLER - PROSES PEMBAYARAN (MIDTRANS & NON-MIDTRANS)
+// ========================================================================
+// UNTUK SIDANG SKRIPSI:
+// - Controller ini menangani PROSES PEMBAYARAN di sistem e-commerce
+// - BERBEDA dengan CheckoutController & Midtrans:
+//   * CheckoutController = Handle checkout (buat order)
+//   * PaymentController = Handle pembayaran (bayar order)
+//   * Midtrans = Payment gateway (tool eksternal untuk proses pembayaran)
+// 
+// ANALOGI:
+// - CheckoutController = Kasir scan barang di supermarket
+// - PaymentController = Proses pembayaran di mesin EDC
+// - Midtrans = Bank/Visa yang benar-benar proses transfer uang
+//
+// FITUR UTAMA:
+// 1. Process Payment - Proses pembayaran via Midtrans/non-Midtrans
+// 2. Payment Callback - Handle callback dari payment gateway
+// 3. Upload Proof - Upload bukti transfer bank
+// 4. Payment Status - Cek status pembayaran
+// 5. Verify Payment - Seller verifikasi pembayaran (untuk bank transfer)
+// 6. Midtrans Notification - Handle webhook dari Midtrans server
+//
+// METODE PEMBAYARAN:
+// - Bank Transfer (BCA, Mandiri, dll) - Upload bukti transfer
+// - E-Wallet (Gopay, OVO, ShopeePay) - Via Midtrans
+// - COD (Cash on Delivery) - Bayar saat barang diterima
+// - Midtrans Direct - Pembayaran langsung via Midtrans
+//
+// FLOW PEMBAYARAN:
+// 1. Customer pilih metode pembayaran di checkout
+// 2. PaymentController process berdasarkan metode:
+//    - Midtrans: Call Midtrans API → dapat Snap Token → redirect customer
+//    - Bank Transfer: Upload bukti → seller verifikasi manual
+//    - COD: Order confirmed → bayar saat delivery
+// 3. Payment gateway kirim callback → update status order
+// 4. Order diproses seller
+// ========================================================================
+
 class PaymentController extends Controller
 {
     protected $midtransService;
 
+    /**
+     * Constructor - Inject MidtransService
+     * 
+     * ==========================================================================
+     * DEPENDENCY INJECTION - MIDTRANS SERVICE
+     * ==========================================================================
+     * UNTUK SIDANG:
+     * - Method ini meng-inject MidtransService ke dalam controller
+     * - MidtransService adalah wrapper untuk Midtrans API
+     * - Memisahkan logic Midtrans dari controller (clean architecture)
+     * 
+     * DEPENDENCIES:
+     * - MidtransService: Service untuk komunikasi dengan Midtrans API
+     * - Middleware 'auth': Pastikan user sudah login
+     */
     public function __construct(MidtransService $midtransService)
     {
+        // Inject MidtransService untuk digunakan di semua method
         $this->midtransService = $midtransService;
+        
+        // Require authentication untuk semua method di controller ini
         $this->middleware('auth');
     }
 
     /**
      * Proses pembayaran untuk pesanan
+     * 
+     * ==========================================================================
+     * FITUR: PROCESS PAYMENT - PROSES PEMBAYARAN ORDER
+     * ==========================================================================
+     * UNTUK SIDANG:
+     * - Method ini adalah MAIN METHOD untuk proses pembayaran
+     * - Handle 2 jenis pembayaran: Midtrans & Non-Midtrans
+     * - Midtrans: Bank Transfer, E-Wallet via Midtrans API
+     * - Non-Midtrans: COD, manual bank transfer
+     * 
+     * FLOW MIDTRANS:
+     * 1. Validasi order & payment method
+     * 2. Call MidtransService → dapat Snap Token
+     * 3. Simpan payment record dengan status 'pending'
+     * 4. Return Snap Token ke frontend → redirect customer ke Midtrans
+     * 5. Midtrans handle pembayaran (BCA, Gopay, dll)
+     * 6. Midtrans kirim callback → update status (di method callback)
+     * 
+     * FLOW COD:
+     * 1. Validasi order & payment method
+     * 2. Set payment status = 'success', order status = 'confirmed'
+     * 3. Customer bayar saat barang diterima
+     * 
+     * FLOW BANK TRANSFER (MANUAL):
+     * 1. Customer upload bukti transfer (di method uploadProof)
+     * 2. Seller verifikasi manual (di method updateStatus)
+     * 3. Update status order
+     * 
+     * VALIDASI:
+     * - order_number: Harus ada di database & milik user ini
+     * - payment_method: bank_transfer, e_wallet, cod, midtrans
+     * - Order belum dibayar sebelumnya (anti-double payment)
+     *
+     * @param Request $request Objek request HTTP
+     * @return \Illuminate\Http\JsonResponse JSON response success/error
      */
     public function process(Request $request)
     {
+        // ========================================
+        // STEP 1: VALIDASI INPUT
+        // ========================================
+        // Validasi order number & payment method
         $request->validate([
-            'order_number' => 'required|string|exists:orders,order_number',
-            'payment_method' => 'required|in:bank_transfer,e_wallet,cod,midtrans'
+            'order_number' => 'required|string|exists:orders,order_number',  // Order harus valid
+            'payment_method' => 'required|in:bank_transfer,e_wallet,cod,midtrans'  // Metode pembayaran valid
         ]);
 
+        // ========================================
+        // STEP 2: AMBIL ORDER
+        // ========================================
         // Ambil order berdasarkan order number
+        // Pastikan order milik user yang login (security)
         $order = Order::where('order_number', $request->order_number)
                      ->where('user_id', Auth::id())
-                     ->with(['user', 'shipping_address', 'items.product', 'items.variant'])
+                     ->with(['user', 'shipping_address', 'items.product', 'items.variant'])  // Load relasi untuk info lengkap
                      ->first();
 
         if (!$order) {
+            // Order tidak ditemukan atau bukan milik user ini
             return response()->json([
                 'success' => false,
                 'message' => 'Pesanan tidak ditemukan'
             ], 404);
         }
 
+        // ========================================
+        // STEP 3: CEK STATUS PEMBAYARAN
+        // ========================================
         // Cek apakah order sudah dibayar sebelumnya
+        // Anti-double payment: Order yang sudah paid tidak bisa dibayar lagi
         if ($order->status === 'paid') {
             return response()->json([
                 'success' => false,
@@ -50,57 +155,91 @@ class PaymentController extends Controller
             ], 400);
         }
 
+        // ========================================
+        // STEP 4: PROSES BERDASARKAN PAYMENT METHOD
+        // ========================================
+        // Cek apakah payment method menggunakan Midtrans
         if ($request->payment_method === 'bank_transfer' || $request->payment_method === 'e_wallet' || $request->payment_method === 'midtrans') {
+            // ========================================
+            // CABANG A: PEMBAYARAN VIA MIDTRANS
+            // ========================================
             // Proses pembayaran Midtrans
             try {
                 // Load relasi produk dan varian sebelum mengirim ke Midtrans
+                // Data ini diperlukan untuk detail transaksi di Midtrans
                 $orderItems = $order->load('items.product', 'items.variant')->items;
 
                 // Format items untuk dikirim ke Midtrans
+                // Midtrans memerlukan detail produk untuk setiap item
                 $itemsForMidtrans = [];
                 foreach ($orderItems as $item) {
                     $itemsForMidtrans[] = [
-                        'product' => $item->product,
-                        'product_variant' => $item->variant,
-                        'quantity' => $item->quantity,
-                        'unit_price' => $item->unit_price,
+                        'product' => $item->product,  // Info produk
+                        'product_variant' => $item->variant,  // Info varian (jika ada)
+                        'quantity' => $item->quantity,  // Jumlah beli
+                        'unit_price' => $item->unit_price,  // Harga per unit
                     ];
                 }
 
+                // ========================================
+                // CALL MIDTRANS API
+                // ========================================
+                // Dapatkan Snap Token dari MidtransService
+                // Snap Token digunakan untuk redirect customer ke halaman pembayaran Midtrans
                 $snapToken = $this->midtransService->getSnapToken($order, $itemsForMidtrans);
 
+                // ========================================
+                // SIMPAN PAYMENT RECORD
+                // ========================================
                 // Simpan transaction_id di payment record
+                // UpdateOrCreate: Update jika sudah ada, Create jika belum
                 $paymentMethod = $request->payment_method; // Use the original payment method requested
                 $payment = Payment::updateOrCreate(
-                    ['order_id' => $order->id],
+                    ['order_id' => $order->id],  // Cari berdasarkan order_id
                     [
-                        'payment_method' => $paymentMethod,
-                        'transaction_id' => $order->order_number,
-                        'payment_status' => 'pending',
-                        'amount' => $order->total_amount,
+                        'payment_method' => $paymentMethod,  // Metode pembayaran
+                        'transaction_id' => $order->order_number,  // ID transaksi = order number
+                        'payment_status' => 'pending',  // Status pending sampai Midtrans konfirmasi
+                        'amount' => $order->total_amount,  // Total amount yang harus dibayar
                     ]
                 );
 
+                // ========================================
+                // RETURN SNAP TOKEN KE FRONTEND
+                // ========================================
+                // Frontend akan gunakan Snap Token untuk redirect ke Midtrans
                 return response()->json([
                     'success' => true,
                     'message' => 'Pembayaran Midtrans berhasil diproses',
-                    'snap_token' => $snapToken,
+                    'snap_token' => $snapToken,  // Token untuk redirect ke Midtrans
                     'order_number' => $order->order_number,
                     'payment_method' => $request->payment_method // Return the original payment method requested
                 ]);
 
             } catch (\Exception $e) {
+                // ========================================
+                // HANDLE ERROR
+                // ========================================
+                // Jika ada error saat call Midtrans API
                 return response()->json([
                     'success' => false,
                     'message' => 'Terjadi kesalahan saat memproses pembayaran Midtrans: ' . $e->getMessage()
                 ], 500);
             }
         } else {
-            // Proses pembayaran metode lama
+            // ========================================
+            // CABANG B: PEMBAYARAN NON-MIDTRANS (COD/MANUAL)
+            // ========================================
+            // Proses pembayaran metode lama (non-Midtrans)
             DB::beginTransaction();
 
             try {
+                // ========================================
+                // STEP B1: BUAT/UPDATE PAYMENT RECORD
+                // ========================================
                 // Buat atau update payment record
+                // COD: Status langsung 'success', paid_at = now
+                // Non-COD: Status 'pending', tunggu konfirmasi
                 $payment = Payment::updateOrCreate(
                     ['order_id' => $order->id],
                     [
@@ -111,12 +250,20 @@ class PaymentController extends Controller
                     ]
                 );
 
-                // Update status order
+                // ========================================
+                // STEP B2: UPDATE STATUS ORDER
+                // ========================================
+                // Update status order berdasarkan payment method
+                // COD: Status 'confirmed' (seller bisa langsung proses)
+                // Non-COD: Status 'pending' (tunggu pembayaran)
                 $order->update([
                     'status' => $request->payment_method === 'cod' ? 'confirmed' : 'pending',
                     'paid_at' => $request->payment_method === 'cod' ? now() : null
                 ]);
 
+                // ========================================
+                // STEP B3: LOG UNTUK COD
+                // ========================================
                 // Jika pembayaran COD, tambahkan log bahwa pembayaran telah dikonfirmasi
                 if ($request->payment_method === 'cod') {
                     $order->logs()->create([
@@ -127,6 +274,9 @@ class PaymentController extends Controller
 
                 DB::commit();
 
+                // ========================================
+                // STEP B4: RETURN RESPONSE
+                // ========================================
                 return response()->json([
                     'success' => true,
                     'message' => $request->payment_method === 'cod' ?
@@ -137,6 +287,10 @@ class PaymentController extends Controller
                 ]);
 
             } catch (\Exception $e) {
+                // ========================================
+                // STEP B5: HANDLE ERROR (ROLLBACK)
+                // ========================================
+                // Rollback transaksi jika ada error
                 DB::rollback();
 
                 return response()->json([

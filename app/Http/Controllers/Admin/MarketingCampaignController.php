@@ -7,6 +7,35 @@ use App\Models\MarketingCampaignTracking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+// ========================================================================
+// MARKETING CAMPAIGN CONTROLLER - ADMIN MONITORING KAMPANYE
+// ========================================================================
+// UNTUK SIDANG SKRIPSI:
+// - Controller ini untuk admin manage marketing campaign
+// - Admin bisa buat, monitor, dan track efektivitas kampanye
+// - Fitur untuk tracking ROI, impressions, clicks, conversions
+//
+// FITUR UTAMA:
+// 1. Campaign Management - CRUD kampanye marketing
+// 2. Performance Tracking - Track impressions, clicks, conversions
+// 3. ROI Calculation - Hitung Return on Investment
+// 4. Status Management - active, completed, paused, cancelled
+// 5. Budget Tracking - Monitor budget vs revenue
+//
+// METRICS YANG DI-TRACK:
+// - impressions: Berapa kali iklan ditampilkan
+// - clicks: Berapa kali iklan diklik
+// - conversions: Berapa yang jadi pembelian
+// - revenue_generated: Total pendapatan dari kampanye
+// - roi: Return on Investment (%)
+//
+// KPI (KEY PERFORMANCE INDICATORS):
+// - CTR (Click-Through Rate) = clicks / impressions
+// - Conversion Rate = conversions / clicks
+// - CPA (Cost Per Acquisition) = budget / conversions
+// - ROI = (revenue - budget) / budget * 100%
+// ========================================================================
+
 class MarketingCampaignController extends Controller
 {
     /**

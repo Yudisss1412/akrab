@@ -218,18 +218,171 @@ class ProfileController extends Controller
         ]);
     }
 
+    // ========================================================================
+    // FITUR GEOCODING - KONVERSI ALAMAT TEKS MENJADI KOORDINAT PETA
+    // ========================================================================
+    // UNTUK SIDANG SKRIPSI:
+    // - Fitur ini mengubah alamat lengkap (contoh: "Jl. Sudirman No. 10, Jakarta")
+    //   menjadi koordinat latitude & longitude yang bisa ditampilkan di Google Maps
+    // - Menggunakan OpenStreetMap Nominatim API (GRATIS, tidak perlu API Key)
+    // - Alternatif dari Google Geocoding API yang berbayar
+    //
+    // ALUR KERJA:
+    // 1. Seller mengisi alamat di form profile
+    // 2. Sistem otomatis memanggil API Nominatim
+    // 3. API mengembalikan koordinat lat/lng
+    // 4. Koordinat disimpan ke database untuk fitur "Petunjuk Arah" di halaman toko
+    //
+    // MENGAPA MENGGUNAKAN NOMINATIM?
+    // - Gratis tanpa limitasi ketat untuk skala kecil-menengah
+    // - Tidak memerlukan credit card atau API key
+    // - Akurasi cukup baik untuk alamat di Indonesia
+    // - Cocok untuk skripsi dengan budget terbatas
+    // ========================================================================
+
     /**
-     * Get coordinates from address using OpenStreetMap Nominatim API
+     * Mendapatkan koordinat dari alamat menggunakan OpenStreetMap Nominatim API
+     *
+     * Method private ini digunakan untuk mengkonversi alamat teks menjadi
+     * koordinat latitude dan longitude (geocoding).
+     *
+     * Proses:
+     * 1. Encode alamat untuk URL (spasi jadi %20, karakter khusus di-encode)
+     * 2. Call API Nominatim OpenStreetMap dengan HTTP GET
+     * 3. Parse response JSON yang berisi hasil geocoding
+     * 4. Return lat dan lng dalam format float
+     *
+     * @param string $address Alamat lengkap yang akan dikonversi
+     * @return array|null Array dengan 'lat' dan 'lng' atau null jika gagal
+     * 
+     * @example
+     * Input: "Jl. Sudirman, Jakarta Pusat"
+     * Output: ['lat' => -6.195172, 'lng' => 106.820673]
      */
     private function getCoordinatesFromAddress($address)
     {
+        // ========================================
+        // STEP 1: VALIDASI AWAL
+        // ========================================
+        // Jika alamat kosong, return null
         if (empty($address)) {
             return null;
         }
 
+        // ========================================
+        // STEP 2: ENCODE ALAMAT UNTUK URL
+        // ========================================
+        // Encode alamat agar aman untuk URL
+        // Contoh: "Jl. Sudirman No. 10" → "Jl.+Sudirman+No.+10"
         $encodedAddress = urlencode($address);
+
+        // ========================================
+        // STEP 3: PANGGIL API NOMINATIM
+        // ========================================
+        // URL API Nominatim OpenStreetMap untuk geocoding
+        // Parameter:
+        // - format=json: Response dalam format JSON
+        // - q: Query pencarian (alamat yang sudah di-encode)
+        // - limit=1: Hanya ambil 1 hasil paling relevan (hemat bandwidth)
         $url = "https://nominatim.openstreetmap.org/search?format=json&q={$encodedAddress}&limit=1";
 
+        // ========================================
+        // STEP 4: SETUP cURL UNTUK HTTP REQUEST
+        // ========================================
+        // Initialize cURL untuk melakukan HTTP GET request
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);                    // Set URL target
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);         // Return response sebagai string (bukan output langsung)
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            // User-Agent WAJIB diisi - Nominatim menolak request tanpa User-Agent yang valid
+            // Ini adalah requirement dari Nominatim API usage policy
+            'User-Agent: EcommerceAkrab/1.0 (contact@ecommerceakrab.com)'
+        ]);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);         // Follow redirect jika ada
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);                  // Timeout 30 detik untuk menghindari hanging
+
+        // ========================================
+        // STEP 5: EKSEKUSI REQUEST & HANDLE RESPONSE
+        // ========================================
+        // Execute request ke API Nominatim
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);  // Get HTTP status code (200 = success)
+        curl_close($ch);  // Tutup cURL session untuk free memory
+
+        // ========================================
+        // STEP 6: VALIDASI HTTP RESPONSE
+        // ========================================
+        // Cek jika request gagal atau HTTP code bukan 200 (OK)
+        if ($response === false || $httpCode !== 200) {
+            \Log::error('Failed to get coordinates from Nominatim API', [
+                'address' => $address,
+                'http_code' => $httpCode
+            ]);
+            return null;  // Return null jika API call gagal
+        }
+
+        // ========================================
+        // STEP 7: DECODE & PARSE JSON RESPONSE
+        // ========================================
+        // Decode JSON response menjadi PHP array
+        $data = json_decode($response, true);
+
+        // ========================================
+        // STEP 8: VALIDASI DATA HASIL
+        // ========================================
+        // Validasi response - harus ada data dan harus ada lat/lng
+        // Nominatim mengembalikan array, bahkan jika tidak ada hasil (array kosong)
+        if (empty($data) || !isset($data[0]['lat']) || !isset($data[0]['lon'])) {
+            \Log::warning('No coordinates found for address', ['address' => $address]);
+            return null;  // Return null jika alamat tidak ditemukan
+        }
+
+        // ========================================
+        // STEP 9: RETURN KOORDINAT
+        // ========================================
+        // Return koordinat sebagai float (tipe data numerik desimal)
+        // CATATAN: Nominatim menggunakan 'lon' (longitude) bukan 'lng'
+        return [
+            'lat' => (float) $data[0]['lat'],   // Latitude: -90 sampai +90
+            'lng' => (float) $data[0]['lon']    // Longitude: -180 sampai +180
+        ];
+    }
+
+    /**
+     * Geocode address to coordinates - Endpoint AJAX untuk geocoding
+     * 
+     * Endpoint publik yang dapat dipanggil via AJAX untuk mengkonversi
+     * alamat menjadi koordinat. Digunakan saat seller update profil
+     * dan ingin mendapatkan koordinat dari alamat yang diinput.
+     * 
+     * Request:
+     * - address (required): Alamat lengkap yang akan dikonversi
+     * 
+     * Response:
+     * - success: boolean
+     * - data.lat: Latitude koordinat
+     * - data.lng: Longitude koordinat
+     * - data.display_name: Nama lengkap alamat dari Nominatim
+     * 
+     * @param Request $request Objek request HTTP
+     * @return \Illuminate\Http\JsonResponse JSON response dengan koordinat
+     */
+    public function geocodeAddress(Request $request)
+    {
+        // Validasi input address
+        $request->validate([
+            'address' => 'required|string|max:255',
+        ]);
+
+        $address = $request->input('address');
+
+        // Encode alamat untuk URL
+        $encodedAddress = urlencode($address);
+
+        // URL API Nominatim OpenStreetMap
+        $url = "https://nominatim.openstreetmap.org/search?format=json&q={$encodedAddress}&limit=1";
+
+        // Setup cURL
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -239,62 +392,12 @@ class ProfileController extends Controller
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 
+        // Execute request
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
-        if ($response === false || $httpCode !== 200) {
-            \Log::error('Failed to get coordinates from Nominatim API', [
-                'address' => $address,
-                'http_code' => $httpCode
-            ]);
-            return null;
-        }
-
-        $data = json_decode($response, true);
-
-        if (empty($data) || !isset($data[0]['lat']) || !isset($data[0]['lon'])) {
-            \Log::warning('No coordinates found for address', ['address' => $address]);
-            return null;
-        }
-
-        return [
-            'lat' => (float) $data[0]['lat'],
-            'lng' => (float) $data[0]['lon']
-        ];
-    }
-
-    /**
-     * Geocode address to coordinates using OpenStreetMap Nominatim API
-     */
-    public function geocodeAddress(Request $request)
-    {
-        $request->validate([
-            'address' => 'required|string|max:255',
-        ]);
-
-        $address = $request->input('address');
-
-        // Encode the address for URL
-        $encodedAddress = urlencode($address);
-
-        // Call OpenStreetMap Nominatim API
-        $url = "https://nominatim.openstreetmap.org/search?format=json&q={$encodedAddress}&limit=1";
-
-        // Set up cURL options
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'User-Agent: EcommerceAkrab/1.0 (contact@ecommerceakrab.com)' // Nominatim requires a proper user agent
-        ]);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-
+        // Handle error
         if ($response === false || $httpCode !== 200) {
             return response()->json([
                 'success' => false,
@@ -302,8 +405,10 @@ class ProfileController extends Controller
             ], 500);
         }
 
+        // Decode response
         $data = json_decode($response, true);
 
+        // Jika tidak ada hasil
         if (empty($data) || !isset($data[0]['lat']) || !isset($data[0]['lon'])) {
             return response()->json([
                 'success' => false,
@@ -311,32 +416,51 @@ class ProfileController extends Controller
             ]);
         }
 
+        // Return koordinat yang berhasil ditemukan
         return response()->json([
             'success' => true,
             'data' => [
                 'lat' => (float) $data[0]['lat'],
                 'lng' => (float) $data[0]['lon'],
-                'display_name' => $data[0]['display_name']
+                'display_name' => $data[0]['display_name']  // Nama lengkap alamat
             ]
         ]);
     }
 
     /**
-     * Get seller coordinates for directions
+     * Get seller coordinates for directions - Endpoint untuk Get Directions
+     * 
+     * Endpoint ini digunakan untuk mendapatkan koordinat seller yang akan
+     * ditampilkan di peta untuk fitur Get Directions. Customer memanggil
+     * endpoint ini saat ingin melihat arah ke toko seller.
+     * 
+     * Prioritas pengambilan koordinat:
+     * 1. Dari tabel sellers (field lat, lng) - jika seller sudah update koordinat
+     * 2. Dari tabel users (field lat, lng) - fallback jika sellers tidak ada
+     * 
+     * Validasi koordinat:
+     * - Tidak boleh null, empty string, 0, atau 'null' (string)
+     * - Harus koordinat valid dalam range Indonesia
+     * 
+     * @param int $sellerId ID penjual yang koordinatnya diminta
+     * @return \Illuminate\Http\JsonResponse JSON dengan lat, lng, name, address
      */
     public function getSellerCoordinates($sellerId)
     {
+        // Cari seller dengan relasi user
         $seller = \App\Models\Seller::with('user')->find($sellerId);
 
+        // Jika seller tidak ditemukan
         if (!$seller) {
             return response()->json(['error' => 'Seller not found'], 404);
         }
 
-        // Pastikan koordinat valid
+        // Inisialisasi variabel koordinat
         $lat = null;
         $lng = null;
 
-        // Cek koordinat di seller terlebih dahulu
+        // PRIORITAS 1: Cek koordinat di tabel sellers terlebih dahulu
+        // Validasi: tidak boleh null, empty, 0, atau string 'null'
         if ($seller->lat && $seller->lng && $seller->lat != 'null' && $seller->lng != 'null' &&
             $seller->lat != 0 && $seller->lng != 0 &&
             !is_null($seller->lat) && !is_null($seller->lng) &&
@@ -345,7 +469,7 @@ class ProfileController extends Controller
             $lng = (float)$seller->lng;
         }
 
-        // Jika tidak ditemukan di seller, cek di user
+        // PRIORITAS 2: Jika tidak ditemukan di seller, cek di tabel users
         if ((!$lat || !$lng) && $seller->user) {
             if ($seller->user->lat && $seller->user->lng &&
                 $seller->user->lat != 'null' && $seller->user->lng != 'null' &&
@@ -357,7 +481,7 @@ class ProfileController extends Controller
             }
         }
 
-        // Jika koordinat masih null, kirimkan informasi debugging
+        // Logging untuk debugging jika koordinat tidak ditemukan
         if ($lat === null || $lng === null) {
             \Log::info('Seller coordinates not found', [
                 'seller_id' => $sellerId,
@@ -368,11 +492,12 @@ class ProfileController extends Controller
             ]);
         }
 
+        // Return response dengan koordinat (atau null jika tidak ada)
         return response()->json([
             'lat' => $lat,
             'lng' => $lng,
-            'name' => $seller->store_name ?? $seller->name,
-            'address' => $seller->address ?? $seller->user->address ?? 'Alamat tidak tersedia'
+            'name' => $seller->store_name ?? $seller->name,  // Nama toko untuk ditampilkan di map
+            'address' => $seller->address ?? $seller->user->address ?? 'Alamat tidak tersedia'  // Alamat untuk ditampilkan
         ]);
     }
 }

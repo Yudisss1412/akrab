@@ -12,35 +12,108 @@ use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+// ========================================================================
+// ADMIN DASHBOARD CONTROLLER - MONITORING PLATFORM (PUSAT KONTROL)
+// ========================================================================
+// UNTUK SIDANG SKRIPSI:
+// - Controller ini adalah "PUSAT KONTROL" untuk admin monitor seluruh platform
+// - Seperti ruang kontrol bandara (Air Traffic Control) yang pantau SEMUA aktivitas
+// - Admin bisa lihat statistik real-time, monitoring user, seller, produk, order
+//
+// FITUR UTAMA:
+// 1. Dashboard Overview - Statistik real-time (user, toko, order, pendapatan)
+// 2. Ecosystem Metrics - GMV, revenue, growth percentage, chart data
+// 3. Seller Statistics - Total seller, active seller, top sellers
+// 4. User Statistics - Total user, new user, active user
+// 5. Product Statistics - Total produk, top selling products
+// 6. Payment Verification - Verifikasi pembayaran manual (COD/bukti transfer)
+// 7. Real-time Stats - Active users, new orders, pending payments
+//
+// ANALOGI:
+// Seperti dashboard di ruang kontrol bandara:
+// - Layar 1: Statistik penerbangan (order, revenue, growth)
+// - Layar 2: Data airline (seller statistics)
+// - Layar 3: Data penumpang (user statistics)
+// - Layar 4: Status kargo (product statistics)
+// - Layar 5: Payment & clearance (payment verification)
+//
+// METRIK PENTING:
+// - GMV (Gross Merchandise Value) = Total nilai transaksi di platform
+// - Revenue = Pendapatan platform (asumsi 5% dari GMV)
+// - Growth Percentage = Persentase pertumbuhan dibanding periode sebelumnya
+// - Active Users = User yang beraktivitas dalam periode tertentu
+// ========================================================================
+
 class AdminDashboardController extends Controller
 {
     /**
      * Get dashboard statistics for admin
+     * 
+     * ==========================================================================
+     * FITUR: DASHBOARD OVERVIEW - STATISTIK REAL-TIME
+     * ==========================================================================
+     * UNTUK SIDANG:
+     * - Method ini adalah "layar utama" di ruang kontrol admin
+     * - Menampilkan statistik menyeluruh dari seluruh platform
+     * - Data di-refresh secara real-time untuk monitoring
+     * 
+     * KOMPONEN STATISTIK:
+     * 1. Ecosystem Metrics - GMV, revenue, orders, growth
+     * 2. Seller Statistics - Total, new, active sellers + top sellers
+     * 3. Moderation Counts - Violations, tickets, withdrawals
+     * 4. User Statistics - Total, new, active users
+     * 
+     * FILTER WAKTU:
+     * - today = Hari ini (start of day)
+     * - 7days = 7 hari terakhir
+     * - month = Bulan ini (start of month)
+     * - year = Tahun ini (start of year)
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param  Request  $request
+     * @return \Illuminate\Http\JsonResponse JSON dengan semua statistik dashboard
      */
     public function getDashboardStats(Request $request)
     {
-        // Get time range filter
+        // ========================================
+        // STEP 1: GET TIME RANGE FILTER
+        // ========================================
+        // Get time range filter dari request (default: 7days)
         $range = $request->get('range', '7days');
-        
-        // Calculate date range
+
+        // ========================================
+        // STEP 2: CALCULATE DATE RANGE
+        // ========================================
+        // Calculate start date berdasarkan range yang dipilih
         $startDate = $this->calculateStartDate($range);
-        
-        // Get ecosystem metrics
+
+        // ========================================
+        // STEP 3: GET ECOSYSTEM METRICS
+        // ========================================
+        // Get metrics: GMV, revenue, orders, growth, chart data
         $metrics = $this->getEcosystemMetrics($startDate);
-        
-        // Get seller statistics
+
+        // ========================================
+        // STEP 4: GET SELLER STATISTICS
+        // ========================================
+        // Get seller stats: total, new, active, top sellers
         $sellerStats = $this->getSellerStatistics($startDate);
-        
-        // Get moderation counts
+
+        // ========================================
+        // STEP 5: GET MODERATION COUNTS
+        // ========================================
+        // Get moderation data: violations, tickets, withdrawals
         $moderationCounts = $this->getModerationCounts();
 
-        // Get user statistics
+        // ========================================
+        // STEP 6: GET USER STATISTICS
+        // ========================================
+        // Get user stats: total, new, active users
         $userStats = $this->getUserStatistics($startDate);
 
-        // Return JSON response
+        // ========================================
+        // STEP 7: RETURN JSON RESPONSE
+        // ========================================
+        // Return semua statistik dalam format JSON untuk frontend
         return response()->json([
             'success' => true,
             'data' => [

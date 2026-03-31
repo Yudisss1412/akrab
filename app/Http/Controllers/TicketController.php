@@ -6,10 +6,70 @@ use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+// ========================================================================
+// TICKET CONTROLLER - SISTEM TIKET BANTUAN (HELP DESK)
+// ========================================================================
+// UNTUK SIDANG SKRIPSI:
+// - Controller ini menangani sistem Customer Service (CS) untuk user
+// - User bisa buat tiket jika ada masalah (pembayaran, produk, teknis, dll)
+// - Admin akan respon dan solve masalah melalui sistem tiket ini
+//
+// FITUR UTAMA:
+// 1. Create Ticket - User buat tiket bantuan dengan kategori & prioritas
+// 2. Ticket List - Admin/Customer lihat daftar tiket dengan filter
+// 3. Ticket Detail - Lihat detail tiket + conversation thread
+// 4. Reply System - Admin & user bisa balas tiket (seperti chat)
+// 5. Status Management - Update status tiket (open → in_progress → resolved → closed)
+// 6. Priority System - Prioritas tiket (low, medium, high, urgent)
+// 7. Assignment - Admin bisa assign tiket ke CS tertentu
+//
+// FLOW TIKET:
+// 1. User buat tiket → Status: open
+// 2. Admin ambil tiket → Status: in_progress
+// 3. Admin solve → Status: resolved
+// 4. User konfirmasi → Status: closed
+//
+// KATEGORI TIKET:
+// - technical      : Masalah teknis (login error, bug, dll)
+// - billing        : Masalah pembayaran (gagal bayar, refund, dll)
+// - account        : Masalah akun (terblokir, hack, dll)
+// - product        : Masalah produk (salah kirim, cacat, dll)
+// - other          : Lainnya
+//
+// PRIORITAS:
+// - low       : Tidak urgent (bisa tunggu 1 minggu)
+// - medium    : Normal (direspon dalam 3 hari)
+// - high      : Urgent (direspon dalam 24 jam)
+// - urgent    : Critical (direspon dalam 1 jam!)
+// ========================================================================
+
 class TicketController extends Controller
 {
+    /**
+     * Display a listing of tickets.
+     * 
+     * ==========================================================================
+     * FITUR: MONITORING DASHBOARD TIKET
+     * ==========================================================================
+     * UNTUK SIDANG:
+     * - Method ini menampilkan daftar tiket dengan filter lengkap
+     * - Support filter by: category, status, priority, search
+     * - Pagination 10 tiket per halaman
+     * 
+     * FILTER YANG TERSEDIA:
+     * 1. Category Filter - Filter by kategori (technical, billing, product, dll)
+     * 2. Status Filter - Filter by status (open, in_progress, resolved, closed)
+     * 3. Priority Filter - Filter by prioritas (low, medium, high, urgent)
+     * 4. Search - Cari by subject, message, atau nama user
+     * 
+     * @param Request $request
+     * @return \Illuminate\View\View
+     */
     public function index(Request $request)
     {
+        // ========================================
+        // STEP 1: CEK APAKAH ADA TIKET DI DATABASE
+        // ========================================
         // Check if there are any real tickets in the database
         $hasRealTickets = Ticket::exists();
 
@@ -18,35 +78,56 @@ class TicketController extends Controller
             return $this->showFilteredDummyTickets($request);
         }
 
+        // ========================================
+        // STEP 2: QUERY TIKET DENGAN EAGER LOADING
+        // ========================================
+        // Query tiket dengan load relasi user & assignee
+        // Eager loading untuk performa (avoid N+1 query)
         $query = Ticket::with('user', 'assignee');
 
+        // ========================================
+        // STEP 3: FILTER BY KATEGORI (OPTIONAL)
+        // ========================================
         // Filter berdasarkan kategori jika ada
         if ($request->filled('category')) {
             $query->where('category', $request->category);
         }
 
+        // ========================================
+        // STEP 4: FILTER BY STATUS (OPTIONAL)
+        // ========================================
         // Filter berdasarkan status jika ada
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
+        // ========================================
+        // STEP 5: FILTER BY PRIORITY (OPTIONAL)
+        // ========================================
         // Filter berdasarkan priority jika ada
         if ($request->filled('priority')) {
             $query->where('priority', $request->priority);
         }
 
+        // ========================================
+        // STEP 6: FILTER BY PENCARIAN (OPTIONAL)
+        // ========================================
         // Filter berdasarkan pencarian jika ada
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
-                $q->where('subject', 'LIKE', "%{$search}%")
-                  ->orWhere('message', 'LIKE', "%{$search}%")
+                $q->where('subject', 'LIKE', "%{$search}%")  // Cari di subject tiket
+                  ->orWhere('message', 'LIKE', "%{$search}%")  // Atau di message
                   ->orWhereHas('user', function($userQuery) use ($search) {
-                      $userQuery->where('name', 'LIKE', "%{$search}%");
+                      $userQuery->where('name', 'LIKE', "%{$search}%");  // Atau nama user
                   });
             });
         }
 
+        // ========================================
+        // STEP 7: PAGINATE RESULTS
+        // ========================================
+        // Paginate 10 tiket per halaman, urutkan dari terbaru
         $tickets = $query->orderBy('created_at', 'desc')->paginate(10);
 
         return view('admin.support_tickets', compact('tickets'));

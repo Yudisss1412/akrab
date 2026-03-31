@@ -377,15 +377,66 @@ function handleImageError(img) {
   img.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(svgString);
 }
 
+/* ==========================================================================
+   FITUR "LIHAT RUTE" - PETUNJUK ARAH KE TOKO MENGGUNAKAN GOOGLE MAPS
+   ==========================================================================
+   UNTUK SIDANG SKRIPSI:
+   - Fitur ini memungkinkan customer melihat rute dari lokasi mereka ke toko
+   - Menggunakan Google Maps Directions API via URL Scheme (bukan embed iframe)
+   - Customer tidak perlu input alamat manual - lokasi otomatis dari GPS browser
+   
+   ALUR KERJA:
+   1. Customer klik tombol "Lihat Rute" di halaman toko
+   2. Sistem meminta izin akses lokasi customer (browser geolocation API)
+   3. Sistem ambil koordinat toko dari database (sudah di-geocode sebelumnya)
+   4. Generate URL Google Maps Directions dengan parameter origin & destination
+   5. Buka URL di tab baru - customer langsung lihat rute di Google Maps
+   
+   MENGAPA PAKAI URL SCHEME, BUKAN EMBED IFRAME?
+   - Google Maps iframe sering diblokir oleh browser modern (privacy policy)
+   - URL scheme lebih reliable dan tidak memerlukan API key untuk basic usage
+   - User experience lebih baik karena buka di app Google Maps (mobile)
+   
+   STRUKTUR URL GOOGLE MAPS DIRECTIONS:
+   https://www.google.com/maps/dir/?api=1&origin={lat},{lng}&destination={lat},{lng}&travelmode=driving
+   
+   Parameter:
+   - api=1: Versi API Google Maps
+   - origin: Titik awal (lokasi customer)
+   - destination: Titik tujuan (lokasi toko)
+   - travelmode: Mode transportasi (driving, walking, bicycling, transit)
+   ========================================================================== */
+
 /* ---------- GET DIRECTIONS FUNCTIONALITY ---------- */
+/**
+ * Fungsi utama untuk menampilkan modal petunjuk arah ke toko
+ * 
+ * ALUR EKSEKUSI:
+ * 1. Cek apakah browser support Geolocation API
+ * 2. Ambil ID penjual dari elemen HTML (.toko-identity)
+ * 3. Fetch koordinat penjual dari endpoint /seller-coordinates/{id}
+ * 4. Request lokasi customer menggunakan navigator.geolocation
+ * 5. Tampilkan modal dengan peta dan tombol buka Google Maps
+ * 
+ * @async
+ * @returns {Promise<void>}
+ */
 async function showDirectionsModal() {
-  // Cek apakah browser mendukung Geolocation
+  // ========================================
+  // STEP 1: CEK BROWSER SUPPORT
+  // ========================================
+  // Cek apakah browser mendukung Geolocation API
+  // Geolocation API hanya bekerja di HTTPS atau localhost
   if (!navigator.geolocation) {
     showNotification('Geolocation tidak didukung oleh browser ini.', 'error');
     return;
   }
 
+  // ========================================
+  // STEP 2: AMBIL ID PENJUAL DARI DOM
+  // ========================================
   // Dapatkan ID penjual dari elemen halaman
+  // Data seller ID disimpan di attribute data-sellerId di elemen .toko-identity
   const sellerIdElement = document.querySelector('.toko-identity');
   if (!sellerIdElement) {
     showNotification('ID penjual tidak ditemukan.', 'error');
@@ -399,7 +450,11 @@ async function showDirectionsModal() {
   }
 
   try {
-    // Ambil koordinat penjual terlebih dahulu
+    // ========================================
+    // STEP 3: FETCH KOORDINAT PENJUAL DARI SERVER
+    // ========================================
+    // Ambil koordinat penjual dari endpoint backend
+    // Endpoint ini return lat, lng, name, address dari database
     const response = await fetch(`/seller-coordinates/${sellerId}`);
     if (!response.ok) {
       if (response.status === 404) {
@@ -412,45 +467,60 @@ async function showDirectionsModal() {
 
     const sellerData = await response.json();
 
+    // ========================================
+    // STEP 4: VALIDASI DATA PENJUAL
+    // ========================================
     // Cek apakah respons berisi error
     if (sellerData.error) {
       showNotification(sellerData.error, 'error');
       return;
     }
 
-    // Cek apakah penjual memiliki koordinat
+    // Cek apakah penjual memiliki koordinat yang valid
+    // Koordinat bisa null jika seller belum update lokasi toko
     if (!sellerData.lat || !sellerData.lng || isNaN(sellerData.lat) || isNaN(sellerData.lng) ||
         sellerData.lat === null || sellerData.lng === null) {
       showNotification('Lokasi penjual belum diatur.', 'error');
       return;
     }
 
-    // Tampilkan loading
+    // ========================================
+    // STEP 5: REQUEST LOKASI CUSTOMER
+    // ========================================
+    // Tampilkan loading notification
     showNotification('Mengambil lokasi Anda...', 'info');
 
-    // Dapatkan lokasi pengguna
+    // Minta izin akses lokasi customer menggunakan browser Geolocation API
+    // Ini akan trigger popup browser minta izin user
     navigator.geolocation.getCurrentPosition(
+      // ===== CALLBACK: LOKASI BERHASIL DIDAPAT =====
       function(position) {
         try {
           // Buat modal untuk menampilkan peta dan rute
+          // position.coords berisi: latitude, longitude, accuracy, dll
           createDirectionsModal(position.coords, sellerData);
         } catch (error) {
           console.error('Error creating directions modal:', error);
           showNotification('Gagal menampilkan rute. Silakan coba lagi.', 'error');
         }
       },
+      // ===== CALLBACK: LOKASI GAGAL DIDAPAT =====
       function(error) {
         console.error('Geolocation error:', error);
         let errorMessage = 'Gagal mendapatkan lokasi Anda: ';
 
+        // Handle berbagai jenis error geolocation
         switch(error.code) {
           case error.PERMISSION_DENIED:
+            // User menolak izin lokasi
             errorMessage += 'Izin lokasi ditolak. Silakan aktifkan izin lokasi di pengaturan browser.';
             break;
           case error.POSITION_UNAVAILABLE:
+            // Informasi lokasi tidak tersedia (GPS off, sinyal lemah)
             errorMessage += 'Informasi lokasi tidak tersedia.';
             break;
           case error.TIMEOUT:
+            // Request timeout (default 10 detik)
             errorMessage += 'Waktu permintaan lokasi habis.';
             break;
           default:
@@ -460,10 +530,11 @@ async function showDirectionsModal() {
 
         showNotification(errorMessage, 'error');
       },
+      // ===== OPTIONS: KONFIGURASI GEOLOCATION =====
       {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 60000
+        enableHighAccuracy: true,   // Gunakan GPS untuk akurasi tinggi (baterai lebih boros)
+        timeout: 10000,             // Timeout 10 detik
+        maximumAge: 60000           // Cache lokasi selama 1 menit (60000ms)
       }
     );
   } catch (error) {
@@ -577,10 +648,39 @@ function createDirectionsModal(userCoords, sellerData) {
   }, 100);
 }
 
+/**
+ * Menampilkan peta dan tombol buka Google Maps di dalam modal
+ * 
+ * FUNGSI INI ADALAH INTI DARI INTEGRASI GOOGLE MAPS:
+ * - Generate URL Google Maps Directions dengan parameter yang benar
+ * - Tampilkan UI dengan tombol untuk buka rute di tab baru
+ * 
+ * GOOGLE MAPS DIRECTIONS URL FORMAT:
+ * https://www.google.com/maps/dir/?api=1&origin={lat},{lng}&destination={lat},{lng}&travelmode={mode}
+ * 
+ * @param {GeolocationCoordinates} userCoords - Objek koordinat user dari navigator.geolocation
+ * @param {Object} sellerData - Data penjual dari API (lat, lng, name, address)
+ */
 function showDirectionsOnMap(userCoords, sellerData) {
+  // ========================================
+  // GENERATE URL GOOGLE MAPS DIRECTIONS
+  // ========================================
   // Buka Google Maps directions di tab baru karena iframe bisa diblokir
+  // 
+  // STRUKTUR URL:
+  // - api=1          : Versi Google Maps API (wajib)
+  // - origin         : Titik awal = koordinat customer (latitude,longitude)
+  // - destination    : Titik tujuan = koordinat toko (latitude,longitude)
+  // - travelmode     : Mode transportasi (driving/walking/bicycling/transit)
+  //
+  // CONTOH URL:
+  // https://www.google.com/maps/dir/?api=1&origin=-6.2088,106.8456&destination=-6.1951,106.8206&travelmode=driving
+  //
   const gmapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${userCoords.latitude},${userCoords.longitude}&destination=${sellerData.lat},${sellerData.lng}&travelmode=driving`;
 
+  // ========================================
+  // TAMPILKAN UI DENGAN TOMBOL BUKA MAPS
+  // ========================================
   // Tampilkan pesan dan tombol untuk membuka Google Maps
   const mapContainer = document.getElementById('directions-map');
   mapContainer.innerHTML = `
@@ -625,12 +725,16 @@ function showDirectionsOnMap(userCoords, sellerData) {
 
 // Tambahkan tombol Get Directions ke halaman toko saat DOM siap
 document.addEventListener('DOMContentLoaded', function() {
-  // Cek apakah ini halaman toko
+  // ========================================
+  // INISIALISASI TOMBOL "LIHAT RUTE"
+  // ========================================
+  // Cek apakah ini halaman toko (ada elemen .toko-identity)
   const tokoIdentity = document.querySelector('.toko-identity');
   if (tokoIdentity) {
     // Tambahkan tombol Get Directions ke dalam container yang sama dengan tombol 'Ikuti Toko'
     const tokoActions = document.querySelector('.toko-actions');
     if (tokoActions) {
+      // Buat elemen tombol baru
       const directionsButton = document.createElement('button');
       directionsButton.innerHTML = 'Lihat Rute';
       directionsButton.className = 'btn btn-primary btn-get-directions';
@@ -639,6 +743,14 @@ document.addEventListener('DOMContentLoaded', function() {
       directionsButton.style.display = 'inline-flex';
       directionsButton.style.alignItems = 'center';
 
+      // ========================================
+      // EVENT LISTENER: TOMBOL DIKLIK
+      // ========================================
+      // Saat tombol diklik, panggil fungsi showDirectionsModal()
+      // yang akan:
+      // 1. Minta izin lokasi user
+      // 2. Fetch koordinat toko dari server
+      // 3. Tampilkan modal dengan peta rute
       directionsButton.addEventListener('click', showDirectionsModal);
       tokoActions.appendChild(directionsButton);
     }

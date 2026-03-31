@@ -8,6 +8,38 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Role;
 
+// ========================================================================
+// MODEL USER - MANAJEMEN USER & AUTENTIKASI
+// ========================================================================
+// UNTUK SIDANG SKRIPSI:
+// - Model ini adalah CORE dari sistem autentikasi dan manajemen user
+// - Setiap user punya role (admin, seller, buyer) yang menentukan akses
+// - Mendukung fitur: Register, Login, Profile Management, Role-based Access
+//
+// ROLE-BASED ACCESS CONTROL (RBAC):
+// 1. admin    - Akses penuh ke semua fitur (admin dashboard, semua data)
+// 2. seller   - Akses ke fitur penjual (produk, order masuk, dashboard seller)
+// 3. buyer    - Akses ke fitur pembeli (belanja, order, wishlist, review)
+//
+// FITUR AUTENTIKASI:
+// - Register: Buat akun baru dengan role 'buyer' (default)
+// - Login:   Authenticate dengan email & password (Laravel Sanctum/Session)
+// - Logout:  Destroy session/token
+// - Password Hash: bcrypt untuk keamanan password
+//
+// INFORMASI USER:
+// - Data dasar: name, email, password
+// - Data tambahan: phone, address, lat/lng (untuk maps)
+// - Data bank: bank_name, account_number (untuk seller withdrawal)
+// - Lokasi: province, city, district, ward, full_address
+//
+// KEAMANAN:
+// - Password di-hash menggunakan bcrypt (Laravel default)
+// - Hidden fields: password & remember_token tidak di-serialize
+// - Email verification: opsional (bisa di-enable)
+// - Remember me: persistent login dengan token
+// ========================================================================
+
 /**
  * Model User
  *
@@ -15,6 +47,10 @@ use App\Models\Role;
  * Setiap pengguna dapat memiliki peran (role) sebagai admin, penjual, atau pembeli.
  * Model ini menyimpan informasi dasar pengguna seperti nama, email, serta informasi
  * tambahan seperti alamat, nomor telepon, dan informasi bank untuk penjual.
+ * 
+ * @package App\Models
+ * @author Tim Ecommerce AKRAB
+ * @version 1.0
  */
 class User extends Authenticatable
 {

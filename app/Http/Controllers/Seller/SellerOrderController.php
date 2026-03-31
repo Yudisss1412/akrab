@@ -13,6 +13,42 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
+// ========================================================================
+// SELLER ORDER CONTROLLER - MONITORING RIWAYAT TRANSAKSI
+// ========================================================================
+// UNTUK SIDANG SKRIPSI:
+// - Controller ini menangani monitoring order dari perspektif PENJUAL
+// - Seller bisa lihat semua order yang berisi produk mereka
+// - Fitur: Lihat order, update status, input resi, tracking history
+//
+// FITUR MONITORING:
+// 1. Dashboard Order - Statistik order per status (pending, processing, shipped, dll)
+// 2. Order List - Daftar semua order dengan filter & pencarian
+// 3. Order Detail - Detail lengkap order + alamat pengiriman + payment status
+// 4. Update Status - Seller update status order (confirmed → shipped → delivered)
+// 5. Input Resi - Seller input nomor pelacakan pengiriman
+// 6. Order History - Log perubahan status (audit trail via OrderLog)
+//
+// ORDER STATUS FLOW (DARI SELLER):
+// 1. pending      - Menunggu pembayaran (customer belum bayar)
+// 2. confirmed    - Pembayaran dikonfirmasi (seller siap proses)
+// 3. processing   - Seller mempersiapkan pesanan (packing)
+// 4. shipped      - Pesanan dikirim (seller input resi)
+// 5. delivered    - Pesanan diterima customer (selesai, buat transaksi)
+// 6. cancelled    - Order dibatalkan
+//
+// KEAMANAN:
+// - Seller hanya bisa lihat order yang berisi produk mereka
+// - Query menggunakan whereHas untuk filter berdasarkan product.seller_id
+// - Admin bisa lihat semua order dari semua seller
+//
+// FITUR UNGGULAN:
+// - Auto-create SellerTransaction saat order jadi 'delivered'
+// - Tracking number validation
+// - Status transition logging (via OrderLog)
+// - Date filtering (today, this_week, this_month, this_year)
+// ========================================================================
+
 class SellerOrderController extends Controller
 {
     public function __construct()
@@ -22,32 +58,72 @@ class SellerOrderController extends Controller
 
     /**
      * Display a listing of the resource.
+     * 
+     * ==========================================================================
+     * MONITORING RIWAYAT TRANSAKSI - DASHBOARD PENJUAL
+     * ==========================================================================
+     * UNTUK SIDANG SKRIPSI:
+     * - Method ini menampilkan daftar order yang berisi produk dari seller
+     * - Query menggunakan whereHas untuk filter berdasarkan product.seller_id
+     * - Support multiple filters: status, search, date_range
+     * 
+     * FITUR MONITORING:
+     * 1. Status Filtering - Filter order by status (pending, processing, shipped, dll)
+     * 2. Search - Cari by order_number atau nama customer
+     * 3. Date Filtering - Filter by tanggal (today, this_week, this_month, this_year)
+     * 4. Pagination - 10 order per halaman
+     * 5. Status Statistics - Hitung jumlah order per status untuk dashboard
+     * 
+     * STATUS MAPPING (APLIKASI ↔ DATABASE):
+     * - pending_payment  ← pending (database)
+     * - processing       ← confirmed (database)
+     * - shipping         ← shipped (database)
+     * - completed        ← delivered (database)
+     * - cancelled        ← cancelled (database)
+     *
+     * @param Request $request
+     * @return \Illuminate\View\View
      */
     public function index(Request $request)
     {
         try {
+            // ========================================
+            // STEP 1: VALIDASI AKSES (SELLER ONLY)
+            // ========================================
             // Hanya penjual yang bisa mengakses
             $user = Auth::user();
             if (!$user || !$user->role || $user->role->name !== 'seller') {
                 abort(403, 'Akses ditolak. Hanya penjual yang dapat mengakses halaman ini.');
             }
 
+            // ========================================
+            // STEP 2: AMBIL SELLER_ID
+            // ========================================
             // Ambil ID penjual dari tabel sellers berdasarkan user_id
             $seller = Seller::where('user_id', $user->id)->first();
             if (!$seller) {
                 abort(403, 'Akses ditolak. Seller record tidak ditemukan.');
             }
 
+            // ========================================
+            // STEP 3: QUERY ORDER DENGAN EAGER LOADING
+            // ========================================
             // Query builder untuk pesanan berdasarkan produk penjual
+            // whereHas: Filter order yang punya item dengan seller_id = seller ini
             $query = Order::with(['user', 'items.product', 'items.variant', 'shipping_address', 'logs', 'payment'])
                 ->whereHas('items.product', function ($q) use ($seller) {
                     $q->where('seller_id', $seller->id);
                 })
-                ->orderBy('created_at', 'desc');
+                ->orderBy('created_at', 'desc');  // Order terbaru dulu
 
+            // ========================================
+            // STEP 4: FILTER BY STATUS (OPTIONAL)
+            // ========================================
             // Filter berdasarkan status jika ada
             if ($request->has('status') && $request->status) {
                 // Mapping status aplikasi ke status database
+                // Aplikasi menggunakan istilah business-friendly
+                // Database menggunakan istilah teknis
                 $statusMapping = [
                     'pending_payment' => 'pending',    // Menunggu Pembayaran
                     'processing' => 'confirmed',       // Diproses
@@ -60,40 +136,57 @@ class SellerOrderController extends Controller
                 $query->where('status', $dbStatus);
             }
 
+            // ========================================
+            // STEP 5: FILTER BY PENCARIAN (OPTIONAL)
+            // ========================================
             // Filter berdasarkan pencarian jika ada
             if ($request->has('search') && $request->search) {
                 $search = $request->search;
                 $query->where(function($q) use ($search) {
-                    $q->where('order_number', 'LIKE', "%{$search}%")
+                    $q->where('order_number', 'LIKE', "%{$search}%")  // Cari by nomor order
                       ->orWhereHas('user', function ($userQuery) use ($search) {
-                          $userQuery->where('name', 'LIKE', "%{$search}%");
+                          $userQuery->where('name', 'LIKE', "%{$search}%");  // Cari by nama customer
                       });
                 });
             }
 
+            // ========================================
+            // STEP 6: FILTER BY TANGGAL (OPTIONAL)
+            // ========================================
             // Filter berdasarkan tanggal jika ada
             if ($request->has('date_filter') && $request->date_filter) {
                 switch ($request->date_filter) {
                     case 'today':
+                        // Order hari ini
                         $query->whereDate('created_at', today());
                         break;
                     case 'this_week':
+                        // Order minggu ini (Senin-Minggu)
                         $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
                         break;
                     case 'this_month':
+                        // Order bulan ini
                         $query->whereMonth('created_at', now()->month)
                               ->whereYear('created_at', now()->year);
                         break;
                     case 'this_year':
+                        // Order tahun ini
                         $query->whereYear('created_at', now()->year);
                         break;
                 }
             }
 
-            // Paginate hasil
+            // ========================================
+            // STEP 7: PAGINATE RESULTS
+            // ========================================
+            // Paginate hasil - 10 order per halaman
             $orders = $query->paginate(10)->appends($request->query());
 
+            // ========================================
+            // STEP 8: FILTER ITEMS PER SELLER
+            // ========================================
             // Filter items hanya untuk produk penjual ini
+            // Karena satu order bisa berisi produk dari multiple seller
             foreach ($orders as $order) {
                 $order->items = $order->items->filter(function ($item) use ($seller) {
                     return $item->product->seller_id == $seller->id;
@@ -330,9 +423,35 @@ class SellerOrderController extends Controller
 
     /**
      * Update the status of the specified order.
+     * 
+     * ==========================================================================
+     * FITUR UPDATE STATUS ORDER - MONITORING TRANSAKSI
+     * ==========================================================================
+     * UNTUK SIDANG SKRIPSI:
+     * - Method ini memungkinkan seller update status order
+     * - Setiap perubahan status dicatat di OrderLog (audit trail)
+     * - Saat order jadi 'delivered', otomatis buat SellerTransaction
+     * 
+     * STATUS TRANSITION (SELLER PERSPECTIVE):
+     * 1. confirmed → processing (seller mulai packing)
+     * 2. processing → shipped (seller input resi, barang dikirim)
+     * 3. shipped → delivered (customer terima barang, selesai)
+     * 
+     * FITUR UNGGULAN:
+     * - Ownership validation - seller hanya bisa update order dengan produk mereka
+     * - Status transition logging - semua perubahan dicatat di OrderLog
+     * - Auto-create transaction - saat delivered, buat record transaksi
+     * - Comprehensive error handling - validation, authorization, not found
+     *
+     * @param Request $request
+     * @param int $id Order ID
+     * @return \Illuminate\Http\JsonResponse
      */
     public function updateStatus(Request $request, $id)
     {
+        // ========================================
+        // LOGGING UNTUK DEBUGGING
+        // ========================================
         \Log::info('Update status called', [
             'user_id' => auth()->id(),
             'order_id' => $id,
@@ -341,11 +460,17 @@ class SellerOrderController extends Controller
         ]);
 
         try {
+            // ========================================
+            // STEP 1: VALIDASI INPUT
+            // ========================================
             // Validasi input - menerima status dalam format database
             $request->validate([
                 'status' => 'required|in:pending,confirmed,shipped,delivered,cancelled'
             ]);
 
+            // ========================================
+            // STEP 2: VALIDASI AKSES (SELLER ONLY)
+            // ========================================
             // Hanya penjual yang bisa mengakses
             $user = Auth::user();
             if (!$user || !$user->role || $user->role->name !== 'seller') {
@@ -353,6 +478,9 @@ class SellerOrderController extends Controller
                 return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
             }
 
+            // ========================================
+            // STEP 3: AMBIL SELLER_ID
+            // ========================================
             // Ambil ID penjual dari tabel sellers berdasarkan user_id
             $seller = Seller::where('user_id', $user->id)->first();
             if (!$seller) {
@@ -360,7 +488,11 @@ class SellerOrderController extends Controller
                 return response()->json(['success' => false, 'message' => 'Akses ditolak. Seller record tidak ditemukan.'], 403);
             }
 
+            // ========================================
+            // STEP 4: AMBIL ORDER (FILTER BY OWNERSHIP)
+            // ========================================
             // Ambil pesanan dengan produk milik penjual ini
+            // whereHas: Pastikan order ini punya item dengan seller_id = seller ini
             $order = Order::where('id', $id)
                 ->whereHas('items.product', function ($q) use ($seller) {
                     $q->where('seller_id', $seller->id);
@@ -376,12 +508,18 @@ class SellerOrderController extends Controller
                 return response()->json(['success' => false, 'message' => 'Pesanan tidak ditemukan atau tidak termasuk dalam produk Anda'], 404);
             }
 
+            // ========================================
+            // STEP 5: FILTER ITEMS PER SELLER
+            // ========================================
             // Filter items hanya untuk produk penjual ini
             $filteredItems = $order->items->filter(function ($item) use ($seller) {
                 return $item->product->seller_id == $seller->id;
             });
 
-            // Simpan status lama sebelum update
+            // ========================================
+            // STEP 6: SIMPAN STATUS LAMA
+            // ========================================
+            // Simpan status lama sebelum update - untuk tracking dan comparison
             $oldStatus = $order->status;
 
             \Log::info('Updating order status', [
@@ -390,18 +528,29 @@ class SellerOrderController extends Controller
                 'new_status' => $request->status
             ]);
 
+            // ========================================
+            // STEP 7: UPDATE STATUS ORDER
+            // ========================================
             // Update status saja, bukan seluruh model
             $order->status = $request->status;
             $order->save();
 
-            // Tambahkan log transisi status
+            // ========================================
+            // STEP 8: CATAT LOG PERUBAHAN STATUS
+            // ========================================
+            // Tambahkan log transisi status - audit trail untuk tracking
+            // Ini akan masuk ke tabel order_logs
             $order->logs()->create([
                 'status' => $request->status,
                 'description' => "Status pesanan diubah menjadi {$request->status} oleh penjual",
                 'updated_by' => 'seller',
             ]);
 
-            // Jika status berubah menjadi 'delivered' (artinya pesanan selesai), buat transaksi penjualan
+            // ========================================
+            // STEP 9: AUTO-CREATE TRANSACTION (JIKA DELIVERED)
+            // ========================================
+            // Jika status berubah menjadi 'delivered' (artinya pesanan selesai),
+            // buat transaksi penjualan untuk seller accounting
             if ($request->status === 'delivered' && $oldStatus !== 'delivered') {
                 $this->createSalesTransactions($order, $seller->id);
             }

@@ -11,6 +11,32 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
+// ========================================================================
+// CHECKOUT CONTROLLER - JANTUNG E-COMMERCE SYSTEM
+// ========================================================================
+// UNTUK SIDANG SKRIPSI:
+// - Controller ini menangani seluruh alur checkout dari keranjang sampai pembayaran
+// - Terintegrasi dengan Midtrans Payment Gateway untuk proses pembayaran online
+// - Mendukung multiple payment methods: Bank Transfer, E-Wallet, COD
+//
+// ALUR CHECKOUT:
+// 1. index()         - Tampilkan halaman checkout dengan ringkasan pesanan
+// 2. process()       - Validasi & buat order baru (Order + ShippingAddress + OrderItems)
+// 3. showShipping()  - Tampilkan halaman pengiriman
+// 4. showPayment()   - Tampilkan halaman pembayaran
+// 5. processPayment()- Proses pembayaran (update status order)
+//
+// INTEGRASI MIDTRANS:
+// - Midtrans adalah payment gateway yang mendukung berbagai metode pembayaran di Indonesia
+// - Payment methods: BCA Virtual Account, Mandiri Virtual Account, Gopay, OVO, ShopeePay, dll
+// - Flow: Customer bayar → Midtrans proses → Midtrans kirim callback/webhook → Update status order
+//
+// PENTING UNTUK SIDANG:
+// - Callback/Webhook Midtrans biasanya ada di endpoint terpisah (route: /midtrans/callback)
+// - Callback ini yang akan mengupdate status order secara otomatis saat pembayaran berhasil
+// - Untuk development, ada command artisan untuk simulate callback (SimulateMidtransCallback.php)
+// ========================================================================
+
 class CheckoutController extends Controller
 {
     protected $cartService;
@@ -455,15 +481,49 @@ class CheckoutController extends Controller
     
     /**
      * Process the payment for an order
+     * 
+     * ==========================================================================
+     * FUNGSI INI ADALAH INTI DARI PROSES PEMBAYARAN
+     * ==========================================================================
+     * UNTUK SIDANG SKRIPSI:
+     * - Fungsi ini menangani pembayaran untuk berbagai metode: Bank Transfer, E-Wallet, COD
+     * - Untuk Bank Transfer & E-Wallet: Order status jadi 'pending', tunggu callback dari Midtrans
+     * - Untuk COD: Order langsung 'confirmed', customer bayar saat barang diterima
+     * 
+     * FLOW PEMBAYARAN MIDTRANS:
+     * 1. Customer pilih metode pembayaran (Bank Transfer/E-Wallet)
+     * 2. Sistem buat transaksi di Midtrans (via Snap token di view)
+     * 3. Customer bayar melalui halaman Midtrans
+     * 4. Midtrans kirim webhook/callback ke endpoint /midtrans/callback
+     * 5. Callback handler update status order berdasarkan response Midtrans
+     * 
+     * STATUS ORDER:
+     * - 'pending'    : Menunggu pembayaran (customer belum bayar)
+     * - 'confirmed'  : Pembayaran berhasil / COD dikonfirmasi
+     * - 'processing' : Pesanan sedang diproses seller
+     * - 'shipped'    : Pesanan dikirim
+     * - 'delivered'  : Pesanan diterima customer
+     * - 'cancelled'  : Pesanan dibatalkan (pembayaran expired/ditolak)
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function processPayment(Request $request)
     {
+        // ========================================
+        // STEP 1: VALIDASI INPUT
+        // ========================================
+        // Validasi parameter yang diperlukan untuk proses pembayaran
         $request->validate([
             'payment_method' => 'required|in:bank_transfer,e_wallet,cod,midtrans',
-            'order_number' => 'required|string'  // Changed: make it required since we're using it in confirmation pages
+            'order_number' => 'required|string'  // Order number untuk identifikasi pesanan
         ]);
 
-        // Find order by order number and user ID (not by status to avoid the issue where status has already changed)
+        // ========================================
+        // STEP 2: CARI ORDER BERDASARKAN ORDER NUMBER
+        // ========================================
+        // Find order by order number and user ID
+        // CATATAN: Tidak filter by status untuk avoid issue jika status sudah berubah
         $order = Order::where('order_number', $request->order_number)
                       ->where('user_id', Auth::id())
                       ->first();
@@ -475,7 +535,11 @@ class CheckoutController extends Controller
             ], 404);
         }
 
-        // For COD, if the order is already in a final state, consider it successful and return immediately
+        // ========================================
+        // STEP 3: HANDLE KHUSUS UNTUK COD
+        // ========================================
+        // For COD, if the order is already in a final state, consider it successful
+        // COD tidak perlu tunggu payment gateway - customer bayar saat delivery
         if ($request->payment_method === 'cod' && in_array($order->status, ['confirmed', 'paid', 'processing', 'shipped', 'delivered'])) {
             return response()->json([
                 'success' => true,
@@ -484,7 +548,11 @@ class CheckoutController extends Controller
             ]);
         }
 
+        // ========================================
+        // STEP 4: CEK PENCEGAHAN DUPLICATE PROCESSING
+        // ========================================
         // Check if order is already processed to prevent duplicate processing for non-COD methods
+        // Status final: paid, processing, shipped, delivered, cancelled
         if (in_array($order->status, ['paid', 'processing', 'shipped', 'delivered', 'cancelled'])) {
             return response()->json([
                 'success' => false,
@@ -492,34 +560,58 @@ class CheckoutController extends Controller
             ], 400);
         }
 
+        // ========================================
+        // STEP 5: TENTUKAN STATUS BARU BERDASARKAN PAYMENT METHOD
+        // ========================================
         // Update the order status based on payment method
         $newStatus = 'paid'; // Default status
-        $paidAt = null;
+        $paidAt = null; // Timestamp pembayaran - null berarti belum bayar
 
         switch ($request->payment_method) {
             case 'bank_transfer':
-                // For bank transfer, redirect to Midtrans payment page
-                // Status will be updated via callback
+                // ========================================
+                // BANK TRANSFER (VIA MIDTRANS)
+                // ========================================
+                // Untuk bank transfer, redirect ke halaman pembayaran Midtrans
+                // Status akan diupdate via callback/webhook dari Midtrans
+                // Customer dapat virtual account number untuk transfer
                 $newStatus = 'pending';
                 break;
+                
             case 'e_wallet':
-                // For e-wallet, redirect to Midtrans payment page
-                // Status will be updated via callback
+                // ========================================
+                // E-WALLET (VIA MIDTRANS)
+                // ========================================
+                // Untuk e-wallet (Gopay, OVO, ShopeePay), redirect ke Midtrans
+                // Status akan diupdate via callback/webhook dari Midtrans
+                // Customer akan diarahkan ke aplikasi e-wallet untuk pembayaran
                 $newStatus = 'pending';
                 break;
+                
             case 'cod':
-                // For COD, set status to confirmed, payment will be done on delivery
+                // ========================================
+                // COD (CASH ON DELIVERY)
+                // ========================================
+                // Untuk COD, set status ke 'confirmed' langsung
+                // Pembayaran akan dilakukan customer saat kurir mengantar barang
+                // Risiko: customer bisa batal terima paket saat delivery
                 $newStatus = 'confirmed';
                 break;
         }
 
+        // ========================================
+        // STEP 6: UPDATE STATUS ORDER
+        // ========================================
         // Update the order status and payment information
         $order->update([
             'status' => $newStatus,
-            'paid_at' => $paidAt
+            'paid_at' => $paidAt  // null untuk pending, akan diisi saat callback Midtrans
         ]);
 
-        // Add order log to track payment
+        // ========================================
+        // STEP 7: CATAT LOG PERUBAHAN STATUS
+        // ========================================
+        // Add order log to track payment - untuk audit trail
         $statusForLog = $request->payment_method === 'cod' ? 'confirmed' : 'paid';
         $description = 'Pembayaran ' . $request->payment_method . ' diproses. Status: ' . $newStatus;
 
@@ -528,6 +620,9 @@ class CheckoutController extends Controller
             'description' => $description
         ]);
 
+        // ========================================
+        // STEP 8: RETURN RESPONSE KE CLIENT
+        // ========================================
         return response()->json([
             'success' => true,
             'message' => 'Pembayaran berhasil diproses',

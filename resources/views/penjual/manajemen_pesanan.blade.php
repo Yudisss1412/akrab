@@ -109,7 +109,17 @@
                 <div class="action-buttons-right">
                   @if($order->status === 'pending')
                     @if(isset($order->payment) && $order->payment && in_array($order->payment->payment_method, ['midtrans', 'bank_transfer', 'e_wallet']))
-                      <span class="payment-method-info" style="color: #6b7280; font-size: 0.9em; display: inline-block; padding: 8px 12px; background-color: #f3f4f6; border-radius: 6px;">Pembayaran sedang diproses - Tidak perlu konfirmasi manual</span>
+                      @if($order->payment->payment_status === 'success')
+                        <span class="payment-method-info" style="color: #059669; font-size: 0.9em; display: inline-block; padding: 8px 12px; background-color: #d1fae5; border-radius: 6px;">✓ Lunas</span>
+                        <button class="btn btn-primary" onclick="updateOrderStatus({{ $order->id }}, 'confirmed')">Proses Pesanan</button>
+                      @elseif($order->payment->payment_status === 'pending_verification' || $order->payment->payment_status === 'pending')
+                        <span class="payment-method-info" style="color: #d97706; font-size: 0.9em; display: inline-block; padding: 8px 12px; background-color: #fef3c7; border-radius: 6px;">⏳ Menunggu</span>
+                        <button class="btn btn-primary" onclick="updateOrderStatus({{ $order->id }}, 'confirmed')">Verifikasi Manual</button>
+                      @elseif($order->payment->payment_status === 'failed')
+                        <span class="payment-method-info" style="color: #dc2626; font-size: 0.9em; display: inline-block; padding: 8px 12px; background-color: #fee2e2; border-radius: 6px;">✗ Gagal</span>
+                      @else
+                        <span class="payment-method-info" style="color: #6b7280; font-size: 0.9em; display: inline-block; padding: 8px 12px; background-color: #f3f4f6; border-radius: 6px;">Menunggu Pembayaran</span>
+                      @endif
                     @else
                       <button class="btn btn-primary" onclick="updateOrderStatus({{ $order->id }}, 'confirmed')">Konfirmasi Pembayaran</button>
                     @endif

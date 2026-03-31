@@ -9,33 +9,43 @@ use App\Models\Seller;
 use Illuminate\Http\Request;
 
 /**
- * Controller Produk
- *
- * Controller ini menangani semua operasi terkait produk dalam sistem e-commerce AKRAB,
- * termasuk menampilkan daftar produk, detail produk, pencarian produk, dan filter
- * berdasarkan kategori. Controller ini juga menyediakan endpoint API untuk mengambil
- * data produk dalam format JSON.
+ * ProductController untuk Customer (Public)
+ * 
+ * Controller ini menangani semua operasi terkait produk untuk tampilan customer/public:
+ * - Menampilkan daftar produk (index)
+ * - Detail produk (show)
+ * - Pencarian produk (search)
+ * - Filter berdasarkan kategori (byCategory, showCategoryPage)
+ * - Format data produk untuk view dan API
+ * 
+ * Controller ini TIDAK memerlukan autentikasi karena untuk public view.
  */
 class ProductController extends Controller
 {
     /**
-     * Menampilkan halaman daftar produk
-     *
+     * Menampilkan halaman daftar produk untuk customer
+     * 
+     * Fitur:
+     * - Menampilkan semua produk aktif yang memiliki seller valid
+     * - Filter berdasarkan kategori (query param: ?kategori=)
+     * - Menampilkan rating dan jumlah ulasan untuk setiap produk
+     * - Sortir kategori berdasarkan prioritas (Kuliner, Fashion, dll)
+     * 
      * @param Request $request Objek request HTTP
-     * @return \Illuminate\View\View Tampilan halaman produk
+     * @return \Illuminate\View\View View halaman produk customer
      */
     public function index(Request $request)
     {
-
-        
-        // Bangun query produk awal
+        // Bangun query produk dengan eager loading untuk performa
+        // Load relasi: variants, seller, category, subcategory, approvedReviews, images
         $query = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images'])
-                       ->whereHas('seller'); // Hanya produk dengan seller yang valid
+                       ->whereHas('seller'); // Hanya produk dengan seller yang valid (tidak orphan)
 
-        // Tambahkan filter berdasarkan kategori jika ada
+        // Tambahkan filter berdasarkan kategori jika ada di query string
+        // Contoh: ?kategori=Kuliner atau ?kategori=all
         $kategori = $request->query('kategori');
         if ($kategori && $kategori !== 'all') {
-            // Jika kategori yang diminta adalah nama alternatif, gunakan nama sebenarnya
+            // Filter produk berdasarkan nama kategori
             $actualCategory = $kategori;
 
             $query->whereHas('category', function($query) use ($actualCategory) {
@@ -43,33 +53,37 @@ class ProductController extends Controller
             });
         }
 
-        // Ambil produk berdasarkan query yang telah difilter
+        // Eksekusi query dan ambil semua produk
         $products = $query->get();
-        
-        // Tambahkan average rating dan review count ke setiap produk
+
+        // Tambahkan atribut computed untuk setiap produk
         $products = $products->map(function($product) {
+            // Hitung average rating dari reviews yang approved
             $product->setAttribute('average_rating', $product->averageRating);
+            // Hitung jumlah total reviews
             $product->setAttribute('review_count', $product->reviews_count);
+            // Format gambar untuk tampilan (convert ke URL lengkap)
             $product->setAttribute('formatted_images', $this->formatProductImages($product));
             return $product;
         });
-        
-        // Ambil kategori-kategori yang sesuai dengan dashboard customer
-        // Kita akan coba beberapa variasi nama kategori
+
+        // Daftar kategori utama untuk ditampilkan di sidebar/filter customer
+        // Urutan berdasarkan prioritas tampilan
         $mainCategories = [
-            'Kuliner', 'Fashion', 'Kerajinan Tangan', 
-            'Produk Berkebun', 'Produk Kesehatan', 
+            'Kuliner', 'Fashion', 'Kerajinan Tangan',
+            'Produk Berkebun', 'Produk Kesehatan',
             'Mainan', 'Hampers'
         ];
-        
-        // Cari kategori-kategori yang ada di database termasuk variasi nama
+
+        // Ambil kategori dari database yang match dengan daftar utama
+        // Gunakan OR WHERE untuk mencakup variasi nama
         $categories = Category::where(function($query) use ($mainCategories) {
             foreach ($mainCategories as $category) {
                 $query->orWhere('name', $category);
             }
-
         })
-        ->orderByRaw("CASE 
+        // Urutkan berdasarkan prioritas (Kuliner pertama, dll)
+        ->orderByRaw("CASE
             WHEN name = 'Kuliner' THEN 1
             WHEN name = 'Fashion' THEN 2
             WHEN name = 'Kerajinan Tangan' THEN 3
@@ -80,67 +94,89 @@ class ProductController extends Controller
             ELSE 8
         END")
         ->get();
-        
+
+        // Return view dengan data produk dan kategori
         return view('customer.produk.halaman_produk', compact('products', 'categories'));
     }
 
     /**
-     * Tampilkan detail produk
+     * Menampilkan halaman detail produk
+     * 
+     * Menampilkan informasi lengkap satu produk:
+     * - Data produk utama (nama, harga, deskripsi, stok, dll)
+     * - Gambar produk (gallery)
+     * - Varian produk (jika ada)
+     * - Ulasan dari pembeli
+     * - Informasi penjual
+     * - Status wishlist (jika user login)
+     * 
+     * @param string $id ID produk yang akan ditampilkan
+     * @return \Illuminate\View\View View detail produk
      */
     public function show($id)
     {
-        // Ambil produk berdasarkan ID dengan relasi yang diperlukan
+        // Ambil produk berdasarkan ID dengan eager loading semua relasi yang diperlukan
         $product = Product::with(['variants', 'seller', 'category', 'subcategory', 'reviews.user', 'images'])->find($id);
 
+        // Jika produk tidak ditemukan, return 404
         if (!$product) {
             abort(404, 'Produk tidak ditemukan');
         }
 
-        // Format data produk menggunakan metode konsisten
+        // Format data produk menggunakan helper method untuk konsistensi
         $produk = $this->formatSingleProduct($product);
 
-        // Cek apakah produk ada dalam wishlist pengguna
+        // Cek apakah produk ada dalam wishlist user yang sedang login
         if (auth()->check()) {
             $userId = auth()->user()->id;
+            // Cek di tabel wishlist apakah user ini sudah add produk ini ke wishlist
             $isInWishlist = \App\Models\Wishlist::where('user_id', $userId)
                                                 ->where('product_id', $product->id)
                                                 ->exists();
             $produk['di_wishlist'] = $isInWishlist;
         } else {
+            // User tidak login, set wishlist false
             $produk['di_wishlist'] = false;
         }
 
+        // Return view detail produk dengan data yang sudah diformat
         return view('customer.produk.produk_detail', compact('produk'));
     }
 
     /**
-     * Format data produk tunggal secara konsisten untuk tampilan dan API
-     *
-     * @param Product $product Objek produk
-     * @return array Data produk yang telah diformat
+     * Format data produk tunggal untuk tampilan dan API
+     * 
+     * Method helper ini mengkonversi objek Product menjadi array asosiatif
+     * dengan format yang konsisten untuk digunakan di view atau API response.
+     * 
+     * Termasuk:
+     * - Data dasar produk (nama, harga, deskripsi, dll)
+     * - Spesifikasi produk (dari array atau field terpisah)
+     * - Fitur produk
+     * - Gambar (utama + semua gambar)
+     * - Rating dan ulasan
+     * - Informasi penjual
+     * - Varian produk
+     * 
+     * @param Product $product Objek produk yang akan diformat
+     * @return array Data produk yang telah diformat dalam format array
      */
     private function formatSingleProduct($product)
     {
         // Format spesifikasi produk
-        // $specs = [];
-        // if ($product->specifications) {
-        //     foreach ($product->specifications as $key => $value) {
-        //         $specs[] = ['nama' => $key, 'nilai' => $value];
-        //     }
-        // }
         $specs = [];
 
+        // Jika specifications adalah array, loop dan format
         if (is_array($product->specifications)) {
             foreach ($product->specifications as $key => $value) {
-
-                // Jika array numerik → list biasa
+                // Jika array numerik (indexed) → format sebagai list biasa
                 if (is_int($key)) {
                     $specs[] = [
                         'nama' => 'Spesifikasi',
                         'nilai' => $value
                     ];
                 }
-                // Jika associative array → key : value
+                // Jika associative array → format sebagai key : value pair
                 else {
                     $specs[] = [
                         'nama' => $key,
@@ -150,7 +186,7 @@ class ProductController extends Controller
             }
         }
 
-        // Tambahkan informasi kategori dan spesifikasi dasar jika tidak ada spesifikasi khusus
+        // Jika tidak ada spesifikasi khusus, buat spesifikasi default dari field produk
         if (empty($specs)) {
             $specs = [
                 ['nama' => 'Kategori', 'nilai' => ($product->category && is_object($product->category) ? $product->category->name : 'Umum')],
@@ -168,32 +204,36 @@ class ProductController extends Controller
             if ($product->warranty) $specs[] = ['nama' => 'Garansi', 'nilai' => $product->warranty];
         }
 
-        // Format fitur produk
+        // Format fitur produk - convert ke array indexed
         $features = [];
         if ($product->features) {
             $features = array_values($product->features);
         }
 
+        // Ambil gambar utama produk
         $mainImage = $product->main_image;
 
-        // Fallback kategori dan subkategori yang lebih bijak
+        // Setup fallback nama kategori dan subkategori
+        // Default ke 'Umum' jika tidak ada data
         $categoryName = 'Umum';
         $subcategoryName = 'Umum';
 
+        // Ambil nama kategori dari relasi jika ada
         if ($product->category && is_object($product->category)) {
             $categoryName = $product->category->name;
         } elseif ($product->category_id) {
-            // Jika category_id ada tapi relasi tidak ditemukan, coba ambil kategori
+            // Jika category_id ada tapi relasi tidak ditemukan, coba ambil manual dari database
             $category = Category::find($product->category_id);
             if ($category) {
                 $categoryName = $category->name;
             }
         }
 
+        // Ambil nama subkategori dari relasi jika ada
         if ($product->subcategory && is_object($product->subcategory)) {
             $subcategoryName = $product->subcategory->name;
         } elseif ($product->subcategory_id) {
-            // Jika subcategory_id ada tapi relasi tidak ditemukan, coba ambil subkategori
+            // Jika subcategory_id ada tapi relasi tidak ditemukan, coba ambil manual
             $subcategory = Subcategory::find($product->subcategory_id);
             if ($subcategory) {
                 $subcategoryName = $subcategory->name;
@@ -225,18 +265,26 @@ class ProductController extends Controller
             $subcategoryName = $product->subcategory;
         }
 
+        // Buat array formatted product dengan semua data yang diperlukan untuk view
         $formattedProduct = [
+            // ID dan nama produk
             'id' => $product->id,
             'nama' => $product->name,
             'name' => $product->name,
+            
+            // Kategori dan subkategori
             'kategori' => $categoryName,
             'category_name' => $categoryName,
             'subkategori' => $subcategoryName,
             'subcategory_name' => $subcategoryName,
+            
+            // Harga dan deskripsi
             'harga' => $product->price,
             'price' => $product->price, // Hanya angka untuk perhitungan, bukan teks dengan format
             'deskripsi' => $product->description,
             'description' => $product->description,
+            
+            // Gambar produk
             'gambar_utama' => $mainImage ? asset('storage/' . $mainImage) : asset('src/placeholder.png'),
             'gambar' => collect($product->all_images)->map(function($img) {
                 return asset('storage/' . $img);
@@ -244,9 +292,13 @@ class ProductController extends Controller
             'formatted_images' => collect($product->all_images)->map(function($img) {
                 return asset('storage/' . $img);
             })->toArray(), // Tambahkan semua gambar untuk keperluan galeri
+            
+            // Spesifikasi dan fitur
             'spesifikasi' => $specs, // Ubah nama key untuk konsistensi dengan view
             'specifications' => $specs,
             'features' => $features,
+            
+            // Atribut tambahan produk
             'material' => $product->material,
             'size' => $product->size,
             'color' => $product->color,
@@ -254,13 +306,19 @@ class ProductController extends Controller
             'origin' => $product->origin,
             'warranty' => $product->warranty,
             'min_order' => $product->min_order,
+            
+            // Stok dan status
             'stock' => $product->stock,
             'weight' => $product->weight,
             'status' => $product->status,
             'view_count' => $product->view_count,
+            
+            // Diskon (jika ada)
             'discount_price' => $product->discount_price ? $product->discount_price : null,
             'discount_start_date' => $product->discount_start_date,
             'discount_end_date' => $product->discount_end_date,
+            
+            // Rating dan ulasan
             'rating' => count($product->reviews) > 0 ? round($product->averageRating, 1) : 0, // Rating rata-rata dari semua ulasan
             'average_rating' => count($product->reviews) > 0 ? round($product->averageRating, 1) : 0, // Rating rata-rata dari semua ulasan
             'jumlah_ulasan' => count($product->reviews) > 0 ? $product->reviews->count() : 0, // Jumlah semua ulasan
@@ -277,8 +335,12 @@ class ProductController extends Controller
                     ];
                 })->toArray()
                 : [],
+            
+            // Informasi penjual
             'toko' => $product->seller && is_object($product->seller) ? $product->seller->store_name : 'Toko Umum',
             'seller_name' => $product->seller && is_object($product->seller) ? $product->seller->store_name : 'Toko Umum',
+            
+            // Varian produk (jika ada)
             'varian' => $product->variants->map(function($variant) {
                 return [
                     'id' => $variant->id,
@@ -289,6 +351,8 @@ class ProductController extends Controller
                     'stok' => $variant->stock
                 ];
             })->toArray(),
+            
+            // Status wishlist (default false, akan diupdate di method show)
             'di_wishlist' => false // Nilai default, nanti di view akan dicek secara dinamis
         ];
 
@@ -296,20 +360,29 @@ class ProductController extends Controller
     }
 
     /**
-     * Mencari produk berdasarkan nama
-     *
-     * @param Request $request Objek request HTTP
-     * @return \Illuminate\View\View Tampilan hasil pencarian produk
+     * Mencari produk berdasarkan nama (search functionality)
+     * 
+     * Fitur pencarian produk:
+     * - Search berdasarkan nama produk (LIKE query)
+     * - Menampilkan rating dan review count
+     * - Format gambar untuk tampilan
+     * - Tampilkan kategori untuk filter
+     * 
+     * @param Request $request Objek request HTTP (query param: ?q=)
+     * @return \Illuminate\View\View View halaman hasil pencarian
      */
     public function search(Request $request)
     {
+        // Ambil keyword pencarian dari query string
         $query = $request->input('q');
 
+        // Search produk berdasarkan nama (LIKE %keyword%)
+        // Load relasi untuk performa
         $products = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images'])
                         ->where('name', 'LIKE', "%{$query}%")
                         ->get();
 
-        // Tambahkan average rating dan review count ke setiap produk
+        // Tambahkan atribut computed untuk setiap produk
         $products = $products->map(function($product) {
             $product->setAttribute('average_rating', $product->averageRating);
             $product->setAttribute('review_count', $product->reviews_count);
@@ -319,15 +392,14 @@ class ProductController extends Controller
             return $product;
         });
 
-        // Ambil kategori-kategori yang sesuai dengan dashboard customer
-        // Kita akan coba beberapa variasi nama kategori
+        // Ambil kategori untuk filter (sama seperti method index)
         $mainCategories = [
             'Kuliner', 'Fashion', 'Kerajinan Tangan',
             'Produk Berkebun', 'Produk Kesehatan',
             'Mainan', 'Hampers'
         ];
 
-        // Cari kategori-kategori yang ada di database termasuk variasi nama
+        // Cari kategori yang ada di database
         $categories = Category::where(function($query) use ($mainCategories) {
             foreach ($mainCategories as $category) {
                 $query->orWhere('name', $category);

@@ -96,9 +96,7 @@ Route::delete('/penjual/promosi/{id}', [App\Http\Controllers\PromotionController
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 // Seller Management Routes
 Route::prefix('admin')->name('sellers.')->group(function () {

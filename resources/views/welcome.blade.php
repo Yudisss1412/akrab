@@ -60,39 +60,53 @@
 
         <section id="populer" class="main-section">
             <div class="section-header animate-on-scroll">
-                <h2>Produk Populer</h2>
-                <p>Lihat produk yang paling banyak diminati oleh pelanggan kami.</p>
+                <h2>Produk Terlaris</h2>
+                <p>Produk yang paling banyak dibeli oleh pelanggan kami.</p>
             </div>
-            <div class="product-grid">
-                <article class="product-card animate-on-scroll" 
-                        data-title="Batik Gajah Uling" 
-                        data-price="Rp 50.000" 
-                        data-desc="Kain batik premium dengan motif khas Banyuwangi yang melegenda."
-                        data-images="src/product_1.png,https://placehold.co/600x800/eee/333?text=Detail+1,https://placehold.co/600x800/ddd/333?text=Detail+2"
-                        data-specs="Ukuran:2m x 1.15m|Warna:Hijau Botol|Bahan:Katun Primisima|Stok:Tersedia"
-                        data-product-slug="batik-gajah-uling-01">
-                    <img src="src/product_1.png" alt="Produk Batik">
-                    <div class="product-info">
-                        <h3>Batik Gajah Uling</h3>
-                        <p class="price">Rp 50.000</p>
-                        <button class="view-product-btn">Pratinjau</button>
+            
+            <div class="carousel-container">
+                <div class="carousel-track" id="carousel-track">
+                    @forelse($products as $product)
+                    <article class="product-card carousel-item"
+                            data-title="{{ $product->name }}"
+                            data-price="Rp {{ number_format($product->price, 0, ',', '.') }}"
+                            data-desc="{{ Str::limit($product->description, 100) }}"
+                            data-images="{{ $product->main_image ? asset('storage/' . $product->main_image) : 'https://placehold.co/600x800/eee/333?text=No+Image' }}"
+                            data-specs="{{ $product->specifications ? collect($product->specifications)->map(fn($v, $k) => "$k:$v")->join('|') : '' }}"
+                            data-product-slug="{{ Str::slug($product->name) }}">
+                        <img src="{{ $product->main_image ? asset('storage/' . $product->main_image) : 'https://placehold.co/400x400/333/fff?text=' . urlencode($product->name) }}"
+                             alt="{{ $product->name }}"
+                             onerror="this.onerror=null;this.src='https://placehold.co/400x400/333/fff?text={{ urlencode($product->name) }}'">
+                        <div class="product-info">
+                            <div class="title-container">
+                                <h3>{{ $product->name }}</h3>
+                            </div>
+                            <p class="price">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
+                            <button class="view-product-btn">Pratinjau</button>
+                        </div>
+                    </article>
+                    @empty
+                    <div class="carousel-item no-products">
+                        <p>Belum ada produk terlaris tersedia.</p>
                     </div>
-                </article>
-                <article class="product-card animate-on-scroll delay-1" 
-                        data-title="Kopi Lanang Ijen" 
-                        data-price="Rp 75.000" 
-                        data-desc="Kopi robusta pilihan dari lereng Ijen, diproses secara tradisional."
-                        data-images="https://placehold.co/400x400/333/fff?text=Kopi,https://placehold.co/600x800/eee/333?text=Biji+Kopi,https://placehold.co/600x800/ddd/333?text=Kemasan"
-                        data-specs="Berat:250g|Jenis:Robusta|Proses:Natural|Asal:Lereng Ijen"
-                        data-product-slug="kopi-lanang-ijen-02">
-                    <img src="https://placehold.co/400x400/333/fff?text=Kopi" alt="Produk Kopi">
-                    <div class="product-info">
-                        <h3>Kopi Lanang Ijen</h3>
-                        <p class="price">Rp 75.000</p>
-                        <button class="view-product-btn">Pratinjau</button>
-                    </div>
-                </article>
+                    @endforelse
+                </div>
+                
+                <!-- Carousel Navigation Buttons -->
+                <button class="carousel-btn prev-btn" id="prev-btn" aria-label="Scroll kiri">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <button class="carousel-btn next-btn" id="next-btn" aria-label="Scroll kanan">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
             </div>
+            
+            <!-- Carousel Indicators -->
+            <div class="carousel-indicators" id="carousel-indicators"></div>
         </section>
         
         <section id="tentang" class="main-section">
@@ -301,6 +315,153 @@
             animateOnScrollElements.forEach(element => {
                 observer.observe(element);
             });
+        });
+
+        // Carousel Auto-Scroll Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const carouselTrack = document.getElementById('carousel-track');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const indicatorsContainer = document.getElementById('carousel-indicators');
+            
+            if (!carouselTrack) return;
+            
+            const carouselItems = carouselTrack.querySelectorAll('.carousel-item');
+            if (carouselItems.length === 0) return;
+            
+            let autoScrollInterval;
+            let isPaused = false;
+            let currentIndicator = 0;
+            
+            // Create indicators
+            function createIndicators() {
+                if (!indicatorsContainer) return;
+                indicatorsContainer.innerHTML = '';
+                
+                carouselItems.forEach((_, index) => {
+                    const indicator = document.createElement('div');
+                    indicator.classList.add('indicator');
+                    if (index === 0) indicator.classList.add('active');
+                    indicator.addEventListener('click', () => {
+                        scrollToIndex(index);
+                        resetAutoScroll();
+                    });
+                    indicatorsContainer.appendChild(indicator);
+                });
+            }
+            
+            // Update active indicator
+            function updateIndicators() {
+                if (!indicatorsContainer) return;
+                
+                const itemWidth = carouselItems[0].offsetWidth + 24; // width + gap
+                const scrollPos = carouselTrack.scrollLeft;
+                const currentIndex = Math.round(scrollPos / itemWidth);
+                
+                if (currentIndex !== currentIndicator) {
+                    currentIndicator = currentIndex;
+                    const indicators = indicatorsContainer.querySelectorAll('.indicator');
+                    indicators.forEach((ind, idx) => {
+                        ind.classList.toggle('active', idx === currentIndex);
+                    });
+                }
+            }
+            
+            // Scroll to specific item
+            function scrollToIndex(index) {
+                const itemWidth = carouselItems[0].offsetWidth + 24; // width + gap
+                carouselTrack.scrollTo({
+                    left: index * itemWidth,
+                    behavior: 'smooth'
+                });
+            }
+            
+            // Auto scroll function
+            function autoScroll() {
+                if (isPaused) return;
+                
+                const maxScrollLeft = carouselTrack.scrollWidth - carouselTrack.clientWidth;
+                const currentScroll = carouselTrack.scrollLeft;
+                
+                if (currentScroll >= maxScrollLeft - 1) {
+                    // Loop back to start
+                    carouselTrack.scrollTo({
+                        left: 0,
+                        behavior: 'smooth'
+                    });
+                } else {
+                    const itemWidth = carouselItems[0].offsetWidth + 24; // width + gap
+                    carouselTrack.scrollBy({
+                        left: itemWidth,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+            
+            // Start auto scroll
+            function startAutoScroll() {
+                autoScrollInterval = setInterval(autoScroll, 3000); // Scroll setiap 3 detik
+            }
+            
+            // Stop auto scroll
+            function stopAutoScroll() {
+                if (autoScrollInterval) {
+                    clearInterval(autoScrollInterval);
+                }
+            }
+            
+            // Reset auto scroll timer
+            function resetAutoScroll() {
+                stopAutoScroll();
+                setTimeout(startAutoScroll, 500);
+            }
+            
+            // Button event listeners
+            if (prevBtn) {
+                prevBtn.addEventListener('click', function() {
+                    const itemWidth = carouselItems[0].offsetWidth + 24;
+                    carouselTrack.scrollBy({
+                        left: -itemWidth,
+                        behavior: 'smooth'
+                    });
+                    resetAutoScroll();
+                });
+            }
+            
+            if (nextBtn) {
+                nextBtn.addEventListener('click', function() {
+                    const itemWidth = carouselItems[0].offsetWidth + 24;
+                    carouselTrack.scrollBy({
+                        left: itemWidth,
+                        behavior: 'smooth'
+                    });
+                    resetAutoScroll();
+                });
+            }
+            
+            // Pause on hover
+            carouselTrack.addEventListener('mouseenter', function() {
+                isPaused = true;
+                stopAutoScroll();
+            });
+            
+            carouselTrack.addEventListener('mouseleave', function() {
+                isPaused = false;
+                startAutoScroll();
+            });
+            
+            // Update indicators on scroll
+            carouselTrack.addEventListener('scroll', function() {
+                updateIndicators();
+            });
+            
+            // Initialize
+            createIndicators();
+            
+            // Only start auto-scroll if there are multiple items
+            if (carouselItems.length > 1) {
+                startAutoScroll();
+            }
         });
     </script>
     <script src="js/script.js"></script>

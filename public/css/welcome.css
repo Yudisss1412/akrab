@@ -827,3 +827,243 @@ footer .footer__inner .footer-right .footer-privacy a {
 .footer-copyright {
     color: white !important; /* Tetap jaga warna copyright di footer */
 }
+
+/* ============================================================
+   CAROUSEL - Horizontal Scroll Produk Terlaris
+   ============================================================ */
+
+.carousel-container {
+    position: relative;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 50px;
+    overflow: hidden;
+}
+
+.carousel-track {
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox - hide scrollbar */
+    -ms-overflow-style: none; /* IE/Edge - hide scrollbar */
+    padding: 1rem 0;
+}
+
+.carousel-track::-webkit-scrollbar {
+    display: none; /* Chrome/Safari - hide scrollbar */
+}
+
+.carousel-item {
+    flex: 0 0 calc(25% - 1.125rem) !important; /* 4 items visible on large screens */
+    scroll-snap-align: start;
+    animation: none !important; /* Override animate-on-scroll */
+    display: flex !important;
+}
+
+/* Product card dalam carousel - tinggi tetap sama untuk semua */
+.carousel-item .product-card {
+    width: 100% !important;
+    height: 420px !important; /* Tinggi TETAP sama untuk semua card */
+    min-height: 420px !important;
+    max-height: 420px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+    overflow: hidden !important; /* Mencegah overflow */
+}
+
+.carousel-item .product-card:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12) !important;
+}
+
+/* Gambar produk dengan tinggi tetap */
+.carousel-item .product-card img {
+    width: 100% !important;
+    height: 250px !important;
+    object-fit: cover !important;
+    flex-shrink: 0 !important;
+}
+
+/* Product info dengan tinggi tetap */
+.carousel-item .product-card .product-info {
+    padding: 0.75rem 1rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 170px !important; /* Tinggi tetap */
+    min-width: 0 !important;
+    overflow: hidden !important;
+}
+
+/* Container untuk judul - tinggi tetap untuk 2 baris */
+.carousel-item .product-card .product-info .title-container {
+    height: 2.8rem !important;
+    max-height: 2.8rem !important;
+    min-height: 2.8rem !important;
+    margin: 0 0 0.5rem 0 !important;
+    overflow: hidden !important;
+    flex-shrink: 0 !important;
+}
+
+/* Judul produk - maksimal 2 baris, dipotong dengan ... */
+.carousel-item .product-card .product-info h3 {
+    font-size: 1rem !important;
+    line-height: 1.4 !important;
+    color: #333 !important;
+    margin: 0 !important;
+    min-width: 0 !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    word-break: break-word !important;
+}
+
+/* Harga dengan margin tetap */
+.carousel-item .product-card .product-info .price {
+    font-weight: 700 !important;
+    color: #006E5C !important;
+    margin: 0 0 0.8rem 0 !important;
+    font-size: 1rem !important;
+    line-height: 1.2 !important;
+    height: 1.2rem !important; /* Tinggi tetap */
+    flex-shrink: 0 !important;
+}
+
+/* Tombol di bagian bawah - selalu di posisi yang sama */
+.carousel-item .product-card .product-info .view-product-btn {
+    margin-top: auto !important;
+    background: #006E5C !important;
+    color: white !important;
+    border: none !important;
+    padding: 0.6rem 1rem !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    font-weight: 600 !important;
+    transition: background 0.2s !important;
+    align-self: flex-start !important;
+    white-space: nowrap !important;
+    height: 36px !important; /* Tinggi tetap untuk tombol */
+    flex-shrink: 0 !important;
+}
+
+.carousel-item .product-card .product-info .view-product-btn:hover {
+    background: #a8d5c9 !important;
+    color: #006E5C !important;
+}
+
+/* Carousel Navigation Buttons */
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid #006E5C;
+    color: #006E5C;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.carousel-btn:hover {
+    background: #006E5C;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0,110,92,0.3);
+}
+
+.prev-btn {
+    left: 5px;
+}
+
+.next-btn {
+    right: 5px;
+}
+
+/* Carousel Indicators */
+.carousel-indicators {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 1.5rem;
+}
+
+.carousel-indicators .indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #e9ecef;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.carousel-indicators .indicator.active {
+    background: #006E5C;
+    width: 30px;
+    border-radius: 5px;
+}
+
+/* No products message */
+.no-products {
+    flex: 0 0 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    text-align: center;
+    color: #666;
+    font-size: 1.1rem;
+}
+
+/* Responsive Carousel */
+@media (max-width: 1200px) {
+    .carousel-item {
+        flex: 0 0 calc(33.333% - 1rem); /* 3 items */
+    }
+}
+
+@media (max-width: 992px) {
+    .carousel-item {
+        flex: 0 0 calc(50% - 0.75rem); /* 2 items */
+    }
+    
+    .carousel-container {
+        padding: 0 45px;
+    }
+}
+
+@media (max-width: 576px) {
+    .carousel-item {
+        flex: 0 0 calc(100% - 0.5rem); /* 1 item */
+    }
+    
+    .carousel-container {
+        padding: 0 40px;
+    }
+    
+    .carousel-btn {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .carousel-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+/* Hide buttons on mobile - use touch scroll instead */
+@media (max-width: 576px) {
+    .carousel-btn {
+        display: none;
+    }
+}

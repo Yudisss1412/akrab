@@ -164,20 +164,21 @@ async function searchProducts(search = '', category = 'all', subcategory = '', m
 
     const result = await response.json();
 
+    // Handle both array response and object response with products array
+    const productsArray = Array.isArray(result) ? result : (result.products || []);
+
     // Format the data to match what the render function expects
-    const formattedProducts = Array.isArray(result) ?
-      result.map(product => ({
-        id: product.id,
-        nama: product.nama || product.name || 'Produk Tanpa Nama',
-        kategori: product.kategori || product.category?.name || 'Umum',
-        subkategori: product.subkategori || product.subcategory?.name || 'Umum',
-        harga: product.harga ? formatPrice(product.harga) : formatPrice(product.price || 0),
-        gambar: product.gambar || product.image || product.main_image || 'src/placeholder.png',
-        rating: product.rating || product.average_rating || product.averageRating || 0,
-        toko: product.toko || product.seller?.name || 'Toko Umum',
-        deskripsi: product.deskripsi || product.description || ''
-      })) :
-      [];
+    const formattedProducts = productsArray.map(product => ({
+      id: product.id,
+      nama: product.nama || product.name || 'Produk Tanpa Nama',
+      kategori: product.kategori || product.category?.name || 'Umum',
+      subkategori: product.subkategori || product.subcategory?.name || 'Umum',
+      harga: product.harga ? formatPrice(product.harga) : formatPrice(product.price || 0),
+      gambar: product.gambar || product.image || product.main_image || 'src/placeholder.png',
+      rating: product.rating || product.average_rating || product.averageRating || 0,
+      toko: product.toko || product.seller?.name || 'Toko Umum',
+      deskripsi: product.deskripsi || product.description || ''
+    }));
 
     return formattedProducts;
   } catch (error) {
@@ -330,19 +331,20 @@ async function loadPopularProducts() {
 
     const result = await response.json();
 
+    // Handle both array response and object response with products array
+    const productsArray = Array.isArray(result) ? result : (result.products || []);
+
     // Format the data to match what the render function expects
-    const formattedProducts = Array.isArray(result) ?
-      result.map(product => ({
-        id: product.id,
-        nama: product.name || product.nama || 'Produk Tanpa Nama',
-        kategori: product.kategori || product.category?.name || 'Umum',
-        harga: product.price || product.harga ? formatPrice(product.price || product.harga) : formatPrice(0),
-        gambar: product.image || product.gambar || product.main_image || 'src/placeholder.png',
-        rating: product.average_rating || product.rating || product.averageRating || 0,
-        toko: product.toko || product.seller?.name || 'Toko Umum',
-        deskripsi: product.description || product.deskripsi || ''
-      })) :
-      [];
+    const formattedProducts = productsArray.map(product => ({
+      id: product.id,
+      nama: product.name || product.nama || 'Produk Tanpa Nama',
+      kategori: product.kategori || product.category?.name || 'Umum',
+      harga: product.price || product.harga ? formatPrice(product.price || product.harga) : formatPrice(0),
+      gambar: product.image || product.gambar || product.main_image || 'src/placeholder.png',
+      rating: product.average_rating || product.rating || product.averageRating || 0,
+      toko: product.toko || product.seller?.name || 'Toko Umum',
+      deskripsi: product.description || product.deskripsi || ''
+    }));
 
     return formattedProducts;
   } catch (error) {

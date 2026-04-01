@@ -750,13 +750,18 @@ class ProductController extends Controller
      */
     public function popular()
     {
-        // Ambil produk terbaru atau produk dengan penjualan terbanyak sebagai produk populer
+        // Ambil produk terlaris berdasarkan total quantity terjual dari order_items
         // Pastikan produk memiliki seller yang valid
         $products = Product::with(['variants', 'seller', 'category', 'subcategory', 'approvedReviews', 'images'])
-                        ->whereHas('seller') // Hanya produk dengan seller yang valid
-                        ->orderBy('created_at', 'desc') // Urutkan berdasarkan tanggal terbaru
-                        ->limit(10)
-                        ->get();
+            ->select('products.*')
+            ->selectRaw('COALESCE(SUM(order_items.quantity), 0) as total_sold')
+            ->leftJoin('order_items', 'products.id', '=', 'order_items.product_id')
+            ->whereHas('seller') // Hanya produk dengan seller yang valid
+            ->where('products.status', 'active') // Hanya produk aktif
+            ->groupBy('products.id')
+            ->orderBy('total_sold', 'desc') // Urutkan berdasarkan yang paling laku
+            ->limit(10)
+            ->get();
 
         // Gunakan accessor dan relasi untuk menghitung rating dan jumlah ulasan
         $formattedProducts = $products->map(function($product) {

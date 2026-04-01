@@ -17,8 +17,9 @@ use App\Http\Controllers\Api\SubcategoryController;
 
 // Product API routes
 Route::get('/products/popular', [ProductController::class, 'popular']);
+Route::get('/products/search', [ProductController::class, 'apiSearch']);
+Route::get('/products/filter', [ProductController::class, 'apiFilter'])->name('api.products.filter');
 Route::get('/products/{id}', [ProductController::class, 'apiShow']);
-Route::get('/products/filter', [ProductController::class, 'filter'])->name('api.products.filter');
 
 // Subcategory API routes
 Route::get('/subcategories/category/{categoryName}', [SubcategoryController::class, 'getSubcategoriesByCategoryName']);

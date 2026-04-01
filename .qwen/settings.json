@@ -2,7 +2,16 @@
   "permissions": {
     "allow": [
       "Bash(dir *)",
-      "Bash(findstr *)"
+      "Bash(findstr *)",
+      "Bash(rm *)",
+      "Bash(del *)",
+      "Bash(php *)",
+      "Bash(curl *)",
+      "Bash(timeout *)",
+      "Bash(type *)",
+      "Bash(taskkill *)",
+      "Bash(powershell *)",
+      "Bash(composer *)"
     ]
   },
   "$version": 3

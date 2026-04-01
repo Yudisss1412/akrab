@@ -7,8 +7,11 @@
   <script>
     // Siapkan semua data produk untuk modal
     window.allProductData = [
+      @php $first = true; @endphp
       @if(isset($page_1_products))
         @foreach($page_1_products as $product)
+          @if(!$first),@endif
+          @php $first = false; @endphp
           {
             id: {{ $product['id'] }},
             name: {{ json_encode($product['name']) }},
@@ -16,11 +19,13 @@
             price: {{ json_encode($product['price']) }},
             image: {{ json_encode($product['image']) }},
             specifications: []
-          },
+          }
         @endforeach
       @endif
       @if(isset($page_2_products))
         @foreach($page_2_products as $product)
+          @if(!$first),@endif
+          @php $first = false; @endphp
           {
             id: {{ $product['id'] }},
             name: {{ json_encode($product['name']) }},
@@ -28,11 +33,13 @@
             price: {{ json_encode($product['price']) }},
             image: {{ json_encode($product['image']) }},
             specifications: []
-          },
+          }
         @endforeach
       @endif
       @if(isset($page_3_products))
         @foreach($page_3_products as $product)
+          @if(!$first),@endif
+          @php $first = false; @endphp
           {
             id: {{ $product['id'] }},
             name: {{ json_encode($product['name']) }},
@@ -40,11 +47,13 @@
             price: {{ json_encode($product['price']) }},
             image: {{ json_encode($product['image']) }},
             specifications: []
-          },
+          }
         @endforeach
       @endif
       @if(isset($page_4_products))
         @foreach($page_4_products as $product)
+          @if(!$first),@endif
+          @php $first = false; @endphp
           {
             id: {{ $product['id'] }},
             name: {{ json_encode($product['name']) }},
@@ -52,11 +61,13 @@
             price: {{ json_encode($product['price']) }},
             image: {{ json_encode($product['image']) }},
             specifications: []
-          },
+          }
         @endforeach
       @endif
       @if(isset($page_5_products))
         @foreach($page_5_products as $product)
+          @if(!$first),@endif
+          @php $first = false; @endphp
           {
             id: {{ $product['id'] }},
             name: {{ json_encode($product['name']) }},
@@ -64,7 +75,7 @@
             price: {{ json_encode($product['price']) }},
             image: {{ json_encode($product['image']) }},
             specifications: []
-          },
+          }
         @endforeach
       @endif
     ];

@@ -1,13 +1,13 @@
-@extends('layouts.app')
 
-@section('title', 'Kategori - UMKM AKRAB')
 
-@section('header')
-  @include('components.customer.header.header')
-@endsection
+<?php $__env->startSection('title', 'Kategori - UMKM AKRAB'); ?>
 
-@push('styles')
-  <link rel="stylesheet" href="{{ asset('css/customer/kategori/kategori.css') }}">
+<?php $__env->startSection('header'); ?>
+  <?php echo $__env->make('components.customer.header.header', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startPush('styles'); ?>
+  <link rel="stylesheet" href="<?php echo e(asset('css/customer/kategori/kategori.css')); ?>">
   <style>
     /* ========== Modal Produk ========== */
     .modal-detail-produk {
@@ -257,14 +257,14 @@
       </div>
     </div>
   </div>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
   <main class="kategori-page">
     <div class="container">
       <div class="page-header">
-        <h1 id="kategori-title">{{ $categoryTitle }}</h1>
-        <p id="kategori-description">{{ $categoryDescription }}</p>
+        <h1 id="kategori-title"><?php echo e($categoryTitle); ?></h1>
+        <p id="kategori-description"><?php echo e($categoryDescription); ?></p>
       </div>
 
       <!-- Mobile Filter Toggle Button -->
@@ -290,15 +290,16 @@
               </div>
               <div class="filter-content" id="subkategori-content">
                 <div class="filter-checkbox-group">
-                  @if(isset($subcategories) && $subcategories->count() > 0)
-                    @foreach($subcategories as $subcategory)
+                  <?php if(isset($subcategories) && $subcategories->count() > 0): ?>
+                    <?php $__currentLoopData = $subcategories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $subcategory): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                       <label class="checkbox-label">
-                        <input type="checkbox" name="subkategori[]" value="{{ \Illuminate\Support\Str::slug($subcategory->name) }}"> {{ $subcategory->name }}
+                        <input type="checkbox" name="subkategori[]" value="<?php echo e(\Illuminate\Support\Str::slug($subcategory->name)); ?>"> <?php echo e($subcategory->name); ?>
+
                       </label>
-                    @endforeach
-                  @else
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                  <?php else: ?>
                     <p class="no-subcategories">Tidak ada subkategori untuk kategori ini</p>
-                  @endif
+                  <?php endif; ?>
                 </div>
               </div>
             </div>
@@ -417,32 +418,32 @@
           </div>
 
           <div class="products-grid" id="products-container">
-            @section('category-products')
+            <?php $__env->startSection('category-products'); ?>
               <!-- Tampilkan produk halaman pertama secara default -->
-              @if(isset($page_1_products) && count($page_1_products) > 0)
-                @foreach($page_1_products as $product)
+              <?php if(isset($page_1_products) && count($page_1_products) > 0): ?>
+                <?php $__currentLoopData = $page_1_products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                   <div class="product-card">
-                    <img class="product-image" src="{{ $product['image'] }}" alt="{{ $product['name'] }}" onerror="this.onerror=null; this.src='{{ asset('src/placeholder_produk.png') }}';">
+                    <img class="product-image" src="<?php echo e($product['image']); ?>" alt="<?php echo e($product['name']); ?>" onerror="this.onerror=null; this.src='<?php echo e(asset('src/placeholder_produk.png')); ?>';">
                     <div class="product-info">
-                      <h3 class="product-name">{{ $product['name'] }}</h3>
-                      <p class="product-description">{{ Str::limit($product['description'], 100) }}</p>
-                      <div class="product-price">{{ $product['price'] }}</div>
-                      <a href="{{ route('produk.detail', $product['id']) }}" class="btn btn-primary">Lihat Detail</a>
+                      <h3 class="product-name"><?php echo e($product['name']); ?></h3>
+                      <p class="product-description"><?php echo e(Str::limit($product['description'], 100)); ?></p>
+                      <div class="product-price"><?php echo e($product['price']); ?></div>
+                      <a href="<?php echo e(route('produk.detail', $product['id'])); ?>" class="btn btn-primary">Lihat Detail</a>
                     </div>
                   </div>
-                @endforeach
-              @else
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+              <?php else: ?>
                 <p class="no-products-message">Tidak ada produk dalam kategori ini.</p>
-              @endif
-            @show
+              <?php endif; ?>
+            <?php echo $__env->yieldSection(); ?>
           </div>
 
           <div class="produk-pagination">
             <button class="page-btn" id="first-page">«</button>
             <button class="page-btn" id="prev-page">‹</button>
-            @for ($i = 1; $i <= 5; $i++)
-              <button class="page-btn @if($i == 1) active @endif" data-page="{{ $i }}">{{ $i }}</button>
-            @endfor
+            <?php for($i = 1; $i <= 5; $i++): ?>
+              <button class="page-btn <?php if($i == 1): ?> active <?php endif; ?>" data-page="<?php echo e($i); ?>"><?php echo e($i); ?></button>
+            <?php endfor; ?>
             <button class="page-btn" id="next-page">›</button>
             <button class="page-btn" id="last-page">»</button>
           </div>
@@ -450,9 +451,9 @@
       </div>
     </div>
   </main>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
   <script>
     // Initialize when DOM is loaded
     document.addEventListener('DOMContentLoaded', function() {
@@ -563,7 +564,7 @@
       // Function to apply product filters via API
       function applyProductFilters(apiUrl, params) {
         // Use Laravel's asset helper for correct base path
-        const fullUrl = '{{ url("/api/products/filter") }}?' + params.toString();
+        const fullUrl = '<?php echo e(url("/api/products/filter")); ?>?' + params.toString();
         
         console.log('Fetching:', fullUrl);
         
@@ -1356,9 +1357,11 @@
   </script>
 
   <!-- Subcategory filter script -->
-  <script src="{{ asset('js/customer/kategori/subcategory-filter.js') }}"></script>
-@endpush
+  <script src="<?php echo e(asset('js/customer/kategori/subcategory-filter.js')); ?>"></script>
+<?php $__env->stopPush(); ?>
 
-@section('footer')
-  @include('components.customer.footer.footer')
-@endsection
+<?php $__env->startSection('footer'); ?>
+  <?php echo $__env->make('components.customer.footer.footer', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\ecommerce-akrab\resources\views/customer/kategori/base.blade.php ENDPATH**/ ?>

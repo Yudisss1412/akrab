@@ -336,21 +336,15 @@ class CheckoutController extends Controller
 
         $shippingCost = $shippingCostMap[$request->shipping_method];
         $insuranceCost = 1500; // Insurance cost remains constant
-        
-        // Calculate new total
-        $newTotal = $order->sub_total + $shippingCost + $insuranceCost;
+        $discount = $order->discount ?? 0; // Get discount from order
+
+        // Calculate new total = subtotal - discount + shipping + insurance
+        $newTotal = $order->sub_total - $discount + $shippingCost + $insuranceCost;
 
         // Update the order
         $order->update([
             'shipping_cost' => $shippingCost,
-            'insurance_cost' => $insuranceCost, // Store insurance cost for consistency
-            'total_amount' => $newTotal,
-            'shipping_courier' => $request->shipping_method
-        ]);
-
-        // Update the order
-        $order->update([
-            'shipping_cost' => $shippingCost,
+            'insurance_cost' => $insuranceCost,
             'total_amount' => $newTotal,
             'shipping_courier' => $request->shipping_method
         ]);
@@ -362,7 +356,15 @@ class CheckoutController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Metode pengiriman berhasil diperbarui',
-            'order' => $order
+            'order' => $order,
+            'total_amount' => $newTotal,
+            'breakdown' => [
+                'subtotal' => $order->sub_total,
+                'discount' => $discount,
+                'shipping_cost' => $shippingCost,
+                'insurance_cost' => $insuranceCost,
+                'total' => $newTotal
+            ]
         ]);
     }
 

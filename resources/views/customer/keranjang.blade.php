@@ -70,7 +70,7 @@
                       @endif
                     </div>
                   </td>
-                  <td class="price-col" data-label="Harga">
+                  <td class="price-col" data-label="Harga" data-original-price="{{ $item['original_price'] ?? 0 }}" data-discounted-price="{{ $item['discounted_price'] ?? 0 }}">
                     @php
                       $hasDiscount = $item['has_discount'] ?? false;
                       $originalPrice = $item['original_price'] ?? (($item['product'] ?? $item->product)->price + (($item['product_variant'] ?? $item->productVariant ?? null) ? ($item['product_variant'] ?? $item->productVariant)->additional_price : 0));
@@ -97,7 +97,7 @@
                       <button class="qty-btn plus" data-item-id="{{ $item['id'] ?? $item->id }}">+</button>
                     </div>
                   </td>
-                  <td class="subtotal-col" data-label="Subtotal">
+                  <td class="subtotal-col" data-label="Subtotal" data-item-subtotal="{{ ($item['discounted_price'] ?? $originalPrice) * ($item['quantity'] ?? $item->quantity) }}">
                     @php
                       $originalPrice = $item['original_price'] ?? (($item['product'] ?? $item->product)->price + (($item['product_variant'] ?? $item->productVariant ?? null) ? ($item['product_variant'] ?? $item->productVariant)->additional_price : 0));
                       $subtotalPrice = $originalPrice * ($item['quantity'] ?? $item->quantity);

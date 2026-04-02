@@ -302,6 +302,7 @@
 
       // Ambil nilai awal dari data Blade
       let subtotal = {{ $subTotal }};
+      let discount = {{ $totalDiscount ?? 0 }};
       // Biaya pengiriman disembunyikan sampai pengguna memilih metode pengiriman
       let shippingCost = 0; // Set ke 0 karena biaya pengiriman disembunyikan
 
@@ -315,12 +316,15 @@
         }).format(shippingCost).replace('Rp', '').trim();
       }
 
+      // Total = Subtotal - Discount + Shipping
+      let total = subtotal - discount + shippingCost;
+      
       totalHargaElement.textContent = new Intl.NumberFormat('id-ID', {
         style: 'currency',
         currency: 'IDR',
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
-      }).format(subtotal).replace('Rp', '').trim();
+      }).format(total).replace('Rp', '').trim();
 
       // Edit alamat functionality
       const editBtn = document.getElementById('editAlamatBtn');

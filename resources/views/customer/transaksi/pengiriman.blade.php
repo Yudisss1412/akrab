@@ -145,9 +145,35 @@
               <div class="total-row">
                 <span>Total Belanja</span>
                 @if(isset($order) && $order)
-                  <span>Rp {{ number_format($order->sub_total, 0, ',', '.') }}</span>
+                  <span class="subtotal-amount">Rp {{ number_format($order->sub_total, 0, ',', '.') }}</span>
                 @else
-                  <span>Rp 0</span>
+                  <span class="subtotal-amount">Rp 0</span>
+                @endif
+              </div>
+              @if(isset($order) && $order && ($order->discount ?? 0) > 0)
+              <div class="total-row discount-row">
+                <span><i class="bi bi-tag-fill" style="color: #28a745;"></i> Diskon</span>
+                <span class="discount-amount" style="color: #28a745; font-weight: 600;">- Rp {{ number_format($order->discount, 0, ',', '.') }}</span>
+              </div>
+              @endif
+              <div class="total-row">
+                <span>Ongkos Kirim</span>
+                @if(isset($order) && $order)
+                  <span class="shipping-cost-amount">Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}</span>
+                @else
+                  <span class="shipping-cost-amount">Rp 0</span>
+                @endif
+              </div>
+              <div class="total-row">
+                <span>Asuransi</span>
+                <span>Rp 1.500</span>
+              </div>
+              <div class="total-row total-amount" style="border-top: 1px solid #eee; padding-top: 10px; margin-top: 10px;">
+                <span><strong>Total</strong></span>
+                @if(isset($order) && $order)
+                  <span><strong>Rp {{ number_format($order->total_amount, 0, ',', '.') }}</strong></span>
+                @else
+                  <span><strong>Rp 0</strong></span>
                 @endif
               </div>
 
@@ -268,6 +294,7 @@
         const subtotalElement = document.querySelector('.subtotal-amount');
         const shippingCostElement = document.querySelector('.shipping-cost-amount');
         const totalElement = document.querySelector('.total-amount');
+        const discountElement = document.querySelector('.discount-amount');
 
         if (subtotalElement) {
           subtotalElement.textContent = 'Rp ' + formatCurrency(order.sub_total);
@@ -277,7 +304,13 @@
           shippingCostElement.textContent = 'Rp ' + formatCurrency(order.shipping_cost);
         }
 
+        // Update discount if exists
+        if (discountElement && order.discount > 0) {
+          discountElement.textContent = '- Rp ' + formatCurrency(order.discount);
+        }
+
         if (totalElement) {
+          // Total = subtotal - discount + shipping + insurance
           totalElement.textContent = 'Rp ' + formatCurrency(order.total_amount);
         }
       }

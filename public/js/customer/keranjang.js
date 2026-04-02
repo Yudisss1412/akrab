@@ -323,15 +323,20 @@ class CartManager {
     // Simpan nilai kuantitas sebelumnya
     input.dataset.previousValue = input.value;
 
-    // Ambil harga dari teks yang ditampilkan, bersihkan dari format
-    const priceText = row.querySelector('.price-col').textContent;
-    const price = parseInt(priceText.replace(/[^0-9]/g, ''));
+    // Get discounted price from data attribute
+    const priceCol = row.querySelector('.price-col');
+    const discountedPrice = parseInt(priceCol.dataset.discountedPrice) || 0;
     const quantity = parseInt(input.value);
-    const subtotal = price * quantity;
+    const subtotal = discountedPrice * quantity;
 
-    // Format subtotal ke format Rupiah
+    // Update data-item-subtotal attribute
+    row.querySelector('.subtotal-col').dataset.itemSubtotal = subtotal;
+
+    // Format subtotal ke format Rupiah (tampilkan harga sebelum diskon untuk konsistensi dengan server)
+    const originalPrice = parseInt(priceCol.dataset.originalPrice) || 0;
+    const originalSubtotal = originalPrice * quantity;
     const subtotalElement = row.querySelector('.subtotal-col');
-    subtotalElement.textContent = this.formatRupiah(subtotal);
+    subtotalElement.textContent = this.formatRupiah(originalSubtotal);
   }
 
   async removeItem(row) {
@@ -372,21 +377,34 @@ class CartManager {
     document.querySelectorAll('.cart-table tbody tr').forEach(row => {
       const checkbox = row.querySelector('.item-check');
       if (checkbox && checkbox.checked) {
-        const subtotalText = row.querySelector('.subtotal-col').textContent;
-        // Hapus "Rp" dan semua titik (ribuan), lalu ganti koma desimal menjadi titik
-        const cleanedText = subtotalText.replace('Rp', '').replace(/\./g, '').replace(',', '.').trim();
-        const itemSubtotal = parseFloat(cleanedText) || 0;
+        // Use data-item-subtotal for calculation (already has discounted price * qty)
+        const subtotalCol = row.querySelector('.subtotal-col');
+        const itemSubtotal = parseFloat(subtotalCol.dataset.itemSubtotal) || 0;
         subtotal += itemSubtotal;
 
         itemCount++;
       }
     });
 
-    // Update subtotal display
+    // Update subtotal display (show original price subtotal)
     document.querySelector('#subtotal-count').textContent = itemCount;
-    document.querySelector('#cart-subtotal').textContent = this.formatRupiah(subtotal);
     
-    // Untuk sementara, total = subtotal (akan ditambahkan logika diskon dan ongkir nanti)
+    // Calculate original subtotal for display
+    let originalSubtotal = 0;
+    document.querySelectorAll('.cart-table tbody tr').forEach(row => {
+      const checkbox = row.querySelector('.item-check');
+      if (checkbox && checkbox.checked) {
+        const priceCol = row.querySelector('.price-col');
+        const originalPrice = parseInt(priceCol.dataset.originalPrice) || 0;
+        const qtyInput = row.querySelector('.qty-input');
+        const qty = parseInt(qtyInput.value) || 0;
+        originalSubtotal += originalPrice * qty;
+      }
+    });
+    
+    document.querySelector('#cart-subtotal').textContent = this.formatRupiah(originalSubtotal);
+
+    // Total = discounted subtotal (harga setelah diskon)
     document.querySelector('#cartTotal').textContent = this.formatRupiah(subtotal);
   }
 

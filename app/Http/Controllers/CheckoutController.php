@@ -55,12 +55,24 @@ class CheckoutController extends Controller
         // Ambil item keranjang
         $cartItems = $this->cartService->getCartItems();
 
-        // Hitung subtotal
-        $subTotal = $this->cartService->getSubtotal();
+        // Hitung subtotal (harga SEBELUM diskon) dan diskon
+        $subTotal = 0;
+        $totalDiscount = 0;
+        
+        foreach ($cartItems as $item) {
+            $originalPrice = $item['original_price'] ?? 0;
+            $discountedPrice = $item['discounted_price'] ?? 0;
+            $quantity = $item['quantity'] ?? 0;
+            
+            $subTotal += $originalPrice * $quantity;
+            $totalDiscount += ($originalPrice - $discountedPrice) * $quantity;
+        }
 
         // Biaya pengiriman default
         $shippingCost = 15000; // Harga default untuk REGULER
-        $total = $subTotal + $shippingCost;
+        
+        // Total = Subtotal - Diskon + Ongkir
+        $total = $subTotal - $totalDiscount + $shippingCost;
 
         // Ambil alamat pengguna (misalnya dari profil pengguna)
         $user = Auth::user();
@@ -69,6 +81,7 @@ class CheckoutController extends Controller
         $checkoutData = [
             'cartItems' => $cartItems,
             'subTotal' => $subTotal,
+            'totalDiscount' => $totalDiscount,
             'shippingCost' => $shippingCost,
             'total' => $total,
             'user' => $user
@@ -112,8 +125,18 @@ class CheckoutController extends Controller
 
             \Log::info('Cart items retrieved', ['count' => $cartItems->count()]);
 
-            // Hitung subtotal
-            $subTotal = $this->cartService->getSubtotal();
+            // Hitung subtotal (harga SEBELUM diskon)
+            $subTotal = 0;
+            $totalDiscount = 0;
+            
+            foreach ($cartItems as $item) {
+                $originalPrice = $item['original_price'] ?? 0;
+                $discountedPrice = $item['discounted_price'] ?? 0;
+                $quantity = $item['quantity'] ?? 0;
+                
+                $subTotal += $originalPrice * $quantity;
+                $totalDiscount += ($originalPrice - $discountedPrice) * $quantity;
+            }
 
             // Determine shipping cost based on method
             $shippingCostMap = [
@@ -136,7 +159,8 @@ class CheckoutController extends Controller
                 'sub_total' => $subTotal,
                 'shipping_cost' => $shippingCost,
                 'insurance_cost' => $insuranceCost,
-                'total_amount' => $subTotal + $shippingCost + $insuranceCost,
+                'discount' => $totalDiscount,
+                'total_amount' => $subTotal + $shippingCost + $insuranceCost - $totalDiscount,
                 'notes' => $request->notes ?? '',
                 'shipping_courier' => $request->shipping_method
             ]);

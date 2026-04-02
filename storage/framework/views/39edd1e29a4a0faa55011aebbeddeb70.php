@@ -1,17 +1,17 @@
-@extends('layouts.app')
 
-@section('title', 'Checkout')
 
-@section('header')
-  @include('components.customer.header.header')
-@endsection
+<?php $__env->startSection('title', 'Checkout'); ?>
 
-@push('styles')
-  <link rel="stylesheet" href="{{ asset('css/customer/transaksi/checkout.css') }}"/>
-  <link rel="stylesheet" href="{{ asset('css/customer/transaksi/checkout_additional.css') }}"/>
-@endpush
+<?php $__env->startSection('header'); ?>
+  <?php echo $__env->make('components.customer.header.header', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startPush('styles'); ?>
+  <link rel="stylesheet" href="<?php echo e(asset('css/customer/transaksi/checkout.css')); ?>"/>
+  <link rel="stylesheet" href="<?php echo e(asset('css/customer/transaksi/checkout_additional.css')); ?>"/>
+<?php $__env->stopPush(); ?>
+
+<?php $__env->startSection('content'); ?>
   <main class="checkout-page">
     <div class="container">
       <div class="page-header">
@@ -36,8 +36,8 @@
         </div>
       </div>
 
-      <form id="checkoutForm" action="{{ route('checkout.process') }}" method="POST">
-        @csrf
+      <form id="checkoutForm" action="<?php echo e(route('checkout.process')); ?>" method="POST">
+        <?php echo csrf_field(); ?>
         <!-- Field tersembunyi untuk metode pengiriman default -->
         <input type="hidden" name="shipping_method" value="reguler" id="hiddenShippingMethod" />
 
@@ -46,30 +46,30 @@
           <input type="hidden" name="debug_trace" value="checkout_form" />
         </div>
 
-        @if($errors->any())
+        <?php if($errors->any()): ?>
         <div class="alert alert-danger">
             <ul class="mb-0">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
+                <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <li><?php echo e($error); ?></li>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </ul>
         </div>
-        @endif
+        <?php endif; ?>
 
         <script>
           // Jika ada error validasi, tampilkan form alamat dalam mode edit
-          @if($errors->any())
+          <?php if($errors->any()): ?>
             document.addEventListener('DOMContentLoaded', function() {
               document.getElementById('alamatCard').style.display = 'none';
               document.getElementById('alamatFormSection').style.display = 'block';
               document.getElementById('editAlamatBtn').innerHTML = '<i class="bi bi-check"></i>';
             });
-          @else
+          <?php else: ?>
             // Jika tidak ada error, pastikan form alamat disembunyikan saat halaman dimuat
             document.addEventListener('DOMContentLoaded', function() {
               document.getElementById('alamatFormSection').style.display = 'none';
             });
-          @endif
+          <?php endif; ?>
         </script>
 
         <div class="checkout-content">
@@ -86,10 +86,10 @@
               <div class="alamat-card" id="alamatCard">
                 <div class="alamat-content">
                   <div class="primary-badge">Utama</div>
-                  <h3 id="alamatNama">{{ $user->name ?? '' }}</h3>
+                  <h3 id="alamatNama"><?php echo e($user->name ?? ''); ?></h3>
                   <div id="alamatDetail">
-                    @if($user)
-                      @php
+                    <?php if($user): ?>
+                      <?php
                         $alamatParts = [];
 
                         // Tambahkan full_address jika ada
@@ -116,21 +116,21 @@
                         $uniqueAlamatParts = array_unique(array_filter($alamatParts, function($part) {
                             return !empty(trim($part));
                         }));
-                      @endphp
+                      ?>
 
-                      @if(count($uniqueAlamatParts) > 0)
-                        @foreach($uniqueAlamatParts as $alamatPart)
-                          <span class="alamat-line">{{ $alamatPart }}</span>
-                          @if(!$loop->last)<br />@endif
-                        @endforeach
-                      @else
+                      <?php if(count($uniqueAlamatParts) > 0): ?>
+                        <?php $__currentLoopData = $uniqueAlamatParts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $alamatPart): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                          <span class="alamat-line"><?php echo e($alamatPart); ?></span>
+                          <?php if(!$loop->last): ?><br /><?php endif; ?>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                      <?php else: ?>
                         <span class="alamat-line">Alamat tidak lengkap</span>
-                      @endif
-                    @else
+                      <?php endif; ?>
+                    <?php else: ?>
                       <span class="alamat-line">User tidak ditemukan</span>
-                    @endif
+                    <?php endif; ?>
                   </div>
-                  <p class="alamat-phone" id="alamatPhone">{{ $user->phone ?? '' }}</p>
+                  <p class="alamat-phone" id="alamatPhone"><?php echo e($user->phone ?? ''); ?></p>
                 </div>
               </div>
 
@@ -138,42 +138,42 @@
               <div class="alamat-form" id="alamatFormSection" style="display: none;">
                 <div class="form-group field">
                   <input type="text" id="recipient_name" name="recipient_name"
-                         value="{{ old('recipient_name', $user->name ?? '') }}" required placeholder=" " />
+                         value="<?php echo e(old('recipient_name', $user->name ?? '')); ?>" required placeholder=" " />
                   <label for="recipient_name">Nama Penerima</label>
                 </div>
 
                 <div class="form-group field">
                   <input type="tel" id="phone" name="phone"
-                         value="{{ old('phone', $user->phone ?? '') }}" required placeholder=" " />
+                         value="<?php echo e(old('phone', $user->phone ?? '')); ?>" required placeholder=" " />
                   <label for="phone">Nomor Telepon</label>
                 </div>
 
                 <div class="form-group field">
                   <input type="text" id="province" name="province"
-                         value="{{ old('province', $user->province ?? '') }}" required placeholder=" " />
+                         value="<?php echo e(old('province', $user->province ?? '')); ?>" required placeholder=" " />
                   <label for="province">Provinsi</label>
                 </div>
 
                 <div class="form-group field">
                   <input type="text" id="city" name="city"
-                         value="{{ old('city', $user->city ?? '') }}" required placeholder=" " />
+                         value="<?php echo e(old('city', $user->city ?? '')); ?>" required placeholder=" " />
                   <label for="city">Kota/Kabupaten</label>
                 </div>
 
                 <div class="form-group field">
                   <input type="text" id="district" name="district"
-                         value="{{ old('district', $user->district ?? '') }}" required placeholder=" " />
+                         value="<?php echo e(old('district', $user->district ?? '')); ?>" required placeholder=" " />
                   <label for="district">Kecamatan</label>
                 </div>
 
                 <div class="form-group field">
                   <input type="text" id="ward" name="ward"
-                         value="{{ old('ward', $user->ward ?? '') }}" required placeholder=" " />
+                         value="<?php echo e(old('ward', $user->ward ?? '')); ?>" required placeholder=" " />
                   <label for="ward">Kelurahan</label>
                 </div>
 
                 <div class="form-group field">
-                  <textarea id="full_address" name="full_address" rows="3" required placeholder=" ">{{ old('full_address', $user->full_address ?? $user->address ?? '') }}</textarea>
+                  <textarea id="full_address" name="full_address" rows="3" required placeholder=" "><?php echo e(old('full_address', $user->full_address ?? $user->address ?? '')); ?></textarea>
                   <label for="full_address">Alamat Lengkap</label>
                 </div>
               </div>
@@ -186,40 +186,40 @@
               </div>
 
               <div class="ringkasan-content">
-                @if(isset($cartItems) && $cartItems->count() > 0)
-                  @foreach($cartItems as $item)
+                <?php if(isset($cartItems) && $cartItems->count() > 0): ?>
+                  <?php $__currentLoopData = $cartItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <div class="produk-item">
-                      <img src="{{ asset(($item['product'] ?? $item->product)->main_image ?? 'src/default-product.png') }}" alt="{{ ($item['product'] ?? $item->product)->name ?? '' }}" />
+                      <img src="<?php echo e(asset(($item['product'] ?? $item->product)->main_image ?? 'src/default-product.png')); ?>" alt="<?php echo e(($item['product'] ?? $item->product)->name ?? ''); ?>" />
                       <div class="item-info">
-                        <h4>{{ ($item['product'] ?? $item->product)->name ?? '' }}</h4>
-                        <p>{{ $item['quantity'] ?? $item->quantity }} x Rp {{ number_format(($item['product'] ?? $item->product)->price ?? 0, 0, ',', '.') }}</p>
+                        <h4><?php echo e(($item['product'] ?? $item->product)->name ?? ''); ?></h4>
+                        <p><?php echo e($item['quantity'] ?? $item->quantity); ?> x Rp <?php echo e(number_format(($item['product'] ?? $item->product)->price ?? 0, 0, ',', '.')); ?></p>
                       </div>
-                      <div class="item-harga">Rp {{ number_format((($item['product'] ?? $item->product)->price ?? 0) * ($item['quantity'] ?? $item->quantity), 0, ',', '.') }}</div>
+                      <div class="item-harga">Rp <?php echo e(number_format((($item['product'] ?? $item->product)->price ?? 0) * ($item['quantity'] ?? $item->quantity), 0, ',', '.')); ?></div>
                     </div>
-                  @endforeach
-                @else
+                  <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                <?php else: ?>
                   <!-- Tidak tampilkan apapun jika keranjang kosong di ringkasan pesanan -->
-                @endif
+                <?php endif; ?>
 
                 <div class="biaya-detail">
                   <div class="detail-row">
                     <span>Subtotal</span>
-                    <span>Rp {{ number_format($subTotal, 0, ',', '.') }}</span>
+                    <span>Rp <?php echo e(number_format($subTotal, 0, ',', '.')); ?></span>
                   </div>
-                  @if($totalDiscount > 0)
+                  <?php if($totalDiscount > 0): ?>
                   <div class="detail-row discount-row">
                     <span><i class="bi bi-tag-fill" style="color: #28a745;"></i> Diskon</span>
-                    <span style="color: #28a745; font-weight: 600;">- Rp {{ number_format($totalDiscount, 0, ',', '.') }}</span>
+                    <span style="color: #28a745; font-weight: 600;">- Rp <?php echo e(number_format($totalDiscount, 0, ',', '.')); ?></span>
                   </div>
-                  @endif
+                  <?php endif; ?>
                   <!-- Sembunyikan biaya pengiriman sampai pengguna memilih metode pengiriman -->
                   <div class="detail-row checkout-shipping-cost-hidden">
                     <span>Biaya Pengiriman</span>
-                    <span id="shippingCost">Rp {{ number_format($shippingCost, 0, ',', '.') }}</span>
+                    <span id="shippingCost">Rp <?php echo e(number_format($shippingCost, 0, ',', '.')); ?></span>
                   </div>
                   <div class="detail-row total">
                     <span>Total</span>
-                    <span id="totalHarga">Rp {{ number_format($total, 0, ',', '.') }}</span>
+                    <span id="totalHarga">Rp <?php echo e(number_format($total, 0, ',', '.')); ?></span>
                   </div>
                 </div>
               </div>
@@ -238,38 +238,30 @@
               </div>
 
               <div class="ringkasan-content" id="ringkasanDetails">
-                {{-- Debug info - uncomment to see variable details --}}
-                {{--
-                @php
-                echo "<!-- cartItems type: " . gettype($cartItems) . " -->";
-                if(isset($cartItems)) {
-                  echo "<!-- cartItems count: " . ($cartItems ? $cartItems->count() : 'NULL') . " -->";
-                  echo "<!-- subTotal: " . ($subTotal ?? 'NULL') . " -->";
-                }
-                @endphp
-                --}}
-                @if(isset($cartItems) && $cartItems->count() > 0)
-                  @foreach($cartItems as $item)
+                
+                
+                <?php if(isset($cartItems) && $cartItems->count() > 0): ?>
+                  <?php $__currentLoopData = $cartItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <div class="produk-preview">
-                      <img src="{{ asset(($item['product'] ?? $item->product)->main_image ?? 'src/default-product.png') }}" alt="{{ ($item['product'] ?? $item->product)->name ?? '' }}" />
+                      <img src="<?php echo e(asset(($item['product'] ?? $item->product)->main_image ?? 'src/default-product.png')); ?>" alt="<?php echo e(($item['product'] ?? $item->product)->name ?? ''); ?>" />
                       <div class="produk-info">
-                        <h4>{{ ($item['product'] ?? $item->product)->name ?? '' }}</h4>
-                        <p class="produk-harga">Rp {{ number_format(($item['product'] ?? $item->product)->price ?? 0, 0, ',', '.') }}</p>
+                        <h4><?php echo e(($item['product'] ?? $item->product)->name ?? ''); ?></h4>
+                        <p class="produk-harga">Rp <?php echo e(number_format(($item['product'] ?? $item->product)->price ?? 0, 0, ',', '.')); ?></p>
                       </div>
-                      <span class="produk-qty">x{{ $item['quantity'] ?? $item->quantity }}</span>
+                      <span class="produk-qty">x<?php echo e($item['quantity'] ?? $item->quantity); ?></span>
                     </div>
-                  @endforeach
-                @else
+                  <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                <?php else: ?>
                   <div class="empty-cart-message">
                     <p>Tidak ada produk dalam keranjang Anda saat ini.</p>
                   </div>
-                @endif
+                <?php endif; ?>
               </div>
 
               <div class="total-section">
                 <div class="total-row">
                   <span>Total Belanja</span>
-                  <span>Rp {{ number_format($subTotal, 0, ',', '.') }}</span>
+                  <span>Rp <?php echo e(number_format($subTotal, 0, ',', '.')); ?></span>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-checkout" id="prosesPesananBtn">
@@ -283,16 +275,16 @@
 
       <!-- Sticky Bottom Action Bar -->
       <div class="sticky-action-bar">
-        <div class="total-tagihan">Rp {{ number_format($subTotal, 0, ',', '.') }}</div>
+        <div class="total-tagihan">Rp <?php echo e(number_format($subTotal, 0, ',', '.')); ?></div>
         <button type="submit" form="checkoutForm" class="btn btn-primary btn-proses-pesanan">
           Proses Pesanan
         </button>
       </div>
     </div>
   </main>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const form = document.getElementById('checkoutForm');
@@ -301,7 +293,7 @@
       const prosesPesananBtn = document.getElementById('prosesPesananBtn');
 
       // Ambil nilai awal dari data Blade
-      let subtotal = {{ $subTotal }};
+      let subtotal = <?php echo e($subTotal); ?>;
       // Biaya pengiriman disembunyikan sampai pengguna memilih metode pengiriman
       let shippingCost = 0; // Set ke 0 karena biaya pengiriman disembunyikan
 
@@ -423,12 +415,12 @@
       });
 
       // Reset status tombol jika ada error
-      @if($errors->any())
+      <?php if($errors->any()): ?>
         if (prosesPesananBtn) {
           prosesPesananBtn.innerHTML = 'Proses Pesanan';
           prosesPesananBtn.disabled = false;
         }
-      @endif
+      <?php endif; ?>
 
       // Toggle ringkasan belanja section
       const toggleBtn = document.getElementById('toggleRingkasan');
@@ -453,8 +445,10 @@
       }
     });
   </script>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@section('footer')
-  @include('components.customer.footer.footer')
-@endsection 
+<?php $__env->startSection('footer'); ?>
+  <?php echo $__env->make('components.customer.footer.footer', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+<?php $__env->stopSection(); ?> 
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\ecommerce-akrab\resources\views/customer/transaksi/checkout.blade.php ENDPATH**/ ?>

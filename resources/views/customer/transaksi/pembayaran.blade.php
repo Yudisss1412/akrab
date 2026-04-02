@@ -157,12 +157,12 @@
                 </div>
                 <div class="summary-row discount">
                   <span>Diskon</span>
-                  <span>-Rp{{ number_format(0, 0, ',', '.') }}</span>
+                  <span style="color: #28a745; font-weight: 600;">-Rp{{ number_format($order->discount ?? 0, 0, ',', '.') }}</span>
                 </div>
                 <div class="summary-divider"></div>
                 <div class="summary-row total">
                   <span>Total</span>
-                  <span class="total-amount">Rp{{ number_format($order->total_amount + 1500, 0, ',', '.') }}</span>
+                  <span class="total-amount">Rp{{ number_format($order->total_amount + ($order->discount ?? 0), 0, ',', '.') }}</span>
                 </div>
               @else
                 <p>Data pembayaran tidak ditemukan.</p>

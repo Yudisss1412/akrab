@@ -278,10 +278,20 @@
                               <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
                             </svg>
                           </a>
-                          <button class="action-btn btn-deactivate rounded-circle bg-light p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Nonaktifkan" onclick="confirmDeactivate({{ $voucher->id }})">
+                          <button class="action-btn btn-deactivate rounded-circle bg-light p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" 
+                            title="{{ $voucher->status === 'inactive' ? 'Aktifkan' : 'Nonaktifkan' }}" 
+                            onclick="confirmToggleStatus({{ $voucher->id }})">
+                            @if($voucher->status === 'inactive')
+                            <!-- Icon Play/Activate -->
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M10.804 8 5 4.633v6.734L10.804 8zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692z"/>
+                            </svg>
+                            @else
+                            <!-- Icon X/Deactivate -->
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                               <path d="M7.29314 7.99965L3.14614 3.85366C3.09966 3.80717 3.06278 3.75198 3.03762 3.69124C3.01246 3.6305 2.99951 3.5654 2.99951 3.49966C2.99951 3.43391 3.01246 3.36881 3.03762 3.30807C3.06278 3.24733 3.09966 3.19214 3.14614 3.14565C3.19263 3.09917 3.24782 3.06229 3.30856 3.03713C3.3693 3.01197 3.4344 2.99902 3.50014 2.99902C3.56589 2.99902 3.63099 3.01197 3.69173 3.03713C3.75247 3.06229 3.80766 3.09917 3.85414 3.14565L8.00014 7.29265L12.1461 3.14565C12.24 3.05177 12.3674 2.99902 12.5001 2.99902C12.6329 2.99902 12.7603 3.05177 12.8541 3.14565C12.948 3.23954 13.0008 3.36688 13.0008 3.49966C13.0008 3.63243 12.948 3.75977 12.8541 3.85366L8.70714 7.99965L12.8541 12.1457C12.948 12.2395 13.0008 12.3669 13.0008 12.4997C13.0008 12.6324 12.948 12.7598 12.8541 12.8537C12.7603 12.9475 12.6329 13.0003 12.5001 13.0003C12.3674 13.0003 12.24 12.9475 12.1461 12.8537L8.00014 8.70665L3.85414 12.8537C3.76026 12.9475 3.63292 13.0003 3.50014 13.0003C3.36737 13.0003 3.24003 12.9475 3.14614 12.8537C3.05226 12.7598 2.99951 12.6324 2.99951 12.4997C2.99951 12.3669 3.05226 12.2395 3.14614 12.1457L7.29314 7.99965Z" fill="currentColor"/>
                             </svg>
+                            @endif
                           </button>
                           <button class="action-btn btn-delete rounded-circle bg-light p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Hapus" onclick="confirmDelete({{ $voucher->id }})">
                             <svg width="33" height="33" viewBox="0 0 33 33" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -316,10 +326,20 @@
                               <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
                             </svg>
                           </a>
-                          <button class="action-btn btn-deactivate rounded-circle bg-light p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Nonaktifkan" onclick="confirmDeactivate({{ $productPromotion->id }})">
+                          <button class="action-btn btn-deactivate rounded-circle bg-light p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" 
+                            title="{{ $productPromotion->status === 'inactive' ? 'Aktifkan' : 'Nonaktifkan' }}" 
+                            onclick="confirmToggleStatus({{ $productPromotion->id }})">
+                            @if($productPromotion->status === 'inactive')
+                            <!-- Icon Play/Activate -->
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M10.804 8 5 4.633v6.734L10.804 8zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692z"/>
+                            </svg>
+                            @else
+                            <!-- Icon X/Deactivate -->
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                               <path d="M7.29314 7.99965L3.14614 3.85366C3.09966 3.80717 3.06278 3.75198 3.03762 3.69124C3.01246 3.6305 2.99951 3.5654 2.99951 3.49966C2.99951 3.43391 3.01246 3.36881 3.03762 3.30807C3.06278 3.24733 3.09966 3.19214 3.14614 3.14565C3.19263 3.09917 3.24782 3.06229 3.30856 3.03713C3.3693 3.01197 3.4344 2.99902 3.50014 2.99902C3.56589 2.99902 3.63099 3.01197 3.69173 3.03713C3.75247 3.06229 3.80766 3.09917 3.85414 3.14565L8.00014 7.29265L12.1461 3.14565C12.24 3.05177 12.3674 2.99902 12.5001 2.99902C12.6329 2.99902 12.7603 3.05177 12.8541 3.14565C12.948 3.23954 13.0008 3.36688 13.0008 3.49966C13.0008 3.63243 12.948 3.75977 12.8541 3.85366L8.70714 7.99965L12.8541 12.1457C12.948 12.2395 13.0008 12.3669 13.0008 12.4997C13.0008 12.6324 12.948 12.7598 12.8541 12.8537C12.7603 12.9475 12.6329 13.0003 12.5001 13.0003C12.3674 13.0003 12.24 12.9475 12.1461 12.8537L8.00014 8.70665L3.85414 12.8537C3.76026 12.9475 3.63292 13.0003 3.50014 13.0003C3.36737 13.0003 3.24003 12.9475 3.14614 12.8537C3.05226 12.7598 2.99951 12.6324 2.99951 12.4997C2.99951 12.3669 3.05226 12.2395 3.14614 12.1457L7.29314 7.99965Z" fill="currentColor"/>
                             </svg>
+                            @endif
                           </button>
                           <button class="action-btn btn-delete rounded-circle bg-light p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Hapus" onclick="confirmDelete({{ $productPromotion->id }})">
                             <svg width="33" height="33" viewBox="0 0 33 33" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -378,10 +398,20 @@
                               <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
                             </svg>
                           </a>
-                          <button class="action-btn btn-deactivate rounded-circle bg-light p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Nonaktifkan" onclick="confirmDeactivate({{ $productPromotion->id }})">
+                          <button class="action-btn btn-deactivate rounded-circle bg-light p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" 
+                            title="{{ $productPromotion->status === 'inactive' ? 'Aktifkan' : 'Nonaktifkan' }}" 
+                            onclick="confirmToggleStatus({{ $productPromotion->id }})">
+                            @if($productPromotion->status === 'inactive')
+                            <!-- Icon Play/Activate -->
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M10.804 8 5 4.633v6.734L10.804 8zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692z"/>
+                            </svg>
+                            @else
+                            <!-- Icon X/Deactivate -->
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                               <path d="M7.29314 7.99965L3.14614 3.85366C3.09966 3.80717 3.06278 3.75198 3.03762 3.69124C3.01246 3.6305 2.99951 3.5654 2.99951 3.49966C2.99951 3.43391 3.01246 3.36881 3.03762 3.30807C3.06278 3.24733 3.09966 3.19214 3.14614 3.14565C3.19263 3.09917 3.24782 3.06229 3.30856 3.03713C3.3693 3.01197 3.4344 2.99902 3.50014 2.99902C3.56589 2.99902 3.63099 3.01197 3.69173 3.03713C3.75247 3.06229 3.80766 3.09917 3.85414 3.14565L8.00014 7.29265L12.1461 3.14565C12.24 3.05177 12.3674 2.99902 12.5001 2.99902C12.6329 2.99902 12.7603 3.05177 12.8541 3.14565C12.948 3.23954 13.0008 3.36688 13.0008 3.49966C13.0008 3.63243 12.948 3.75977 12.8541 3.85366L8.70714 7.99965L12.8541 12.1457C12.948 12.2395 13.0008 12.3669 13.0008 12.4997C13.0008 12.6324 12.948 12.7598 12.8541 12.8537C12.7603 12.9475 12.6329 13.0003 12.5001 13.0003C12.3674 13.0003 12.24 12.9475 12.1461 12.8537L8.00014 8.70665L3.85414 12.8537C3.76026 12.9475 3.63292 13.0003 3.50014 13.0003C3.36737 13.0003 3.24003 12.9475 3.14614 12.8537C3.05226 12.7598 2.99951 12.6324 2.99951 12.4997C2.99951 12.3669 3.05226 12.2395 3.14614 12.1457L7.29314 7.99965Z" fill="currentColor"/>
                             </svg>
+                            @endif
                           </button>
                           <button class="action-btn btn-delete rounded-circle bg-light p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Hapus" onclick="confirmDelete({{ $productPromotion->id }})">
                             <svg width="33" height="33" viewBox="0 0 33 33" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -444,10 +474,20 @@
                               <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
                             </svg>
                           </a>
-                          <button class="action-btn btn-deactivate rounded-circle bg-light p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Nonaktifkan" onclick="confirmDeactivate({{ $voucher->id }})">
+                          <button class="action-btn btn-deactivate rounded-circle bg-light p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" 
+                            title="{{ $voucher->status === 'inactive' ? 'Aktifkan' : 'Nonaktifkan' }}" 
+                            onclick="confirmToggleStatus({{ $voucher->id }})">
+                            @if($voucher->status === 'inactive')
+                            <!-- Icon Play/Activate -->
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M10.804 8 5 4.633v6.734L10.804 8zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692z"/>
+                            </svg>
+                            @else
+                            <!-- Icon X/Deactivate -->
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                               <path d="M7.29314 7.99965L3.14614 3.85366C3.09966 3.80717 3.06278 3.75198 3.03762 3.69124C3.01246 3.6305 2.99951 3.5654 2.99951 3.49966C2.99951 3.43391 3.01246 3.36881 3.03762 3.30807C3.06278 3.24733 3.09966 3.19214 3.14614 3.14565C3.19263 3.09917 3.24782 3.06229 3.30856 3.03713C3.3693 3.01197 3.4344 2.99902 3.50014 2.99902C3.56589 2.99902 3.63099 3.01197 3.69173 3.03713C3.75247 3.06229 3.80766 3.09917 3.85414 3.14565L8.00014 7.29265L12.1461 3.14565C12.24 3.05177 12.3674 2.99902 12.5001 2.99902C12.6329 2.99902 12.7603 3.05177 12.8541 3.14565C12.948 3.23954 13.0008 3.36688 13.0008 3.49966C13.0008 3.63243 12.948 3.75977 12.8541 3.85366L8.70714 7.99965L12.8541 12.1457C12.948 12.2395 13.0008 12.3669 13.0008 12.4997C13.0008 12.6324 12.948 12.7598 12.8541 12.8537C12.7603 12.9475 12.6329 13.0003 12.5001 13.0003C12.3674 13.0003 12.24 12.9475 12.1461 12.8537L8.00014 8.70665L3.85414 12.8537C3.76026 12.9475 3.63292 13.0003 3.50014 13.0003C3.36737 13.0003 3.24003 12.9475 3.14614 12.8537C3.05226 12.7598 2.99951 12.6324 2.99951 12.4997C2.99951 12.3669 3.05226 12.2395 3.14614 12.1457L7.29314 7.99965Z" fill="currentColor"/>
                             </svg>
+                            @endif
                           </button>
                           <button class="action-btn btn-delete rounded-circle bg-light p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Hapus" onclick="confirmDelete({{ $voucher->id }})">
                             <svg width="33" height="33" viewBox="0 0 33 33" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -556,7 +596,7 @@
       } else {
         setActiveTab('all'); // Default ke 'Semua Promosi'
       }
-      
+
       // Tambahkan event listener ke semua tombol tab
       tabButtons.forEach(button => {
         button.addEventListener('click', function() {
@@ -564,57 +604,109 @@
           setActiveTab(tabId);
         });
       });
-      
-      // Fungsi konfirmasi untuk menonaktifkan promosi
-      function confirmDeactivate(promosiId) {
-        if (confirm('Apakah Anda yakin ingin menonaktifkan promosi ini?')) {
-          // Kirim permintaan ke endpoint nonaktifkan
-          fetch(`/penjual/promosi/${promosiId}/nonaktifkan`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-          })
-          .then(response => {
-            if (response.ok) {
-              window.location.reload();
-            } else {
-              alert('Gagal menonaktifkan promosi. Silakan coba lagi.');
-            }
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            alert('Terjadi kesalahan. Silakan coba lagi.');
-          });
-        }
-      }
-      
-      // Fungsi konfirmasi untuk menghapus promosi
-      function confirmDelete(promosiId) {
-        if (confirm('Apakah Anda yakin ingin menghapus promosi ini secara permanen? Data yang dihapus tidak dapat dikembalikan.')) {
-          // Kirim permintaan ke endpoint delete
-          fetch(`/penjual/promosi/${promosiId}`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-          })
-          .then(response => {
-            if (response.ok) {
-              window.location.reload();
-            } else {
-              alert('Gagal menghapus promosi. Silakan coba lagi.');
-            }
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            alert('Terjadi kesalahan. Silakan coba lagi.');
-          });
-        }
-      }
     });
+
+    // Fungsi konfirmasi untuk menonaktifkan promosi - GLOBAL SCOPE
+    window.confirmDeactivate = function(promosiId) {
+      if (confirm('Apakah Anda yakin ingin menonaktifkan promosi ini?')) {
+        fetch(`/penjual/promosi/${promosiId}/nonaktifkan`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json'
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+            return response.json().then(err => { throw err; });
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.success || data.message) {
+            window.location.reload();
+          } else if (data.error) {
+            alert('Error: ' + data.error);
+          } else {
+            alert('Gagal menonaktifkan promosi. Silakan coba lagi.');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          // If we get an HTML response (redirect), reload anyway
+          window.location.reload();
+        });
+      }
+    };
+
+    // Fungsi konfirmasi untuk toggle status promosi (Aktif/Nonaktif) - GLOBAL SCOPE
+    window.confirmToggleStatus = function(promosiId) {
+      const action = confirm('Klik OK untuk menonaktifkan promosi ini, atau Cancel untuk membatalkan.');
+      if (action) {
+        fetch(`/penjual/promosi/${promosiId}/nonaktifkan`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json'
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+            return response.json().then(err => { throw err; });
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.success || data.message) {
+            window.location.reload();
+          } else if (data.error) {
+            alert('Error: ' + data.error);
+          } else {
+            alert('Gagal mengubah status promosi. Silakan coba lagi.');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          window.location.reload();
+        });
+      }
+    };
+
+    // Fungsi konfirmasi untuk menghapus promosi - GLOBAL SCOPE
+    window.confirmDelete = function(promosiId) {
+      if (confirm('Apakah Anda yakin ingin menghapus promosi ini secara permanen? Data yang dihapus tidak dapat dikembalikan.')) {
+        fetch(`/penjual/promosi/${promosiId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json'
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+            return response.json().then(err => { throw err; });
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.success || data.message) {
+            window.location.reload();
+          } else if (data.error) {
+            alert('Error: ' + data.error);
+          } else {
+            alert('Gagal menghapus promosi. Silakan coba lagi.');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          // If we get an HTML response (redirect), reload anyway
+          window.location.reload();
+        });
+      }
+    };
   </script>
 </body>
 </html>

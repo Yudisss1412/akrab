@@ -72,11 +72,23 @@
                   </td>
                   <td class="price-col" data-label="Harga">
                     @php
-                      $basePrice = ($item['product'] ?? $item->product)->price;
-                      $variantPrice = ($item['product_variant'] ?? $item->productVariant ?? null) ? ($item['product_variant'] ?? $item->productVariant)->additional_price : 0;
-                      $totalPrice = $basePrice + $variantPrice;
+                      $hasDiscount = $item['has_discount'] ?? false;
+                      $originalPrice = $item['original_price'] ?? (($item['product'] ?? $item->product)->price + (($item['product_variant'] ?? $item->productVariant ?? null) ? ($item['product_variant'] ?? $item->productVariant)->additional_price : 0));
+                      $discountedPrice = $item['discounted_price'] ?? $originalPrice;
                     @endphp
-                    Rp {{ number_format($totalPrice, 0, ',', '.') }}
+                    
+                    @if($hasDiscount)
+                      <div style="display: flex; flex-direction: column; gap: 4px;">
+                        <span style="text-decoration: line-through; color: #999; font-size: 0.85em;">
+                          Rp {{ number_format($originalPrice, 0, ',', '.') }}
+                        </span>
+                        <span style="color: #dc3545; font-weight: 600;">
+                          Rp {{ number_format($discountedPrice, 0, ',', '.') }}
+                        </span>
+                      </div>
+                    @else
+                      Rp {{ number_format($originalPrice, 0, ',', '.') }}
+                    @endif
                   </td>
                   <td class="qty-col" data-label="Jumlah">
                     <div class="qty-controls">
@@ -85,7 +97,13 @@
                       <button class="qty-btn plus" data-item-id="{{ $item['id'] ?? $item->id }}">+</button>
                     </div>
                   </td>
-                  <td class="subtotal-col" data-label="Subtotal">Rp {{ number_format($totalPrice * ($item['quantity'] ?? $item->quantity), 0, ',', '.') }}</td>
+                  <td class="subtotal-col" data-label="Subtotal">
+                    @php
+                      $originalPrice = $item['original_price'] ?? (($item['product'] ?? $item->product)->price + (($item['product_variant'] ?? $item->productVariant ?? null) ? ($item['product_variant'] ?? $item->productVariant)->additional_price : 0));
+                      $subtotalPrice = $originalPrice * ($item['quantity'] ?? $item->quantity);
+                    @endphp
+                    Rp {{ number_format($subtotalPrice, 0, ',', '.') }}
+                  </td>
                 </tr>
                 @empty
                 <tr>
@@ -119,7 +137,24 @@
                   <div class="product-variant">Varian: {{ ($item['product_variant'] ?? $item->productVariant)->name }}</div>
                   @endif
                   <div class="product-item-price">
-                    Harga Satuan: Rp {{ number_format((($item['product'] ?? $item->product)->price + (($item['product_variant'] ?? $item->productVariant ?? null) ? ($item['product_variant'] ?? $item->productVariant)->additional_price : 0)), 0, ',', '.') }}
+                    @php
+                      $hasDiscount = $item['has_discount'] ?? false;
+                      $originalPrice = $item['original_price'] ?? (($item['product'] ?? $item->product)->price + (($item['product_variant'] ?? $item->productVariant ?? null) ? ($item['product_variant'] ?? $item->productVariant)->additional_price : 0));
+                      $discountedPrice = $item['discounted_price'] ?? $originalPrice;
+                    @endphp
+                    
+                    @if($hasDiscount)
+                      <div style="display: flex; flex-direction: column; gap: 4px;">
+                        <span style="text-decoration: line-through; color: #999; font-size: 0.85em;">
+                          Rp {{ number_format($originalPrice, 0, ',', '.') }}
+                        </span>
+                        <span style="color: #dc3545; font-weight: 600;">
+                          Rp {{ number_format($discountedPrice, 0, ',', '.') }}
+                        </span>
+                      </div>
+                    @else
+                      Rp {{ number_format($originalPrice, 0, ',', '.') }}
+                    @endif
                   </div>
                   <div class="product-item-qty">
                     <div class="qty-controls">
@@ -129,7 +164,11 @@
                     </div>
                   </div>
                   <div class="product-item-subtotal">
-                    Subtotal: Rp {{ number_format((($item['product'] ?? $item->product)->price + (($item['product_variant'] ?? $item->productVariant ?? null) ? ($item['product_variant'] ?? $item->productVariant)->additional_price : 0)) * ($item['quantity'] ?? $item->quantity), 0, ',', '.') }}
+                    @php
+                      $originalPrice = $item['original_price'] ?? (($item['product'] ?? $item->product)->price + (($item['product_variant'] ?? $item->productVariant ?? null) ? ($item['product_variant'] ?? $item->productVariant)->additional_price : 0));
+                      $subtotalPrice = $originalPrice * ($item['quantity'] ?? $item->quantity);
+                    @endphp
+                    Subtotal: Rp {{ number_format($subtotalPrice, 0, ',', '.') }}
                   </div>
                 </div>
               </div>
@@ -150,12 +189,12 @@
             <div class="summary-details-container">
               <div class="summary-details">
                 <div class="summary-row">
-                  <span>Subtotal (<span id="subtotal-count">{{ $cartItems->count() }}</span> produk)</span>
-                  <span id="cart-subtotal">Rp {{ number_format($cartSubtotal, 0, ',', '.') }}</span>
+                  <span>Subtotal (<span id="subtotal-count">{{ $totalItems ?? $cartItems->count() }}</span> produk)</span>
+                  <span id="cart-subtotal">Rp {{ number_format($cartSubtotal ?? 0, 0, ',', '.') }}</span>
                 </div>
-                <div class="summary-row">
-                  <span>Diskon</span>
-                  <span>- Rp {{ number_format($discount, 0, ',', '.') }}</span>
+                <div class="summary-row discount-row">
+                  <span><i class="bi bi-tag-fill" style="color: #28a745;"></i> Diskon</span>
+                  <span style="color: #28a745; font-weight: 600;">- Rp {{ number_format($totalDiscount ?? 0, 0, ',', '.') }}</span>
                 </div>
                 <div class="summary-row">
                   <span>Total Berat</span>
@@ -165,7 +204,7 @@
 
               <div class="summary-total">
                 <span>Total</span>
-                <span id="cartTotal">Rp {{ number_format($cartTotal, 0, ',', '.') }}</span>
+                <span id="cartTotal">Rp {{ number_format($cartTotal ?? 0, 0, ',', '.') }}</span>
               </div>
             </div>
 
@@ -178,7 +217,7 @@
 
       <!-- Sticky Checkout Bar for Mobile -->
       <div class="sticky-checkout-bar">
-        <div class="checkout-total">Total: Rp <span id="mobile-cartTotal">{{ number_format($cartTotal, 0, ',', '.') }}</span></div>
+        <div class="checkout-total">Total: Rp <span id="mobile-cartTotal">{{ number_format($cartTotal ?? 0, 0, ',', '.') }}</span></div>
         <a href="{{ route('checkout') }}" class="checkout-btn-mobile">
           Checkout
         </a>

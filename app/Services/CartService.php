@@ -29,7 +29,8 @@ class CartService
     {
         if (Auth::check()) {
             // Jika pengguna login, ambil dari database dan kembalikan dalam format konsisten
-            $cartItems = Carts::with(['product', 'productVariant'])
+            // Eager load productPromotions.promotion untuk discount calculation
+            $cartItems = Carts::with(['product.productPromotions.promotion', 'productVariant'])
                 ->where('user_id', Auth::id())
                 ->get();
 
@@ -37,6 +38,9 @@ class CartService
             return $cartItems->map(function ($item) {
                 $product = $item->product; // Relasi product sudah dimuat dengan with()
                 $productVariant = $item->productVariant; // Relasi productVariant
+                
+                // Get discounted price
+                $priceInfo = $this->getPriceWithDiscount($product);
 
                 return [
                     'id' => $item->id,
@@ -45,7 +49,11 @@ class CartService
                     'quantity' => $item->quantity,
                     'product' => $product,
                     'product_variant' => $productVariant,
-                    'subtotal' => ($product->price + ($productVariant ? $productVariant->additional_price : 0)) * $item->quantity
+                    'original_price' => $priceInfo['original_price'],
+                    'discounted_price' => $priceInfo['discounted_price'],
+                    'discount_amount' => $priceInfo['discount_amount'],
+                    'subtotal' => $priceInfo['discounted_price'] * $item->quantity,
+                    'has_discount' => $priceInfo['has_discount']
                 ];
             });
         } else {
@@ -62,6 +70,14 @@ class CartService
                     $productVariant = ProductVariant::find($item['product_variant_id']);
                 }
 
+                // Get discounted price
+                $priceInfo = $product ? $this->getPriceWithDiscount($product) : [
+                    'original_price' => 0,
+                    'discounted_price' => 0,
+                    'discount_amount' => 0,
+                    'has_discount' => false
+                ];
+
                 // Tambahkan ID array index sebagai referensi untuk session
                 $processedItem = [
                     'id' => $index, // Ini akan digunakan sebagai referensi untuk update/remove
@@ -70,7 +86,11 @@ class CartService
                     'quantity' => $item['quantity'],
                     'product' => $product,
                     'product_variant' => $productVariant,
-                    'subtotal' => (($product ? $product->price : 0) + ($productVariant ? $productVariant->additional_price : 0)) * $item['quantity']
+                    'original_price' => $priceInfo['original_price'],
+                    'discounted_price' => $priceInfo['discounted_price'],
+                    'discount_amount' => $priceInfo['discount_amount'],
+                    'subtotal' => $priceInfo['discounted_price'] * $item['quantity'],
+                    'has_discount' => $priceInfo['has_discount']
                 ];
 
                 $indexedCartItems->push($processedItem);
@@ -78,6 +98,91 @@ class CartService
 
             return $indexedCartItems;
         }
+    }
+
+    /**
+     * Menghitung harga produk dengan diskon dari product_promotions
+     *
+     * @param Product|null $product
+     * @return array ['original_price', 'discounted_price', 'discount_amount', 'has_discount']
+     */
+    protected function getPriceWithDiscount($product)
+    {
+        if (!$product) {
+            return [
+                'original_price' => 0,
+                'discounted_price' => 0,
+                'discount_amount' => 0,
+                'has_discount' => false
+            ];
+        }
+
+        $originalPrice = $product->price;
+        $discountedPrice = $originalPrice;
+        $discountAmount = 0;
+        $hasDiscount = false;
+
+        // Check for active product promotion with eager loaded relations
+        $activePromotion = null;
+        
+        if ($product->relationLoaded('productPromotions')) {
+            // Use already loaded promotions
+            foreach ($product->productPromotions as $productPromotion) {
+                if ($productPromotion->status === 'active' && 
+                    $productPromotion->start_date <= now() && 
+                    ($productPromotion->end_date === null || $productPromotion->end_date >= now())) {
+                    $activePromotion = $productPromotion;
+                    break;
+                }
+            }
+        } else {
+            // Fallback to query if not loaded
+            $activePromotion = $product->productPromotions()
+                ->where('status', 'active')
+                ->where('start_date', '<=', now())
+                ->where(function($query) {
+                    $query->whereNull('end_date')
+                          ->orWhere('end_date', '>=', now());
+                })
+                ->first();
+        }
+
+        if ($activePromotion && $activePromotion->promotion) {
+            $promotion = $activePromotion->promotion;
+            $discountType = $promotion->type;
+            $discountValue = $promotion->discount_value;
+
+            if ($discountType === 'percentage') {
+                // Diskon persentase
+                $discountAmount = ($originalPrice * $discountValue) / 100;
+                $discountedPrice = $originalPrice - $discountAmount;
+                
+                // Apply max discount if exists
+                if ($promotion->max_discount_amount && $discountAmount > $promotion->max_discount_amount) {
+                    $discountAmount = $promotion->max_discount_amount;
+                    $discountedPrice = $originalPrice - $discountAmount;
+                }
+            } elseif ($discountType === 'fixed_amount') {
+                // Diskon nominal
+                $discountAmount = $discountValue;
+                $discountedPrice = $originalPrice - $discountValue;
+                
+                // Ensure price doesn't go below 0
+                if ($discountedPrice < 0) {
+                    $discountedPrice = 0;
+                    $discountAmount = $originalPrice;
+                }
+            }
+
+            $hasDiscount = true;
+        }
+
+        return [
+            'original_price' => $originalPrice,
+            'discounted_price' => max(0, $discountedPrice),
+            'discount_amount' => $discountAmount,
+            'has_discount' => $hasDiscount
+        ];
     }
 
     /**
@@ -245,7 +350,7 @@ class CartService
 
     /**
      * Menghitung total subtotal keranjang
-     * 
+     *
      * @return float
      */
     public function getSubtotal()
@@ -254,14 +359,10 @@ class CartService
         $subtotal = 0;
 
         foreach ($cartItems as $item) {
-            // Akses konsisten berdasarkan format yang dihasilkan getCartItems()
-            $product = $item['product'] ?? null;
-            $productVariant = $item['product_variant'] ?? null;
+            // Use discounted price from the item data
+            $discountedPrice = $item['discounted_price'] ?? 0;
             $quantity = $item['quantity'] ?? 0;
-
-            $basePrice = $product ? $product->price : 0;
-            $variantPrice = $productVariant ? $productVariant->additional_price : 0;
-            $subtotal += ($basePrice + $variantPrice) * $quantity;
+            $subtotal += $discountedPrice * $quantity;
         }
 
         return $subtotal;

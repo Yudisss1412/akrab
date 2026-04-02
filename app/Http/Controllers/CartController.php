@@ -100,10 +100,23 @@ class CartController extends Controller
         $cartItems = $this->cartService->getCartItems();
 
         // ========================================
-        // STEP 2: HITUNG SUBTOTAL
+        // STEP 2: HITUNG SUBTOTAL (harga SEBELUM diskon)
         // ========================================
         // Hitung subtotal untuk semua item (total harga sebelum diskon)
-        $cartSubtotal = $this->cartService->getSubtotal();
+        $totalBeforeDiscount = 0;
+        $totalDiscount = 0;
+        
+        foreach ($cartItems as $item) {
+            $originalPrice = $item['original_price'] ?? 0;
+            $discountedPrice = $item['discounted_price'] ?? 0;
+            $quantity = $item['quantity'] ?? 0;
+            
+            $totalBeforeDiscount += $originalPrice * $quantity;
+            $totalDiscount += ($originalPrice - $discountedPrice) * $quantity;
+        }
+        
+        // Subtotal = harga sebelum diskon
+        $cartSubtotal = $totalBeforeDiscount;
 
         // ========================================
         // STEP 3: HITUNG TOTAL BERAT
@@ -121,11 +134,10 @@ class CartController extends Controller
         }
 
         // ========================================
-        // STEP 4: HITUNG DISCOUNT & TOTAL AKHIR
+        // STEP 4: HITUNG TOTAL AKHIR
         // ========================================
-        // Nilai-nilai lain yang mungkin ditampilkan di keranjang
-        $discount = 0; // Placeholder untuk diskon (bisa dikembangkan untuk promo/voucher)
-        $cartTotal = $cartSubtotal - $discount; // Total akhir yang harus dibayar
+        // Total akhir = Subtotal - Diskon
+        $cartTotal = $cartSubtotal - $totalDiscount;
 
         // ========================================
         // STEP 5: HITUNG TOTAL ITEMS
@@ -138,7 +150,7 @@ class CartController extends Controller
         // STEP 6: RETURN VIEW DENGAN DATA
         // ========================================
         // Return view keranjang dengan semua data yang diperlukan
-        return view('customer.keranjang', compact('cartItems', 'cartSubtotal', 'discount', 'totalWeight', 'cartTotal', 'totalItems'));
+        return view('customer.keranjang', compact('cartItems', 'cartSubtotal', 'totalDiscount', 'totalWeight', 'cartTotal', 'totalItems'));
     }
 
     /**

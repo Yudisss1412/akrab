@@ -636,61 +636,89 @@ class PromotionController extends Controller
     }
     
     /**
-     * Nonaktifkan a promotion.
+     * Toggle status promosi (Aktif/Nonaktif).
      *
      * @param int $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
     public function nonaktifkan($id)
     {
         $seller = Seller::where('user_id', Auth::id())->first();
-        
+
         if (!$seller) {
-            \Log::error('Seller not found for user ID: ' . Auth::id() . ' when trying to deactivate promotion ID: ' . $id);
+            \Log::error('Seller not found for user ID: ' . Auth::id() . ' when trying to toggle promotion ID: ' . $id);
+            
+            // Return JSON for AJAX requests
+            if (request()->expectsJson()) {
+                return response()->json(['error' => 'Seller tidak ditemukan. Silakan cek profil penjual Anda.'], 404);
+            }
             return redirect()->back()->with('error', 'Seller tidak ditemukan. Silakan cek profil penjual Anda.');
         }
-        
+
         // Check if it's a general promotion (voucher)
         $promotion = Promotion::where('id', $id)
                             ->where('seller_id', $seller->id)
                             ->first();
-        
+
         if ($promotion) {
             // This is a voucher promotion
-            // Check if promotion can be deactivated (not expired)
+            // Check if promotion can be toggled (not expired)
             $now = Carbon::now();
             $endDate = Carbon::parse($promotion->end_date);
 
-            if ($endDate < $now && $promotion->status !== 'active' && $promotion->status !== 'inactive') {
-                return redirect()->route('penjual.promosi')->with('error', 'Promosi sudah berakhir dan tidak bisa dinonaktifkan.');
+            if ($endDate < $now && $promotion->status !== 'inactive') {
+                if (request()->expectsJson()) {
+                    return response()->json(['error' => 'Promosi sudah berakhir dan tidak bisa diubah statusnya.'], 400);
+                }
+                return redirect()->route('penjual.promosi')->with('error', 'Promosi sudah berakhir dan tidak bisa diubah statusnya.');
             }
 
-            $promotion->update(['status' => 'inactive']);
+            // Toggle status: active -> inactive, inactive -> active
+            $newStatus = $promotion->status === 'inactive' ? 'active' : 'inactive';
+            $actionMessage = $newStatus === 'active' ? 'Voucher berhasil diaktifkan.' : 'Voucher berhasil dinonaktifkan.';
+            
+            $promotion->update(['status' => $newStatus]);
 
-            return redirect()->route('penjual.promosi')->with('success', 'Voucher berhasil dinonaktifkan.');
+            if (request()->expectsJson()) {
+                return response()->json(['success' => $actionMessage]);
+            }
+            return redirect()->route('penjual.promosi')->with('success', $actionMessage);
         }
-        
+
         // If not found as a general promotion, try as a product promotion
         $productPromotion = ProductPromotion::where('id', $id)
                                           ->whereHas('product', function($query) use ($seller) {
                                               $query->where('seller_id', $seller->id);
                                           })
                                           ->first();
-        
+
         if ($productPromotion) {
-            // Check if product promotion can be deactivated (not expired)
+            // Check if product promotion can be toggled (not expired)
             $now = Carbon::now();
             $endDate = Carbon::parse($productPromotion->end_date);
 
-            if ($endDate < $now && $productPromotion->status !== 'active' && $productPromotion->status !== 'inactive') {
-                return redirect()->route('penjual.promosi')->with('error', 'Diskon produk sudah berakhir dan tidak bisa dinonaktifkan.');
+            if ($endDate < $now && $productPromotion->status !== 'inactive') {
+                if (request()->expectsJson()) {
+                    return response()->json(['error' => 'Diskon produk sudah berakhir dan tidak bisa diubah statusnya.'], 400);
+                }
+                return redirect()->route('penjual.promosi')->with('error', 'Diskon produk sudah berakhir dan tidak bisa diubah statusnya.');
             }
 
-            $productPromotion->update(['status' => 'inactive']);
+            // Toggle status: active -> inactive, inactive -> active
+            $newStatus = $productPromotion->status === 'inactive' ? 'active' : 'inactive';
+            $actionMessage = $newStatus === 'active' ? 'Diskon produk berhasil diaktifkan.' : 'Diskon produk berhasil dinonaktifkan.';
+            
+            $productPromotion->update(['status' => $newStatus]);
 
-            return redirect()->route('penjual.promosi')->with('success', 'Diskon produk berhasil dinonaktifkan.');
+            if (request()->expectsJson()) {
+                return response()->json(['success' => $actionMessage]);
+            }
+            return redirect()->route('penjual.promosi')->with('success', $actionMessage);
         }
-        
+
+        if (request()->expectsJson()) {
+            return response()->json(['error' => 'Promosi tidak ditemukan.'], 404);
+        }
         return redirect()->route('penjual.promosi')->with('error', 'Promosi tidak ditemukan.');
     }
     
@@ -698,42 +726,55 @@ class PromotionController extends Controller
      * Hapus a promotion permanently.
      *
      * @param int $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
     public function destroy($id)
     {
         $seller = Seller::where('user_id', Auth::id())->first();
-        
+
         if (!$seller) {
             \Log::error('Seller not found for user ID: ' . Auth::id() . ' when trying to delete promotion ID: ' . $id);
+            
+            if (request()->expectsJson()) {
+                return response()->json(['error' => 'Seller tidak ditemukan. Silakan cek profil penjual Anda.'], 404);
+            }
             return redirect()->back()->with('error', 'Seller tidak ditemukan. Silakan cek profil penjual Anda.');
         }
-        
+
         // Check if it's a general promotion (voucher)
         $promotion = Promotion::where('id', $id)
                             ->where('seller_id', $seller->id)
                             ->first();
-        
+
         if ($promotion) {
             // This is a voucher promotion
             $promotion->delete();
 
+            if (request()->expectsJson()) {
+                return response()->json(['success' => 'Voucher berhasil dihapus secara permanen.']);
+            }
             return redirect()->route('penjual.promosi')->with('success', 'Voucher berhasil dihapus secara permanen.');
         }
-        
+
         // If not found as a general promotion, try as a product promotion
         $productPromotion = ProductPromotion::where('id', $id)
                                           ->whereHas('product', function($query) use ($seller) {
                                               $query->where('seller_id', $seller->id);
                                           })
                                           ->first();
-        
+
         if ($productPromotion) {
             $productPromotion->delete();
 
+            if (request()->expectsJson()) {
+                return response()->json(['success' => 'Diskon produk berhasil dihapus secara permanen.']);
+            }
             return redirect()->route('penjual.promosi')->with('success', 'Diskon produk berhasil dihapus secara permanen.');
         }
-        
+
+        if (request()->expectsJson()) {
+            return response()->json(['error' => 'Promosi tidak ditemukan.'], 404);
+        }
         return redirect()->route('penjual.promosi')->with('error', 'Promosi tidak ditemukan.');
     }
 }

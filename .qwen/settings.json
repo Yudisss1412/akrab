@@ -11,7 +11,8 @@
       "Bash(type *)",
       "Bash(taskkill *)",
       "Bash(powershell *)",
-      "Bash(composer *)"
+      "Bash(composer *)",
+      "WebSearch"
     ]
   },
   "$version": 3

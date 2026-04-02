@@ -1,13 +1,13 @@
-@extends('layouts.app')
 
-@section('title', 'Buat Diskon Produk Baru')
 
-@section('header')
-  @include('components.penjual.header_compact')
-@endsection
+<?php $__env->startSection('title', 'Buat Diskon Produk Baru'); ?>
 
-@push('styles')
-  <link rel="stylesheet" href="{{ asset('css/penjual/manajemen-promosi.css') }}">
+<?php $__env->startSection('header'); ?>
+  <?php echo $__env->make('components.penjual.header_compact', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startPush('styles'); ?>
+  <link rel="stylesheet" href="<?php echo e(asset('css/penjual/manajemen-promosi.css')); ?>">
   <style>
     /* Styling tambahan untuk formulir diskon */
     .form-card {
@@ -139,42 +139,44 @@
       border-color: #545b62;
     }
   </style>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
   <main class="create-discount">
     <div class="container-fluid">
       <!-- Alert Messages -->
-      @if(session('success'))
+      <?php if(session('success')): ?>
       <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+        <i class="bi bi-check-circle-fill me-2"></i> <?php echo e(session('success')); ?>
+
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
-      @endif
+      <?php endif; ?>
 
-      @if(session('error'))
+      <?php if(session('error')): ?>
       <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> <?php echo e(session('error')); ?>
+
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
-      @endif
+      <?php endif; ?>
 
-      @if($errors->any())
+      <?php if($errors->any()): ?>
       <div class="alert alert-danger alert-dismissible fade show" role="alert">
         <i class="bi bi-exclamation-triangle-fill me-2"></i>
         <ul class="mb-0">
-          @foreach($errors->all() as $error)
-          <li>{{ $error }}</li>
-          @endforeach
+          <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+          <li><?php echo e($error); ?></li>
+          <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </ul>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
-      @endif
+      <?php endif; ?>
 
       <!-- Header Halaman -->
       <div class="page-header">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-          <a href="{{ route('penjual.promosi') }}" class="btn btn-outline-secondary">
+          <a href="<?php echo e(route('penjual.promosi')); ?>" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left"></i> Kembali
           </a>
           <h1 class="page-title mb-0">Buat Diskon Produk Baru</h1>
@@ -182,17 +184,31 @@
       </div>
 
       <!-- Formulir Diskon -->
-      <form id="createDiscountForm" action="{{ route('penjual.promosi.diskon.store') }}" method="POST">
-        @csrf
+      <form id="createDiscountForm" action="<?php echo e(route('penjual.promosi.diskon.store')); ?>" method="POST">
+        <?php echo csrf_field(); ?>
         <!-- Bagian Informasi Dasar -->
         <div class="form-card">
           <h5 class="card-title mb-3">Informasi Dasar</h5>
           <div class="form-group">
             <label for="discountName" class="form-label">Nama Promosi</label>
-            <input type="text" id="discountName" name="name" class="form-control @error('name') is-invalid @enderror" placeholder="Contoh: Diskon Akhir Tahun" value="{{ old('name') }}">
-            @error('name')
-            <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
+            <input type="text" id="discountName" name="name" class="form-control <?php $__errorArgs = ['name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" placeholder="Contoh: Diskon Akhir Tahun" value="<?php echo e(old('name')); ?>">
+            <?php $__errorArgs = ['name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+            <div class="invalid-feedback"><?php echo e($message); ?></div>
+            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
           </div>
         </div>
 
@@ -211,17 +227,38 @@
                 <label for="typeFixed">Potongan Harga Tetap (Rp)</label>
               </div>
             </div>
-            @error('type')
-            <div class="invalid-feedback d-block">{{ $message }}</div>
-            @enderror
+            <?php $__errorArgs = ['type'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+            <div class="invalid-feedback d-block"><?php echo e($message); ?></div>
+            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
           </div>
 
           <div class="form-group">
             <label for="discountValue" class="form-label">Besar Diskon</label>
-            <input type="number" id="discountValue" name="discount_value" class="form-control @error('discount_value') is-invalid @enderror" placeholder="Masukkan besar diskon" value="{{ old('discount_value') }}">
-            @error('discount_value')
-            <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
+            <input type="number" id="discountValue" name="discount_value" class="form-control <?php $__errorArgs = ['discount_value'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" placeholder="Masukkan besar diskon" value="<?php echo e(old('discount_value')); ?>">
+            <?php $__errorArgs = ['discount_value'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+            <div class="invalid-feedback"><?php echo e($message); ?></div>
+            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
           </div>
         </div>
 
@@ -238,9 +275,16 @@
             <div class="selected-products" id="selectedProductsContainer">
               <p class="text-muted mb-0">Belum ada produk yang dipilih</p>
             </div>
-            @error('product_ids')
-            <div class="invalid-feedback d-block">{{ $message }}</div>
-            @enderror
+            <?php $__errorArgs = ['product_ids'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+            <div class="invalid-feedback d-block"><?php echo e($message); ?></div>
+            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
           </div>
         </div>
 
@@ -251,19 +295,47 @@
             <div class="col-md-6">
               <div class="form-group">
                 <label for="startDate" class="form-label">Tanggal & Waktu Mulai</label>
-                <input type="datetime-local" id="startDate" name="start_date" class="form-control @error('start_date') is-invalid @enderror" value="{{ old('start_date') }}">
-                @error('start_date')
-                <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
+                <input type="datetime-local" id="startDate" name="start_date" class="form-control <?php $__errorArgs = ['start_date'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" value="<?php echo e(old('start_date')); ?>">
+                <?php $__errorArgs = ['start_date'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                <div class="invalid-feedback"><?php echo e($message); ?></div>
+                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-group">
                 <label for="endDate" class="form-label">Tanggal & Waktu Selesai</label>
-                <input type="datetime-local" id="endDate" name="end_date" class="form-control @error('end_date') is-invalid @enderror" value="{{ old('end_date') }}">
-                @error('end_date')
-                <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
+                <input type="datetime-local" id="endDate" name="end_date" class="form-control <?php $__errorArgs = ['end_date'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" value="<?php echo e(old('end_date')); ?>">
+                <?php $__errorArgs = ['end_date'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                <div class="invalid-feedback"><?php echo e($message); ?></div>
+                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
               </div>
             </div>
           </div>
@@ -272,7 +344,7 @@
         <!-- Bagian Tombol Aksi -->
         <div class="form-card">
           <div class="action-buttons">
-            <a href="{{ route('penjual.promosi') }}" class="btn btn-secondary">Batal</a>
+            <a href="<?php echo e(route('penjual.promosi')); ?>" class="btn btn-secondary">Batal</a>
             <button type="submit" class="btn btn-primary">Simpan Diskon</button>
           </div>
         </div>
@@ -281,13 +353,13 @@
 
     </div>
   </main>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Get real products from database
-      const products = @json($products);
+      const products = <?php echo json_encode($products, 15, 512) ?>;
 
       // Fungsi pencarian produk
       const productSearchInput = document.getElementById('productSearch');
@@ -434,4 +506,6 @@
       });
     });
   </script>
-@endpush
+<?php $__env->stopPush(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\ecommerce-akrab\resources\views/penjual/promosi/create_discount.blade.php ENDPATH**/ ?>

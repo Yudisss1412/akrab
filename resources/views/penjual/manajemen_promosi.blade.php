@@ -156,10 +156,37 @@
   
   <div class="main-layout pt-5 pb-5">
     <div class="content-wrapper">
+      <!-- Alert Messages -->
+      @if(session('success'))
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      @endif
+
+      @if(session('error'))
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      @endif
+
+      @if($errors->any())
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <ul class="mb-0">
+          @foreach($errors->all() as $error)
+          <li>{{ $error }}</li>
+          @endforeach
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      @endif
+
       <!-- Header Halaman -->
       <div class="page-header my-5 py-5 mb-5" style="margin-top: 2rem; margin-bottom: 3rem;">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-          <h1 class="page-title mb-0">Manajemen Promosi untuk {{ auth()->user()->name }}</h1>
+          <h1 class="page-title mb-0">Manajemen Promosi untuk {{ auth()->check() ? auth()->user()->name : 'Penjual' }}</h1>
           <button class="btn btn-primary" id="openPromotionModalBtn">
             <i class="bi bi-plus-lg"></i> Buat Promosi Baru
           </button>
@@ -269,20 +296,21 @@
                     <!-- Product Discount Promotions -->
                     @foreach($productDiscounts as $productPromotion)
                     <tr>
-                      <td>{{ $productPromotion->product->name }} - Diskon</td>
+                      <td>{{ $productPromotion->product ? $productPromotion->product->name . ' - Diskon' : 'Produk tidak ditemukan' }}</td>
                       <td>Diskon Produk</td>
-                      <td>{{ $productPromotion->product->name }}</td>
+                      <td>{{ $productPromotion->product ? $productPromotion->product->name : '-' }}</td>
                       <td>{{ \Carbon\Carbon::parse($productPromotion->start_date)->format('d M Y') }} - {{ \Carbon\Carbon::parse($productPromotion->end_date)->format('d M Y') }}</td>
                       <td>
-                        <span class="status-badge 
-                          @if($productPromotion->status === 'active') status-completed 
-                          @elseif($productPromotion->status === 'inactive') status-upcoming 
+                        <span class="status-badge
+                          @if($productPromotion->status === 'active') status-completed
+                          @elseif($productPromotion->status === 'inactive') status-upcoming
                           @else status-expired @endif">
                           {{ ucfirst($productPromotion->status) }}
                         </span>
                       </td>
                       <td>
                         <div class="action-buttons d-flex justify-content-end gap-2">
+                          @if($productPromotion->product)
                           <a href="{{ route('penjual.promosi.edit', ['id' => $productPromotion->id]) }}" class="action-btn btn-edit rounded-circle bg-light p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Edit">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
                               <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
@@ -298,6 +326,9 @@
                               <path d="M5.5 9.625H27.5M13.75 15.125V23.375M19.25 15.125V23.375M6.875 9.625L8.25 26.125C8.25 26.8543 8.53973 27.5538 9.05546 28.0695C9.57118 28.5853 10.2707 28.875 11 28.875H22C22.7293 28.875 23.4288 28.5853 23.9445 28.0695C24.4603 27.5538 24.75 26.8543 24.75 26.125L26.125 9.625M12.375 9.625V5.5C12.375 5.13533 12.5199 4.78559 12.7777 4.52773C13.0356 4.26987 13.3853 4.125 13.75 4.125H19.25C19.6147 4.125 19.9644 4.26987 20.2223 4.52773C20.4801 4.78559 20.625 5.13533 20.625 5.5V9.625" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                           </button>
+                          @else
+                          <span class="text-muted">Produk dihapus</span>
+                          @endif
                         </div>
                       </td>
                     </tr>

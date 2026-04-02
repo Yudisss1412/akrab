@@ -105,18 +105,16 @@ class PromotionController extends Controller
             // ========================================
             // STEP 4: QUERY VOUCHERS (NON-PRODUCT PROMOTIONS)
             // ========================================
-            // Get all promotions that are NOT associated with any product (pure vouchers) for this seller
-            // Subquery: Exclude promotions yang punya product_promotions
+            // Get all promotions that are vouchers (category = 'voucher') for this seller
             $vouchers = Promotion::where('seller_id', $seller->id)
-                               ->whereNotIn('id', function($query) {
-                                   $query->select('promotion_id')
-                                         ->from('product_promotions')
-                                         ->whereNotNull('promotion_id');
-                               })
+                               ->where('category', 'voucher')  // Only get vouchers
                                ->orderBy('created_at', 'desc')
                                ->get();
 
             \Log::info('Fetched ' . $vouchers->count() . ' vouchers for seller: ' . $seller->id);
+            foreach($vouchers as $v) {
+                \Log::info('Voucher ID: ' . $v->id . ', Name: ' . $v->name . ', Category: ' . $v->category . ', Type: ' . $v->type);
+            }
 
             // ========================================
             // STEP 5: QUERY PRODUCT DISCOUNTS
@@ -138,8 +136,11 @@ class PromotionController extends Controller
 
             // Log each product discount untuk debugging
             foreach($productDiscounts as $pd) {
-                \Log::info('Product discount ID: ' . $pd->id . ', Product ID: ' . $pd->product_id . ', Product: ' . ($pd->product ? $pd->product->name : 'NULL') . ', Promotion: ' . ($pd->promotion ? $pd->promotion->name : 'NULL'));
+                \Log::info('Product discount ID: ' . $pd->id . ', Product ID: ' . $pd->product_id . ', Product: ' . ($pd->product ? $pd->product->name : 'NULL') . ', Promotion: ' . ($pd->promotion ? $pd->promotion->name : 'NULL') . ', Promotion Category: ' . ($pd->promotion ? $pd->promotion->category : 'NULL') . ', Promotion Type: ' . ($pd->promotion ? $pd->promotion->type : 'NULL'));
             }
+            
+            // Debug: Log raw product promotion data
+            \Log::info('Raw product discounts data: ' . json_encode($productDiscounts->toArray()));
 
             // ========================================
             // STEP 6: CALCULATE STATUS STATISTICS
@@ -341,7 +342,7 @@ class PromotionController extends Controller
             'status' => Carbon::now()->between($request->start_date, $request->end_date) ? 'active' : 'inactive',
         ]);
 
-        \Log::info('Base promotion created successfully with ID: ' . $promotion->id);
+        \Log::info('Base promotion created successfully with ID: ' . $promotion->id . ', Category: ' . $promotion->category . ', Type: ' . $promotion->type);
 
         // ========================================
         // STEP 5: BUAT PRODUCT PROMOTION RECORDS

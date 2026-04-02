@@ -102,6 +102,33 @@
 @section('content')
   <main class="create-voucher">
     <div class="container-fluid">
+      <!-- Alert Messages -->
+      @if(session('success'))
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      @endif
+
+      @if(session('error'))
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      @endif
+
+      @if($errors->any())
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <ul class="mb-0">
+          @foreach($errors->all() as $error)
+          <li>{{ $error }}</li>
+          @endforeach
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      @endif
+
       <!-- Header Halaman -->
       <div class="page-header">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
@@ -111,7 +138,7 @@
           <h1 class="page-title mb-0">Buat Voucher Toko Baru</h1>
         </div>
       </div>
-      
+
       <!-- Formulir Voucher -->
       <form id="createVoucherForm" action="{{ route('penjual.promosi.voucher.store') }}" method="POST">
         @csrf
@@ -120,13 +147,19 @@
           <h5 class="card-title mb-3">Informasi Dasar</h5>
           <div class="form-group">
             <label for="voucherName" class="form-label">Nama Voucher</label>
-            <input type="text" id="voucherName" name="name" class="form-control" placeholder="Contoh: Voucher Hemat Akhir Tahun">
+            <input type="text" id="voucherName" name="name" class="form-control @error('name') is-invalid @enderror" placeholder="Contoh: Voucher Hemat Akhir Tahun" value="{{ old('name') }}">
+            @error('name')
+            <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
           </div>
-          
+
           <div class="form-group">
             <label for="voucherCode" class="form-label">Kode Voucher</label>
             <div class="input-group">
-              <input type="text" id="voucherCode" name="code" class="form-control" placeholder="Contoh: HEMAT2024">
+              <input type="text" id="voucherCode" name="code" class="form-control @error('code') is-invalid @enderror" placeholder="Contoh: HEMAT2024" value="{{ old('code') }}">
+              @error('code')
+              <div class="invalid-feedback">{{ $message }}</div>
+              @enderror
               <button type="button" class="btn btn-outline-secondary" id="generateCodeBtn">Buat Kode Acak</button>
             </div>
           </div>
@@ -143,37 +176,56 @@
                 <label for="typePercentage">Persentase (%)</label>
               </div>
               <div class="radio-option">
-                <input type="radio" id="typeFixed" name="type" value="fixed">
+                <input type="radio" id="typeFixed" name="type" value="fixed_amount">
                 <label for="typeFixed">Potongan Harga Tetap (Rp)</label>
               </div>
+              <div class="radio-option">
+                <input type="radio" id="typeFreeShipping" name="type" value="free_shipping">
+                <label for="typeFreeShipping">Gratis Ongkir</label>
+              </div>
             </div>
+            @error('type')
+            <div class="invalid-feedback d-block">{{ $message }}</div>
+            @enderror
           </div>
-          
+
           <div class="form-group">
             <label for="discountValue" class="form-label">Besar Diskon/Potongan</label>
-            <input type="number" id="discountValue" name="discount_value" class="form-control" placeholder="Masukkan besar diskon">
+            <input type="number" id="discountValue" name="discount_value" class="form-control @error('discount_value') is-invalid @enderror" placeholder="Masukkan besar diskon" value="{{ old('discount_value') }}">
+            @error('discount_value')
+            <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
           </div>
-          
+
           <div class="form-group max-discount-group" id="maxDiscountGroup">
             <label for="maxDiscount" class="form-label">Maksimum Potongan (Rp)</label>
-            <input type="number" id="maxDiscount" name="max_discount_amount" class="form-control" placeholder="Masukkan maksimum potongan">
+            <input type="number" id="maxDiscount" name="max_discount_amount" class="form-control @error('max_discount_amount') is-invalid @enderror" placeholder="Masukkan maksimum potongan" value="{{ old('max_discount_amount') }}">
+            @error('max_discount_amount')
+            <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
           </div>
         </div>
-        
+
         <!-- Bagian Syarat & Ketentuan -->
         <div class="form-card">
           <h5 class="card-title mb-3">Syarat & Ketentuan</h5>
           <div class="form-group">
             <label for="minPurchase" class="form-label">Minimum Pembelian (Rp)</label>
-            <input type="number" id="minPurchase" name="min_order_amount" class="form-control" placeholder="Rp 0">
+            <input type="number" id="minPurchase" name="min_order_amount" class="form-control @error('min_order_amount') is-invalid @enderror" placeholder="Rp 0" value="{{ old('min_order_amount') }}">
+            @error('min_order_amount')
+            <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
           </div>
-          
+
           <div class="form-group">
             <label for="quota" class="form-label">Kuota Penggunaan</label>
-            <input type="number" id="quota" name="usage_limit" class="form-control" placeholder="Jumlah total voucher yang tersedia">
+            <input type="number" id="quota" name="usage_limit" class="form-control @error('usage_limit') is-invalid @enderror" placeholder="Jumlah total voucher yang tersedia" value="{{ old('usage_limit') }}">
+            @error('usage_limit')
+            <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
           </div>
         </div>
-        
+
         <!-- Bagian Periode Berlaku -->
         <div class="form-card">
           <h5 class="card-title mb-3">Periode Berlaku</h5>
@@ -181,13 +233,19 @@
             <div class="col-md-6">
               <div class="form-group">
                 <label for="startDate" class="form-label">Tanggal & Waktu Mulai</label>
-                <input type="datetime-local" id="startDate" name="start_date" class="form-control">
+                <input type="datetime-local" id="startDate" name="start_date" class="form-control @error('start_date') is-invalid @enderror" value="{{ old('start_date') }}">
+                @error('start_date')
+                <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-group">
                 <label for="endDate" class="form-label">Tanggal & Waktu Selesai</label>
-                <input type="datetime-local" id="endDate" name="end_date" class="form-control">
+                <input type="datetime-local" id="endDate" name="end_date" class="form-control @error('end_date') is-invalid @enderror" value="{{ old('end_date') }}">
+                @error('end_date')
+                <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
               </div>
             </div>
           </div>

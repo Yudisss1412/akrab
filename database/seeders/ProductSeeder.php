@@ -839,10 +839,14 @@ class ProductSeeder extends Seeder
             $imagePath = $productData['image'] ?? null;
             unset($productData['image']); // Remove image from product data since it's no longer in the products table
 
-            $product = Product::create($productData);
+            // Use firstOrCreate to prevent duplicate entries on re-seed
+            $product = Product::firstOrCreate(
+                ['name' => $productData['name'], 'seller_id' => $seller->id],
+                $productData
+            );
 
             // Add image to product_images table if image path exists
-            if ($imagePath) {
+            if ($imagePath && $product->wasRecentlyCreated) {
                 $product->images()->create([
                     'image_path' => $imagePath,
                     'is_primary' => true,

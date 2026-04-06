@@ -15,6 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Trust Railway proxies for HTTPS
+        $middleware->trustProxies(at: '*');
+        
         $middleware->append(\App\Http\Middleware\MergeCartWithSession::class);
         $middleware->alias([
             'admin.role' => \App\Http\Middleware\CheckAdminRole::class,

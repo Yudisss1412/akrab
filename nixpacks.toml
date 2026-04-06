@@ -3,3 +3,6 @@ nixPkgs = ["php", "composer"]
 
 [phases.build]
 cmds = ["composer install --no-dev --optimize-autoloader"]
+
+[start]
+cmd = "frankenphp php-server -r public -l 0.0.0.0:$PORT"

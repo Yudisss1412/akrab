@@ -17,7 +17,6 @@ cmds = [
 [phases.start]
 cmds = [
   "php artisan migrate --force --verbose",
-  "php artisan db:seed --class=RoleSeeder --force",
-  "php artisan db:seed --class=UserSeeder --force",
+  "php artisan db:seed --force",
   "frankenphp php-server -r public -l 0.0.0.0:$PORT"
 ]

@@ -12,7 +12,10 @@
       "Bash(taskkill *)",
       "Bash(powershell *)",
       "Bash(composer *)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
     ]
   },
   "$version": 3

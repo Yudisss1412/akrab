@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["php", "composer", "mysql"]
+nixPkgs = ["php", "composer", "mysql-client"]
 
 [phases.install]
 cmds = [
@@ -16,6 +16,8 @@ cmds = [
 
 [phases.start]
 cmds = [
-  "php artisan migrate --force",
+  "php artisan migrate --force --verbose",
+  "php artisan db:seed --class=RoleSeeder --force",
+  "php artisan db:seed --class=UserSeeder --force",
   "frankenphp php-server -r public -l 0.0.0.0:$PORT"
 ]

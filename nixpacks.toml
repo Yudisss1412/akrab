@@ -1,8 +1,21 @@
 [phases.setup]
-nixPkgs = ["php", "composer"]
+nixPkgs = ["php", "composer", "mysql"]
+
+[phases.install]
+cmds = [
+  "composer install --no-dev --optimize-autoloader --no-interaction",
+  "php artisan package:discover --ansi"
+]
 
 [phases.build]
-cmds = ["composer install --no-dev --optimize-autoloader"]
+cmds = [
+  "php artisan config:clear",
+  "php artisan cache:clear",
+  "php artisan view:clear"
+]
 
-[start]
-cmd = "frankenphp php-server -r public -l 0.0.0.0:$PORT"
+[phases.start]
+cmds = [
+  "php artisan migrate --force",
+  "frankenphp php-server -r public -l 0.0.0.0:$PORT"
+]

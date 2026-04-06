@@ -27,6 +27,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Paksa URL asset jadi HTTPS di production (Railway)
+        if (config('app.env') === 'production') {
+            \URL::forceScheme('https');
+        }
+
         // Menambahkan ekstensi blade.view untuk file tampilan
         View::addExtension('blade.view', 'blade');
     }

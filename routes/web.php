@@ -131,13 +131,12 @@ Route::get('/welcome', function () {
     return view('customer.cust_welcome');
 })->name('welcome');
 
-Route::get('/login', function () {
-    return view('auth.login');
-})->name('view');
-
-Route::get('/register', function () {
-    return view('auth.register');
-})->name('register');
+// Authentication Routes (defined at bottom to avoid conflicts)
+Route::get('/login', [App\Http\Controllers\AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
+Route::get('/register', [App\Http\Controllers\AuthController::class, 'showRegisterForm'])->name('register');
+Route::post('/register', [App\Http\Controllers\AuthController::class, 'register']);
+Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout'])->name('logout');
 
 Route::get('/cust_welcome', [App\Http\Controllers\Customer\WelcomeController::class, 'index'])->name('cust.welcome');
 
@@ -797,13 +796,6 @@ Route::middleware(['auth', 'customer.role'])->group(function () {
     Route::get('/tickets/create', [App\Http\Controllers\TicketController::class, 'create'])->name('tickets.create');
     Route::post('/tickets', [App\Http\Controllers\TicketController::class, 'store'])->name('tickets.store');
 });
-
-// Authentication Routes
-Route::get('/login', [App\Http\Controllers\AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
-Route::get('/register', [App\Http\Controllers\AuthController::class, 'showRegisterForm'])->name('register');
-Route::post('/register', [App\Http\Controllers\AuthController::class, 'register']);
-Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout'])->name('logout');
 
 // Password Reset Routes
 Route::get('/password/reset', [App\Http\Controllers\ResetPasswordController::class, 'showLinkRequestForm'])->name('password.request');

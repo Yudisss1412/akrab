@@ -69,6 +69,9 @@ document.addEventListener('DOMContentLoaded', () => {
         submitButton.disabled = true;
 
         try {
+            // Get form action URL from the form element
+            const formAction = loginForm.getAttribute('action') || '/login';
+            
             // Prepare form data
             const formData = new FormData();
             formData.append('email', emailValue);
@@ -76,11 +79,13 @@ document.addEventListener('DOMContentLoaded', () => {
             formData.append('_token', document.querySelector('input[name="_token"]').value);
 
             // Make AJAX request to Laravel backend
-            const response = await fetch('/login', {
+            const response = await fetch(formAction, {
                 method: 'POST',
                 body: formData,
                 headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
                 }
             });
 

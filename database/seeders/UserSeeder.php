@@ -40,7 +40,10 @@ class UserSeeder extends Seeder
         ];
 
         foreach ($adminUsers as $adminUser) {
-            User::create($adminUser);
+            User::firstOrCreate(
+                ['email' => $adminUser['email']],
+                $adminUser
+            );
         }
 
         // Create Seller Users and link them to the Sellers table
@@ -135,13 +138,18 @@ class UserSeeder extends Seeder
         foreach ($sellerUsers as $sellerUser) {
             $userData = $sellerUser;
             unset($userData['seller_data']);
-            
-            $user = User::create($userData);
-            
+
+            $user = User::firstOrCreate(
+                ['email' => $userData['email']],
+                $userData
+            );
+
             // Create corresponding seller record
-            $sellerData = $sellerUser['seller_data'];
-            $sellerData['user_id'] = $user->id;
-            Seller::create($sellerData);
+            if ($user->wasRecentlyCreated) {
+                $sellerData = $sellerUser['seller_data'];
+                $sellerData['user_id'] = $user->id;
+                Seller::create($sellerData);
+            }
         }
 
         // Create Buyer Users (regular usersrudi@elektromurah.com without seller records)
@@ -184,7 +192,10 @@ class UserSeeder extends Seeder
         ];
 
         foreach ($buyerUsers as $buyerUser) {
-            User::create($buyerUser);
+            User::firstOrCreate(
+                ['email' => $buyerUser['email']],
+                $buyerUser
+            );
         }
     }
 }

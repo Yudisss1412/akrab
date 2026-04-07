@@ -832,17 +832,11 @@ Route::middleware(['auth', 'admin.role'])->group(function () {
 use Illuminate\Support\Facades\Artisan;
 
 Route::get('/reset-database-sekarang', function () {
-    // Only accessible in production with query parameter for security
-    if (request()->get('key') !== 'akrab2026') {
-        return response()->json(['error' => 'Unauthorized'], 403);
-    }
-    
     try {
         Artisan::call('migrate:fresh', [
-            '--seed' => true,
             '--force' => true
         ]);
-        return 'Mantap bos! Database Railway lu udah beres di-reset dan di-seed dari nol.';
+        return 'Database bersih bos!';
     } catch (\Exception $e) {
         return 'Gagal bos: ' . $e->getMessage();
     }

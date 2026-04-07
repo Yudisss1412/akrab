@@ -81,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Make AJAX request to Laravel backend
             const response = await fetch(formAction, {
                 method: 'POST',
+                credentials: 'same-origin',
                 body: formData,
                 headers: {
                     'Accept': 'application/json',

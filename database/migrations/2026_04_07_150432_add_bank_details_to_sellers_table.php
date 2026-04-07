@@ -12,9 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('sellers', function (Blueprint $table) {
-            $table->string('bank_name')->nullable();
-            $table->string('bank_account_number')->nullable();
-            $table->string('account_holder_name')->nullable();
+            // Cek dulu, kalau kolom BELUM ADA, baru dibikin.
+            // Kalau udah ada (dari hasil import SQL), ya lewatin aja.
+            if (!Schema::hasColumn('sellers', 'bank_name')) {
+                $table->string('bank_name')->nullable();
+            }
+            if (!Schema::hasColumn('sellers', 'bank_account_number')) {
+                $table->string('bank_account_number')->nullable();
+            }
+            if (!Schema::hasColumn('sellers', 'account_holder_name')) {
+                $table->string('account_holder_name')->nullable();
+            }
         });
     }
 

@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 use App\Models\Product;
 use App\Models\Seller;
 use App\Models\Category;
@@ -20,15 +21,20 @@ class ProductSeeder extends Seeder
     public function run(): void
     {
         // Ensure categories exist before creating products
-        $categories = Category::pluck('id', 'name')->toArray();
-        if (empty($categories)) {
-            $this->command->info('No categories found, calling CategorySubcategorySeeder...');
-            $this->call(CategorySubcategorySeeder::class);
-            $categories = Category::pluck('id', 'name')->toArray();
+        // Buat kategori utama secara langsung agar gak depend on CategorySeeder
+        $categoryNames = ['Kuliner', 'Fashion', 'Kerajinan Tangan', 'Produk Berkebun', 'Produk Kesehatan', 'Mainan', 'Hampers', 'Kulit'];
+        $categories = [];
+        
+        foreach ($categoryNames as $catName) {
+            $cat = Category::firstOrCreate(
+                ['name' => $catName],
+                ['slug' => Str::slug($catName)]
+            );
+            $categories[$cat->name] = $cat->id;
         }
         
         // Log categories for debugging
-        $this->command->info("Categories found: " . count($categories) . " - " . json_encode(array_keys($categories)));
+        $this->command->info("Categories ready: " . count($categories) . " - " . json_encode(array_keys($categories)));
 
         // Ensure sellers exist before creating products
         $sellers = Seller::all();

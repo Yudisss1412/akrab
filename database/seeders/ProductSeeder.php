@@ -20,21 +20,20 @@ class ProductSeeder extends Seeder
      */
     public function run(): void
     {
-        // Ensure categories exist before creating products
-        // Buat kategori utama secara langsung agar gak depend on CategorySeeder
+        // --- MANUAL CATEGORY CREATION (Bulletproof Fix) ---
+        // Kita bikin kategori manual di sini biar gak depend on CategorySeeder yang mungkin gagal
         $categoryNames = ['Kuliner', 'Fashion', 'Kerajinan Tangan', 'Produk Berkebun', 'Produk Kesehatan', 'Mainan', 'Hampers', 'Kulit'];
         $categories = [];
         
         foreach ($categoryNames as $catName) {
-            $cat = Category::firstOrCreate(
-                ['name' => $catName],
-                ['slug' => Str::slug($catName)]
-            );
+            // firstOrCreate: Cek dulu, kalo belum ada baru insert.
+            // Cuma pake 'name' biar aman gak bentrok sama kolom lain
+            $cat = Category::firstOrCreate(['name' => $catName]);
             $categories[$cat->name] = $cat->id;
         }
         
-        // Log categories for debugging
-        $this->command->info("Categories ready: " . count($categories) . " - " . json_encode(array_keys($categories)));
+        $this->command->info("Categories loaded: " . count($categories));
+        // ----------------------------------------------------
 
         // Ensure sellers exist before creating products
         $sellers = Seller::all();

@@ -43,11 +43,6 @@ function createStarsHTML($rating) {
 @endpush
 
 @section('content')
-<script>
-    const auth = JSON.parse(localStorage.getItem('auth') || '{}');
-    if (!auth.role || auth.role !== 'buyer') window.location.href = '/login';
-</script>
-
 <main class="welcome-page">
     <section class="welcome-banner">
         <h2>Selamat datang, {{ auth()->user() ? auth()->user()->name : 'Pengunjung' }}!</h2>

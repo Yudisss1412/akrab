@@ -138,7 +138,7 @@ Route::get('/register', [App\Http\Controllers\AuthController::class, 'showRegist
 Route::post('/register', [App\Http\Controllers\AuthController::class, 'register']);
 Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout'])->name('logout');
 
-Route::get('/cust_welcome', [App\Http\Controllers\Customer\WelcomeController::class, 'index'])->name('cust.welcome');
+Route::get('/cust_welcome', [App\Http\Controllers\Customer\WelcomeController::class, 'index'])->name('cust.welcome')->middleware('auth');
 
 Route::get('/halaman_produk', [App\Http\Controllers\ProductController::class, 'index'])->name('halaman.produk');
 Route::get('/produk', [App\Http\Controllers\ProductController::class, 'getAllProducts'])->name('produk.api');

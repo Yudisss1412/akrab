@@ -21,14 +21,22 @@ class ProductSeeder extends Seeder
     public function run(): void
     {
         // --- MANUAL CATEGORY CREATION (Bulletproof Fix) ---
-        // Kita bikin kategori manual di sini biar gak depend on CategorySeeder yang mungkin gagal
+        // Kita ambil kategori yang udah ada dari CategorySubcategorySeeder
         $categoryNames = ['Kuliner', 'Fashion', 'Kerajinan Tangan', 'Produk Berkebun', 'Produk Kesehatan', 'Mainan', 'Hampers', 'Kulit'];
         $categories = [];
         
         foreach ($categoryNames as $catName) {
-            // firstOrCreate: Cek dulu, kalo belum ada baru insert.
-            // Cuma pake 'name' biar aman gak bentrok sama kolom lain
-            $cat = Category::firstOrCreate(['name' => $catName]);
+            // Cek dulu apakah kategori udah ada
+            $cat = Category::where('name', $catName)->first();
+            
+            if (!$cat) {
+                // Kalau belum ada, bikin baru dengan slug yang proper
+                $cat = Category::create([
+                    'name' => $catName,
+                    'slug' => \Illuminate\Support\Str::slug($catName)
+                ]);
+            }
+            
             $categories[$cat->name] = $cat->id;
         }
         

@@ -19,15 +19,14 @@ class DynamicReviewSeeder extends Seeder
         ProductReturn::truncate();
 
         // Buat atau ambil user penjual
-        $user = User::where('role_id', 3)->first(); // Misalnya role_id 3 adalah seller
-        if (!$user) {
-            $user = User::create([
+        $user = User::firstOrCreate(
+            ['email' => 'seller@test.com'],
+            [
                 'name' => 'Seller Test',
-                'email' => 'seller@test.com',
                 'password' => bcrypt('password'),
                 'role_id' => 3
-            ]);
-        }
+            ]
+        );
 
         // Buat atau ambil seller
         $seller = Seller::where('user_id', $user->id)->first();
@@ -62,12 +61,14 @@ class DynamicReviewSeeder extends Seeder
         // Buat user pelanggan (non-seller)
         $customerUsers = [];
         for ($i = 1; $i <= 10; $i++) {
-            $customerUsers[] = User::create([
-                'name' => "Customer $i",
-                'email' => "customer$i@test.com",
-                'password' => bcrypt('password'),
-                'role_id' => 2  // role customer
-            ]);
+            $customerUsers[] = User::firstOrCreate(
+                ['email' => "customer$i@test.com"],
+                [
+                    'name' => "Customer $i",
+                    'password' => bcrypt('password'),
+                    'role_id' => 2  // role customer
+                ]
+            );
         }
 
         // Buat ulasan dengan rating bervariasi (termasuk komplain rating 1-2)

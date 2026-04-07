@@ -22,10 +22,13 @@ class ProductSeeder extends Seeder
         // Ensure categories exist before creating products
         $categories = Category::pluck('id', 'name')->toArray();
         if (empty($categories)) {
-            $this->command->info('No categories found, calling CategorySeeder...');
-            $this->call(CategorySeeder::class);
+            $this->command->info('No categories found, calling CategorySubcategorySeeder...');
+            $this->call(CategorySubcategorySeeder::class);
             $categories = Category::pluck('id', 'name')->toArray();
         }
+        
+        // Log categories for debugging
+        $this->command->info("Categories found: " . count($categories) . " - " . json_encode(array_keys($categories)));
 
         // Ensure sellers exist before creating products
         $sellers = Seller::all();
@@ -830,7 +833,12 @@ class ProductSeeder extends Seeder
             $categoryName = $productData['category_name'];
             
             // Safely get category ID, fallback to first available category if not found
-            $categoryId = $categories[$categoryName] ?? (reset($categories) ?: null);
+            $categoryId = $categories[$categoryName] ?? null;
+            
+            if (!$categoryId && !empty($categories)) {
+                $categoryId = reset($categories);
+                $this->command->warn("Category '{$categoryName}' not found, using fallback: " . key($categories));
+            }
 
             if (!$categoryId) {
                 $this->command->error("Category '{$categoryName}' not found and no fallback available. Skipping product '{$productData['name']}'.");

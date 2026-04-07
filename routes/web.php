@@ -833,10 +833,10 @@ use Illuminate\Support\Facades\Artisan;
 
 Route::get('/reset-database-sekarang', function () {
     try {
-        Artisan::call('migrate:fresh', [
-            '--force' => true
-        ]);
-        return 'Database bersih bos!';
+        Artisan::call('config:clear');
+        Artisan::call('cache:clear');
+        Artisan::call('view:clear');
+        return 'Cache bersih bos! Route ini sekarang udah aman dari reset database.';
     } catch (\Exception $e) {
         return 'Gagal bos: ' . $e->getMessage();
     }

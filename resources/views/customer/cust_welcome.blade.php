@@ -45,7 +45,7 @@ function createStarsHTML($rating) {
 @section('content')
 <script>
     const auth = JSON.parse(localStorage.getItem('auth') || '{}');
-    if (!auth.role || auth.role !== 'buyer') window.location.href = '/cust_welcome';
+    if (!auth.role || auth.role !== 'buyer') window.location.href = '/login';
 </script>
 
 <main class="welcome-page">

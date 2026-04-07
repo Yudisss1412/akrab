@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('sellers', function (Blueprint $table) {
-            $table->string('bank_name')->nullable()->after('phone');
-            $table->string('bank_account_number')->nullable()->after('bank_name');
-            $table->string('account_holder_name')->nullable()->after('bank_account_number');
+            $table->string('bank_name')->nullable();
+            $table->string('bank_account_number')->nullable();
+            $table->string('account_holder_name')->nullable();
         });
     }
 

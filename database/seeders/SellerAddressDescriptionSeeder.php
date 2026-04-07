@@ -84,13 +84,6 @@ class SellerAddressDescriptionSeeder extends Seeder
                     ]);
                 }
 
-                // Update informasi bank untuk penjual
-                $seller->update([
-                    'bank_name' => $seller->bank_name ?: $banks[$index % count($banks)],
-                    'bank_account_number' => $seller->bank_account_number ?: '12345' . rand(1000, 9999),
-                    'account_holder_name' => $seller->account_holder_name ?: $seller->owner_name
-                ]);
-
                 echo "Berhasil mengisi data untuk toko: {$seller->store_name}\n";
             }
         }

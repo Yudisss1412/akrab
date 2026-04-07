@@ -44,6 +44,8 @@ class DynamicReviewSeeder extends Seeder
 
         // Buat produk untuk penjual
         $products = [];
+        $defaultCategoryId = \App\Models\Category::first()->id ?? 1;
+        
         for ($i = 1; $i <= 5; $i++) {
             $products[] = Product::create([
                 'name' => "Produk Test $i",
@@ -51,7 +53,7 @@ class DynamicReviewSeeder extends Seeder
                 'price' => 100000,
                 'stock' => 100,
                 'weight' => 1.0,
-                'category_id' => 1,
+                'category_id' => $defaultCategoryId,
                 'seller_id' => $seller->id,
                 'status' => 'active'
             ]);

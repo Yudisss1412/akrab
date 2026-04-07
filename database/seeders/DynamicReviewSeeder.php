@@ -7,7 +7,7 @@ use App\Models\User;
 use App\Models\Seller;
 use App\Models\Product;
 use App\Models\Review;
-use App\Models\Models\ProductReturn; // Sesuaikan dengan model yang benar
+use App\Models\ProductReturn;
 use Illuminate\Support\Facades\DB;
 
 class DynamicReviewSeeder extends Seeder

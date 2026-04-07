@@ -82,7 +82,11 @@ class SellerReviewSeeder extends Seeder
         }
 
         foreach ($reviews as $review) {
-            Review::create($review);
+            Review::firstOrCreate([
+                'user_id' => $review['user_id'],
+                'product_id' => $review['product_id'],
+                'order_id' => $review['order_id'],
+            ], $review);
         }
 
         $this->command->info('Berhasil membuat ' . count($reviews) . ' review dummy untuk produk penjual.');

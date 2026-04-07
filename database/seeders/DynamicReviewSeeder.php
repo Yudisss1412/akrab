@@ -84,17 +84,21 @@ class DynamicReviewSeeder extends Seeder
                 4 => 'Bagus, cukup memuaskan.',
                 5 => 'Sangat bagus! Kualitasnya mantap.'
             ];
-            
-            Review::create([
-                'user_id' => $user->id,
-                'product_id' => $product->id,
-                'order_id' => rand(1, 10), // Asumsi ada order
-                'rating' => $rating,
-                'review_text' => $comments[$rating],
-                'status' => 'approved',
-                'reply' => ($rating <= 2) ? 'Terima kasih atas masukannya, kami akan perbaiki kualitasnya.' : null,
-                'replied_at' => ($rating <= 2) ? now()->subDays(rand(1, 5)) : null
-            ]);
+
+            try {
+                Review::create([
+                    'user_id' => $user->id,
+                    'product_id' => $product->id,
+                    'order_id' => rand(1, 10), // Asumsi ada order
+                    'rating' => $rating,
+                    'review_text' => $comments[$rating],
+                    'status' => 'approved',
+                    'reply' => ($rating <= 2) ? 'Terima kasih atas masukannya, kami akan perbaiki kualitasnya.' : null,
+                    'replied_at' => ($rating <= 2) ? now()->subDays(rand(1, 5)) : null
+                ]);
+            } catch (\Exception $e) {
+                // Skip jika review sudah ada (duplicate entry)
+            }
         }
 
         // Buat permintaan retur
@@ -105,16 +109,20 @@ class DynamicReviewSeeder extends Seeder
             $statuses = ['pending', 'approved', 'rejected', 'completed'];
             $status = $statuses[array_rand($statuses)];
             
-            ProductReturn::create([
-                'user_id' => $user->id,
-                'order_item_id' => rand(1, 20), // Asumsi ada order items
-                'reason' => 'Produk cacat/rusak',
-                'description' => 'Barang yang saya terima dalam keadaan rusak.',
-                'status' => $status,
-                'requested_at' => now()->subDays(rand(1, 30)),
-                'processed_at' => in_array($status, ['approved', 'rejected', 'completed']) ? now()->subDays(rand(1, 10)) : null,
-                'refund_amount' => rand(50000, 200000)
-            ]);
+            try {
+                ProductReturn::create([
+                    'user_id' => $user->id,
+                    'order_item_id' => rand(1, 20), // Asumsi ada order items
+                    'reason' => 'Produk cacat/rusak',
+                    'description' => 'Barang yang saya terima dalam keadaan rusak.',
+                    'status' => $status,
+                    'requested_at' => now()->subDays(rand(1, 30)),
+                    'processed_at' => in_array($status, ['approved', 'rejected', 'completed']) ? now()->subDays(rand(1, 10)) : null,
+                    'refund_amount' => rand(50000, 200000)
+                ]);
+            } catch (\Exception $e) {
+                // Skip jika gagal (misal foreign key constraint)
+            }
         }
 
         $this->command->info('Berhasil membuat data dummy untuk testing ulasan dan retur');

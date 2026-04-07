@@ -99,8 +99,9 @@ class SellerOrderSeeder extends Seeder
         }
 
         // Membuat beberapa pesanan dummy sesuai dengan status yang digunakan di SellerOrderController
-        $order1 = Order::create([
-            'order_number' => 'ORD-202312001',
+        $order1 = Order::firstOrCreate([
+            'order_number' => 'ORD-202312001'
+        ], [
             'user_id' => $user->id,
             'status' => 'pending_payment',
             'sub_total' => 170000,
@@ -144,8 +145,9 @@ class SellerOrderSeeder extends Seeder
         ]);
 
 
-        $order2 = Order::create([
-            'order_number' => 'ORD-202312002',
+        $order2 = Order::firstOrCreate([
+            'order_number' => 'ORD-202312002'
+        ], [
             'user_id' => $user->id,
             'status' => 'processing',
             'sub_total' => 215000,
@@ -198,8 +200,9 @@ class SellerOrderSeeder extends Seeder
         ]);
 
 
-        $order3 = Order::create([
-            'order_number' => 'ORD-202312003',
+        $order3 = Order::firstOrCreate([
+            'order_number' => 'ORD-202312003'
+        ], [
             'user_id' => $user->id,
             'status' => 'shipping',
             'sub_total' => 220000,
@@ -245,8 +248,9 @@ class SellerOrderSeeder extends Seeder
         ]);
 
 
-        $order4 = Order::create([
-            'order_number' => 'ORD-202312004',
+        $order4 = Order::firstOrCreate([
+            'order_number' => 'ORD-202312004'
+        ], [
             'user_id' => $user->id,
             'status' => 'completed',
             'sub_total' => 250000,
@@ -292,8 +296,9 @@ class SellerOrderSeeder extends Seeder
         ]);
 
 
-        $order5 = Order::create([
-            'order_number' => 'ORD-202312005',
+        $order5 = Order::firstOrCreate([
+            'order_number' => 'ORD-202312005'
+        ], [
             'user_id' => $user->id,
             'status' => 'cancelled',
             'sub_total' => 120000,

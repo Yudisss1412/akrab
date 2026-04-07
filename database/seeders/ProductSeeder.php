@@ -828,7 +828,14 @@ class ProductSeeder extends Seeder
         foreach ($productsData as $index => $productData) {
             $seller = $sellers->get($index % $sellers->count());
             $categoryName = $productData['category_name'];
-            $categoryId = $categories[$categoryName] ?? $categories['Fashion']; // fallback to Fashion if category not found
+            
+            // Safely get category ID, fallback to first available category if not found
+            $categoryId = $categories[$categoryName] ?? (reset($categories) ?: null);
+
+            if (!$categoryId) {
+                $this->command->error("Category '{$categoryName}' not found and no fallback available. Skipping product '{$productData['name']}'.");
+                continue;
+            }
 
             unset($productData['category_name']); // remove temporary category name
 

@@ -103,8 +103,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 // Check if redirect URL exists in response
-                const redirectUrl = responseData.redirect || '/dashboard';
+                let redirectUrl = responseData.redirect;
+                
+                // Fallback logic based on user role
+                if (!redirectUrl) {
+                    // If server doesn't provide redirect, check user role from response
+                    const userRole = responseData.role || responseData.user?.role;
+                    
+                    if (userRole === 'buyer') {
+                        redirectUrl = '/cust_welcome';
+                    } else {
+                        redirectUrl = '/dashboard';
+                    }
+                }
+                
                 console.log('Redirect URL:', redirectUrl);
+                console.log('User role:', responseData.role || responseData.user?.role || 'unknown');
 
                 // Show success toast notification in the center of screen
                 const toast = document.createElement('div');

@@ -788,8 +788,26 @@
        MOBILE RESPONSIVE - Optimize for narrow screens
        =================================== */
     
-    /* Tablet & Mobile (768px and below) */
+    /* Default: Show table, hide cards */
+    .sellers-cards-mobile {
+      display: none;
+    }
+    
+    .table-desktop-view {
+      display: block;
+    }
+    
+    /* Tablet & Mobile (768px and below) - Show cards, hide table */
     @media (max-width: 768px) {
+      /* Show mobile cards, hide desktop table */
+      .sellers-cards-mobile {
+        display: block;
+      }
+      
+      .table-desktop-view {
+        display: none;
+      }
+
       /* Reduce main content padding */
       .main-content {
         padding-top: 1rem !important;
@@ -902,62 +920,221 @@
         margin-bottom: 0.35rem;
       }
 
-      /* Table container */
-      .table-container {
-        margin-top: 0.75rem;
+      /* Mobile seller cards */
+      .sellers-cards-list {
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
       }
 
-      .table-header {
-        padding: 0.9rem 1rem;
+      .seller-card-mobile {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: 0.75rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transition: all 0.2s ease;
       }
 
-      .table-title {
-        font-size: 0.95rem;
+      .seller-card-mobile:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        transform: translateY(-2px);
       }
 
-      .table-content {
-        padding: 0.75rem;
+      .seller-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        background: linear-gradient(135deg, rgba(0,110,92,0.05) 0%, rgba(168,213,201,0.05) 100%);
+        border-bottom: 1px solid var(--border);
       }
 
-      /* Table - horizontal scroll on mobile */
-      .table-responsive {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        border-radius: 0.5rem;
+      .seller-card-check {
+        flex-shrink: 0;
       }
 
-      .table {
-        font-size: 0.8rem;
-        min-width: 600px; /* Ensure table doesn't squish */
+      .seller-card-check .form-check-input {
+        width: 1.125rem;
+        height: 1.125rem;
+        cursor: pointer;
       }
 
-      .table th,
-      .table td {
-        padding: 0.6rem 0.5rem;
-        font-size: 0.8rem;
+      .seller-card-info {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .seller-card-name {
+        display: block;
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--primary);
+        text-decoration: none;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin-bottom: 0.25rem;
+      }
+
+      .seller-card-name:hover {
+        text-decoration: underline;
+      }
+
+      .seller-card-id {
+        font-size: 0.75rem;
+        color: var(--gray);
+      }
+
+      .seller-card-badge {
+        flex-shrink: 0;
+        padding: 0.35rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.7rem;
+        font-weight: 600;
         white-space: nowrap;
       }
 
-      .table th {
-        font-size: 0.7rem;
+      .status-active {
+        background: rgba(40, 167, 69, 0.1);
+        color: #28a745;
       }
 
-      /* Make action buttons smaller on mobile */
-      .table .btn {
-        width: auto !important;
-        padding: 0.35rem 0.5rem !important;
-        font-size: 0.7rem !important;
-        min-width: auto !important;
-        height: auto !important;
+      .status-suspended {
+        background: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
       }
 
-      /* Reduce padding in table cells */
-      .table td > div > * {
-        margin-bottom: 0.15rem;
+      .status-pending,
+      .status-new {
+        background: rgba(255, 193, 7, 0.1);
+        color: #856404;
       }
 
-      .table td > div > :last-child {
+      .status-unknown {
+        background: rgba(108, 117, 125, 0.1);
+        color: #6c757d;
+      }
+
+      .seller-card-body {
+        padding: 1rem;
+      }
+
+      .seller-card-section {
+        margin-bottom: 1rem;
+      }
+
+      .seller-card-section:last-child {
         margin-bottom: 0;
+      }
+
+      .seller-card-section-title {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--gray);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.5rem;
+      }
+
+      .seller-card-detail {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.4rem 0;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+      }
+
+      .seller-card-detail:last-child {
+        border-bottom: none;
+      }
+
+      .seller-card-label {
+        font-size: 0.8rem;
+        color: var(--gray);
+        font-weight: 500;
+      }
+
+      .seller-card-value {
+        font-size: 0.85rem;
+        color: var(--dark);
+        font-weight: 600;
+        text-align: right;
+        max-width: 60%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .seller-card-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+        background: var(--light);
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+      }
+
+      .seller-card-stat {
+        text-align: center;
+      }
+
+      .stat-number {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 0.25rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .stat-label {
+        font-size: 0.7rem;
+        color: var(--gray);
+        font-weight: 500;
+      }
+
+      .seller-card-actions {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+      }
+
+      .seller-card-actions .btn-card-action {
+        width: 100%;
+        padding: 0.6rem 0.75rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+      }
+
+      .seller-card-actions .btn-card-action:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      }
+
+      .seller-card-actions .btn-card-action i {
+        font-size: 0.85rem;
+      }
+
+      .seller-card-empty {
+        text-align: center;
+        padding: 3rem 1rem;
+        background: var(--white);
+        border-radius: 0.75rem;
       }
 
       /* Badges */
@@ -1019,30 +1196,65 @@
         padding: 0.5rem 0.6rem;
       }
 
-      /* Table even more compact */
-      .table {
-        font-size: 0.75rem;
-        min-width: 550px;
+      /* Mobile cards more compact */
+      .sellers-cards-list {
+        padding: 0.75rem;
+        gap: 0.75rem;
       }
 
-      .table th,
-      .table td {
-        padding: 0.5rem 0.4rem;
-        font-size: 0.75rem;
+      .seller-card-header {
+        padding: 0.85rem;
       }
 
-      .table th {
+      .seller-card-name {
+        font-size: 0.9rem;
+      }
+
+      .seller-card-id {
+        font-size: 0.7rem;
+      }
+
+      .seller-card-badge {
+        padding: 0.3rem 0.6rem;
         font-size: 0.65rem;
       }
 
-      .table .btn {
-        padding: 0.3rem 0.4rem !important;
-        font-size: 0.65rem !important;
+      .seller-card-body {
+        padding: 0.85rem;
       }
 
-      .badge {
-        padding: 0.25em 0.4em;
-        font-size: 0.65em;
+      .seller-card-section-title {
+        font-size: 0.75rem;
+      }
+
+      .seller-card-label {
+        font-size: 0.75rem;
+      }
+
+      .seller-card-value {
+        font-size: 0.8rem;
+      }
+
+      .seller-card-stats {
+        gap: 0.5rem;
+        padding: 0.6rem;
+      }
+
+      .stat-number {
+        font-size: 0.8rem;
+      }
+
+      .stat-label {
+        font-size: 0.65rem;
+      }
+
+      .seller-card-actions {
+        gap: 0.4rem;
+      }
+
+      .seller-card-actions .btn-card-action {
+        padding: 0.5rem 0.6rem;
+        font-size: 0.75rem;
       }
 
       /* Bulk actions */
@@ -1095,30 +1307,78 @@
         font-size: 0.75rem;
       }
 
-      /* Ultra compact table */
-      .table {
-        font-size: 0.7rem;
-        min-width: 500px;
+      /* Ultra compact cards */
+      .sellers-cards-list {
+        padding: 0.6rem;
+        gap: 0.6rem;
       }
 
-      .table th,
-      .table td {
-        padding: 0.4rem 0.35rem;
-        font-size: 0.7rem;
+      .seller-card-header {
+        padding: 0.75rem;
+        gap: 0.5rem;
       }
 
-      .table th {
+      .seller-card-name {
+        font-size: 0.85rem;
+      }
+
+      .seller-card-id {
+        font-size: 0.65rem;
+      }
+
+      .seller-card-badge {
+        padding: 0.25rem 0.5rem;
         font-size: 0.6rem;
       }
 
-      .table .btn {
-        padding: 0.25rem 0.35rem !important;
-        font-size: 0.6rem !important;
+      .seller-card-body {
+        padding: 0.75rem;
       }
 
-      .badge {
-        padding: 0.2em 0.35em;
-        font-size: 0.6em;
+      .seller-card-section {
+        margin-bottom: 0.75rem;
+      }
+
+      .seller-card-section-title {
+        font-size: 0.7rem;
+        margin-bottom: 0.4rem;
+      }
+
+      .seller-card-detail {
+        padding: 0.3rem 0;
+      }
+
+      .seller-card-label {
+        font-size: 0.7rem;
+      }
+
+      .seller-card-value {
+        font-size: 0.75rem;
+      }
+
+      .seller-card-stats {
+        gap: 0.4rem;
+        padding: 0.5rem;
+      }
+
+      .stat-number {
+        font-size: 0.75rem;
+      }
+
+      .stat-label {
+        font-size: 0.6rem;
+      }
+
+      .seller-card-actions {
+        grid-template-columns: 1fr;
+        gap: 0.4rem;
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+      }
+
+      .seller-card-actions .btn-card-action {
+        padding: 0.5rem 0.6rem;
+        font-size: 0.7rem;
       }
     }
   </style>
@@ -1221,8 +1481,8 @@
                 </div>
               </div>
 
-              <!-- Sellers Table -->
-              <div class="table-container mt-2">
+              <!-- Sellers Table (Desktop) -->
+              <div class="table-container mt-2 table-desktop-view">
                 <div class="table-header">
                   <h3 class="table-title">Daftar Penjual</h3>
                 </div>
@@ -1336,6 +1596,131 @@
                     </tbody>
                   </table>
                 </div>
+              </div>
+
+              <!-- Sellers Cards (Mobile) -->
+              <div class="sellers-cards-mobile table-container mt-2">
+                <div class="table-header">
+                  <h3 class="table-title">Daftar Penjual</h3>
+                </div>
+                <div class="sellers-cards-list">
+                  @forelse($sellers ?? collect() as $seller)
+                  <div class="seller-card-mobile" id="seller-card-{{ $seller->id }}">
+                    <div class="seller-card-header">
+                      <div class="seller-card-check">
+                        <input type="checkbox" class="form-check-input seller-checkbox" value="{{ $seller->id }}" name="seller_ids[]">
+                      </div>
+                      <div class="seller-card-info">
+                        <a href="{{ route('sellers.show', $seller) }}" class="seller-card-name">
+                          {{ $seller->store_name }}
+                        </a>
+                        <div class="seller-card-id">ID: {{ $seller->id }}</div>
+                      </div>
+                      @php
+                        $statusClass = '';
+                        $statusText = '';
+                        switch($seller->status) {
+                          case 'aktif':
+                            $statusClass = 'status-active';
+                            $statusText = 'Aktif';
+                            break;
+                          case 'ditangguhkan':
+                            $statusClass = 'status-suspended';
+                            $statusText = 'Ditangguhkan';
+                            break;
+                          case 'menunggu_verifikasi':
+                            $statusClass = 'status-pending';
+                            $statusText = 'Menunggu';
+                            break;
+                          case 'baru':
+                            $statusClass = 'status-new';
+                            $statusText = 'Baru';
+                            break;
+                          default:
+                            $statusClass = 'status-unknown';
+                            $statusText = 'N/A';
+                        }
+                      @endphp
+                      <span class="seller-card-badge {{ $statusClass }}">{{ $statusText }}</span>
+                    </div>
+                    
+                    <div class="seller-card-body">
+                      <div class="seller-card-section">
+                        <div class="seller-card-section-title">Info Pemilik</div>
+                        <div class="seller-card-detail">
+                          <span class="seller-card-label">Nama:</span>
+                          <span class="seller-card-value">{{ $seller->owner_name }}</span>
+                        </div>
+                        <div class="seller-card-detail">
+                          <span class="seller-card-label">Email:</span>
+                          <span class="seller-card-value">{{ $seller->email }}</span>
+                        </div>
+                        <div class="seller-card-detail">
+                          <span class="seller-card-label">Bergabung:</span>
+                          <span class="seller-card-value">{{ $seller->join_date ? $seller->join_date->format('d M Y') : '-' }}</span>
+                        </div>
+                      </div>
+
+                      <div class="seller-card-section">
+                        <div class="seller-card-section-title">Statistik</div>
+                        <div class="seller-card-stats">
+                          <div class="seller-card-stat">
+                            <div class="stat-number">{{ $seller->active_products_count }}</div>
+                            <div class="stat-label">Produk</div>
+                          </div>
+                          <div class="seller-card-stat">
+                            <div class="stat-number">Rp {{ number_format($seller->total_sales, 0, ',', '.') }}</div>
+                            <div class="stat-label">GMV</div>
+                          </div>
+                          <div class="seller-card-stat">
+                            <div class="stat-number">
+                              <i class="fas fa-star" style="color: #ffc107;"></i> {{ number_format($seller->rating, 1) }}
+                            </div>
+                            <div class="stat-label">Rating</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="seller-card-actions">
+                        <a href="{{ route('sellers.show', $seller) }}" class="btn btn-info btn-card-action" title="Lihat Detail">
+                          <i class="fas fa-eye"></i> Lihat
+                        </a>
+                        <a href="{{ route('sellers.edit', $seller) }}" class="btn btn-primary btn-card-action" title="Edit">
+                          <i class="fas fa-edit"></i> Edit
+                        </a>
+                        @if($seller->status !== 'ditangguhkan')
+                          <form action="{{ route('sellers.suspend', $seller) }}" method="POST" class="d-inline">
+                            @csrf
+                            <button type="submit" class="btn btn-warning text-dark btn-card-action" title="Tangguhkan">
+                              <i class="fas fa-pause"></i> Tangguh
+                            </button>
+                          </form>
+                        @else
+                          <form action="{{ route('sellers.activate', $seller) }}" method="POST" class="d-inline">
+                            @csrf
+                            <button type="submit" class="btn btn-success btn-card-action" title="Aktifkan">
+                              <i class="fas fa-play"></i> Aktifkan
+                            </button>
+                          </form>
+                        @endif
+                        <form action="{{ route('sellers.destroy', $seller) }}" method="POST" class="d-inline delete-seller-form">
+                          @csrf
+                          @method('DELETE')
+                          <button type="submit" class="btn btn-danger btn-card-action" title="Hapus">
+                            <i class="fas fa-trash"></i> Hapus
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                  @empty
+                  <div class="seller-card-empty">
+                    <i class="fas fa-inbox" style="font-size: 3rem; color: #d1d5db; margin-bottom: 1rem;"></i>
+                    <div style="color: #6b7280;">Tidak ada data penjual ditemukan.</div>
+                  </div>
+                  @endforelse
+                </div>
+              </div>
 
                 <!-- Pagination -->
                 <div class="mt-3 d-flex justify-content-between align-items-center">

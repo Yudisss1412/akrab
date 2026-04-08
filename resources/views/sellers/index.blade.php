@@ -9,665 +9,793 @@
   <link rel="stylesheet" href="{{ asset('css/admin/dashboard_admin.css') }}">
   <link rel="stylesheet" href="{{ asset('css/admin_penjual/style.css') }}">
   <style>
-    /* Modern Design System for Seller Management */
+    /* Enhanced styles for seller management page */
     :root {
       --primary: #006E5C;
       --primary-light: #a8d5c9;
-      --primary-dark: #005a4a;
-      --secondary: #64748b;
-      --success: #10b981;
-      --danger: #ef4444;
-      --warning: #f59e0b;
-      --info: #06b6d4;
-      --light: #f8fafc;
-      --dark: #1e293b;
+      --secondary: #6c757d;
+      --success: #28a745;
+      --danger: #dc3545;
+      --warning: #ffc107;
+      --info: #17a2b8;
+      --light: #f8f9fa;
+      --dark: #343a40;
       --white: #ffffff;
-      --gray-50: #f9fafb;
-      --gray-100: #f3f4f6;
-      --gray-200: #e5e7eb;
-      --gray-300: #d1d5db;
-      --gray-400: #9ca3af;
-      --gray-500: #6b7280;
-      --gray-600: #4b5563;
-      --gray-700: #374151;
-      --gray-800: #1f2937;
-      --border: #e5e7eb;
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-      --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-      --radius-sm: 0.375rem;
-      --radius: 0.5rem;
-      --radius-md: 0.75rem;
-      --radius-lg: 1rem;
-      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    * {
-      box-sizing: border-box;
+      --gray: #6c757d;
+      --border: #dee2e6;
+      --box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+      --border-radius: 0.375rem;
+      --transition: all 0.3s ease;
     }
 
     body {
-      background-color: var(--gray-50);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      color: var(--gray-800);
-      line-height: 1.6;
+      background-color: #f5f7fa;
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #333;
     }
 
-    /* Modern Container */
-    .modern-container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 1.5rem;
+    .main-content {
+      padding-top: 2rem;
+      padding-bottom: 2rem;
     }
 
-    /* Page Header Modern */
-    .page-header-modern {
+    .page-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 2rem;
-      flex-wrap: wrap;
-      gap: 1rem;
+      margin-bottom: 0.5rem;
+      padding: 0.25rem 0;
     }
 
-    .page-header-left {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .back-button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-      border-radius: var(--radius);
-      background: var(--white);
-      border: 1px solid var(--border);
-      color: var(--gray-600);
-      cursor: pointer;
-      transition: var(--transition);
-      text-decoration: none;
-    }
-
-    .back-button:hover {
-      background: var(--gray-100);
-      color: var(--primary);
-      border-color: var(--primary);
-    }
-
-    .page-title-modern {
+    .page-title {
       margin: 0;
-      font-size: 1.875rem;
+      font-size: 1.75rem;
       font-weight: 700;
-      color: var(--dark);
-      letter-spacing: -0.025em;
-    }
-
-    .page-subtitle {
-      font-size: 0.875rem;
-      color: var(--gray-500);
-      margin-top: 0.25rem;
-    }
-
-    /* Tab Navigation Modern */
-    .tabs-modern {
-      display: flex;
-      gap: 0.5rem;
-      background: var(--white);
-      padding: 0.5rem;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border);
-      margin-bottom: 2rem;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .tab-modern {
-      flex: 1;
-      padding: 0.75rem 1.5rem;
-      border-radius: var(--radius);
-      border: none;
-      background: transparent;
-      color: var(--gray-600);
-      font-weight: 600;
-      font-size: 0.9375rem;
-      cursor: pointer;
-      transition: var(--transition);
-      text-align: center;
-    }
-
-    .tab-modern:hover {
-      background: var(--gray-100);
       color: var(--primary);
-    }
-
-    .tab-modern.active {
-      background: var(--primary);
-      color: var(--white);
-      box-shadow: var(--shadow);
-    }
-
-    /* Action Bar Modern */
-    .action-bar {
       display: flex;
-      gap: 0.75rem;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-    }
-
-    .btn-modern {
-      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1.25rem;
-      border-radius: var(--radius);
+      gap: 0.75rem;
+    }
+
+    .page-title i {
+      color: var(--primary-light);
+    }
+
+    .filter-panel {
+      background: var(--white);
+      border-radius: var(--border-radius);
       border: none;
-      font-weight: 600;
-      font-size: 0.875rem;
-      cursor: pointer;
-      transition: var(--transition);
-      text-decoration: none;
-      white-space: nowrap;
-    }
-
-    .btn-primary-modern {
-      background: var(--primary);
-      color: var(--white);
-    }
-
-    .btn-primary-modern:hover {
-      background: var(--primary-dark);
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-md);
-    }
-
-    .btn-secondary-modern {
-      background: var(--white);
-      color: var(--gray-700);
-      border: 1px solid var(--border);
-    }
-
-    .btn-secondary-modern:hover {
-      background: var(--gray-50);
-      border-color: var(--gray-300);
-    }
-
-    .btn-danger-modern {
-      background: var(--danger);
-      color: var(--white);
-    }
-
-    .btn-danger-modern:hover {
-      background: #dc2626;
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-md);
-    }
-
-    .btn-success-modern {
-      background: var(--success);
-      color: var(--white);
-    }
-
-    .btn-success-modern:hover {
-      background: #059669;
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-md);
-    }
-
-    .btn-warning-modern {
-      background: var(--warning);
-      color: var(--white);
-    }
-
-    .btn-warning-modern:hover {
-      background: #d97706;
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-md);
-    }
-
-    /* Card Modern */
-    .card-modern {
-      background: var(--white);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
+      box-shadow: var(--box-shadow);
+      margin-bottom: 1.5rem;
       overflow: hidden;
       transition: var(--transition);
     }
 
-    .card-modern:hover {
-      box-shadow: var(--shadow-lg);
+    .filter-panel:hover {
+      box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.1);
     }
 
-    .card-header-modern {
+    .custom-notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      max-width: 350px;
+    }
+
+    .custom-notification.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .custom-notification .alert {
+      margin-bottom: 0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border: none;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .custom-notification .alert .alert-content {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .custom-notification .alert .alert-icon {
+      font-size: 1.2rem;
+    }
+
+    .custom-notification .alert .alert-message {
+      flex: 1;
+    }
+
+    .confirm-danger {
+      background-color: #dc3545 !important;
+      border-color: #dc3545 !important;
+      color: white !important;
+      transition: all 0.2s ease;
+    }
+
+    .confirm-danger:hover {
+      background-color: #c82333 !important;
+      border-color: #bd2130 !important;
+      transform: translateY(-2px);
+    }
+
+    .filter-header {
       padding: 1.25rem 1.5rem;
       background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-      color: var(--white);
+      color: white;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .card-title-modern {
+    .filter-title {
       margin: 0;
-      font-size: 1.125rem;
-      font-weight: 700;
+      font-size: 1.1rem;
+      font-weight: 600;
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
 
-    .card-body-modern {
+    .filter-content {
       padding: 1.5rem;
     }
 
-    /* Search & Filter Card Modern */
-    .filter-card {
-      margin-bottom: 1.5rem;
-    }
-
-    .filter-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-    }
-
-    .form-group-modern {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .form-label-modern {
-      font-size: 0.875rem;
+    .form-label {
       font-weight: 600;
-      color: var(--gray-700);
-      margin-bottom: 0;
-    }
-
-    .form-input-modern {
-      padding: 0.625rem 0.875rem;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      font-size: 0.875rem;
-      transition: var(--transition);
-      background: var(--white);
-    }
-
-    .form-input-modern:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(0, 110, 92, 0.1);
-    }
-
-    .form-select-modern {
-      padding: 0.625rem 0.875rem;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      font-size: 0.875rem;
-      transition: var(--transition);
-      background: var(--white);
-      cursor: pointer;
-    }
-
-    .form-select-modern:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(0, 110, 92, 0.1);
-    }
-
-    /* Seller Card Grid (Mobile) */
-    .seller-card-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1.25rem;
-    }
-
-    .seller-card {
-      background: var(--white);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      padding: 1.25rem;
-      transition: var(--transition);
-      position: relative;
-    }
-
-    .seller-card:hover {
-      box-shadow: var(--shadow-lg);
-      transform: translateY(-2px);
-      border-color: var(--primary-light);
-    }
-
-    .seller-card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 1rem;
-      gap: 0.75rem;
-    }
-
-    .seller-store-name {
-      font-size: 1.125rem;
-      font-weight: 700;
-      color: var(--dark);
-      margin: 0 0 0.25rem 0;
-      text-decoration: none;
-    }
-
-    .seller-store-name:hover {
-      color: var(--primary);
-    }
-
-    .seller-id {
-      font-size: 0.75rem;
-      color: var(--gray-400);
-    }
-
-    .seller-status-badge {
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-
-    .status-active {
-      background: rgba(16, 185, 129, 0.1);
-      color: var(--success);
-    }
-
-    .status-suspended {
-      background: rgba(239, 68, 68, 0.1);
-      color: var(--danger);
-    }
-
-    .status-pending {
-      background: rgba(245, 158, 11, 0.1);
-      color: var(--warning);
-    }
-
-    .seller-info-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
-      margin-bottom: 1rem;
-    }
-
-    .seller-info-item {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    .seller-info-label {
-      font-size: 0.75rem;
-      color: var(--gray-500);
-      font-weight: 500;
-    }
-
-    .seller-info-value {
-      font-size: 0.875rem;
-      color: var(--gray-800);
-      font-weight: 600;
-    }
-
-    .seller-stats {
-      display: flex;
-      gap: 0.75rem;
-      margin-bottom: 1rem;
-      padding: 0.75rem;
-      background: var(--gray-50);
-      border-radius: var(--radius);
-    }
-
-    .seller-stat {
-      flex: 1;
-      text-align: center;
-    }
-
-    .seller-stat-value {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--primary);
-    }
-
-    .seller-stat-label {
-      font-size: 0.7rem;
-      color: var(--gray-500);
-      margin-top: 0.125rem;
-    }
-
-    .seller-card-actions {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-
-    .seller-card-actions .btn-modern {
-      flex: 1;
-      min-width: 70px;
-      padding: 0.5rem 0.75rem;
-      font-size: 0.8rem;
-    }
-
-    /* Table View (Desktop) */
-    .table-modern {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-    }
-
-    .table-modern thead th {
-      background: var(--gray-50);
-      padding: 0.875rem 1rem;
-      text-align: left;
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--gray-600);
-      border-bottom: 2px solid var(--border);
-    }
-
-    .table-modern tbody tr {
-      transition: var(--transition);
-    }
-
-    .table-modern tbody tr:hover {
-      background: var(--gray-50);
-    }
-
-    .table-modern tbody td {
-      padding: 1rem;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.875rem;
-    }
-
-    /* Pagination Modern */
-    .pagination-modern {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 0.5rem;
-      margin-top: 2rem;
-      flex-wrap: wrap;
-    }
-
-    .pagination-btn {
-      padding: 0.5rem 0.875rem;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: var(--white);
-      color: var(--gray-700);
-      font-weight: 600;
-      font-size: 0.875rem;
-      cursor: pointer;
-      transition: var(--transition);
-      text-decoration: none;
-    }
-
-    .pagination-btn:hover {
-      background: var(--gray-100);
-      border-color: var(--gray-300);
-    }
-
-    .pagination-btn.active {
-      background: var(--primary);
-      color: var(--white);
-      border-color: var(--primary);
-    }
-
-    .pagination-btn.disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    /* Responsive - Mobile First */
-    @media (max-width: 768px) {
-      .modern-container {
-        padding: 1rem;
-      }
-
-      .page-header-modern {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .page-title-modern {
-        font-size: 1.5rem;
-      }
-
-      .tabs-modern {
-        flex-direction: column;
-      }
-
-      .tab-modern {
-        width: 100%;
-      }
-
-      .action-bar {
-        flex-direction: column;
-      }
-
-      .btn-modern {
-        width: 100%;
-      }
-
-      .filter-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .seller-card-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .seller-info-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .seller-card-actions {
-        flex-direction: column;
-      }
-
-      .seller-card-actions .btn-modern {
-        width: 100%;
-      }
-
-      /* Hide table on mobile */
-      .table-desktop {
-        display: none;
-      }
-    }
-
-    @media (min-width: 769px) {
-      /* Hide card grid on desktop */
-      .seller-card-grid {
-        display: none;
-      }
-
-      /* Show table on desktop */
-      .table-desktop {
-        display: block;
-      }
-    }
-
-    /* Empty State */
-    .empty-state {
-      text-align: center;
-      padding: 3rem 1.5rem;
-    }
-
-    .empty-state-icon {
-      font-size: 3rem;
-      color: var(--gray-300);
-      margin-bottom: 1rem;
-    }
-
-    .empty-state-title {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--gray-700);
+      color: #495057;
       margin-bottom: 0.5rem;
     }
 
-    .empty-state-text {
-      color: var(--gray-500);
-      font-size: 0.875rem;
-    }
-
-    /* Checkbox Modern */
-    .checkbox-modern {
-      width: 1.125rem;
-      height: 1.125rem;
-      border: 2px solid var(--border);
-      border-radius: var(--radius-sm);
-      cursor: pointer;
+    .form-control, .form-select {
+      border: 1px solid var(--border);
+      border-radius: var(--border-radius);
+      padding: 0.65rem 0.75rem;
       transition: var(--transition);
     }
 
-    .checkbox-modern:checked {
-      background: var(--primary);
+    .form-control:focus, .form-select:focus {
       border-color: var(--primary);
+      box-shadow: 0 0 0 0.2rem rgba(0, 110, 92, 0.25);
+      outline: 0;
     }
 
-    /* Bulk Actions Modern */
-    .bulk-actions {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 1rem;
-      background: rgba(0, 110, 92, 0.05);
-      border-left: 4px solid var(--primary);
-      border-radius: var(--radius);
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
+    .btn {
+      border-radius: var(--border-radius);
+      padding: 0.5rem 1rem;
+      font-weight: 600;
+      transition: var(--transition);
+      border: none;
     }
 
-    .bulk-actions label {
+    .btn-primary {
+      background: var(--primary);
+      border: 1px solid var(--primary);
+    }
+
+    .btn-primary:hover {
+      background: #005a4a;
+      border-color: #005a4a;
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: var(--secondary);
+      border: 1px solid var(--secondary);
+    }
+
+    .btn-secondary:hover {
+      background: #5a6268;
+      border-color: #545b62;
+      transform: translateY(-2px);
+    }
+
+    .table-container {
+      background: var(--white);
+      border-radius: var(--border-radius);
+      border: none;
+      box-shadow: var(--box-shadow);
+      overflow: hidden;
+      transition: var(--transition);
+    }
+
+    .table-container:hover {
+      box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.1);
+    }
+
+    .table-header {
+      padding: 1.25rem 1.5rem;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .table-title {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      font-size: 0.875rem;
+    }
+
+    .table-content {
+      padding: 1.5rem;
+    }
+
+    .table {
+      margin-bottom: 0;
+    }
+
+    .table th {
+      background-color: #f8f9fa;
+      color: #495057;
       font-weight: 600;
-      color: var(--gray-700);
+      padding: 0.9rem 0.75rem;
+      border-top: none;
     }
 
-    /* Loading Skeleton */
-    .skeleton {
-      background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-200) 50%, var(--gray-100) 75%);
-      background-size: 200% 100%;
-      animation: skeleton-loading 1.5s infinite;
-      border-radius: var(--radius);
+    .table td {
+      padding: 0.9rem 0.75rem;
+      vertical-align: middle;
     }
 
-    @keyframes skeleton-loading {
-      0% {
-        background-position: 200% 0;
+    .table-hover tbody tr:hover {
+      background-color: rgba(0, 110, 92, 0.05);
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+      background-color: rgba(0, 0, 0, 0.02);
+    }
+
+    .badge {
+      padding: 0.4em 0.7em;
+      font-size: 0.8em;
+      font-weight: 500;
+      border-radius: 50rem;
+    }
+
+    .bulk-actions-toolbar {
+      background: #e9f7ef;
+      border-radius: var(--border-radius);
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      border-left: 4px solid var(--primary);
+      box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+
+    .btn-group .btn {
+      margin-right: 0.25rem;
+    }
+
+    .btn-group .btn:last-child {
+      margin-right: 0;
+    }
+
+    .pagination {
+      margin-bottom: 0;
+    }
+
+    .pagination .page-link {
+      color: var(--primary);
+      border-radius: var(--border-radius);
+      margin: 0 0.1rem;
+    }
+
+    .pagination .page-item.active .page-link {
+      background-color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .card {
+      box-shadow: var(--box-shadow);
+      border: none;
+      border-radius: var(--border-radius);
+      transition: var(--transition);
+    }
+
+    .table-responsive {
+      border-radius: var(--border-radius);
+    }
+
+    /* Responsive table adjustments */
+    .table th, .table td {
+      white-space: nowrap;
+      vertical-align: top;
+    }
+
+    /* Adjust for smaller screens */
+    @media (max-width: 768px) {
+      .table th, .table td {
+        padding: 0.5rem 0.25rem;
+        font-size: 0.9rem;
       }
-      100% {
-        background-position: -200% 0;
+
+      .btn-group-vertical .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+        margin-bottom: 0.1rem;
+      }
+    }
+
+    /* Ensure actions column doesn't get too wide */
+    .table td:last-child {
+      min-width: 100px;
+    }
+
+    /* Improved table styling for better UX */
+    .table th {
+      background-color: #f8f9fa;
+      color: #495057;
+      font-weight: 600;
+      border-top: none;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 0.5px;
+    }
+
+    .table td {
+      vertical-align: top;
+      padding: 0.75rem 0.5rem;
+    }
+
+    /* Responsive improvements */
+    @media (max-width: 768px) {
+      .table {
+        font-size: 0.85rem;
+      }
+
+      .table th, .table td {
+        padding: 0.5rem 0.25rem;
+      }
+
+      /* Stack table on very small screens */
+      .table-responsive {
+        overflow-x: auto;
+      }
+
+      /* Make links more touch-friendly */
+      .btn-group .btn {
+        padding: 0.3rem 0.4rem;
+        font-size: 0.7rem;
+        margin-bottom: 0.1rem;
+        width: 100%;
+      }
+    }
+
+    /* Make table rows more distinct */
+    .table-hover tbody tr:hover {
+      background-color: rgba(0, 110, 92, 0.05);
+    }
+
+    /* Better display for mobile */
+    @media (max-width: 576px) {
+      .table th, .table td {
+        padding: 0.4rem 0.2rem;
+        font-size: 0.8rem;
+      }
+
+      .table th:nth-child(1),
+      .table td:nth-child(1) {
+        min-width: 120px;
+      }
+
+      .btn-group .btn {
+        padding: 0.25rem 0.35rem;
+        font-size: 0.65rem;
+        margin-bottom: 0.05rem;
+        width: 100%;
+      }
+    }
+
+    /* Styling for text elements */
+    .font-weight-bold.text-primary:hover {
+      text-decoration: underline;
+    }
+
+    /* Badge improvements */
+    .badge {
+      font-size: 0.75em;
+    }
+
+    /* Better spacing in table cells */
+    td > div > * {
+      margin-bottom: 0.25rem;
+    }
+
+    td > div > :last-child {
+      margin-bottom: 0;
+    }
+
+        /* Consistent button sizing for all action buttons */
+    .table .btn-group.d-block .btn,
+    .table form button.btn,
+    .table a.btn {
+      min-width: 85px !important;
+      height: 36px !important;
+      padding: 0.2rem 0.3rem !important;
+      text-align: center !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 0.25rem !important;
+      white-space: nowrap !important;
+      font-size: 0.8rem !important;
+    }
+
+    /* Better alignment for icon and text */
+    .table .btn i {
+      margin-right: 0.1rem;
+    }
+
+    /* Force all action buttons to be perfect squares with icon only */
+    .table .square-btn,
+    .table .btn.square-btn,
+    .table form button.square-btn,
+    .table a.square-btn {
+      width: 32px !important;
+      height: 32px !important;
+      padding: 6px !important;
+      text-align: center !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      white-space: nowrap !important;
+      font-size: 12px !important;
+      line-height: 1 !important;
+      box-sizing: border-box !important;
+      min-width: 32px !important;
+      min-height: 32px !important;
+      max-width: 32px !important;
+      max-height: 32px !important;
+      border-radius: 4px !important;
+      margin: 0 !important;
+      flex: 0 0 32px !important;
+    }
+
+    /* Override any conflicting Bootstrap styles with highest specificity */
+    .table .btn.square-btn,
+    .table button.square-btn,
+    .table a.square-btn {
+      width: 32px !important;
+      height: 32px !important;
+      padding: 6px !important;
+      min-width: 32px !important;
+      min-height: 32px !important;
+      max-width: 32px !important;
+      max-height: 32px !important;
+    }
+
+    /* Ensure form buttons specifically match other buttons */
+    .table form button.square-btn {
+      width: 32px !important;
+      height: 32px !important;
+      padding: 6px !important;
+      min-width: 32px !important;
+      min-height: 32px !important;
+      max-width: 32px !important;
+      max-height: 32px !important;
+    }
+
+    /* Icon sizing for icon-only buttons - force perfect centering */
+    .table .btn i {
+      font-size: 14px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      min-width: 16px !important;
+      width: 16px !important;
+      height: 16px !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      line-height: 1 !important;
+    }
+
+    /* Extra specificity for font awesome icons */
+    .table .btn .fas,
+    .table .btn .fa {
+      font-size: 14px !important;
+      width: 16px !important;
+      height: 16px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+
+    /* Fix container styling that might affect button sizing */
+    .table .btn-group.d-block {
+      display: block !important;
+      width: auto !important;
+      margin-bottom: 8px !important;
+    }
+
+    /* Add extra spacing between delete button and status buttons */
+    .table .btn-group.d-block:first-child {
+      margin-bottom: 10px !important;
+    }
+
+    .table .btn-group.d-block:last-child {
+      margin-bottom: 0 !important;
+    }
+
+    /* Add spacing between individual buttons */
+    .table .btn.square-btn {
+      margin-bottom: 4px !important;
+      transition: all 0.2s ease !important;
+      transform: scale(1) !important;
+    }
+
+    .table .btn.square-btn:last-child {
+      margin-bottom: 0 !important;
+    }
+
+    /* Consistent spacing between all buttons using modern gap property - highest specificity */
+    .table td .btn-group.d-block,
+    td .table .btn-group.d-block,
+    .table .seller-table td .btn-group.d-block {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 6px !important;
+      padding: 2px 0 !important;
+    }
+
+    /* Remove individual button margins since we're using gap - highest specificity */
+    .table td .btn.square-btn,
+    td .table .btn.square-btn,
+    .table .seller-table td .btn.square-btn {
+      margin-bottom: 0 !important;
+      margin: 0 !important;
+    }
+
+    /* Ensure all buttons have consistent styling - highest specificity */
+    .table td .btn.square-btn,
+    td .table .btn.square-btn,
+    .table .seller-table td .btn.square-btn {
+      width: 32px !important;
+      height: 32px !important;
+      padding: 6px !important;
+      min-width: 32px !important;
+      min-height: 32px !important;
+      max-width: 32px !important;
+      max-height: 32px !important;
+    }
+
+    /* Add hover animations */
+    .table .btn.square-btn:hover {
+      transform: scale(1.1) !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+      z-index: 10 !important;
+      position: relative !important;
+    }
+
+    /* Specific hover effects for different button types */
+    .table .btn-info.square-btn:hover {
+      background-color: #005a4a !important;
+      border-color: #005a4a !important;
+    }
+
+    .table .btn-primary.square-btn:hover {
+      background-color: #005a9c !important;
+      border-color: #005a9c !important;
+    }
+
+    .table .btn-danger.square-btn:hover {
+      background-color: #bd2130 !important;
+      border-color: #bd2130 !important;
+    }
+
+    .table .btn-success.square-btn:hover {
+      background-color: #1e7e34 !important;
+      border-color: #1e7e34 !important;
+    }
+
+    .table .btn-warning.square-btn:hover {
+      background-color: #d39e00 !important;
+      border-color: #d39e00 !important;
+    }
+
+    /* Specific icon styling within buttons */
+    .table .btn i {
+      font-size: 0.9em !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      min-width: 14px !important;
+    }
+
+    /* Ensure icon color matches text color for all buttons */
+    .table .btn-info i {
+      color: #28a745 !important; /* Green icon for info buttons (Lihat) */
+    }
+
+    .table .btn-primary {
+      color: #fff !important; /* White text for primary buttons (Edit) */
+    }
+
+    .table .btn-primary i {
+      color: #fff !important; /* White icon for primary buttons (Edit) */
+    }
+
+    .table .btn-danger {
+      background-color: #dc3545 !important; /* Solid red background for danger buttons (Hapus) */
+      border-color: #dc3545 !important; /* Solid red border for danger buttons (Hapus) */
+      color: #fff !important; /* White text for danger buttons (Hapus) */
+    }
+
+    .table .btn-danger i {
+      color: #fff !important; /* White icon for danger buttons (Hapus) */
+    }
+
+    .table .btn-success {
+      background-color: #28a745 !important; /* Solid green background for success buttons (Aktifkan) */
+      border-color: #28a745 !important; /* Solid green border for success buttons (Aktifkan) */
+      color: #fff !important; /* White text for success buttons (Aktifkan) */
+    }
+
+    .table .btn-success i {
+      color: #fff !important; /* White icon for success buttons (Aktifkan) */
+    }
+
+    /* Special case for warning button with dark text */
+    .table .btn-warning.text-dark {
+      background-color: #ffc107 !important; /* Solid yellow background for warning buttons (Tangguhkan) */
+      border-color: #ffc107 !important; /* Solid yellow border for warning buttons (Tangguhkan) */
+      color: #212529 !important; /* Dark text for warning buttons (Tangguhkan) */
+    }
+
+    .table .btn-warning.text-dark i {
+      color: #212529 !important; /* Dark icon for warning buttons (Tangguhkan) */
+    }
+
+    /* Button styling for better visual consistency */
+    .table .btn-sm {
+      padding: 0.25rem 0.5rem !important;
+      font-size: 0.85rem !important;
+      line-height: 1.5 !important;
+    }
+
+    /* Fixed button height for consistency with higher specificity */
+    .table .fixed-btn-height {
+      min-width: 85px !important;
+      height: 36px !important;
+      padding: 0.25rem 0.5rem !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-align: center !important;
+      white-space: nowrap !important;
+    }
+
+    /* Additional specificity for form buttons to ensure consistency */
+    .table form .btn {
+      min-width: 85px !important;
+      height: 36px !important;
+      padding: 0.25rem 0.5rem !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-align: center !important;
+      white-space: nowrap !important;
+    }
+
+    /* Mobile adjustments for consistent button sizes */
+    @media (max-width: 768px) {
+      .table .fixed-btn-height,
+      .table form .btn {
+        min-width: 80px !important;
+        height: 32px !important;
+        padding: 0.2rem 0.4rem !important;
+        font-size: 0.75rem !important;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .table .fixed-btn-height,
+      .table form .btn {
+        min-width: 70px !important;
+        height: 30px !important;
+        padding: 0.15rem 0.3rem !important;
+        font-size: 0.7rem !important;
+      }
+    }
+
+    /* Additional specificity for form buttons */
+    .table form .btn {
+      min-width: 85px !important;
+      height: 36px !important;
+      padding: 0.25rem 0.5rem !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-align: center !important;
+      white-space: nowrap !important;
+    }
+
+    /* Mobile adjustments for consistent button sizes */
+    @media (max-width: 768px) {
+      .table .fixed-btn-height,
+      .table form .btn {
+        min-width: 80px !important;
+        height: 32px !important;
+        padding: 0.2rem 0.4rem !important;
+        font-size: 0.75rem !important;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .table .fixed-btn-height,
+      .table form .btn {
+        min-width: 70px !important;
+        height: 30px !important;
+        padding: 0.15rem 0.3rem !important;
+        font-size: 0.7rem !important;
+      }
+    }
+
+    /* Enhance readability and accessibility */
+    .table th {
+      font-weight: 600;
+      color: #343a40;
+      border-bottom: 2px solid #dee2e6;
+    }
+
+    .table td {
+      border-top: 1px solid #dee2e6;
+      vertical-align: top;
+    }
+
+    /* Improve contrast for better accessibility */
+    .table a {
+      color: #006E5C;
+      text-decoration: none;
+    }
+
+    .table a:hover {
+      color: #005a4a;
+      text-decoration: underline;
+    }
+
+    /* Better alignment for badges and status indicators */
+    .table .badge {
+      margin: 0.1rem 0;
+    }
+
+    /* Consistent spacing in data cells */
+    .table td div {
+      margin-bottom: 0.25rem;
+    }
+
+    .table td div:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Enhance hover state for better UX */
+    .table-hover tbody tr:hover {
+      background-color: rgba(0, 110, 92, 0.08) !important;
+    }
+
+    /* Responsive text sizing */
+    @media (max-width: 768px) {
+      .table th, .table td {
+        font-size: 0.85rem;
+        padding: 0.5rem 0.25rem;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .table th, .table td {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.2rem;
       }
     }
   </style>

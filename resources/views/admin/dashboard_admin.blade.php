@@ -4,8 +4,8 @@
 
 @push('styles')
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ asset('css/admin/dashboard_admin.css') }}">
-  <link rel="stylesheet" href="{{ asset('css/admin_penjual/style.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/admin/dashboard_admin.css') }}?v={{ time() }}">
+  <link rel="stylesheet" href="{{ asset('css/admin_penjual/style.css') }}?v={{ time() }}">
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 @endpush

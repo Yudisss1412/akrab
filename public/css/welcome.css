@@ -1139,7 +1139,7 @@ footer .footer__inner .footer-right .footer-privacy a {
 
 @media (max-width: 576px) {
     .carousel-item {
-        flex: 0 0 calc(50% - 0.75rem) !important; /* 2 items for small screens */
+        flex: 0 0 calc(100% - 0.5rem) !important; /* 1 item for small screens */
     }
 
     .carousel-container {
@@ -1153,32 +1153,32 @@ footer .footer__inner .footer-right .footer-privacy a {
     }
 
     .carousel-item .product-card img {
-        height: 160px !important;
+        height: 220px !important;
     }
 
     .carousel-item .product-card .product-info {
         height: auto !important;
-        padding: 0.6rem 0.7rem !important;
+        padding: 0.8rem 1rem !important;
     }
 
     .carousel-item .product-card .product-info .title-container {
-        height: 2.4rem !important;
-        max-height: 2.4rem !important;
-        min-height: 2.4rem !important;
+        height: 2.8rem !important;
+        max-height: 2.8rem !important;
+        min-height: 2.8rem !important;
     }
 
     .carousel-item .product-card .product-info h3 {
-        font-size: 0.85rem !important;
+        font-size: 1rem !important;
     }
 
     .carousel-item .product-card .product-info .price {
-        font-size: 0.8rem !important;
+        font-size: 1rem !important;
     }
 
     .carousel-item .product-card .product-info .view-product-btn {
-        font-size: 0.75rem !important;
-        padding: 0.45rem 0.7rem !important;
-        height: 32px !important;
+        font-size: 0.9rem !important;
+        padding: 0.6rem 1rem !important;
+        height: 38px !important;
     }
 
     .carousel-btn {
@@ -1195,7 +1195,7 @@ footer .footer__inner .footer-right .footer-privacy a {
 /* Tablet 425px */
 @media (max-width: 425px) {
     .carousel-item {
-        flex: 0 0 calc(50% - 0.75rem) !important; /* 2 items */
+        flex: 0 0 calc(100% - 0.5rem) !important; /* 1 item */
     }
 
     .carousel-container {
@@ -1209,42 +1209,38 @@ footer .footer__inner .footer-right .footer-privacy a {
     }
 
     .carousel-item .product-card img {
-        height: 140px !important;
+        height: 200px !important;
     }
 
     .carousel-item .product-card .product-info {
-        padding: 0.55rem 0.65rem !important;
+        padding: 0.7rem 0.9rem !important;
     }
 
     .carousel-item .product-card .product-info .title-container {
-        height: 2.3rem !important;
-        max-height: 2.3rem !important;
-        min-height: 2.3rem !important;
+        height: 2.6rem !important;
+        max-height: 2.6rem !important;
+        min-height: 2.6rem !important;
     }
 
     .carousel-item .product-card .product-info h3 {
-        font-size: 0.8rem !important;
+        font-size: 0.95rem !important;
     }
 
     .carousel-item .product-card .product-info .price {
-        font-size: 0.75rem !important;
+        font-size: 0.95rem !important;
     }
 
     .carousel-item .product-card .product-info .view-product-btn {
-        font-size: 0.7rem !important;
-        padding: 0.4rem 0.6rem !important;
-        height: 30px !important;
+        font-size: 0.85rem !important;
+        padding: 0.55rem 0.9rem !important;
+        height: 36px !important;
     }
 }
 
 /* Small mobile 375px */
 @media (max-width: 375px) {
     .carousel-item {
-        flex: 0 0 calc(50% - 0.65rem) !important; /* 2 items with smaller gap */
-    }
-
-    .carousel-track {
-        gap: 1rem !important;
+        flex: 0 0 calc(100% - 0.5rem) !important; /* 1 item */
     }
 
     .carousel-container {
@@ -1252,42 +1248,38 @@ footer .footer__inner .footer-right .footer-privacy a {
     }
 
     .carousel-item .product-card img {
-        height: 125px !important;
+        height: 180px !important;
     }
 
     .carousel-item .product-card .product-info {
-        padding: 0.5rem 0.6rem !important;
+        padding: 0.65rem 0.85rem !important;
     }
 
     .carousel-item .product-card .product-info .title-container {
-        height: 2.2rem !important;
-        max-height: 2.2rem !important;
-        min-height: 2.2rem !important;
+        height: 2.4rem !important;
+        max-height: 2.4rem !important;
+        min-height: 2.4rem !important;
     }
 
     .carousel-item .product-card .product-info h3 {
-        font-size: 0.72rem !important;
+        font-size: 0.9rem !important;
     }
 
     .carousel-item .product-card .product-info .price {
-        font-size: 0.7rem !important;
+        font-size: 0.9rem !important;
     }
 
     .carousel-item .product-card .product-info .view-product-btn {
-        font-size: 0.65rem !important;
-        padding: 0.35rem 0.55rem !important;
-        height: 28px !important;
+        font-size: 0.8rem !important;
+        padding: 0.5rem 0.85rem !important;
+        height: 34px !important;
     }
 }
 
 /* Very small mobile 400px */
 @media (max-width: 400px) {
     .carousel-item {
-        flex: 0 0 calc(50% - 0.65rem) !important; /* 2 items with smaller gap */
-    }
-
-    .carousel-track {
-        gap: 1rem !important;
+        flex: 0 0 calc(100% - 0.5rem) !important; /* 1 item */
     }
 
     .carousel-container {
@@ -1301,31 +1293,31 @@ footer .footer__inner .footer-right .footer-privacy a {
     }
 
     .carousel-item .product-card img {
-        height: 115px !important;
+        height: 160px !important;
     }
 
     .carousel-item .product-card .product-info {
-        padding: 0.45rem 0.55rem !important;
+        padding: 0.6rem 0.8rem !important;
     }
 
     .carousel-item .product-card .product-info .title-container {
-        height: 2rem !important;
-        max-height: 2rem !important;
-        min-height: 2rem !important;
+        height: 2.2rem !important;
+        max-height: 2.2rem !important;
+        min-height: 2.2rem !important;
     }
 
     .carousel-item .product-card .product-info h3 {
-        font-size: 0.68rem !important;
+        font-size: 0.85rem !important;
     }
 
     .carousel-item .product-card .product-info .price {
-        font-size: 0.68rem !important;
+        font-size: 0.85rem !important;
     }
 
     .carousel-item .product-card .product-info .view-product-btn {
-        font-size: 0.62rem !important;
-        padding: 0.35rem 0.5rem !important;
-        height: 26px !important;
+        font-size: 0.75rem !important;
+        padding: 0.45rem 0.8rem !important;
+        height: 32px !important;
     }
 }
 

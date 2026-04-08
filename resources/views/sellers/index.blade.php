@@ -790,22 +790,24 @@
     
     /* Default: Show table, hide cards */
     .sellers-cards-mobile {
-      display: none;
+      display: none !important;
     }
     
     .table-desktop-view {
-      display: block;
+      display: block !important;
     }
     
     /* Tablet & Mobile (768px and below) - Show cards, hide table */
     @media (max-width: 768px) {
       /* Show mobile cards, hide desktop table */
       .sellers-cards-mobile {
-        display: block;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
       }
       
       .table-desktop-view {
-        display: none;
+        display: none !important;
       }
 
       /* Reduce main content padding */
@@ -926,21 +928,25 @@
         display: flex;
         flex-direction: column;
         gap: 1rem;
+        background-color: #f5f7fa;
       }
 
       .seller-card-mobile {
-        background: #ffffff !important;
-        border: 1px solid #dee2e6;
+        background-color: #ffffff;
+        border: 2px solid #006E5C;
         border-radius: 0.75rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         overflow: hidden;
         transition: all 0.2s ease;
-        color: #1f2937;
+        min-height: 200px;
+        position: relative;
+        z-index: 1;
       }
 
       .seller-card-mobile:hover {
-        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.2);
         transform: translateY(-2px);
+        border-color: #005a4a;
       }
 
       .seller-card-header {

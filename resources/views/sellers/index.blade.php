@@ -6,8 +6,8 @@
 
 @push('styles')
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ asset('css/admin/dashboard_admin.css') }}">
-  <link rel="stylesheet" href="{{ asset('css/admin_penjual/style.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/admin/dashboard_admin.css') }}?v={{ time() }}">
+  <link rel="stylesheet" href="{{ asset('css/admin_penjual/style.css') }}?v={{ time() }}">
   <style>
     /* Enhanced styles for seller management page */
     :root {
@@ -784,18 +784,341 @@
       background-color: rgba(0, 110, 92, 0.08) !important;
     }
 
-    /* Responsive text sizing */
+    /* ===================================
+       MOBILE RESPONSIVE - Optimize for narrow screens
+       =================================== */
+    
+    /* Tablet & Mobile (768px and below) */
     @media (max-width: 768px) {
-      .table th, .table td {
+      /* Reduce main content padding */
+      .main-content {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+      }
+
+      /* Page header */
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+
+      .page-title {
+        font-size: 1.35rem;
+      }
+
+      /* Tabs - stack vertically */
+      .nav-tabs {
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+
+      .nav-tabs .nav-link {
+        width: 100%;
+        text-align: center;
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+      }
+
+      /* Action buttons - full width */
+      .btn {
+        width: 100%;
+        padding: 0.6rem 1rem;
         font-size: 0.85rem;
-        padding: 0.5rem 0.25rem;
+      }
+
+      .d-flex.justify-content-between {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      /* Bulk actions - stack vertically */
+      .bulk-actions-toolbar {
+        padding: 0.75rem;
+      }
+
+      .bulk-actions-toolbar .row {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .bulk-actions-toolbar .col-md-2,
+      .bulk-actions-toolbar .col-md-3,
+      .bulk-actions-toolbar .col-md-5 {
+        width: 100%;
+        flex: 0 0 100%;
+        max-width: 100%;
+      }
+
+      .bulk-actions-toolbar .text-end {
+        text-align: left !important;
+      }
+
+      .bulk-actions-toolbar .form-select,
+      .bulk-actions-toolbar .btn {
+        width: 100%;
+      }
+
+      /* Filter panel */
+      .filter-panel {
+        margin-bottom: 1rem;
+      }
+
+      .filter-header {
+        padding: 0.9rem 1rem;
+      }
+
+      .filter-title {
+        font-size: 0.95rem;
+      }
+
+      .filter-content {
+        padding: 1rem;
+      }
+
+      .filter-content .row {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .filter-content .col-md-5,
+      .filter-content .col-md-2 {
+        width: 100%;
+        flex: 0 0 100%;
+        max-width: 100%;
+      }
+
+      .filter-content .form-control,
+      .filter-content .form-select {
+        width: 100%;
+        font-size: 0.85rem;
+        padding: 0.55rem 0.7rem;
+      }
+
+      .filter-content .form-label {
+        font-size: 0.8rem;
+        margin-bottom: 0.35rem;
+      }
+
+      /* Table container */
+      .table-container {
+        margin-top: 0.75rem;
+      }
+
+      .table-header {
+        padding: 0.9rem 1rem;
+      }
+
+      .table-title {
+        font-size: 0.95rem;
+      }
+
+      .table-content {
+        padding: 0.75rem;
+      }
+
+      /* Table - horizontal scroll on mobile */
+      .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 0.5rem;
+      }
+
+      .table {
+        font-size: 0.8rem;
+        min-width: 600px; /* Ensure table doesn't squish */
+      }
+
+      .table th,
+      .table td {
+        padding: 0.6rem 0.5rem;
+        font-size: 0.8rem;
+        white-space: nowrap;
+      }
+
+      .table th {
+        font-size: 0.7rem;
+      }
+
+      /* Make action buttons smaller on mobile */
+      .table .btn {
+        width: auto !important;
+        padding: 0.35rem 0.5rem !important;
+        font-size: 0.7rem !important;
+        min-width: auto !important;
+        height: auto !important;
+      }
+
+      /* Reduce padding in table cells */
+      .table td > div > * {
+        margin-bottom: 0.15rem;
+      }
+
+      .table td > div > :last-child {
+        margin-bottom: 0;
+      }
+
+      /* Badges */
+      .badge {
+        padding: 0.3em 0.5em;
+        font-size: 0.7em;
+      }
+
+      /* Pagination */
+      .pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .pagination .page-link {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.75rem;
       }
     }
 
+    /* Small Mobile (576px and below) */
     @media (max-width: 576px) {
-      .table th, .table td {
+      .main-content {
+        padding-top: 0.75rem !important;
+        padding-bottom: 0.75rem !important;
+      }
+
+      .page-title {
+        font-size: 1.2rem;
+      }
+
+      .nav-tabs .nav-link {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+      }
+
+      /* Compact buttons */
+      .btn {
+        padding: 0.55rem 0.85rem;
         font-size: 0.8rem;
-        padding: 0.4rem 0.2rem;
+      }
+
+      /* Filter panel more compact */
+      .filter-header {
+        padding: 0.75rem 0.85rem;
+      }
+
+      .filter-title {
+        font-size: 0.85rem;
+      }
+
+      .filter-content {
+        padding: 0.85rem;
+      }
+
+      .filter-content .form-control,
+      .filter-content .form-select {
+        font-size: 0.8rem;
+        padding: 0.5rem 0.6rem;
+      }
+
+      /* Table even more compact */
+      .table {
+        font-size: 0.75rem;
+        min-width: 550px;
+      }
+
+      .table th,
+      .table td {
+        padding: 0.5rem 0.4rem;
+        font-size: 0.75rem;
+      }
+
+      .table th {
+        font-size: 0.65rem;
+      }
+
+      .table .btn {
+        padding: 0.3rem 0.4rem !important;
+        font-size: 0.65rem !important;
+      }
+
+      .badge {
+        padding: 0.25em 0.4em;
+        font-size: 0.65em;
+      }
+
+      /* Bulk actions */
+      .bulk-actions-toolbar {
+        padding: 0.6rem;
+      }
+
+      .bulk-actions-toolbar .form-select,
+      .bulk-actions-toolbar .btn {
+        font-size: 0.8rem;
+      }
+    }
+
+    /* Very Small Mobile (400px and below) */
+    @media (max-width: 400px) {
+      .page-title {
+        font-size: 1.1rem;
+      }
+
+      .nav-tabs .nav-link {
+        padding: 0.45rem 0.6rem;
+        font-size: 0.8rem;
+      }
+
+      .btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.75rem;
+      }
+
+      /* Ultra compact filter */
+      .filter-header {
+        padding: 0.65rem 0.75rem;
+      }
+
+      .filter-title {
+        font-size: 0.8rem;
+      }
+
+      .filter-content {
+        padding: 0.75rem;
+      }
+
+      .filter-content .form-control,
+      .filter-content .form-select {
+        font-size: 0.75rem;
+        padding: 0.45rem 0.55rem;
+      }
+
+      .filter-content .form-label {
+        font-size: 0.75rem;
+      }
+
+      /* Ultra compact table */
+      .table {
+        font-size: 0.7rem;
+        min-width: 500px;
+      }
+
+      .table th,
+      .table td {
+        padding: 0.4rem 0.35rem;
+        font-size: 0.7rem;
+      }
+
+      .table th {
+        font-size: 0.6rem;
+      }
+
+      .table .btn {
+        padding: 0.25rem 0.35rem !important;
+        font-size: 0.6rem !important;
+      }
+
+      .badge {
+        padding: 0.2em 0.35em;
+        font-size: 0.6em;
       }
     }
   </style>

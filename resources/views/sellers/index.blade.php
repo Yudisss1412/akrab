@@ -929,12 +929,13 @@
       }
 
       .seller-card-mobile {
-        background: var(--white);
-        border: 1px solid var(--border);
+        background: #ffffff !important;
+        border: 1px solid #dee2e6;
         border-radius: 0.75rem;
         box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         overflow: hidden;
         transition: all 0.2s ease;
+        color: #1f2937;
       }
 
       .seller-card-mobile:hover {
@@ -948,7 +949,8 @@
         gap: 0.75rem;
         padding: 1rem;
         background: linear-gradient(135deg, rgba(0,110,92,0.05) 0%, rgba(168,213,201,0.05) 100%);
-        border-bottom: 1px solid var(--border);
+        border-bottom: 1px solid #dee2e6;
+        color: #1f2937;
       }
 
       .seller-card-check {
@@ -964,13 +966,14 @@
       .seller-card-info {
         flex: 1;
         min-width: 0;
+        color: #1f2937;
       }
 
       .seller-card-name {
         display: block;
         font-size: 1rem;
         font-weight: 700;
-        color: var(--primary);
+        color: #006E5C;
         text-decoration: none;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -984,7 +987,7 @@
 
       .seller-card-id {
         font-size: 0.75rem;
-        color: var(--gray);
+        color: #6c757d;
       }
 
       .seller-card-badge {
@@ -1019,6 +1022,8 @@
 
       .seller-card-body {
         padding: 1rem;
+        color: #1f2937;
+        background: #ffffff;
       }
 
       .seller-card-section {
@@ -1032,7 +1037,7 @@
       .seller-card-section-title {
         font-size: 0.8rem;
         font-weight: 600;
-        color: var(--gray);
+        color: #6c757d;
         text-transform: uppercase;
         letter-spacing: 0.05em;
         margin-bottom: 0.5rem;
@@ -1044,6 +1049,7 @@
         align-items: center;
         padding: 0.4rem 0;
         border-bottom: 1px solid rgba(0,0,0,0.05);
+        color: #1f2937;
       }
 
       .seller-card-detail:last-child {
@@ -1052,13 +1058,13 @@
 
       .seller-card-label {
         font-size: 0.8rem;
-        color: var(--gray);
+        color: #6c757d;
         font-weight: 500;
       }
 
       .seller-card-value {
         font-size: 0.85rem;
-        color: var(--dark);
+        color: #1f2937;
         font-weight: 600;
         text-align: right;
         max-width: 60%;
@@ -1071,19 +1077,20 @@
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 0.75rem;
-        background: var(--light);
+        background: #f8f9fa;
         padding: 0.75rem;
         border-radius: 0.5rem;
       }
 
       .seller-card-stat {
         text-align: center;
+        color: #1f2937;
       }
 
       .stat-number {
         font-size: 0.9rem;
         font-weight: 700;
-        color: var(--primary);
+        color: #006E5C;
         margin-bottom: 0.25rem;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -1092,7 +1099,7 @@
 
       .stat-label {
         font-size: 0.7rem;
-        color: var(--gray);
+        color: #6c757d;
         font-weight: 500;
       }
 
@@ -1102,7 +1109,7 @@
         gap: 0.5rem;
         margin-top: 1rem;
         padding-top: 1rem;
-        border-top: 1px solid var(--border);
+        border-top: 1px solid #dee2e6;
       }
 
       .seller-card-actions .btn-card-action {
@@ -1119,6 +1126,7 @@
         cursor: pointer;
         transition: all 0.2s ease;
         text-decoration: none;
+        color: #ffffff;
       }
 
       .seller-card-actions .btn-card-action:hover {
@@ -1133,8 +1141,10 @@
       .seller-card-empty {
         text-align: center;
         padding: 3rem 1rem;
-        background: var(--white);
+        background: #ffffff;
         border-radius: 0.75rem;
+        border: 1px solid #dee2e6;
+        color: #6b7280;
       }
 
       /* Badges */

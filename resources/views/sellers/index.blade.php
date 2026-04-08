@@ -800,6 +800,100 @@
     }
 
     /* =========================================
+       MOBILE CARD STYLES (EXPLICIT HEX COLORS)
+       ========================================= */
+    .seller-mobile-card {
+        background-color: #ffffff !important;
+        border: 1px solid #dee2e6 !important;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        padding: 1rem;
+        margin-bottom: 1rem;
+        color: #1f2937 !important;
+    }
+
+    .card-header-mobile {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .card-store-name {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #006E5C !important;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    .card-info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .card-info-label {
+        color: #6b7280 !important;
+        font-weight: 500;
+        min-width: 80px;
+    }
+
+    .card-info-value {
+        color: #111827 !important;
+        font-weight: 600;
+        text-align: right;
+    }
+
+    .card-stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 0.5rem;
+        background: #f3f4f6;
+        padding: 0.75rem;
+        border-radius: 8px;
+        margin: 0.75rem 0;
+        text-align: center;
+    }
+
+    .stat-item-num {
+        font-weight: 700;
+        color: #006E5C !important;
+        display: block;
+        font-size: 1rem;
+    }
+    
+    .stat-item-label {
+        font-size: 0.75rem;
+        color: #6b7280 !important;
+    }
+
+    .card-actions-mobile {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .card-actions-mobile .btn {
+        flex: 1;
+        padding: 0.5rem;
+        font-size: 0.8rem;
+        border-radius: 6px;
+    }
+
+    /* Status Badges Mobile */
+    .badge-mobile-active { background: #d1fae5; color: #065f46 !important; }
+    .badge-mobile-suspended { background: #fee2e2; color: #991b1b !important; }
+    .badge-mobile-pending { background: #fef3c7; color: #92400e !important; }
+    .badge-mobile-new { background: #e0f2fe; color: #075985 !important; }
+
+    /* =========================================
        MOBILE RESPONSIVE - Simple & Effective
        ========================================= */
     
@@ -1053,8 +1147,119 @@
                 </div>
               </div>
 
-              <!-- Sellers Table -->
-              <div class="table-container mt-2">
+              <!-- ==========================================
+                   MOBILE VIEW: CARD LAYOUT (< 992px)
+                   ========================================== -->
+              <div class="d-lg-none">
+                <h4 class="mb-3" style="font-weight: 600; color: #374151;">Daftar Penjual</h4>
+                
+                @forelse($sellers ?? collect() as $seller)
+                <div class="seller-mobile-card">
+                    <!-- Header: Checkbox, Nama, Status -->
+                    <div class="card-header-mobile">
+                        <div class="d-flex align-items-center" style="gap: 0.75rem; flex: 1; min-width: 0;">
+                            <input type="checkbox" class="form-check-input seller-checkbox" value="{{ $seller->id }}" name="seller_ids[]" style="width: 1.2rem; height: 1.2rem;">
+                            <div style="overflow: hidden;">
+                                <a href="{{ route('sellers.show', $seller) }}" class="card-store-name">
+                                    {{ $seller->store_name }}
+                                </a>
+                                <small style="color: #6b7280;">ID: {{ $seller->id }}</small>
+                            </div>
+                        </div>
+
+                        @php
+                            $statusClass = 'badge-mobile-pending'; // default
+                            $statusText = 'N/A';
+                            switch($seller->status) {
+                              case 'aktif': $statusClass = 'badge-mobile-active'; $statusText = 'Aktif'; break;
+                              case 'ditangguhkan': $statusClass = 'badge-mobile-suspended'; $statusText = 'Ditangguhkan'; break;
+                              case 'menunggu_verifikasi': $statusClass = 'badge-mobile-pending'; $statusText = 'Pending'; break;
+                              case 'baru': $statusClass = 'badge-mobile-new'; $statusText = 'Baru'; break;
+                            }
+                        @endphp
+                        <span class="badge {{ $statusClass }} fw-bold" style="font-size: 0.75rem;">{{ $statusText }}</span>
+                    </div>
+
+                    <!-- Body: Info & Stats -->
+                    <div class="card-body-mobile">
+                        <!-- Info Pemilik -->
+                        <div class="card-info-row">
+                            <span class="card-info-label">Pemilik</span>
+                            <span class="card-info-value">{{ $seller->owner_name }}</span>
+                        </div>
+                        <div class="card-info-row">
+                            <span class="card-info-label">Email</span>
+                            <span class="card-info-value" style="font-size: 0.8rem;">{{ $seller->email }}</span>
+                        </div>
+                        <div class="card-info-row">
+                            <span class="card-info-label">Gabung</span>
+                            <span class="card-info-value">{{ $seller->join_date ? $seller->join_date->format('d M Y') : '-' }}</span>
+                        </div>
+
+                        <!-- Statistik Grid -->
+                        <div class="card-stats-grid">
+                            <div>
+                                <span class="stat-item-num">{{ $seller->active_products_count }}</span>
+                                <span class="stat-item-label">Produk</span>
+                            </div>
+                            <div>
+                                <span class="stat-item-num" style="font-size: 0.85rem;">Rp{{ number_format($seller->total_sales, 0, ',', '.') }}</span>
+                                <span class="stat-item-label">GMV</span>
+                            </div>
+                            <div>
+                                <span class="stat-item-num">
+                                    <i class="fas fa-star" style="color: #f59e0b; font-size: 0.8em;"></i> {{ number_format($seller->rating, 1) }}
+                                </span>
+                                <span class="stat-item-label">Rating</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer: Actions -->
+                    <div class="card-actions-mobile">
+                        <a href="{{ route('sellers.show', $seller) }}" class="btn btn-info text-white" title="Lihat">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{{ route('sellers.edit', $seller) }}" class="btn btn-primary" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        
+                        @if($seller->status !== 'ditangguhkan')
+                          <form action="{{ route('sellers.suspend', $seller) }}" method="POST" class="flex-fill">
+                            @csrf
+                            <button type="submit" class="btn btn-warning text-dark w-100" title="Tangguhkan">
+                              <i class="fas fa-pause"></i>
+                            </button>
+                          </form>
+                        @else
+                          <form action="{{ route('sellers.activate', $seller) }}" method="POST" class="flex-fill">
+                            @csrf
+                            <button type="submit" class="btn btn-success w-100" title="Aktifkan">
+                              <i class="fas fa-play"></i>
+                            </button>
+                          </form>
+                        @endif
+
+                        <form action="{{ route('sellers.destroy', $seller) }}" method="POST" class="flex-fill delete-seller-form">
+                          @csrf @method('DELETE')
+                          <button type="submit" class="btn btn-danger w-100" title="Hapus">
+                            <i class="fas fa-trash"></i>
+                          </button>
+                        </form>
+                    </div>
+                </div>
+                @empty
+                <div class="text-center py-5" style="color: #6b7280;">
+                    <i class="fas fa-inbox fa-3x mb-3"></i>
+                    <p>Tidak ada data penjual ditemukan.</p>
+                </div>
+                @endforelse
+              </div>
+
+              <!-- ==========================================
+                   DESKTOP VIEW: TABLE LAYOUT (>= 992px)
+                   ========================================== -->
+              <div class="d-none d-lg-block table-container mt-2">
                 <div class="table-header">
                   <h3 class="table-title">Daftar Penjual</h3>
                 </div>
@@ -1168,6 +1373,7 @@
                     </tbody>
                   </table>
                 </div>
+              </div>
 
                 <!-- Pagination -->
                 <div class="mt-3 d-flex justify-content-between align-items-center">

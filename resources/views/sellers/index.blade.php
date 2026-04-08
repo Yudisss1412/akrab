@@ -798,6 +798,161 @@
         padding: 0.4rem 0.2rem;
       }
     }
+
+    /* =========================================
+       MOBILE RESPONSIVE - Simple & Effective
+       ========================================= */
+    
+    @media (max-width: 768px) {
+      /* Reduce padding */
+      .main-content {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+      }
+
+      /* Stack page header */
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .page-title {
+        font-size: 1.4rem;
+      }
+
+      /* Stack tabs vertically */
+      .nav-tabs {
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .nav-tabs .nav-link {
+        width: 100%;
+        text-align: center;
+        padding: 0.75rem;
+      }
+
+      /* Full-width buttons */
+      .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+      }
+
+      .d-flex.justify-content-between {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      /* Stack bulk actions */
+      .bulk-actions-toolbar .row {
+        flex-direction: column;
+      }
+
+      .bulk-actions-toolbar .col-md-2,
+      .bulk-actions-toolbar .col-md-3,
+      .bulk-actions-toolbar .col-md-5 {
+        width: 100%;
+        max-width: 100%;
+        flex: 0 0 100%;
+        margin-bottom: 0.75rem;
+      }
+
+      .bulk-actions-toolbar .text-end {
+        text-align: left !important;
+      }
+
+      /* Stack filters */
+      .filter-content .row {
+        flex-direction: column;
+      }
+
+      .filter-content .col-md-5,
+      .filter-content .col-md-2 {
+        width: 100%;
+        max-width: 100%;
+        flex: 0 0 100%;
+        margin-bottom: 0.75rem;
+      }
+
+      .filter-content .form-control,
+      .filter-content .form-select {
+        width: 100%;
+      }
+
+      /* Table horizontal scroll */
+      .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .table {
+        min-width: 650px;
+        font-size: 0.85rem;
+      }
+
+      .table th {
+        font-size: 0.75rem;
+        white-space: nowrap;
+      }
+
+      .table td {
+        white-space: nowrap;
+      }
+
+      /* Keep action buttons small in table */
+      .table .btn {
+        width: auto !important;
+        padding: 0.35rem 0.5rem;
+        font-size: 0.75rem;
+        margin-bottom: 0;
+      }
+
+      /* Pagination wrap */
+      .pagination {
+        flex-wrap: wrap;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .page-title {
+        font-size: 1.2rem;
+      }
+
+      .table {
+        min-width: 600px;
+        font-size: 0.8rem;
+      }
+
+      .table th {
+        font-size: 0.7rem;
+      }
+
+      .table .btn {
+        padding: 0.3rem 0.4rem;
+        font-size: 0.7rem;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .page-title {
+        font-size: 1.1rem;
+      }
+
+      .table {
+        min-width: 550px;
+        font-size: 0.75rem;
+      }
+
+      .table th {
+        font-size: 0.65rem;
+      }
+
+      .table .btn {
+        padding: 0.25rem 0.35rem;
+        font-size: 0.65rem;
+      }
+    }
   </style>
 @endpush
 

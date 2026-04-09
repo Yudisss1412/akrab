@@ -7,6 +7,198 @@
   <link rel="stylesheet" href="{{ asset('css/admin/dashboard_admin.css') }}">
   <link rel="stylesheet" href="{{ asset('css/admin_penjual/style.css') }}">
   <link rel="stylesheet" href="{{ asset('css/admin/reports_violations.css') }}">
+  <style>
+    /* SHOPEE-STYLE MOBILE CARDS FOR VIOLATIONS */
+    .violation-card {
+        background-color: #ffffff !important;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        margin-bottom: 0.75rem;
+        overflow: hidden;
+        border: 1px solid #f0f0f0;
+    }
+
+    .violation-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+        background: #fafafa;
+        border-bottom: 1px solid #f0f0f0;
+        gap: 0.5rem;
+    }
+
+    .violation-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .violation-type {
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: #222222 !important;
+        display: block;
+        margin-bottom: 0.15rem;
+    }
+
+    .violation-date {
+        font-size: 0.75rem;
+        color: #6b7280 !important;
+    }
+
+    .violation-card-body {
+        padding: 1rem;
+    }
+
+    .violation-info-row {
+        display: flex;
+        margin-bottom: 0.5rem;
+        font-size: 0.85rem;
+        gap: 0.5rem;
+    }
+
+    .violation-info-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .violation-label {
+        color: #757575 !important;
+        min-width: 75px;
+        font-weight: 500;
+        flex-shrink: 0;
+    }
+
+    .violation-value {
+        color: #222222 !important;
+        font-weight: 600;
+        flex: 1;
+        text-align: right;
+        word-break: break-word;
+    }
+
+    .violation-card-footer {
+        display: flex;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        border-top: 1px solid #f0f0f0;
+        background: #fafafa;
+        flex-wrap: wrap;
+    }
+
+    .violation-action-btn {
+        flex: 1;
+        min-width: 70px;
+        padding: 0.5rem;
+        font-size: 0.8rem;
+        border-radius: 4px;
+        border: 1px solid #dee2e6;
+        background: #ffffff;
+        color: #222222 !important;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.3rem;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    .violation-action-btn:hover {
+        background: #f8f9fa;
+        border-color: #006E5C;
+        color: #006E5C !important;
+    }
+
+    .violation-action-btn.btn-primary {
+        background: #006E5C;
+        color: #ffffff !important;
+        border-color: #006E5C;
+    }
+
+    /* Status Pills */
+    .status-pill {
+        padding: 0.25rem 0.6rem;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .status-pill-pending {
+        background: #fef3c7;
+        color: #92400e !important;
+    }
+
+    .status-pill-investigating {
+        background: #e0f2fe;
+        color: #0369a1 !important;
+    }
+
+    .status-pill-resolved {
+        background: #e6fffa;
+        color: #006E5C !important;
+    }
+
+    .status-pill-dismissed {
+        background: #e5e7eb;
+        color: #374151 !important;
+    }
+
+    /* Hide mobile cards on desktop, show on mobile */
+    .mobile-cards { display: none; }
+    
+    @media (max-width: 991px) {
+        .desktop-table { display: none !important; }
+        .mobile-cards { display: block !important; }
+    }
+
+    /* SMALL MOBILE FIXES */
+    @media (max-width: 360px) {
+        .violation-card { padding: 0.5rem !important; }
+        .violation-card-header { padding: 0.6rem !important; }
+        .violation-card-body { padding: 0.75rem 0.5rem !important; }
+        .violation-info-row { gap: 0.25rem !important; }
+        .violation-label { min-width: 60px !important; }
+        .violation-card-footer { padding: 0.6rem 0.5rem !important; gap: 0.4rem !important; }
+        .violation-action-btn { padding: 0.4rem 0.3rem !important; font-size: 0.7rem !important; min-width: 55px !important; }
+        
+        /* Pagination fixes */
+        .mt-4 .d-flex { flex-direction: column !important; text-align: center; }
+        .pagination-controls { justify-content: center !important; }
+        .page-btn { padding: 0.35rem 0.5rem !important; font-size: 0.75rem !important; }
+    }
+
+    @media (max-width: 320px) {
+        .violation-card { padding: 0.4rem !important; }
+        .violation-card-header { padding: 0.5rem !important; flex-wrap: wrap; }
+        .violation-type { font-size: 0.9rem !important; }
+        .violation-card-body { padding: 0.6rem 0.4rem !important; }
+        .violation-label { min-width: 55px !important; font-size: 0.75rem !important; }
+        .violation-value { font-size: 0.8rem !important; }
+        .violation-card-footer { padding: 0.5rem 0.4rem !important; gap: 0.3rem !important; }
+        .violation-action-btn { flex: 1 1 calc(50% - 0.3rem) !important; padding: 0.35rem 0.2rem !important; font-size: 0.65rem !important; }
+        
+        /* Pagination fixes */
+        .mt-4 .d-flex { font-size: 0.8rem !important; }
+        .page-btn { padding: 0.3rem 0.4rem !important; font-size: 0.7rem !important; }
+    }
+
+    /* Force hide inactive tabs */
+    .tab-content > .tab-pane:not(.active),
+    .tab-pane.fade:not(.show) {
+        display: none !important;
+    }
+
+    /* Remove flex stretching */
+    .content-wrapper, .admin-page-content, .main-content, .main-layout {
+        flex: none !important; 
+        height: auto !important;
+        min-height: 0 !important;
+        margin-bottom: 1rem;
+    }
+  </style>
 @endpush
 
 @section('content')
@@ -165,8 +357,8 @@
         </div>
 
         <div class="table-container">
-          <!-- Tabel normal untuk desktop -->
-          <table id="violationsTable" class="d-none d-lg-table">
+          <!-- Desktop Table -->
+          <table id="violationsTable" class="desktop-table">
             <thead>
               <tr>
                 <th class="sortable" data-column="date">Tanggal <span class="sort-indicator"></span></th>
@@ -183,19 +375,12 @@
               <tr>
                 <td>{{ $report->created_at->format('Y-m-d') }}</td>
                 <td>
-                  @if($report->violation_type === 'product')
-                    Produk Palsu
-                  @elseif($report->violation_type === 'content')
-                    Konten Tidak Pantas
-                  @elseif($report->violation_type === 'scam')
-                    Penipuan
-                  @elseif($report->violation_type === 'copyright')
-                    Pelanggaran Hak Cipta
-                  @elseif($report->violation_type === 'other')
-                    Lainnya
-                  @else
-                    {{ ucfirst(str_replace('_', ' ', $report->violation_type)) }}
-                  @endif
+                  @if($report->violation_type === 'product') Produk Palsu
+                  @elseif($report->violation_type === 'content') Konten Tidak Pantas
+                  @elseif($report->violation_type === 'scam') Penipuan
+                  @elseif($report->violation_type === 'copyright') Pelanggaran Hak Cipta
+                  @elseif($report->violation_type === 'other') Lainnya
+                  @else {{ ucfirst(str_replace('_', ' ', $report->violation_type)) }} @endif
                 </td>
                 <td>{{ $report->violator->name ?? 'Penjual Tidak Ditemukan' }}</td>
                 <td>{{ $report->product->name ?? 'Tidak Ada Produk Terkait' }}</td>
@@ -225,69 +410,61 @@
             </tbody>
           </table>
 
-          <!-- Card view untuk mobile dan tablet -->
-          <div class="card-view-container d-lg-none">
+          <!-- Mobile Cards -->
+          <div class="mobile-cards">
+            <h5 class="mb-3" style="font-weight: 600; color: #374151;">Daftar Pelanggaran</h5>
             @forelse($reports as $report)
-            <div class="card mb-3">
-              <div class="card-body">
-                <div class="row mb-2">
-                  <div class="col-4"><strong>Tanggal:</strong></div>
-                  <div class="col-8">{{ $report->created_at->format('Y-m-d') }}</div>
+            <div class="violation-card">
+              <div class="violation-card-header">
+                <div class="violation-info">
+                  <span class="violation-type">
+                    @if($report->violation_type === 'product') Produk Palsu
+                    @elseif($report->violation_type === 'content') Konten Tidak Pantas
+                    @elseif($report->violation_type === 'scam') Penipuan
+                    @elseif($report->violation_type === 'copyright') Pelanggaran Hak Cipta
+                    @elseif($report->violation_type === 'other') Lainnya
+                    @else {{ ucfirst(str_replace('_', ' ', $report->violation_type)) }} @endif
+                  </span>
+                  <span class="violation-date">{{ $report->created_at->format('d M Y') }}</span>
                 </div>
-                <div class="row mb-2">
-                  <div class="col-4"><strong>Jenis:</strong></div>
-                  <div class="col-8">
-                    @if($report->violation_type === 'product')
-                      Produk Palsu
-                    @elseif($report->violation_type === 'content')
-                      Konten Tidak Pantas
-                    @elseif($report->violation_type === 'scam')
-                      Penipuan
-                    @elseif($report->violation_type === 'copyright')
-                      Pelanggaran Hak Cipta
-                    @elseif($report->violation_type === 'other')
-                      Lainnya
-                    @else
-                      {{ ucfirst(str_replace('_', ' ', $report->violation_type)) }}
-                    @endif
-                  </div>
+                @php
+                  $pillClass = '';
+                  $statusText = '';
+                  switch($report->status) {
+                    case 'pending': $pillClass = 'status-pill-pending'; $statusText = 'Pending'; break;
+                    case 'investigating': $pillClass = 'status-pill-investigating'; $statusText = 'Ditinjau'; break;
+                    case 'resolved': $pillClass = 'status-pill-resolved'; $statusText = 'Selesai'; break;
+                    case 'dismissed': $pillClass = 'status-pill-dismissed'; $statusText = 'Ditolak'; break;
+                    default: $pillClass = 'status-pill-pending'; $statusText = 'Pending';
+                  }
+                @endphp
+                <span class="status-pill {{ $pillClass }}">{{ $statusText }}</span>
+              </div>
+              <div class="violation-card-body">
+                <div class="violation-info-row">
+                  <span class="violation-label">Penjual</span>
+                  <span class="violation-value">{{ $report->violator->name ?? 'N/A' }}</span>
                 </div>
-                <div class="row mb-2">
-                  <div class="col-4"><strong>Penjual:</strong></div>
-                  <div class="col-8">{{ $report->violator->name ?? 'Penjual Tidak Ditemukan' }}</div>
+                <div class="violation-info-row">
+                  <span class="violation-label">Produk</span>
+                  <span class="violation-value">{{ $report->product->name ?? 'N/A' }}</span>
                 </div>
-                <div class="row mb-2">
-                  <div class="col-4"><strong>Produk:</strong></div>
-                  <div class="col-8">{{ $report->product->name ?? 'Tidak Ada Produk Terkait' }}</div>
+                <div class="violation-info-row">
+                  <span class="violation-label">Pelapor</span>
+                  <span class="violation-value">{{ $report->reporter->name ?? 'N/A' }}</span>
                 </div>
-                <div class="row mb-2">
-                  <div class="col-4"><strong>Pelapor:</strong></div>
-                  <div class="col-8">{{ $report->reporter->name ?? 'Pelapor Tidak Ditemukan' }}</div>
-                </div>
-                <div class="row mb-3">
-                  <div class="col-4"><strong>Status:</strong></div>
-                  <div class="col-8">
-                    <span class="status-badge
-                      @if($report->status === 'pending') status-pending
-                      @elseif($report->status === 'investigating') status-investigating
-                      @elseif($report->status === 'resolved') status-resolved
-                      @elseif($report->status === 'dismissed') status-dismissed
-                      @else status-pending @endif">
-                      {{ ucfirst(str_replace('_', ' ', $report->status)) }}
-                    </span>
-                  </div>
-                </div>
-                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                  <a href="{{ route('reports.violations.detail', $report->id) }}" class="btn btn-outline-primary btn-sm">Lihat</a>
-                  @if($report->status === 'pending' || $report->status === 'investigating')
-                  <button class="btn btn-success btn-sm" onclick="updateReportStatus({{ $report->id }})">Selesaikan</button>
-                  @endif
-                </div>
+              </div>
+              <div class="violation-card-footer">
+                <a href="{{ route('reports.violations.detail', $report->id) }}" class="violation-action-btn" title="Lihat"><i class="fas fa-eye"></i> Lihat</a>
+                @if($report->status === 'pending' || $report->status === 'investigating')
+                <button class="violation-action-btn btn-primary" onclick="updateReportStatus({{ $report->id }})" title="Selesaikan"><i class="fas fa-check"></i> Selesaikan</button>
+                @endif
               </div>
             </div>
             @empty
-            <div class="text-center p-4">
-              <p>Tidak ada laporan pelanggaran ditemukan</p>
+            <div class="text-center py-5" style="color: #6b7280;">
+              <i class="fas fa-inbox fa-3x mb-3"></i>
+              <p>Tidak ada laporan pelanggaran ditemukan.</p>
             </div>
             @endforelse
           </div>

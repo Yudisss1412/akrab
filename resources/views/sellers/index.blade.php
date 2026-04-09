@@ -1578,8 +1578,102 @@
                 </div>
               </div>
 
-              <!-- Buyers Table -->
-              <div class="table-container mt-2">
+              <!-- ==========================================
+                   MOBILE: SHOPEE-STYLE CARDS (< 992px)
+                   ========================================== -->
+              <div class="d-lg-none">
+                <h5 class="mb-3" style="font-weight: 600; color: #374151;">Daftar Pembeli</h5>
+                
+                @forelse($buyers ?? collect() as $buyer)
+                <div class="shopee-card">
+                    <!-- Header: Checkbox + Name + Status -->
+                    <div class="shopee-card-header">
+                        <div class="shopee-store-info">
+                            <input type="checkbox" class="form-check-input buyer-checkbox" value="{{ $buyer->id }}" name="user_ids[]" style="width: 1.1rem; height: 1.1rem; flex-shrink: 0;">
+                            <a href="{{ route('sellers.edit_user', $buyer) }}" class="shopee-store-name">
+                                {{ $buyer->name }}
+                            </a>
+                        </div>
+                        
+                        @php
+                            $pillClass = $buyer->status === 'suspended' ? 'status-pill-suspended' : 'status-pill-active';
+                            $statusText = $buyer->status === 'suspended' ? 'Ditangguhkan' : 'Aktif';
+                        @endphp
+                        <span class="status-pill {{ $pillClass }}">{{ $statusText }}</span>
+                    </div>
+
+                    <!-- Body: User Info -->
+                    <div class="shopee-card-body">
+                        <div class="shopee-info-row">
+                            <span class="shopee-info-label">Email</span>
+                            <span class="shopee-info-value">{{ $buyer->email }}</span>
+                        </div>
+                        <div class="shopee-info-row">
+                            <span class="shopee-info-label">Bergabung</span>
+                            <span class="shopee-info-value">{{ $buyer->created_at ? $buyer->created_at->format('d M Y') : '-' }}</span>
+                        </div>
+
+                        <!-- Stats Bar -->
+                        <div class="shopee-stats-bar">
+                            <div class="shopee-stat-item">
+                                <span class="shopee-stat-num">
+                                  @php
+                                    $totalOrders = isset($buyer->orders) ? $buyer->orders->count() : $buyer->orders()->count();
+                                  @endphp
+                                  {{ $totalOrders }}
+                                </span>
+                                <span class="shopee-stat-label">Transaksi</span>
+                            </div>
+                            <div class="shopee-stat-item">
+                                <span class="shopee-stat-num">
+                                  @php
+                                    $totalSpending = isset($buyer->orders) ? $buyer->orders->sum('total_amount') : $buyer->orders()->sum('total_amount');
+                                  @endphp
+                                  Rp{{ number_format($totalSpending, 0, ',', '.') }}
+                                </span>
+                                <span class="shopee-stat-label">Spending</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer: Action Buttons -->
+                    <div class="shopee-card-footer">
+                        <a href="{{ route('sellers.user_history', $buyer) }}" class="shopee-action-btn" title="Riwayat">
+                            <i class="fas fa-history"></i> Riwayat
+                        </a>
+                        <a href="{{ route('sellers.edit_user', $buyer) }}" class="shopee-action-btn btn-primary" title="Edit">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        
+                        @if($buyer->status === 'suspended')
+                          <form action="{{ route('sellers.activate_user', $buyer) }}" method="POST" class="flex-fill">
+                            @csrf
+                            <button type="submit" class="shopee-action-btn" style="color: #006E5C !important; border-color: #006E5C;" title="Aktifkan">
+                              <i class="fas fa-play"></i> Aktifkan
+                            </button>
+                          </form>
+                        @else
+                          <form action="{{ route('sellers.suspend_user', $buyer) }}" method="POST" class="flex-fill">
+                            @csrf
+                            <button type="submit" class="shopee-action-btn" style="color: #92400e !important; border-color: #f59e0b;" title="Tangguhkan">
+                              <i class="fas fa-pause"></i> Tangguh
+                            </button>
+                          </form>
+                        @endif
+                    </div>
+                </div>
+                @empty
+                <div class="text-center py-5" style="color: #6b7280;">
+                    <i class="fas fa-inbox fa-3x mb-3"></i>
+                    <p>Tidak ada data pembeli ditemukan.</p>
+                </div>
+                @endforelse
+              </div>
+
+              <!-- ==========================================
+                   DESKTOP: TABLE LAYOUT (>= 992px)
+                   ========================================== -->
+              <div class="d-none d-lg-block table-container mt-2">
                 <div class="table-header">
                   <h3 class="table-title">Daftar Pembeli</h3>
                 </div>
@@ -1658,6 +1752,7 @@
                     </tbody>
                   </table>
                   </div>
+              </div>
 
                   <!-- Pagination for buyers -->
                   <div class="mt-3 d-flex justify-content-between align-items-center">

@@ -837,8 +837,125 @@
     }
 
     /* =========================================
-       SHOPEE-STYLE MOBILE CARDS (NO IMAGES)
+       SMALL MOBILE FIXES (360px & 320px)
        ========================================= */
+    @media (max-width: 360px) {
+      .shopee-card {
+        padding: 0.5rem !important;
+      }
+
+      .shopee-card-header {
+        padding: 0.6rem !important;
+      }
+
+      .shopee-card-body {
+        padding: 0.75rem 0.5rem !important;
+      }
+
+      .shopee-info-row {
+        gap: 0.25rem !important;
+      }
+
+      .shopee-info-label {
+        min-width: 60px !important;
+      }
+
+      .shopee-stats-bar {
+        gap: 0.4rem !important;
+        padding: 0.5rem !important;
+      }
+
+      .shopee-stat-num {
+        font-size: 0.85rem !important;
+      }
+
+      .shopee-stat-label {
+        font-size: 0.65rem !important;
+      }
+
+      .shopee-card-footer {
+        padding: 0.6rem 0.5rem !important;
+        gap: 0.4rem !important;
+      }
+
+      .shopee-action-btn {
+        padding: 0.4rem 0.3rem !important;
+        font-size: 0.7rem !important;
+        gap: 0.2rem !important;
+        min-width: 60px !important;
+      }
+
+      .status-pill {
+        font-size: 0.65rem !important;
+        padding: 0.2rem 0.5rem !important;
+      }
+    }
+
+    @media (max-width: 320px) {
+      .shopee-card {
+        padding: 0.4rem !important;
+      }
+
+      .shopee-card-header {
+        padding: 0.5rem !important;
+        flex-wrap: wrap;
+      }
+
+      .shopee-store-name {
+        font-size: 0.9rem !important;
+        max-width: 60% !important;
+      }
+
+      .shopee-card-body {
+        padding: 0.6rem 0.4rem !important;
+      }
+
+      .shopee-info-label {
+        min-width: 55px !important;
+        font-size: 0.75rem !important;
+      }
+
+      .shopee-info-value {
+        font-size: 0.8rem !important;
+      }
+
+      .shopee-stats-bar {
+        flex-wrap: wrap !important;
+        gap: 0.3rem !important;
+        padding: 0.4rem !important;
+      }
+
+      .shopee-stat-item {
+        flex: 1 1 30% !important;
+        min-width: 80px !important;
+      }
+
+      .shopee-stat-num {
+        font-size: 0.8rem !important;
+      }
+
+      .shopee-stat-label {
+        font-size: 0.6rem !important;
+      }
+
+      .shopee-card-footer {
+        padding: 0.5rem 0.4rem !important;
+        gap: 0.3rem !important;
+        flex-wrap: wrap !important;
+      }
+
+      .shopee-action-btn {
+        flex: 1 1 calc(50% - 0.3rem) !important;
+        padding: 0.35rem 0.2rem !important;
+        font-size: 0.65rem !important;
+        min-width: 0 !important;
+      }
+
+      .status-pill {
+        font-size: 0.6rem !important;
+        padding: 0.15rem 0.4rem !important;
+      }
+    }
     .shopee-card {
         background-color: #ffffff !important;
         border-radius: 8px;
@@ -1173,6 +1290,38 @@
         padding: 0.25rem 0.35rem;
         font-size: 0.65rem;
       }
+    }
+    /* =========================================
+       SMALL MOBILE FIXES (360px & 320px)
+       ========================================= */
+    @media (max-width: 360px) {
+      .shopee-card { padding: 0.5rem !important; }
+      .shopee-card-header { padding: 0.6rem !important; }
+      .shopee-card-body { padding: 0.75rem 0.5rem !important; }
+      .shopee-info-row { gap: 0.25rem !important; }
+      .shopee-info-label { min-width: 60px !important; }
+      .shopee-stats-bar { gap: 0.4rem !important; padding: 0.5rem !important; }
+      .shopee-stat-num { font-size: 0.85rem !important; }
+      .shopee-stat-label { font-size: 0.65rem !important; }
+      .shopee-card-footer { padding: 0.6rem 0.5rem !important; gap: 0.4rem !important; }
+      .shopee-action-btn { padding: 0.4rem 0.3rem !important; font-size: 0.7rem !important; gap: 0.2rem !important; min-width: 60px !important; }
+      .status-pill { font-size: 0.65rem !important; padding: 0.2rem 0.5rem !important; }
+    }
+
+    @media (max-width: 320px) {
+      .shopee-card { padding: 0.4rem !important; }
+      .shopee-card-header { padding: 0.5rem !important; flex-wrap: wrap; }
+      .shopee-store-name { font-size: 0.9rem !important; max-width: 60% !important; }
+      .shopee-card-body { padding: 0.6rem 0.4rem !important; }
+      .shopee-info-label { min-width: 55px !important; font-size: 0.75rem !important; }
+      .shopee-info-value { font-size: 0.8rem !important; }
+      .shopee-stats-bar { flex-wrap: wrap !important; gap: 0.3rem !important; padding: 0.4rem !important; }
+      .shopee-stat-item { flex: 1 1 30% !important; min-width: 80px !important; }
+      .shopee-stat-num { font-size: 0.8rem !important; }
+      .shopee-stat-label { font-size: 0.6rem !important; }
+      .shopee-card-footer { padding: 0.5rem 0.4rem !important; gap: 0.3rem !important; flex-wrap: wrap !important; }
+      .shopee-action-btn { flex: 1 1 calc(50% - 0.3rem) !important; padding: 0.35rem 0.2rem !important; font-size: 0.65rem !important; min-width: 0 !important; }
+      .status-pill { font-size: 0.6rem !important; padding: 0.15rem 0.4rem !important; }
     }
   </style>
 @endpush

@@ -165,9 +165,30 @@
         .violation-action-btn { padding: 0.4rem 0.3rem !important; font-size: 0.7rem !important; min-width: 55px !important; }
         
         /* Pagination fixes */
-        .mt-4 .d-flex { flex-direction: column !important; text-align: center; }
-        .pagination-controls { justify-content: center !important; }
-        .page-btn { padding: 0.35rem 0.5rem !important; font-size: 0.75rem !important; }
+        .mt-4 .d-flex.flex-column.flex-md-row {
+            flex-direction: column !important;
+            text-align: center !important;
+            gap: 0.5rem !important;
+        }
+        .pagination-controls {
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            justify-content: center !important;
+            gap: 0.2rem !important;
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+        .page-btn {
+            padding: 0.35rem 0.5rem !important;
+            font-size: 0.75rem !important;
+            min-width: 28px !important;
+            white-space: nowrap !important;
+        }
+        .pagination-info {
+            font-size: 0.75rem !important;
+            line-height: 1.3 !important;
+            word-break: break-word !important;
+        }
     }
 
     @media (max-width: 320px) {
@@ -181,8 +202,21 @@
         .violation-action-btn { flex: 1 1 calc(50% - 0.3rem) !important; padding: 0.35rem 0.2rem !important; font-size: 0.65rem !important; }
         
         /* Pagination fixes */
-        .mt-4 .d-flex { font-size: 0.8rem !important; }
-        .page-btn { padding: 0.3rem 0.4rem !important; font-size: 0.7rem !important; }
+        .mt-4 .d-flex.flex-column.flex-md-row { 
+            font-size: 0.7rem !important;
+            gap: 0.4rem !important;
+        }
+        .pagination-controls {
+            gap: 0.15rem !important;
+        }
+        .page-btn { 
+            padding: 0.3rem 0.4rem !important; 
+            font-size: 0.7rem !important;
+            min-width: 26px !important;
+        }
+        .pagination-info {
+            font-size: 0.7rem !important;
+        }
     }
 
     /* Force hide inactive tabs */

@@ -328,6 +328,24 @@
         .product-stat-num { font-size: 0.85rem !important; }
         .product-card-footer { padding: 0.6rem 0.5rem !important; gap: 0.4rem !important; }
         .product-action-btn { padding: 0.4rem 0.3rem !important; font-size: 0.7rem !important; min-width: 55px !important; }
+        
+        /* Pagination fixes for small screens */
+        .mt-3.d-flex.justify-content-between.align-items-center {
+            flex-direction: column;
+            text-align: center;
+            gap: 0.5rem;
+        }
+        
+        .pagination {
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.25rem;
+        }
+        
+        .pagination .page-link {
+            padding: 0.35rem 0.5rem;
+            font-size: 0.75rem;
+        }
     }
 
     @media (max-width: 320px) {
@@ -340,6 +358,16 @@
         .product-stats-bar { gap: 0.3rem !important; padding: 0.4rem !important; }
         .product-card-footer { padding: 0.5rem 0.4rem !important; gap: 0.3rem !important; }
         .product-action-btn { flex: 1 1 calc(50% - 0.3rem) !important; padding: 0.35rem 0.2rem !important; font-size: 0.65rem !important; }
+        
+        /* Further pagination fixes for 320px */
+        .mt-3.d-flex.justify-content-between.align-items-center {
+            font-size: 0.8rem;
+        }
+        
+        .pagination .page-link {
+            padding: 0.3rem 0.4rem;
+            font-size: 0.7rem;
+        }
     }
 
     /* Force hide inactive tabs */

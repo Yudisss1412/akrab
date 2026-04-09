@@ -835,7 +835,8 @@
         text-decoration: none;
         overflow: hidden;
         text-overflow: ellipsis;
-        white-space: nowrap;
+        white-space: normal;
+        max-width: 70%;
     }
 
     .shopee-store-name:hover {
@@ -850,6 +851,7 @@
         display: flex;
         margin-bottom: 0.5rem;
         font-size: 0.85rem;
+        gap: 0.5rem;
     }
 
     .shopee-info-row:last-child {
@@ -858,8 +860,9 @@
 
     .shopee-info-label {
         color: #757575 !important;
-        min-width: 90px;
+        min-width: 75px;
         font-weight: 500;
+        flex-shrink: 0;
     }
 
     .shopee-info-value {
@@ -867,9 +870,8 @@
         font-weight: 600;
         flex: 1;
         text-align: right;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        word-break: break-word;
+        overflow-wrap: break-word;
     }
 
     .shopee-stats-bar {
@@ -903,10 +905,12 @@
         padding: 0.75rem 1rem;
         border-top: 1px solid #f0f0f0;
         background: #fafafa;
+        flex-wrap: wrap;
     }
 
     .shopee-action-btn {
         flex: 1;
+        min-width: 70px;
         padding: 0.5rem;
         font-size: 0.8rem;
         border-radius: 4px;
@@ -921,6 +925,7 @@
         justify-content: center;
         gap: 0.3rem;
         text-decoration: none;
+        white-space: nowrap;
     }
 
     .shopee-action-btn:hover {
@@ -1284,7 +1289,7 @@
                                 <span class="shopee-stat-label">Produk</span>
                             </div>
                             <div class="shopee-stat-item">
-                                <span class="shopee-stat-num">Rp{{ number_format($seller->total_sales, 0, ',', '.') }}</span>
+                                <span class="shopee-stat-num">Rp{{ number_format($seller->total_sales, 2, ',', '.') }}</span>
                                 <span class="shopee-stat-label">GMV</span>
                             </div>
                             <div class="shopee-stat-item">

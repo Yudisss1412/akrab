@@ -800,6 +800,185 @@
     }
 
     /* =========================================
+       SHOPEE-STYLE MOBILE CARDS (NO IMAGES)
+       ========================================= */
+    .shopee-card {
+        background-color: #ffffff !important;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        margin-bottom: 0.75rem;
+        overflow: hidden;
+        border: 1px solid #f0f0f0;
+    }
+
+    .shopee-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+        background: #fafafa;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .shopee-store-info {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .shopee-store-name {
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: #222222 !important;
+        text-decoration: none;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .shopee-store-name:hover {
+        color: #006E5C !important;
+    }
+
+    .shopee-card-body {
+        padding: 1rem;
+    }
+
+    .shopee-info-row {
+        display: flex;
+        margin-bottom: 0.5rem;
+        font-size: 0.85rem;
+    }
+
+    .shopee-info-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .shopee-info-label {
+        color: #757575 !important;
+        min-width: 90px;
+        font-weight: 500;
+    }
+
+    .shopee-info-value {
+        color: #222222 !important;
+        font-weight: 600;
+        flex: 1;
+        text-align: right;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .shopee-stats-bar {
+        display: flex;
+        gap: 1rem;
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid #f0f0f0;
+        font-size: 0.8rem;
+    }
+
+    .shopee-stat-item {
+        flex: 1;
+        text-align: center;
+    }
+
+    .shopee-stat-num {
+        font-weight: 700;
+        color: #006E5C !important;
+        display: block;
+    }
+
+    .shopee-stat-label {
+        color: #757575 !important;
+        font-size: 0.75rem;
+    }
+
+    .shopee-card-footer {
+        display: flex;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        border-top: 1px solid #f0f0f0;
+        background: #fafafa;
+    }
+
+    .shopee-action-btn {
+        flex: 1;
+        padding: 0.5rem;
+        font-size: 0.8rem;
+        border-radius: 4px;
+        border: 1px solid #dee2e6;
+        background: #ffffff;
+        color: #222222 !important;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.3rem;
+        text-decoration: none;
+    }
+
+    .shopee-action-btn:hover {
+        background: #f8f9fa;
+        border-color: #006E5C;
+        color: #006E5C !important;
+    }
+
+    .shopee-action-btn.btn-primary {
+        background: #006E5C;
+        color: #ffffff !important;
+        border-color: #006E5C;
+    }
+
+    .shopee-action-btn.btn-primary:hover {
+        background: #005a4a;
+    }
+
+    .shopee-action-btn.btn-danger {
+        color: #dc3545 !important;
+        border-color: #dc3545;
+    }
+
+    .shopee-action-btn.btn-danger:hover {
+        background: #dc3545;
+        color: #ffffff !important;
+    }
+
+    /* Status Badges */
+    .status-pill {
+        padding: 0.25rem 0.6rem;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .status-pill-active {
+        background: #e6fffa;
+        color: #006E5C !important;
+    }
+
+    .status-pill-suspended {
+        background: #fee2e2;
+        color: #dc3545 !important;
+    }
+
+    .status-pill-pending {
+        background: #fef3c7;
+        color: #92400e !important;
+    }
+
+    .status-pill-new {
+        background: #e0f2fe;
+        color: #0369a1 !important;
+    }
+
+    /* =========================================
        MOBILE RESPONSIVE - Simple & Effective
        ========================================= */
     
@@ -1053,8 +1232,115 @@
                 </div>
               </div>
 
-              <!-- Sellers Table -->
-              <div class="table-container mt-2">
+              <!-- ==========================================
+                   MOBILE: SHOPEE-STYLE CARDS (< 992px)
+                   ========================================== -->
+              <div class="d-lg-none">
+                <h5 class="mb-3" style="font-weight: 600; color: #374151;">Daftar Penjual</h5>
+                
+                @forelse($sellers ?? collect() as $seller)
+                <div class="shopee-card">
+                    <!-- Header: Checkbox + Store Name + Status -->
+                    <div class="shopee-card-header">
+                        <div class="shopee-store-info">
+                            <input type="checkbox" class="form-check-input seller-checkbox" value="{{ $seller->id }}" name="seller_ids[]" style="width: 1.1rem; height: 1.1rem; flex-shrink: 0;">
+                            <a href="{{ route('sellers.show', $seller) }}" class="shopee-store-name">
+                                {{ $seller->store_name }}
+                            </a>
+                        </div>
+                        
+                        @php
+                            $pillClass = 'status-pill-pending';
+                            $statusText = 'N/A';
+                            switch($seller->status) {
+                              case 'aktif': $pillClass = 'status-pill-active'; $statusText = 'Aktif'; break;
+                              case 'ditangguhkan': $pillClass = 'status-pill-suspended'; $statusText = 'Ditangguhkan'; break;
+                              case 'menunggu_verifikasi': $pillClass = 'status-pill-pending'; $statusText = 'Pending'; break;
+                              case 'baru': $pillClass = 'status-pill-new'; $statusText = 'Baru'; break;
+                            }
+                        @endphp
+                        <span class="status-pill {{ $pillClass }}">{{ $statusText }}</span>
+                    </div>
+
+                    <!-- Body: Owner Info -->
+                    <div class="shopee-card-body">
+                        <div class="shopee-info-row">
+                            <span class="shopee-info-label">Pemilik</span>
+                            <span class="shopee-info-value">{{ $seller->owner_name }}</span>
+                        </div>
+                        <div class="shopee-info-row">
+                            <span class="shopee-info-label">Email</span>
+                            <span class="shopee-info-value">{{ $seller->email }}</span>
+                        </div>
+                        <div class="shopee-info-row">
+                            <span class="shopee-info-label">Bergabung</span>
+                            <span class="shopee-info-value">{{ $seller->join_date ? $seller->join_date->format('d M Y') : '-' }}</span>
+                        </div>
+
+                        <!-- Stats Bar -->
+                        <div class="shopee-stats-bar">
+                            <div class="shopee-stat-item">
+                                <span class="shopee-stat-num">{{ $seller->active_products_count }}</span>
+                                <span class="shopee-stat-label">Produk</span>
+                            </div>
+                            <div class="shopee-stat-item">
+                                <span class="shopee-stat-num">Rp{{ number_format($seller->total_sales, 0, ',', '.') }}</span>
+                                <span class="shopee-stat-label">GMV</span>
+                            </div>
+                            <div class="shopee-stat-item">
+                                <span class="shopee-stat-num">
+                                    <i class="fas fa-star" style="color: #f59e0b;"></i> {{ number_format($seller->rating, 1) }}
+                                </span>
+                                <span class="shopee-stat-label">Rating</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer: Action Buttons -->
+                    <div class="shopee-card-footer">
+                        <a href="{{ route('sellers.show', $seller) }}" class="shopee-action-btn" title="Lihat">
+                            <i class="fas fa-eye"></i> Lihat
+                        </a>
+                        <a href="{{ route('sellers.edit', $seller) }}" class="shopee-action-btn btn-primary" title="Edit">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        
+                        @if($seller->status !== 'ditangguhkan')
+                          <form action="{{ route('sellers.suspend', $seller) }}" method="POST" class="flex-fill">
+                            @csrf
+                            <button type="submit" class="shopee-action-btn" style="color: #92400e !important; border-color: #f59e0b;" title="Tangguhkan">
+                              <i class="fas fa-pause"></i> Tangguh
+                            </button>
+                          </form>
+                        @else
+                          <form action="{{ route('sellers.activate', $seller) }}" method="POST" class="flex-fill">
+                            @csrf
+                            <button type="submit" class="shopee-action-btn" style="color: #006E5C !important; border-color: #006E5C;" title="Aktifkan">
+                              <i class="fas fa-play"></i> Aktifkan
+                            </button>
+                          </form>
+                        @endif
+
+                        <form action="{{ route('sellers.destroy', $seller) }}" method="POST" class="flex-fill delete-seller-form">
+                          @csrf @method('DELETE')
+                          <button type="submit" class="shopee-action-btn btn-danger" title="Hapus">
+                            <i class="fas fa-trash"></i> Hapus
+                          </button>
+                        </form>
+                    </div>
+                </div>
+                @empty
+                <div class="text-center py-5" style="color: #6b7280;">
+                    <i class="fas fa-inbox fa-3x mb-3"></i>
+                    <p>Tidak ada data penjual ditemukan.</p>
+                </div>
+                @endforelse
+              </div>
+
+              <!-- ==========================================
+                   DESKTOP: TABLE LAYOUT (>= 992px)
+                   ========================================== -->
+              <div class="d-none d-lg-block table-container mt-2">
                 <div class="table-header">
                   <h3 class="table-title">Daftar Penjual</h3>
                 </div>
@@ -1168,6 +1454,7 @@
                     </tbody>
                   </table>
                 </div>
+              </div>
 
                 <!-- Pagination -->
                 <div class="mt-3 d-flex justify-content-between align-items-center">

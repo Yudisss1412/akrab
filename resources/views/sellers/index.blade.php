@@ -1323,6 +1323,21 @@
       .shopee-action-btn { flex: 1 1 calc(50% - 0.3rem) !important; padding: 0.35rem 0.2rem !important; font-size: 0.65rem !important; min-width: 0 !important; }
       .status-pill { font-size: 0.6rem !important; padding: 0.15rem 0.4rem !important; }
     }
+    /* =========================================
+       FINAL FIX: FORCE HIDE GHOSTS & FLEXBOX
+       ========================================= */
+    .content-wrapper, .admin-page-content, .main-content, .main-layout {
+        flex: none !important; 
+        height: auto !important;
+        min-height: 0 !important;
+        margin-bottom: 1rem;
+    }
+
+    /* USIR HANTU TAB YANG LAGI NGGAK AKTIF */
+    .tab-content > .tab-pane:not(.active),
+    .tab-pane.fade:not(.show) {
+        display: none !important;
+    }
   </style>
 @endpush
 

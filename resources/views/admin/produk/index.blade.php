@@ -9,6 +9,353 @@
   <link rel="stylesheet" href="{{ asset('css/admin/dashboard_admin.css') }}">
   <link rel="stylesheet" href="{{ asset('css/admin_penjual/style.css') }}">
   <link rel="stylesheet" href="{{ asset('css/admin/produk.css') }}">
+  <style>
+    /* SHOPEE-STYLE MOBILE CARDS FOR PRODUCTS */
+    .product-card {
+        background-color: #ffffff !important;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        margin-bottom: 0.75rem;
+        overflow: hidden;
+        border: 1px solid #f0f0f0;
+    }
+
+    .product-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+        background: #fafafa;
+        border-bottom: 1px solid #f0f0f0;
+        gap: 0.5rem;
+    }
+
+    .product-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .product-name {
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: #222222 !important;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 0.15rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .product-name:hover {
+        color: #006E5C !important;
+    }
+
+    .product-sku {
+        font-size: 0.75rem;
+        color: #6b7280 !important;
+    }
+
+    .product-card-body {
+        padding: 1rem;
+    }
+
+    .product-info-row {
+        display: flex;
+        margin-bottom: 0.5rem;
+        font-size: 0.85rem;
+        gap: 0.5rem;
+    }
+
+    .product-info-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .product-label {
+        color: #757575 !important;
+        min-width: 75px;
+        font-weight: 500;
+        flex-shrink: 0;
+    }
+
+    .product-value {
+        color: #222222 !important;
+        font-weight: 600;
+        flex: 1;
+        text-align: right;
+        word-break: break-word;
+    }
+
+    .product-stats-bar {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid #f0f0f0;
+        font-size: 0.8rem;
+        flex-wrap: wrap;
+    }
+
+    .product-stat-item {
+        flex: 1;
+        min-width: 80px;
+        text-align: center;
+    }
+
+    .product-stat-num {
+        font-weight: 700;
+        color: #006E5C !important;
+        display: block;
+    }
+
+    .product-stat-label {
+        color: #757575 !important;
+        font-size: 0.75rem;
+    }
+
+    .product-card-footer {
+        display: flex;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        border-top: 1px solid #f0f0f0;
+        background: #fafafa;
+        flex-wrap: wrap;
+    }
+
+    .product-action-btn {
+        flex: 1;
+        min-width: 60px;
+        padding: 0.5rem;
+        font-size: 0.8rem;
+        border-radius: 4px;
+        border: 1px solid #dee2e6;
+        background: #ffffff;
+        color: #222222 !important;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.3rem;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    .product-action-btn:hover {
+        background: #f8f9fa;
+        border-color: #006E5C;
+        color: #006E5C !important;
+    }
+
+    .product-action-btn.btn-view {
+        color: #17a2b8 !important;
+        border-color: #17a2b8;
+    }
+
+    .product-action-btn.btn-edit {
+        background: #006E5C;
+        color: #ffffff !important;
+        border-color: #006E5C;
+    }
+
+    .product-action-btn.btn-edit:hover {
+        background: #005a4a;
+    }
+
+    .product-action-btn.btn-approve {
+        color: #28a745 !important;
+        border-color: #28a745;
+    }
+
+    .product-action-btn.btn-reject {
+        color: #dc3545 !important;
+        border-color: #dc3545;
+    }
+
+    .product-action-btn.btn-suspend {
+        color: #92400e !important;
+        border-color: #f59e0b;
+    }
+
+    /* Status Pills */
+    .status-pill {
+        padding: 0.25rem 0.6rem;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .status-pill-pending {
+        background: #fef3c7;
+        color: #92400e !important;
+    }
+
+    .status-pill-active {
+        background: #e6fffa;
+        color: #006E5C !important;
+    }
+
+    .status-pill-suspended {
+        background: #fee2e2;
+        color: #dc3545 !important;
+    }
+
+    .status-pill-rejected {
+        background: #e5e7eb;
+        color: #374151 !important;
+    }
+
+    /* Review Cards */
+    .review-card {
+        background-color: #ffffff !important;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        margin-bottom: 0.75rem;
+        overflow: hidden;
+        border: 1px solid #f0f0f0;
+    }
+
+    .review-card-header {
+        padding: 0.75rem 1rem;
+        background: #fafafa;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .review-rating {
+        color: #f59e0b;
+        font-weight: 700;
+        font-size: 0.9rem;
+    }
+
+    .review-card-body {
+        padding: 1rem;
+    }
+
+    .review-text {
+        font-size: 0.9rem;
+        color: #222222 !important;
+        margin-bottom: 0.75rem;
+        font-style: italic;
+    }
+
+    .review-info-row {
+        display: flex;
+        margin-bottom: 0.4rem;
+        font-size: 0.8rem;
+        gap: 0.5rem;
+    }
+
+    .review-label {
+        color: #757575 !important;
+        min-width: 60px;
+        font-weight: 500;
+    }
+
+    .review-value {
+        color: #222222 !important;
+        font-weight: 600;
+        flex: 1;
+    }
+
+    .review-card-footer {
+        display: flex;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        border-top: 1px solid #f0f0f0;
+        background: #fafafa;
+        flex-wrap: wrap;
+    }
+
+    /* Category Mobile Cards */
+    .category-card {
+        background-color: #ffffff !important;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        margin-bottom: 0.75rem;
+        overflow: hidden;
+        border: 1px solid #f0f0f0;
+    }
+
+    .category-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+        background: #fafafa;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .category-card-body {
+        padding: 0.75rem 1rem;
+    }
+
+    .subcategory-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 0.85rem;
+    }
+
+    .subcategory-item:last-child {
+        border-bottom: none;
+    }
+
+    .subcategory-actions {
+        display: flex;
+        gap: 0.4rem;
+    }
+
+    /* Hide mobile cards on desktop, show on mobile */
+    .mobile-cards { display: none; }
+    
+    @media (max-width: 991px) {
+        .desktop-table { display: none; }
+        .mobile-cards { display: block; }
+    }
+
+    /* SMALL MOBILE FIXES */
+    @media (max-width: 360px) {
+        .product-card { padding: 0.5rem !important; }
+        .product-card-header { padding: 0.6rem !important; }
+        .product-card-body { padding: 0.75rem 0.5rem !important; }
+        .product-info-row { gap: 0.25rem !important; }
+        .product-label { min-width: 60px !important; }
+        .product-stats-bar { gap: 0.4rem !important; padding: 0.5rem !important; }
+        .product-stat-num { font-size: 0.85rem !important; }
+        .product-card-footer { padding: 0.6rem 0.5rem !important; gap: 0.4rem !important; }
+        .product-action-btn { padding: 0.4rem 0.3rem !important; font-size: 0.7rem !important; min-width: 55px !important; }
+    }
+
+    @media (max-width: 320px) {
+        .product-card { padding: 0.4rem !important; }
+        .product-card-header { padding: 0.5rem !important; flex-wrap: wrap; }
+        .product-name { font-size: 0.9rem !important; }
+        .product-card-body { padding: 0.6rem 0.4rem !important; }
+        .product-label { min-width: 55px !important; font-size: 0.75rem !important; }
+        .product-value { font-size: 0.8rem !important; }
+        .product-stats-bar { gap: 0.3rem !important; padding: 0.4rem !important; }
+        .product-card-footer { padding: 0.5rem 0.4rem !important; gap: 0.3rem !important; }
+        .product-action-btn { flex: 1 1 calc(50% - 0.3rem) !important; padding: 0.35rem 0.2rem !important; font-size: 0.65rem !important; }
+    }
+
+    /* Force hide inactive tabs */
+    .tab-content > .tab-pane:not(.active),
+    .tab-pane.fade:not(.show) {
+        display: none !important;
+    }
+
+    /* Remove flex stretching */
+    .content-wrapper, .admin-page-content, .main-content, .main-layout {
+        flex: none !important; 
+        height: auto !important;
+        min-height: 0 !important;
+        margin-bottom: 1rem;
+    }
+  </style>
 @endpush
 
 @section('content')
@@ -90,8 +437,8 @@
                   </div>
                 </div>
                 
-                <!-- Products Table -->
-                <div class="table-container">
+                <!-- Products Table (Desktop) / Cards (Mobile) -->
+                <div class="desktop-table table-container">
                   <div class="table-header">
                     <h3 class="table-title">Daftar Produk</h3>
                   </div>
@@ -133,64 +480,100 @@
                                 $statusClass = '';
                                 $statusText = '';
                                 switch($product->status) {
-                                  case 'pending':
-                                    $statusClass = 'badge-pending';
-                                    $statusText = 'Menunggu Persetujuan';
-                                    break;
-                                  case 'active':
-                                    $statusClass = 'badge-active';
-                                    $statusText = 'Aktif';
-                                    break;
-                                  case 'suspended':
-                                    $statusClass = 'badge-suspended';
-                                    $statusText = 'Ditangguhkan';
-                                    break;
-                                  case 'rejected':
-                                    $statusClass = 'badge-rejected';
-                                    $statusText = 'Ditolak';
-                                    break;
-                                  default:
-                                    $statusClass = 'badge-secondary';
-                                    $statusText = 'Tidak Dikenal';
+                                  case 'pending': $statusClass = 'badge-pending'; $statusText = 'Menunggu Persetujuan'; break;
+                                  case 'active': $statusClass = 'badge-active'; $statusText = 'Aktif'; break;
+                                  case 'suspended': $statusClass = 'badge-suspended'; $statusText = 'Ditangguhkan'; break;
+                                  case 'rejected': $statusClass = 'badge-rejected'; $statusText = 'Ditolak'; break;
+                                  default: $statusClass = 'badge-secondary'; $statusText = 'Tidak Dikenal';
                                 }
                               @endphp
                               <span class="badge {{ $statusClass }} d-block">{{ $statusText }}</span>
                             </td>
                             <td>
                               <div class="btn-group" role="group">
-                                <a href="{{ route('produk.detail', $product->id) }}" class="btn btn-sm btn-view" title="Lihat di Situs">
-                                  <i class="fas fa-external-link-alt"></i>
-                                </a>
-                                <a href="{{ route('penjual.produk.edit', $product->id) }}" class="btn btn-sm btn-edit" title="Edit">
-                                  <i class="fas fa-edit"></i>
-                                </a>
+                                <a href="{{ route('produk.detail', $product->id) }}" class="btn btn-sm btn-view" title="Lihat di Situs"><i class="fas fa-external-link-alt"></i></a>
+                                <a href="{{ route('penjual.produk.edit', $product->id) }}" class="btn btn-sm btn-edit" title="Edit"><i class="fas fa-edit"></i></a>
                                 @if($product->status === 'pending')
-                                  <button type="button" class="btn btn-sm btn-approve" title="Setujui" onclick="approveProduct({{ $product->id }})">
-                                    <i class="fas fa-check"></i>
-                                  </button>
-                                  <button type="button" class="btn btn-sm btn-reject" title="Tolak" onclick="rejectProduct({{ $product->id }})">
-                                    <i class="fas fa-times"></i>
-                                  </button>
+                                  <button type="button" class="btn btn-sm btn-approve" title="Setujui" onclick="approveProduct({{ $product->id }})"><i class="fas fa-check"></i></button>
+                                  <button type="button" class="btn btn-sm btn-reject" title="Tolak" onclick="rejectProduct({{ $product->id }})"><i class="fas fa-times"></i></button>
                                 @elseif($product->status === 'active')
-                                  <button type="button" class="btn btn-sm btn-suspend" title="Tangguhkan" onclick="suspendProduct({{ $product->id }})">
-                                    <i class="fas fa-pause"></i>
-                                  </button>
+                                  <button type="button" class="btn btn-sm btn-suspend" title="Tangguhkan" onclick="suspendProduct({{ $product->id }})"><i class="fas fa-pause"></i></button>
                                 @else
-                                  <button type="button" class="btn btn-sm btn-approve" title="Setujui" onclick="approveProduct({{ $product->id }})">
-                                    <i class="fas fa-check"></i>
-                                  </button>
+                                  <button type="button" class="btn btn-sm btn-approve" title="Setujui" onclick="approveProduct({{ $product->id }})"><i class="fas fa-check"></i></button>
                                 @endif
                               </div>
                             </td>
                           </tr>
                           @empty
-                          <tr>
-                            <td colspan="6" class="text-center py-4">Tidak ada data produk ditemukan.</td>
-                          </tr>
+                          <tr><td colspan="6" class="text-center py-4">Tidak ada data produk ditemukan.</td></tr>
                           @endforelse
                         </tbody>
                       </table>
                     </div>
+                  </div>
+                </div>
+
+                <!-- Mobile Cards View -->
+                <div class="mobile-cards">
+                  <h5 class="mb-3" style="font-weight: 600; color: #374151;">Daftar Produk</h5>
+                  @forelse($products ?? collect() as $product)
+                  <div class="product-card">
+                    <div class="product-card-header">
+                      <div class="product-info">
+                        <a href="{{ route('produk.detail', $product->id) }}" class="product-name">{{ $product->name }}</a>
+                        <span class="product-sku">SKU: {{ $product->sku ?? 'N/A' }}</span>
+                      </div>
+                      @php
+                        $pillClass = '';
+                        $statusText = '';
+                        switch($product->status) {
+                          case 'pending': $pillClass = 'status-pill-pending'; $statusText = 'Pending'; break;
+                          case 'active': $pillClass = 'status-pill-active'; $statusText = 'Aktif'; break;
+                          case 'suspended': $pillClass = 'status-pill-suspended'; $statusText = 'Ditangguhkan'; break;
+                          case 'rejected': $pillClass = 'status-pill-rejected'; $statusText = 'Ditolak'; break;
+                          default: $pillClass = 'status-pill-rejected'; $statusText = 'N/A';
+                        }
+                      @endphp
+                      <span class="status-pill {{ $pillClass }}">{{ $statusText }}</span>
+                    </div>
+                    <div class="product-card-body">
+                      <div class="product-info-row">
+                        <span class="product-label">Toko</span>
+                        <span class="product-value">{{ $product->seller_name ?? 'N/A' }}</span>
+                      </div>
+                      <div class="product-info-row">
+                        <span class="product-label">Kategori</span>
+                        <span class="product-value">{{ $product->category->name ?? 'N/A' }}</span>
+                      </div>
+                      <div class="product-info-row">
+                        <span class="product-label">Harga</span>
+                        <span class="product-value">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
+                      </div>
+                      <div class="product-info-row">
+                        <span class="product-label">Stok</span>
+                        <span class="product-value">{{ $product->stock }}</span>
+                      </div>
+                    </div>
+                    <div class="product-card-footer">
+                      <a href="{{ route('produk.detail', $product->id) }}" class="product-action-btn btn-view" title="Lihat"><i class="fas fa-external-link-alt"></i> Lihat</a>
+                      <a href="{{ route('penjual.produk.edit', $product->id) }}" class="product-action-btn btn-edit" title="Edit"><i class="fas fa-edit"></i> Edit</a>
+                      @if($product->status === 'pending')
+                        <button type="button" class="product-action-btn btn-approve" onclick="approveProduct({{ $product->id }})" title="Setujui"><i class="fas fa-check"></i> Setujui</button>
+                        <button type="button" class="product-action-btn btn-reject" onclick="rejectProduct({{ $product->id }})" title="Tolak"><i class="fas fa-times"></i> Tolak</button>
+                      @elseif($product->status === 'active')
+                        <button type="button" class="product-action-btn btn-suspend" onclick="suspendProduct({{ $product->id }})" title="Tangguhkan"><i class="fas fa-pause"></i> Tangguh</button>
+                      @else
+                        <button type="button" class="product-action-btn btn-approve" onclick="approveProduct({{ $product->id }})" title="Setujui"><i class="fas fa-check"></i> Setujui</button>
+                      @endif
+                    </div>
+                  </div>
+                  @empty
+                  <div class="text-center py-5" style="color: #6b7280;">
+                    <i class="fas fa-inbox fa-3x mb-3"></i>
+                    <p>Tidak ada data produk ditemukan.</p>
+                  </div>
+                  @endforelse
+                </div>
                     
                     <!-- Pagination -->
                     @if(isset($products) && $products->count() > 0)
@@ -235,7 +618,6 @@
                       </nav>
                     </div>
                     @endif
-                  </div>
                 </div>
               </div>
             </div>
@@ -243,7 +625,8 @@
             <!-- Categories & Attributes Tab -->
             <div class="tab-pane fade {{ (isset($tab) && $tab === 'categories') ? 'show active' : '' }}" id="categories-tab-pane" role="tabpanel">
               <div class="mt-3">
-                <div class="category-layout">
+                <!-- Desktop Category Layout -->
+                <div class="desktop-table category-layout">
                   <div class="category-panel">
                     <h3>Kategori Utama</h3>
                     <div class="d-flex justify-content-between mb-3">
@@ -265,7 +648,7 @@
                       @endif
                     </ul>
                   </div>
-                  
+
                   <div class="category-panel">
                     <h3>Subkategori: <span id="selected-category-name">Pilih Kategori</span></h3>
                     <div class="d-flex justify-content-between mb-3">
@@ -274,6 +657,44 @@
                     <ul class="category-list subcategory-list" id="subcategory-list">
                       <!-- Subkategori akan dimuat secara dinamis -->
                     </ul>
+                  </div>
+                </div>
+
+                <!-- Mobile Categories Cards -->
+                <div class="mobile-cards">
+                  <div class="category-card">
+                    <div class="category-card-header">
+                      <h5 style="margin: 0; font-weight: 600;">Kategori Utama</h5>
+                      <button class="btn btn-sm btn-primary" onclick="showAddCategoryModal()"><i class="fas fa-plus"></i> Tambah</button>
+                    </div>
+                    <div class="category-card-body">
+                      @if(isset($mainCategories) && $mainCategories->count() > 0)
+                        @foreach($mainCategories as $category)
+                          <div class="subcategory-item" onclick="selectCategory({{ $category->id }})" style="cursor: pointer;">
+                            <span>{{ $category->name }}</span>
+                            <div class="subcategory-actions">
+                              <button class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation(); editCategory({{ $category->id }})"><i class="fas fa-edit"></i></button>
+                              <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation(); deleteCategory({{ $category->id }})"><i class="fas fa-trash"></i></button>
+                            </div>
+                          </div>
+                        @endforeach
+                      @else
+                        <p class="text-center text-muted" style="margin: 1rem 0;">Tidak ada kategori ditemukan</p>
+                      @endif
+                    </div>
+                  </div>
+                  
+                  <div class="category-card">
+                    <div class="category-card-header">
+                      <h5 style="margin: 0; font-weight: 600;">Subkategori</h5>
+                      <button class="btn btn-sm btn-primary" onclick="showAddSubcategoryModal()"><i class="fas fa-plus"></i> Tambah</button>
+                    </div>
+                    <div class="category-card-body">
+                      <ul class="category-list subcategory-list" id="subcategory-list-mobile">
+                        <!-- Subkategori akan dimuat secara dinamis -->
+                        <li class="text-center text-muted">Pilih kategori untuk melihat subkategori</li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -322,8 +743,8 @@
                   </div>
                 </div>
                 
-                <!-- Reviews Table -->
-                <div class="table-container">
+                <!-- Reviews Table (Desktop) / Cards (Mobile) -->
+                <div class="desktop-table table-container">
                   <div class="table-header">
                     <h3 class="table-title">Daftar Ulasan Produk</h3>
                   </div>
@@ -347,6 +768,19 @@
                         </tbody>
                       </table>
                     </div>
+                  </div>
+                </div>
+
+                <!-- Mobile Reviews Cards -->
+                <div class="mobile-cards">
+                  <h5 class="mb-3" style="font-weight: 600; color: #374151;">Daftar Ulasan Produk</h5>
+                  <div id="reviews-cards-container">
+                    <div class="text-center py-5" style="color: #6b7280;">
+                      <i class="fas fa-spinner fa-spin fa-3x mb-3"></i>
+                      <p>Memuat data ulasan...</p>
+                    </div>
+                  </div>
+                </div>
 
                     <!-- Pagination -->
                     <div id="reviews-pagination" class="mt-3 d-none">
@@ -688,6 +1122,11 @@
         tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-4">Memuat data ulasan...</td></tr>';
       }
 
+      const mobileContainer = document.getElementById('reviews-cards-container');
+      if (mobileContainer) {
+        mobileContainer.innerHTML = '<div class="text-center py-5" style="color: #6b7280;"><i class="fas fa-spinner fa-spin fa-3x mb-3"></i><p>Memuat data ulasan...</p></div>';
+      }
+
       // Get filter values
       const statusFilter = document.getElementById('review_status_filter') ? document.getElementById('review_status_filter').value : '';
       const ratingFilter = document.getElementById('rating_filter') ? document.getElementById('rating_filter').value : '';
@@ -737,6 +1176,9 @@
         if (tableBody) {
           tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-danger">Terjadi kesalahan saat memuat data ulasan: ' + error.message + '</td></tr>';
         }
+        if (mobileContainer) {
+          mobileContainer.innerHTML = '<div class="text-center py-5" style="color: #dc3545;"><i class="fas fa-exclamation-triangle fa-3x mb-3"></i><p>Terjadi kesalahan saat memuat data ulasan.</p></div>';
+        }
       });
     }
 
@@ -745,15 +1187,24 @@
       const tableBody = document.getElementById('reviews-table-body');
       if (!tableBody) return;
 
+      const mobileContainer = document.getElementById('reviews-cards-container');
+
       if (reviews.length === 0) {
         tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-4">Tidak ada data ulasan produk ditemukan.</td></tr>';
+        if (mobileContainer) {
+          mobileContainer.innerHTML = '<div class="text-center py-5" style="color: #6b7280;"><i class="fas fa-inbox fa-3x mb-3"></i><p>Tidak ada data ulasan produk ditemukan.</p></div>';
+        }
         return;
       }
 
       let rows = '';
+      let mobileCards = '';
       reviews.forEach(review => {
         const statusClass = review.status === 'approved' ? 'badge-active' :
                            review.status === 'rejected' ? 'badge-rejected' : 'badge-pending';
+
+        const pillClass = review.status === 'approved' ? 'status-pill-active' :
+                         review.status === 'rejected' ? 'status-pill-rejected' : 'status-pill-pending';
 
         const canAction = review.can_action;
 
@@ -798,9 +1249,54 @@
             </td>
           </tr>
         `;
+
+        // Mobile Card
+        mobileCards += `
+          <div class="review-card">
+            <div class="review-card-header">
+              <div class="review-rating">
+                <i class="fas fa-star"></i> ${review.rating}
+              </div>
+              <span class="status-pill ${pillClass}">${review.status_label}</span>
+            </div>
+            <div class="review-card-body">
+              <div class="review-text">"${review.review_text.replace(/\(\d+\)/g, '')}"</div>
+              <div class="review-info-row">
+                <span class="review-label">Produk</span>
+                <span class="review-value">${review.product_name}</span>
+              </div>
+              <div class="review-info-row">
+                <span class="review-label">Pengguna</span>
+                <span class="review-value">${review.user_name}</span>
+              </div>
+              <div class="review-info-row">
+                <span class="review-label">Tanggal</span>
+                <span class="review-value">${review.created_at}</span>
+              </div>
+            </div>
+            <div class="review-card-footer">
+              ${canAction ? `
+                <button type="button" class="product-action-btn btn-approve" onclick="approveReview(${review.id})" title="Setujui"><i class="fas fa-check"></i> Setujui</button>
+                <button type="button" class="product-action-btn btn-reject" onclick="rejectReview(${review.id})" title="Tolak"><i class="fas fa-times"></i> Tolak</button>
+              ` : ''}
+              <button type="button" class="product-action-btn btn-delete" onclick="deleteReview(${review.id})" title="Hapus"><i class="fas fa-trash"></i> Hapus</button>
+              <button type="button" class="product-action-btn btn-spam" onclick="markAsSpam(${review.id})" title="Spam"><i class="fas fa-ban"></i> Spam</button>
+            </div>
+          </div>
+        `;
       });
 
       tableBody.innerHTML = rows;
+
+      // Update mobile cards
+      const mobileContainer = document.getElementById('reviews-cards-container');
+      if (mobileContainer) {
+        if (reviews.length === 0) {
+          mobileContainer.innerHTML = '<div class="text-center py-5" style="color: #6b7280;"><i class="fas fa-inbox fa-3x mb-3"></i><p>Tidak ada data ulasan produk ditemukan.</p></div>';
+        } else {
+          mobileContainer.innerHTML = mobileCards;
+        }
+      }
     }
 
     // Update reviews pagination

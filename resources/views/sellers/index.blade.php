@@ -35,8 +35,21 @@
     }
 
     .main-content {
-      padding-top: 2rem;
-      padding-bottom: 2rem;
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+      min-height: auto !important;
+      height: auto !important;
+    }
+
+    .admin-page-content {
+      padding: 1rem !important;
+      min-height: auto !important;
+    }
+
+    .table-container {
+      min-height: auto !important;
+      height: auto !important;
+      margin-bottom: 1rem;
     }
 
     .page-header {

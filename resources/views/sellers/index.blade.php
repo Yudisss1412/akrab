@@ -39,17 +39,41 @@
       padding-bottom: 1rem;
       min-height: auto !important;
       height: auto !important;
+      flex: none !important;
     }
 
     .admin-page-content {
       padding: 1rem !important;
       min-height: auto !important;
+      height: auto !important;
+      flex: none !important;
+    }
+
+    .content-wrapper {
+      min-height: auto !important;
+      height: auto !important;
     }
 
     .table-container {
       min-height: auto !important;
       height: auto !important;
       margin-bottom: 1rem;
+    }
+
+    .table-content {
+      min-height: auto !important;
+      height: auto !important;
+    }
+
+    .table-responsive {
+      min-height: auto !important;
+      height: auto !important;
+    }
+
+    .pagination-wrapper,
+    .mt-3.d-flex {
+      margin-top: 1rem !important;
+      padding-top: 0 !important;
     }
 
     .page-header {

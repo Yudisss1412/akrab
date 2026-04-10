@@ -531,7 +531,7 @@ textarea.form-control {
     text-align: center;
   }
 
-  /* Table Responsive - Card View */
+  /* Table Responsive - Card View with Compact Layout */
   .table-container {
     margin: 0;
     padding: 0;
@@ -562,85 +562,132 @@ textarea.form-control {
   }
 
   table tr {
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: 8px;
     padding: 0;
     background: white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-    overflow: visible;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    position: relative;
+  }
+
+  table tr:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Card header row (shows when collapsed) */
+  table td:first-child {
+    border-top: none;
+  }
+
+  /* Hide bank detail and catatan on mobile to save space */
+  table td[data-label="Bank"],
+  table td[data-label="Catatan"] {
+    display: none;
   }
 
   table td {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    gap: 1rem;
-    padding: 0.75rem 1.25rem;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
     border-bottom: 1px solid var(--border);
     align-items: center;
     flex-wrap: wrap;
+    font-size: 0.875rem;
+    line-height: 1.4;
   }
 
   table td:last-child {
     border-bottom: none;
   }
 
+  /* Label for each data cell */
   table td::before {
     content: attr(data-label);
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     color: #6B7280;
     text-transform: uppercase;
     letter-spacing: 0.025em;
     flex-shrink: 0;
-    min-width: 120px;
-    max-width: 40%;
+    min-width: 90px;
+    max-width: 35%;
     word-wrap: break-word;
     overflow-wrap: break-word;
   }
 
-  /* Checkbox cell */
+  /* Checkbox cell - special handling */
   table td input[type="checkbox"] {
-    justify-self: start;
+    width: 1.1rem;
+    height: 1.1rem;
+    flex-shrink: 0;
   }
 
-  /* Amount cell */
+  table td[data-label="Pilih"] {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 0.5rem;
+  }
+
+  table td[data-label="Pilih"]::before {
+    content: attr(data-label);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6B7280;
+  }
+
+  /* Amount cell - highlight */
   table td.amount {
     color: var(--primary);
     font-weight: 600;
+    font-size: 0.9rem;
   }
 
   /* Action buttons */
   table td .action-buttons {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 0.5rem;
     width: 100%;
+    justify-content: flex-end;
   }
 
   table td .btn-action {
-    width: 100%;
-    padding: 0.5rem;
+    flex: 1;
+    max-width: 120px;
+    padding: 0.4rem 0.5rem;
     text-align: center;
+    font-size: 0.8rem;
   }
 
   /* Seller link */
   table td .seller-link {
     word-break: break-word;
+    color: var(--primary);
+    font-weight: 500;
+  }
+
+  /* Status badge in cards */
+  table td .status-badge {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
   }
 
   /* For empty state row */
   table td[colspan] {
     display: block;
     text-align: center;
-    padding: 2rem 1.5rem;
+    padding: 1.5rem 1rem;
     grid-template-columns: 1fr;
-    min-height: 100px;
-    line-height: 1.6;
+    min-height: 80px;
+    line-height: 1.5;
     word-wrap: break-word;
     overflow-wrap: break-word;
     hyphens: auto;
+    font-size: 0.875rem;
   }
 
   table td[colspan]::before {
@@ -704,7 +751,7 @@ textarea.form-control {
   }
 }
 
-/* Extra Small Mobile */
+/* Extra Small Mobile - 480px */
 @media (max-width: 480px) {
   /* Page Header */
   .page-header h1 {
@@ -753,5 +800,514 @@ textarea.form-control {
   .notification .alert {
     min-width: 250px;
     margin: 0 1rem;
+  }
+}
+
+/* Small Mobile - 425px */
+@media (max-width: 425px) {
+  /* Page Header */
+  .page-header {
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.2rem;
+  }
+
+  .page-header .btn {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  /* Tabs */
+  .tab {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  /* Filters */
+  .filters {
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .filter-group {
+    gap: 0.35rem;
+  }
+
+  .filter-group label {
+    font-size: 0.8rem;
+  }
+
+  .filter-group input,
+  .filter-group select {
+    padding: 0.45rem;
+    font-size: 0.9rem;
+  }
+
+  /* Bulk Actions */
+  .bulk-actions {
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .btn-bulk {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  /* Card View - More Compact */
+  table tr {
+    margin-bottom: 0.6rem;
+    border-radius: 8px;
+  }
+
+  /* Hide bank detail and catatan on mobile */
+  table td[data-label="Bank"],
+  table td[data-label="Catatan"] {
+    display: none;
+  }
+
+  table td {
+    padding: 0.45rem 0.65rem;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    line-height: 1.35;
+  }
+
+  table td::before {
+    font-size: 0.7rem;
+    min-width: 85px;
+    max-width: 38%;
+  }
+
+  table td.amount {
+    font-size: 0.85rem;
+  }
+
+  table td .action-buttons {
+    gap: 0.4rem;
+  }
+
+  table td .btn-action {
+    padding: 0.35rem 0.4rem;
+    font-size: 0.75rem;
+  }
+
+  /* Empty State */
+  table td[colspan] {
+    padding: 1.25rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  /* Pagination */
+  .pagination {
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .pagination-info {
+    font-size: 0.8rem;
+  }
+
+  .pagination-controls {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.35rem;
+  }
+
+  .page-btn {
+    padding: 0.55rem 0.35rem;
+    font-size: 0.75rem;
+  }
+
+  .page-btn:first-child,
+  .page-btn:last-child {
+    grid-column: span 1;
+    font-size: 0.7rem;
+    padding: 0.45rem 0.35rem;
+  }
+
+  /* Modal */
+  .modal-box {
+    padding: 0.7rem;
+    width: 96%;
+    max-width: 96%;
+  }
+
+  .modal-title {
+    font-size: 1rem;
+  }
+
+  .modal-close {
+    font-size: 1.3rem;
+  }
+
+  textarea.form-control {
+    padding: 0.6rem;
+    min-height: 70px;
+    font-size: 0.9rem;
+  }
+
+  .btn-modal {
+    padding: 0.65rem;
+    font-size: 0.9rem;
+  }
+
+  /* Notification */
+  .notification .alert {
+    min-width: 220px;
+    font-size: 0.85rem;
+    margin: 0 0.5rem;
+  }
+}
+
+/* Very Small Mobile - 375px */
+@media (max-width: 375px) {
+  /* Page Header */
+  .page-header h1 {
+    font-size: 1.1rem;
+  }
+
+  .page-header .btn {
+    padding: 0.45rem;
+    font-size: 0.8rem;
+  }
+
+  /* Tabs */
+  .tab {
+    padding: 0.65rem 0.4rem;
+    font-size: 0.85rem;
+  }
+
+  /* Filters */
+  .filters {
+    gap: 0.6rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .filter-group {
+    gap: 0.3rem;
+  }
+
+  .filter-group label {
+    font-size: 0.75rem;
+  }
+
+  .filter-group input,
+  .filter-group select {
+    padding: 0.4rem;
+    font-size: 0.85rem;
+  }
+
+  /* Bulk Actions */
+  .bulk-actions {
+    gap: 0.4rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .btn-bulk {
+    padding: 0.55rem 0.65rem;
+    font-size: 0.8rem;
+  }
+
+  /* Card View - Ultra Compact */
+  table tr {
+    margin-bottom: 0.5rem;
+    border-radius: 7px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Hide bank detail and catatan on mobile */
+  table td[data-label="Bank"],
+  table td[data-label="Catatan"] {
+    display: none;
+  }
+
+  table td {
+    padding: 0.4rem 0.6rem;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    line-height: 1.3;
+  }
+
+  table td::before {
+    font-size: 0.65rem;
+    min-width: 80px;
+    max-width: 40%;
+  }
+
+  table td.amount {
+    font-size: 0.8rem;
+  }
+
+  table td .action-buttons {
+    gap: 0.35rem;
+  }
+
+  table td .btn-action {
+    padding: 0.3rem 0.35rem;
+    font-size: 0.7rem;
+    max-width: 100px;
+  }
+
+  table td .seller-link {
+    font-size: 0.75rem;
+  }
+
+  table td .status-badge {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.4rem;
+  }
+
+  /* Empty State */
+  table td[colspan] {
+    padding: 1rem 0.65rem;
+    font-size: 0.75rem;
+    min-height: 60px;
+  }
+
+  /* Pagination */
+  .pagination {
+    gap: 0.6rem;
+    margin-top: 0.75rem;
+  }
+
+  .pagination-info {
+    font-size: 0.75rem;
+  }
+
+  .pagination-controls {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.3rem;
+  }
+
+  .page-btn {
+    padding: 0.5rem 0.3rem;
+    font-size: 0.7rem;
+  }
+
+  .page-btn:first-child,
+  .page-btn:last-child {
+    grid-column: span 1;
+    font-size: 0.65rem;
+    padding: 0.4rem 0.3rem;
+  }
+
+  /* Modal */
+  .modal-box {
+    padding: 0.6rem;
+    width: 97%;
+    max-width: 97%;
+  }
+
+  .modal-title {
+    font-size: 0.95rem;
+  }
+
+  .modal-close {
+    font-size: 1.2rem;
+  }
+
+  textarea.form-control {
+    padding: 0.5rem;
+    min-height: 60px;
+    font-size: 0.85rem;
+  }
+
+  .btn-modal {
+    padding: 0.6rem;
+    font-size: 0.85rem;
+  }
+
+  /* Notification */
+  .notification .alert {
+    min-width: 200px;
+    font-size: 0.8rem;
+    margin: 0 0.5rem;
+  }
+}
+
+/* Extra Small Mobile - 320px */
+@media (max-width: 320px) {
+  /* Page Content */
+  .admin-page-content {
+    padding: 0.5rem !important;
+  }
+
+  /* Page Header */
+  .page-header {
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .page-header h1 {
+    font-size: 1rem;
+  }
+
+  .page-header .btn {
+    padding: 0.4rem;
+    font-size: 0.75rem;
+  }
+
+  /* Tabs */
+  .tab {
+    padding: 0.6rem 0.35rem;
+    font-size: 0.8rem;
+  }
+
+  /* Filters */
+  .filters {
+    gap: 0.5rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .filter-group {
+    gap: 0.25rem;
+  }
+
+  .filter-group label {
+    font-size: 0.7rem;
+  }
+
+  .filter-group input,
+  .filter-group select {
+    padding: 0.35rem;
+    font-size: 0.8rem;
+  }
+
+  /* Bulk Actions */
+  .bulk-actions {
+    gap: 0.35rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .btn-bulk {
+    padding: 0.5rem 0.6rem;
+    font-size: 0.75rem;
+  }
+
+  /* Card View - Maximum Compact */
+  table tr {
+    margin-bottom: 0.4rem;
+    border-radius: 6px;
+    box-shadow: 0 0.5px 2px rgba(0, 0, 0, 0.04);
+  }
+
+  /* Hide bank detail and catatan on mobile */
+  table td[data-label="Bank"],
+  table td[data-label="Catatan"] {
+    display: none;
+  }
+
+  table td {
+    padding: 0.35rem 0.5rem;
+    gap: 0.3rem;
+    font-size: 0.7rem;
+    line-height: 1.25;
+  }
+
+  table td::before {
+    font-size: 0.6rem;
+    min-width: 75px;
+    max-width: 42%;
+  }
+
+  table td.amount {
+    font-size: 0.75rem;
+  }
+
+  table td .action-buttons {
+    gap: 0.3rem;
+  }
+
+  table td .btn-action {
+    padding: 0.25rem 0.3rem;
+    font-size: 0.65rem;
+    max-width: 90px;
+  }
+
+  table td .seller-link {
+    font-size: 0.7rem;
+  }
+
+  table td .status-badge {
+    font-size: 0.65rem;
+    padding: 0.1rem 0.35rem;
+  }
+
+  /* Checkbox */
+  table td input[type="checkbox"] {
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+
+  /* Empty State */
+  table td[colspan] {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.7rem;
+    min-height: 50px;
+    line-height: 1.4;
+  }
+
+  /* Pagination */
+  .pagination {
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+  }
+
+  .pagination-info {
+    font-size: 0.7rem;
+  }
+
+  .pagination-controls {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.25rem;
+  }
+
+  .page-btn {
+    padding: 0.45rem 0.25rem;
+    font-size: 0.65rem;
+  }
+
+  .page-btn:first-child,
+  .page-btn:last-child {
+    grid-column: span 1;
+    font-size: 0.6rem;
+    padding: 0.35rem 0.25rem;
+  }
+
+  /* Modal */
+  .modal-box {
+    padding: 0.5rem;
+    width: 98%;
+    max-width: 98%;
+    margin: 0.5rem;
+  }
+
+  .modal-title {
+    font-size: 0.9rem;
+  }
+
+  .modal-close {
+    font-size: 1.1rem;
+  }
+
+  textarea.form-control {
+    padding: 0.45rem;
+    min-height: 55px;
+    font-size: 0.8rem;
+  }
+
+  .btn-modal {
+    padding: 0.55rem;
+    font-size: 0.8rem;
+  }
+
+  /* Notification */
+  .notification .alert {
+    min-width: 180px;
+    font-size: 0.75rem;
+    margin: 0 0.5rem;
   }
 }

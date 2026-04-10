@@ -69,13 +69,13 @@
                 </thead>
                 <tbody>
                   @forelse($withdrawalRequests->where('status', 'pending') as $withdrawal)
-                  <tr>
+                  <tr class="withdrawal-card" data-id="{{ $withdrawal->id }}">
                     <td data-label="Pilih"><input type="checkbox" class="request-check" data-id="{{ $withdrawal->id }}"></td>
-                    <td data-label="ID Permintaan">{{ $withdrawal->id }}</td>
+                    <td data-label="ID">{{ $withdrawal->id }}</td>
                     <td data-label="Tanggal">{{ \Carbon\Carbon::parse($withdrawal->created_at)->format('d M Y') }}</td>
                     <td data-label="Penjual"><a href="{{ route('sellers.show', $withdrawal->seller_id) }}" class="seller-link">{{ $withdrawal->seller->store_name ?? 'Penjual Tidak Ditemukan' }}</a></td>
                     <td data-label="Jumlah" class="amount">Rp {{ number_format($withdrawal->amount, 0, ',', '.') }}</td>
-                    <td data-label="Bank Tujuan">{{ $withdrawal->bank_name ?? 'N/A' }} - {{ $withdrawal->account_number ?? 'xxxx' }}</td>
+                    <td data-label="Bank" class="bank-detail">{{ $withdrawal->bank_name ?? 'N/A' }} - {{ $withdrawal->account_number ?? 'xxxx' }}</td>
                     <td data-label="Aksi" class="action-buttons">
                       <button class="btn-action btn-approve" onclick="approveRequest({{ $withdrawal->id }})">Setujui</button>
                       <button class="btn-action btn-reject" onclick="showRejectModal({{ $withdrawal->id }})">Tolak</button>
@@ -156,12 +156,12 @@
                 </thead>
                 <tbody>
                   @forelse($withdrawalRequests->whereNotIn('status', ['pending']) as $withdrawal)
-                  <tr>
-                    <td data-label="ID Permintaan">{{ $withdrawal->id }}</td>
+                  <tr class="withdrawal-card" data-id="{{ $withdrawal->id }}">
+                    <td data-label="ID">{{ $withdrawal->id }}</td>
                     <td data-label="Tanggal Diproses">{{ \Carbon\Carbon::parse($withdrawal->updated_at)->format('d M Y') }}</td>
                     <td data-label="Penjual"><a href="{{ route('sellers.show', $withdrawal->seller_id) }}" class="seller-link">{{ $withdrawal->seller->store_name ?? 'Penjual Tidak Ditemukan' }}</a></td>
                     <td data-label="Jumlah" class="amount">Rp {{ number_format($withdrawal->amount, 0, ',', '.') }}</td>
-                    <td data-label="Bank Tujuan">{{ $withdrawal->bank_name ?? 'N/A' }} - {{ $withdrawal->account_number ?? 'xxxx' }}</td>
+                    <td data-label="Bank" class="bank-detail">{{ $withdrawal->bank_name ?? 'N/A' }} - {{ $withdrawal->account_number ?? 'xxxx' }}</td>
                     <td data-label="Status">
                       @if($withdrawal->status == 'pending')
                         <span class="status-badge status-pending">{{ ucfirst(str_replace('_', ' ', $withdrawal->status)) }}</span>

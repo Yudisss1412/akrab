@@ -563,12 +563,14 @@ textarea.form-control {
   }
 
   table td {
-    display: grid;
-    grid-template-columns: 110px 1fr;
-    gap: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 1rem;
     padding: 0.75rem 1rem;
     border-bottom: 1px solid var(--border);
     align-items: center;
+    flex-wrap: wrap;
   }
 
   table td:last-child {
@@ -582,6 +584,11 @@ textarea.form-control {
     color: #6B7280;
     text-transform: uppercase;
     letter-spacing: 0.025em;
+    flex-shrink: 0;
+    min-width: 120px;
+    max-width: 40%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 
   /* Checkbox cell */
@@ -697,12 +704,14 @@ textarea.form-control {
 
   /* Table Card View */
   table td {
-    grid-template-columns: 90px 1fr;
     padding: 0.6rem 0.75rem;
+    gap: 0.5rem;
   }
 
   table td::before {
     font-size: 0.75rem;
+    min-width: 100px;
+    max-width: 45%;
   }
 
   table tr {

@@ -200,6 +200,11 @@
 
     .action-buttons .btn {
       margin-bottom: 0.5rem;
+      text-align: center;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     /* Mobile Responsive */

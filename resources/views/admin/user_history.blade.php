@@ -59,12 +59,12 @@
               </thead>
               <tbody>
                 @forelse($orders as $order)
-                <tr>
-                  <td>#{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</td>
-                  <td>{{ $order->created_at->format('d M Y, H:i') }}</td>
-                  <td>Rp {{ number_format($order->total_amount, 0, ',', '.') }}</td>
-                  <td>{{ ucfirst(str_replace('_', ' ', $order->payment_method ?? 'N/A')) }}</td>
-                  <td>
+                <tr class="transaction-card">
+                  <td data-label="ID Pesanan">#{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</td>
+                  <td data-label="Tanggal">{{ $order->created_at->format('d M Y, H:i') }}</td>
+                  <td data-label="Total" class="amount">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</td>
+                  <td data-label="Pembayaran">{{ ucfirst(str_replace('_', ' ', $order->payment_method ?? 'N/A')) }}</td>
+                  <td data-label="Status">
                     <span class="status-badge
                       @if(in_array($order->status, ['pending', 'menunggu_pembayaran'])) status-pending
                       @elseif(in_array($order->status, ['processing', 'diproses'])) status-processing
@@ -76,13 +76,13 @@
                       {{ ucfirst(str_replace('_', ' ', $order->status)) }}
                     </span>
                   </td>
-                  <td>
+                  <td data-label="Aksi">
                     <a href="{{ route('order.invoice', $order->order_number) }}" class="btn btn-outline btn-sm">Lihat</a>
                   </td>
                 </tr>
                 @empty
                 <tr>
-                  <td colspan="6" style="text-align: center;">Tidak ada transaksi ditemukan</td>
+                  <td colspan="6" class="empty-state">Tidak ada transaksi ditemukan</td>
                 </tr>
                 @endforelse
               </tbody>

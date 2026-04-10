@@ -399,3 +399,231 @@ textarea.form-control {
   border-top: 1px solid var(--ak-border);
   padding: 1.5rem;
 }
+
+/* Responsive Layout for Ticket Detail Page */
+@media (max-width: 1024px) {
+  /* On tablet: Stack cards horizontally */
+  .ticket-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Page Header Mobile */
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+
+  /* Ticket Header Mobile */
+  .ticket-header {
+    padding: 1rem;
+  }
+
+  .ticket-header h2 {
+    font-size: 1.25rem !important;
+  }
+
+  .ticket-header .status-badge,
+  .ticket-header .priority-badge {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.4rem;
+  }
+
+  /* Info Section Mobile */
+  .ticket-info {
+    padding: 1rem;
+  }
+
+  .info-row {
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .info-label {
+    width: 100%;
+    font-size: 0.85rem;
+  }
+
+  .info-value {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .status-select,
+  .priority-select {
+    width: 100%;
+  }
+
+  /* Chat Container Mobile */
+  .chat-container {
+    height: 350px;
+    padding: 1rem;
+  }
+
+  .message {
+    max-width: 95%;
+    padding: 0.6rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .message-text {
+    font-size: 0.9rem;
+  }
+
+  /* Reply Form Mobile */
+  .reply-form {
+    padding: 1rem;
+  }
+
+  .rich-editor {
+    gap: 0.2rem;
+  }
+
+  .rich-btn {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.9rem;
+  }
+
+  .form-group label {
+    font-size: 0.9rem;
+  }
+
+  textarea.form-control {
+    min-height: 100px;
+    font-size: 0.9rem;
+  }
+
+  /* Attachment Area Mobile */
+  .attachment-area {
+    padding: 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  /* Canned Responses Mobile */
+  .canned-responses label {
+    font-size: 0.9rem;
+  }
+
+  .canned-responses select {
+    font-size: 0.85rem;
+  }
+
+  /* Cards Mobile */
+  .card {
+    margin-top: 1rem;
+  }
+
+  .card-header {
+    padding: 1rem;
+  }
+
+  .card-title {
+    font-size: 0.95rem;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  /* User Info Card Mobile */
+  .user-info-card .info-row {
+    margin-bottom: 0.75rem;
+  }
+
+  /* Ticket History Card Mobile */
+  .log-item {
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .log-time {
+    font-size: 0.75rem;
+  }
+
+  .log-message {
+    font-size: 0.85rem;
+  }
+}
+
+/* Extra Small Mobile */
+@media (max-width: 480px) {
+  .page-header h1 {
+    font-size: 1.25rem;
+  }
+
+  .ticket-header h2 {
+    font-size: 1.1rem !important;
+  }
+
+  .chat-container {
+    height: 300px;
+    padding: 0.75rem;
+  }
+
+  .message {
+    max-width: 100%;
+    padding: 0.5rem;
+  }
+
+  .message-sender {
+    font-size: 0.85rem;
+  }
+
+  .message-text {
+    font-size: 0.85rem;
+  }
+
+  .message-time {
+    font-size: 0.75rem;
+  }
+
+  .reply-form {
+    padding: 0.75rem;
+  }
+
+  .rich-btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  textarea.form-control {
+    min-height: 80px;
+    font-size: 0.85rem;
+  }
+
+  .btn-reply {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .card-header {
+    padding: 0.75rem;
+  }
+
+  .card-body {
+    padding: 0.75rem;
+  }
+
+  .notification .alert {
+    min-width: 250px;
+    margin: 0 1rem;
+  }
+}
+
+/* Landscape mode optimization */
+@media (max-width: 768px) and (orientation: landscape) {
+  .chat-container {
+    height: 250px;
+  }
+
+  .ticket-header {
+    padding: 0.75rem 1rem;
+  }
+}

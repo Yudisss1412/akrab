@@ -70,10 +70,10 @@
               <tbody>
                 @forelse($tickets as $ticket)
                   <tr>
-                    <td>{{ $ticket->id }}</td>
-                    <td>{{ Str::limit($ticket->subject, 30) }}</td>
-                    <td>{{ $ticket->user->name ?? 'N/A' }}</td>
-                    <td>
+                    <td data-label="ID Tiket">{{ $ticket->id }}</td>
+                    <td data-label="Subjek">{{ Str::limit($ticket->subject, 30) }}</td>
+                    <td data-label="Pengirim">{{ $ticket->user->name ?? 'N/A' }}</td>
+                    <td data-label="Status">
                       <select class="status-select status-{{ strtolower($ticket->status) }}" data-ticket="{{ $ticket->id }}" onchange="updateTicketStatus(this)">
                         <option value="open" {{ $ticket->status == 'open' ? 'selected' : '' }}>Terbuka</option>
                         <option value="in_progress" {{ $ticket->status == 'in_progress' ? 'selected' : '' }}>Dalam Proses</option>
@@ -81,15 +81,15 @@
                         <option value="closed" {{ $ticket->status == 'closed' ? 'selected' : '' }}>Ditutup</option>
                       </select>
                     </td>
-                    <td>
+                    <td data-label="Prioritas">
                       <select class="priority-select priority-{{ strtolower($ticket->priority) }}" data-ticket="{{ $ticket->id }}" onchange="updateTicketPriority(this)">
                         <option value="low" {{ $ticket->priority == 'low' ? 'selected' : '' }}>Rendah</option>
                         <option value="medium" {{ $ticket->priority == 'medium' ? 'selected' : '' }}>Sedang</option>
                         <option value="high" {{ $ticket->priority == 'high' ? 'selected' : '' }}>Tinggi</option>
                       </select>
                     </td>
-                    <td>{{ $ticket->created_at->format('d M Y') }}</td>
-                    <td>
+                    <td data-label="Tanggal">{{ $ticket->created_at->format('d M Y') }}</td>
+                    <td data-label="Aksi">
                       <a href="{{ route('support.tickets.detail', ['id' => $ticket->id]) }}" class="btn btn-outline">Lihat</a>
                     </td>
                   </tr>

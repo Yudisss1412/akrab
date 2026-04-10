@@ -364,6 +364,136 @@ textarea.form-control {
 
 /* Mobile Responsive Pagination */
 @media (max-width: 768px) {
+  /* Page Header Mobile */
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .page-header .btn {
+    width: 100%;
+  }
+
+  /* Filters Mobile */
+  .filters {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .filters form {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .filters .filter-group {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .filter-group input,
+  .filter-group select {
+    width: 100%;
+  }
+
+  /* Table Responsive - Card View */
+  .tickets-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table {
+    min-width: 700px; /* Force horizontal scroll on small screens */
+  }
+
+  /* Alternative: Card View for better mobile UX */
+  table thead {
+    display: none;
+  }
+
+  table, table tbody, table tr, table td {
+    display: block;
+    width: 100%;
+  }
+
+  table tr {
+    margin-bottom: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    background: white;
+  }
+
+  table td {
+    text-align: right;
+    padding: 0.5rem 0;
+    border-bottom: none;
+    position: relative;
+    padding-left: 45%;
+  }
+
+  table td:last-child {
+    border-bottom: none;
+  }
+
+  table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    width: 45%;
+    padding-right: 10px;
+    font-weight: 600;
+    text-align: left;
+    color: var(--text);
+  }
+
+  /* Status & Priority Select Mobile */
+  .status-select, .priority-select {
+    width: 100%;
+    max-width: 200px;
+  }
+
+  /* Button Mobile */
+  .btn-outline {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Conversation View Mobile */
+  .conversation-container {
+    margin: 0 -1rem;
+    border-radius: 0;
+  }
+
+  .conversation-content {
+    height: 300px;
+    padding: 1rem;
+  }
+
+  .message {
+    max-width: 95%;
+    padding: 0.5rem;
+  }
+
+  .reply-form {
+    padding: 1rem;
+  }
+
+  /* Detail Row Mobile */
+  .detail-row {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .detail-label {
+    width: 100%;
+  }
+
+  /* Pagination Mobile */
   .pagination {
     flex-direction: column;
     align-items: center;
@@ -373,6 +503,7 @@ textarea.form-control {
   .pagination-info {
     text-align: center;
     width: 100%;
+    font-size: 0.85rem;
   }
 
   .pagination-controls {
@@ -386,13 +517,32 @@ textarea.form-control {
   .page-btn {
     padding: 6px 10px;
     font-size: 0.85rem;
+    flex: 1;
+    min-width: 60px;
+  }
+}
+
+/* Extra Small Mobile */
+@media (max-width: 480px) {
+  .page-header h1 {
+    font-size: 1.25rem;
   }
 
-  /* Adjust button size on very small screens */
-  @media (max-width: 480px) {
-    .page-btn {
-      padding: 5px 8px;
-      font-size: 0.8rem;
-    }
+  .filter-group label {
+    font-size: 0.85rem;
+  }
+
+  .page-btn {
+    padding: 5px 8px;
+    font-size: 0.8rem;
+    min-width: 50px;
+  }
+
+  .message {
+    max-width: 100%;
+  }
+
+  .conversation-content {
+    height: 250px;
   }
 }

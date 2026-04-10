@@ -227,9 +227,348 @@
     }
 
     .logo {
-        height: 40px; /* Mengurangi ukuran logo */
+        height: 40px;
         width: auto;
-        max-width: 120px; /* Membatasi lebar maksimum logo */
+        max-width: 120px;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        body {
+            padding: 10px;
+        }
+
+        .invoice-container {
+            border-radius: 8px;
+        }
+
+        .invoice-header {
+            padding: 1rem;
+        }
+
+        .invoice-title {
+            font-size: 1.25rem;
+        }
+
+        .invoice-number {
+            font-size: 0.9rem;
+        }
+
+        .logo {
+            height: 35px;
+            max-width: 100px;
+        }
+
+        .invoice-content {
+            padding: 1.25rem;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .parties {
+            flex-direction: column;
+            gap: 1.25rem;
+            margin: 1rem 0;
+        }
+
+        .party h3 {
+            font-size: 0.95rem;
+        }
+
+        .party p {
+            font-size: 0.85rem;
+        }
+
+        .items-table th,
+        .items-table td {
+            padding: 0.6rem;
+            font-size: 0.85rem;
+        }
+
+        .item-image {
+            width: 40px;
+            height: 40px;
+        }
+
+        .item-details h4 {
+            font-size: 0.85rem;
+        }
+
+        .item-meta {
+            font-size: 0.75rem;
+        }
+
+        .detail-row {
+            flex-direction: column;
+            gap: 0.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .summary-row {
+            font-size: 0.9rem;
+        }
+
+        .print-actions {
+            padding: 1rem;
+        }
+
+        .btn {
+            padding: 0.6rem 1.25rem;
+            font-size: 0.85rem;
+            width: 100%;
+        }
+    }
+
+    /* Small Mobile - 425px */
+    @media (max-width: 425px) {
+        body {
+            padding: 8px;
+        }
+
+        .invoice-header {
+            padding: 0.75rem;
+        }
+
+        .invoice-title {
+            font-size: 1.1rem;
+        }
+
+        .invoice-number {
+            font-size: 0.85rem;
+        }
+
+        .logo {
+            height: 30px;
+            max-width: 90px;
+        }
+
+        .invoice-content {
+            padding: 1rem;
+        }
+
+        .section-title {
+            font-size: 0.95rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .parties {
+            gap: 1rem;
+            margin: 0.75rem 0;
+        }
+
+        .party h3 {
+            font-size: 0.9rem;
+        }
+
+        .party p {
+            font-size: 0.8rem;
+        }
+
+        .items-table th,
+        .items-table td {
+            padding: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .item-image {
+            width: 35px;
+            height: 35px;
+        }
+
+        .item-details h4 {
+            font-size: 0.8rem;
+        }
+
+        .item-meta {
+            font-size: 0.7rem;
+        }
+
+        .detail-label,
+        .detail-value {
+            font-size: 0.8rem;
+        }
+
+        .summary-row {
+            font-size: 0.85rem;
+        }
+
+        .print-actions {
+            padding: 0.75rem;
+        }
+
+        .btn {
+            padding: 0.55rem 1rem;
+            font-size: 0.8rem;
+        }
+    }
+
+    /* Very Small Mobile - 375px */
+    @media (max-width: 375px) {
+        body {
+            padding: 6px;
+        }
+
+        .invoice-header {
+            padding: 0.6rem;
+        }
+
+        .invoice-title {
+            font-size: 1rem;
+        }
+
+        .invoice-number {
+            font-size: 0.8rem;
+        }
+
+        .logo {
+            height: 28px;
+            max-width: 85px;
+        }
+
+        .invoice-content {
+            padding: 0.75rem;
+        }
+
+        .section-title {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .parties {
+            gap: 0.75rem;
+            margin: 0.6rem 0;
+        }
+
+        .party h3 {
+            font-size: 0.85rem;
+        }
+
+        .party p {
+            font-size: 0.75rem;
+        }
+
+        .items-table th,
+        .items-table td {
+            padding: 0.45rem;
+            font-size: 0.75rem;
+        }
+
+        .item-image {
+            width: 32px;
+            height: 32px;
+        }
+
+        .item-details h4 {
+            font-size: 0.75rem;
+        }
+
+        .item-meta {
+            font-size: 0.65rem;
+        }
+
+        .detail-label,
+        .detail-value {
+            font-size: 0.75rem;
+        }
+
+        .summary-row {
+            font-size: 0.8rem;
+        }
+
+        .print-actions {
+            padding: 0.6rem;
+        }
+
+        .btn {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.75rem;
+        }
+    }
+
+    /* Extra Small Mobile - 320px */
+    @media (max-width: 320px) {
+        body {
+            padding: 5px;
+        }
+
+        .invoice-header {
+            padding: 0.5rem;
+        }
+
+        .invoice-title {
+            font-size: 0.95rem;
+        }
+
+        .invoice-number {
+            font-size: 0.75rem;
+        }
+
+        .logo {
+            height: 25px;
+            max-width: 80px;
+        }
+
+        .invoice-content {
+            padding: 0.6rem;
+        }
+
+        .section-title {
+            font-size: 0.85rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .parties {
+            gap: 0.6rem;
+            margin: 0.5rem 0;
+        }
+
+        .party h3 {
+            font-size: 0.8rem;
+        }
+
+        .party p {
+            font-size: 0.7rem;
+        }
+
+        .items-table th,
+        .items-table td {
+            padding: 0.4rem;
+            font-size: 0.7rem;
+        }
+
+        .item-image {
+            width: 30px;
+            height: 30px;
+        }
+
+        .item-details h4 {
+            font-size: 0.7rem;
+        }
+
+        .item-meta {
+            font-size: 0.6rem;
+        }
+
+        .detail-label,
+        .detail-value {
+            font-size: 0.7rem;
+        }
+
+        .summary-row {
+            font-size: 0.75rem;
+        }
+
+        .print-actions {
+            padding: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.45rem 0.6rem;
+            font-size: 0.7rem;
+        }
     }
     </style>
 </head>

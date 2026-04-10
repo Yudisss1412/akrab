@@ -812,7 +812,7 @@
       margin-bottom: 0.25rem;
     }
 
-    .table td div:last-child {
+    .table td div:last-ch ild {
       margin-bottom: 0;
     }
 

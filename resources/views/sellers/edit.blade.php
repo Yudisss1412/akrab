@@ -226,6 +226,185 @@
       content: " *";
       color: var(--danger);
     }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .page-title {
+        font-size: 1.25rem;
+      }
+
+      .page-header .btn {
+        width: 100%;
+      }
+
+      .form-content {
+        padding: 1.25rem;
+      }
+
+      .form-header {
+        padding: 1.25rem;
+      }
+
+      .form-title {
+        font-size: 1.1rem;
+      }
+
+      .form-actions {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .form-actions .btn {
+        width: 100%;
+        padding: 0.75rem;
+      }
+    }
+
+    /* Small Mobile - 425px */
+    @media (max-width: 425px) {
+      .page-title {
+        font-size: 1.1rem;
+      }
+
+      .page-header .btn {
+        padding: 0.5rem;
+        font-size: 0.85rem;
+      }
+
+      .form-content {
+        padding: 1rem;
+      }
+
+      .form-header {
+        padding: 1rem;
+      }
+
+      .form-title {
+        font-size: 1rem;
+      }
+
+      .form-label {
+        font-size: 0.9rem;
+      }
+
+      .form-control,
+      .form-select {
+        padding: 0.65rem;
+        font-size: 0.95rem;
+      }
+
+      .form-actions {
+        gap: 0.6rem;
+        margin-top: 1.5rem;
+        padding-top: 1.25rem;
+      }
+
+      .form-actions .btn {
+        padding: 0.65rem;
+        font-size: 0.9rem;
+      }
+    }
+
+    /* Very Small Mobile - 375px */
+    @media (max-width: 375px) {
+      .page-title {
+        font-size: 1rem;
+      }
+
+      .page-header .btn {
+        padding: 0.45rem;
+        font-size: 0.8rem;
+      }
+
+      .form-content {
+        padding: 0.75rem;
+      }
+
+      .form-header {
+        padding: 0.75rem;
+      }
+
+      .form-title {
+        font-size: 0.95rem;
+      }
+
+      .form-label {
+        font-size: 0.85rem;
+      }
+
+      .form-control,
+      .form-select {
+        padding: 0.6rem;
+        font-size: 0.9rem;
+      }
+
+      .form-actions {
+        gap: 0.5rem;
+        margin-top: 1.25rem;
+        padding-top: 1rem;
+      }
+
+      .form-actions .btn {
+        padding: 0.6rem;
+        font-size: 0.85rem;
+      }
+    }
+
+    /* Extra Small Mobile - 320px */
+    @media (max-width: 320px) {
+      .page-header {
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+      }
+
+      .page-title {
+        font-size: 0.95rem;
+      }
+
+      .page-header .btn {
+        padding: 0.4rem;
+        font-size: 0.75rem;
+      }
+
+      .form-content {
+        padding: 0.5rem;
+      }
+
+      .form-header {
+        padding: 0.6rem;
+      }
+
+      .form-title {
+        font-size: 0.9rem;
+      }
+
+      .form-label {
+        font-size: 0.8rem;
+      }
+
+      .form-control,
+      .form-select {
+        padding: 0.55rem;
+        font-size: 0.85rem;
+      }
+
+      .form-actions {
+        gap: 0.4rem;
+        margin-top: 1rem;
+        padding-top: 0.75rem;
+      }
+
+      .form-actions .btn {
+        padding: 0.55rem;
+        font-size: 0.8rem;
+      }
+    }
   </style>
 </head>
 <body>

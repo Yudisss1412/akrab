@@ -50,3 +50,297 @@
   overflow-wrap: break-word;
   font-size: 0.8rem;
 }
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .admin-page-content {
+    padding: 1rem !important;
+  }
+
+  .seller-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .seller-identity {
+    width: 100%;
+  }
+
+  .profile-actions {
+    width: 100%;
+    margin-left: 0;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .profile-actions .btn {
+    width: 100%;
+  }
+
+  .admin-profile .info-list {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .admin-profile .info-list dt {
+    grid-column: 1;
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .admin-profile .info-list dd {
+    grid-column: 1;
+    font-size: 0.85rem;
+  }
+
+  .admin-profile .info-list > div {
+    padding: 0.6rem 0.75rem;
+  }
+
+  .seller-meta .seller-name {
+    font-size: 1rem;
+  }
+
+  .seller-meta .seller-mail,
+  .seller-meta .seller-since {
+    font-size: 0.85rem;
+  }
+
+  .admin-orders-viewport {
+    padding: 0;
+  }
+
+  .admin-order-card {
+    margin-bottom: 0.75rem;
+  }
+
+  .order-head {
+    padding: 0.75rem;
+  }
+
+  .order-items {
+    padding: 0.75rem;
+  }
+
+  .item-name {
+    font-size: 0.85rem;
+  }
+
+  .item-desc {
+    font-size: 0.8rem;
+  }
+}
+
+/* Small Mobile - 425px */
+@media (max-width: 425px) {
+  .admin-page-content {
+    padding: 0.75rem !important;
+  }
+
+  .seller-hero {
+    gap: 0.75rem;
+  }
+
+  .avatar {
+    width: 48px;
+    height: 48px;
+    font-size: 1.2rem;
+  }
+
+  .seller-meta .seller-name {
+    font-size: 0.95rem;
+  }
+
+  .seller-meta .seller-mail,
+  .seller-meta .seller-since {
+    font-size: 0.8rem;
+  }
+
+  .admin-profile .info-list dt {
+    font-size: 0.7rem;
+  }
+
+  .admin-profile .info-list dd {
+    font-size: 0.8rem;
+  }
+
+  .admin-profile .info-list > div {
+    padding: 0.5rem 0.65rem;
+  }
+
+  .profile-actions .btn {
+    padding: 0.55rem;
+    font-size: 0.85rem;
+  }
+
+  .admin-order-card {
+    margin-bottom: 0.6rem;
+  }
+
+  .order-head {
+    padding: 0.6rem;
+  }
+
+  .order-items {
+    padding: 0.6rem;
+  }
+
+  .item-name {
+    font-size: 0.8rem;
+  }
+
+  .item-desc {
+    font-size: 0.75rem;
+  }
+
+  .card-head {
+    padding: 0.75rem;
+  }
+
+  .card-title {
+    font-size: 1rem;
+  }
+}
+
+/* Very Small Mobile - 375px */
+@media (max-width: 375px) {
+  .admin-page-content {
+    padding: 0.6rem !important;
+  }
+
+  .seller-hero {
+    gap: 0.6rem;
+  }
+
+  .avatar {
+    width: 44px;
+    height: 44px;
+    font-size: 1.1rem;
+  }
+
+  .seller-meta .seller-name {
+    font-size: 0.9rem;
+  }
+
+  .seller-meta .seller-mail,
+  .seller-meta .seller-since {
+    font-size: 0.75rem;
+  }
+
+  .admin-profile .info-list dt {
+    font-size: 0.65rem;
+  }
+
+  .admin-profile .info-list dd {
+    font-size: 0.75rem;
+  }
+
+  .admin-profile .info-list > div {
+    padding: 0.45rem 0.6rem;
+  }
+
+  .profile-actions .btn {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .admin-order-card {
+    margin-bottom: 0.5rem;
+  }
+
+  .order-head {
+    padding: 0.5rem;
+  }
+
+  .order-items {
+    padding: 0.5rem;
+  }
+
+  .item-name {
+    font-size: 0.75rem;
+  }
+
+  .item-desc {
+    font-size: 0.7rem;
+  }
+
+  .card-head {
+    padding: 0.6rem;
+  }
+
+  .card-title {
+    font-size: 0.95rem;
+  }
+}
+
+/* Extra Small Mobile - 320px */
+@media (max-width: 320px) {
+  .admin-page-content {
+    padding: 0.5rem !important;
+  }
+
+  .seller-hero {
+    gap: 0.5rem;
+  }
+
+  .avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  .seller-meta .seller-name {
+    font-size: 0.85rem;
+  }
+
+  .seller-meta .seller-mail,
+  .seller-meta .seller-since {
+    font-size: 0.7rem;
+  }
+
+  .admin-profile .info-list dt {
+    font-size: 0.6rem;
+  }
+
+  .admin-profile .info-list dd {
+    font-size: 0.7rem;
+  }
+
+  .admin-profile .info-list > div {
+    padding: 0.4rem 0.5rem;
+  }
+
+  .profile-actions .btn {
+    padding: 0.45rem;
+    font-size: 0.75rem;
+  }
+
+  .admin-order-card {
+    margin-bottom: 0.4rem;
+  }
+
+  .order-head {
+    padding: 0.4rem;
+  }
+
+  .order-items {
+    padding: 0.4rem;
+  }
+
+  .item-name {
+    font-size: 0.7rem;
+  }
+
+  .item-desc {
+    font-size: 0.65rem;
+  }
+
+  .card-head {
+    padding: 0.5rem;
+  }
+
+  .card-title {
+    font-size: 0.9rem;
+  }
+}

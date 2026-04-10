@@ -531,7 +531,7 @@ textarea.form-control {
     text-align: center;
   }
 
-  /* Table Responsive - Card View with Compact Layout */
+  /* Table Responsive - Card View with Vertical Layout */
   .table-container {
     margin: 0;
     padding: 0;
@@ -564,10 +564,10 @@ textarea.form-control {
   table tr {
     margin-bottom: 0.75rem;
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: 10px;
     padding: 0;
     background: white;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     overflow: hidden;
     position: relative;
   }
@@ -576,21 +576,22 @@ textarea.form-control {
     margin-bottom: 0;
   }
 
-  /* Card header row (shows when collapsed) */
-  table td:first-child {
-    border-top: none;
+  /* Card header with gradient background */
+  table td[data-label="Pilih"],
+  table td[data-label="ID"] {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-bottom: 2px solid var(--border);
+    padding: 0.6rem 1rem;
   }
 
   table td {
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    border-bottom: 1px solid var(--border);
-    align-items: center;
-    flex-wrap: wrap;
-    font-size: 0.875rem;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid #f0f0f0;
+    align-items: flex-start;
+    font-size: 0.9rem;
     line-height: 1.4;
   }
 
@@ -598,19 +599,18 @@ textarea.form-control {
     border-bottom: none;
   }
 
-  /* Label for each data cell */
+  /* Label for each data cell - positioned above value */
   table td::before {
     content: attr(data-label);
     font-weight: 600;
     font-size: 0.75rem;
     color: #6B7280;
     text-transform: uppercase;
-    letter-spacing: 0.025em;
+    letter-spacing: 0.05em;
     flex-shrink: 0;
-    min-width: 90px;
-    max-width: 35%;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
+    min-width: auto;
+    max-width: none;
+    margin-bottom: 0.2rem;
   }
 
   /* Checkbox cell - special handling */
@@ -622,22 +622,27 @@ textarea.form-control {
 
   table td[data-label="Pilih"] {
     flex-direction: row;
-    justify-content: flex-start;
+    justify-content: space-between;
+    align-items: center;
     gap: 0.5rem;
   }
 
   table td[data-label="Pilih"]::before {
-    content: attr(data-label);
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #6B7280;
+    content: none;
+  }
+
+  table td[data-label="ID"]::before {
+    content: 'ID Permintaan';
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--primary);
   }
 
   /* Amount cell - highlight */
   table td.amount {
     color: var(--primary);
-    font-weight: 600;
-    font-size: 0.9rem;
+    font-weight: 700;
+    font-size: 1rem;
   }
 
   /* Action buttons */
@@ -646,42 +651,43 @@ textarea.form-control {
     flex-direction: row;
     gap: 0.5rem;
     width: 100%;
-    justify-content: flex-end;
+    justify-content: stretch;
+    margin-top: 0.25rem;
   }
 
   table td .btn-action {
     flex: 1;
-    max-width: 120px;
-    padding: 0.4rem 0.5rem;
+    padding: 0.5rem 0.6rem;
     text-align: center;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
+    border-radius: 6px;
   }
 
   /* Seller link */
   table td .seller-link {
     word-break: break-word;
     color: var(--primary);
-    font-weight: 500;
+    font-weight: 600;
   }
 
   /* Status badge in cards */
   table td .status-badge {
-    font-size: 0.75rem;
-    padding: 0.2rem 0.5rem;
+    font-size: 0.8rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
   }
 
   /* For empty state row */
   table td[colspan] {
     display: block;
     text-align: center;
-    padding: 1.5rem 1rem;
-    grid-template-columns: 1fr;
+    padding: 2rem 1.5rem;
     min-height: 80px;
     line-height: 1.5;
     word-wrap: break-word;
     overflow-wrap: break-word;
     hyphens: auto;
-    font-size: 0.875rem;
+    font-size: 0.9rem;
   }
 
   table td[colspan]::before {
@@ -851,36 +857,112 @@ textarea.form-control {
     font-size: 0.85rem;
   }
 
-  /* Card View - More Compact */
+  /* Card View - More Compact with Vertical Layout */
   table tr {
-    margin-bottom: 0.6rem;
-    border-radius: 8px;
+    margin-bottom: 0.7rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    max-width: 100%;
+    padding: 0;
+    background: white;
+    overflow: hidden;
+  }
+
+  /* First row (checkbox + ID) as card header */
+  table td[data-label="Pilih"],
+  table td[data-label="ID"] {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-bottom: 2px solid var(--border);
+    padding: 0.55rem 0.8rem;
   }
 
   table td {
-    padding: 0.45rem 0.65rem;
-    gap: 0.4rem;
-    font-size: 0.8rem;
-    line-height: 1.35;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.55rem 0.8rem;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    max-width: 100%;
   }
 
+  table td:last-child {
+    border-bottom: none;
+  }
+
+  /* Label for each data cell - now positioned above value */
   table td::before {
+    content: attr(data-label);
     font-size: 0.7rem;
-    min-width: 85px;
-    max-width: 38%;
+    font-weight: 600;
+    color: #6B7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+    min-width: auto;
+    max-width: none;
+    margin-bottom: 0.15rem;
+  }
+
+  /* Checkbox and ID in same row as header */
+  table td[data-label="Pilih"] {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  table td[data-label="Pilih"]::before {
+    content: none;
+  }
+
+  table td[data-label="ID"]::before {
+    content: 'ID Permintaan';
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--primary);
   }
 
   table td.amount {
-    font-size: 0.85rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary);
   }
 
   table td .action-buttons {
-    gap: 0.4rem;
+    gap: 0.5rem;
+    flex-direction: row;
+    width: 100%;
+    margin-top: 0.25rem;
   }
 
   table td .btn-action {
-    padding: 0.35rem 0.4rem;
-    font-size: 0.75rem;
+    padding: 0.45rem 0.6rem;
+    font-size: 0.8rem;
+    flex: 1;
+    max-width: none;
+    white-space: nowrap;
+    border-radius: 6px;
+  }
+
+  table td .seller-link {
+    font-size: 0.9rem;
+    word-break: break-word;
+    color: var(--primary);
+    font-weight: 600;
+  }
+
+  table td .status-badge {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+  }
+
+  /* Checkbox */
+  table td input[type="checkbox"] {
+    width: 1.1rem;
+    height: 1.1rem;
+    flex-shrink: 0;
   }
 
   /* Empty State */
@@ -999,47 +1081,112 @@ textarea.form-control {
     font-size: 0.8rem;
   }
 
-  /* Card View - Ultra Compact */
+  /* Card View - Ultra Compact with Vertical Layout */
   table tr {
-    margin-bottom: 0.5rem;
-    border-radius: 7px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    margin-bottom: 0.6rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    max-width: 100%;
+    padding: 0;
+    background: white;
+    overflow: hidden;
+  }
+
+  /* First row (checkbox + ID) as card header */
+  table td[data-label="Pilih"],
+  table td[data-label="ID"] {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-bottom: 2px solid var(--border);
+    padding: 0.5rem 0.75rem;
   }
 
   table td {
-    padding: 0.4rem 0.6rem;
-    gap: 0.35rem;
-    font-size: 0.75rem;
-    line-height: 1.3;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    max-width: 100%;
   }
 
+  table td:last-child {
+    border-bottom: none;
+  }
+
+  /* Label for each data cell - now positioned above value */
   table td::before {
+    content: attr(data-label);
     font-size: 0.65rem;
-    min-width: 80px;
-    max-width: 40%;
+    font-weight: 600;
+    color: #6B7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+    min-width: auto;
+    max-width: none;
+    margin-bottom: 0.15rem;
+  }
+
+  /* Checkbox and ID in same row as header */
+  table td[data-label="Pilih"] {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  table td[data-label="Pilih"]::before {
+    content: none;
+  }
+
+  table td[data-label="ID"]::before {
+    content: 'ID Permintaan';
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--primary);
   }
 
   table td.amount {
-    font-size: 0.8rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--primary);
   }
 
   table td .action-buttons {
-    gap: 0.35rem;
+    gap: 0.4rem;
+    flex-direction: row;
+    width: 100%;
+    margin-top: 0.2rem;
   }
 
   table td .btn-action {
-    padding: 0.3rem 0.35rem;
-    font-size: 0.7rem;
-    max-width: 100px;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.75rem;
+    flex: 1;
+    max-width: none;
+    white-space: nowrap;
+    border-radius: 6px;
   }
 
   table td .seller-link {
-    font-size: 0.75rem;
+    font-size: 0.85rem;
+    word-break: break-word;
+    color: var(--primary);
+    font-weight: 600;
   }
 
   table td .status-badge {
-    font-size: 0.7rem;
-    padding: 0.15rem 0.4rem;
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+  }
+
+  /* Checkbox */
+  table td input[type="checkbox"] {
+    width: 1.1rem;
+    height: 1.1rem;
+    flex-shrink: 0;
   }
 
   /* Empty State */
@@ -1164,11 +1311,6 @@ textarea.form-control {
     margin-bottom: 0.6rem;
   }
 
-  .btn-bulk {
-    padding: 0.5rem 0.6rem;
-    font-size: 0.75rem;
-  }
-
   /* Card Container - Constrain width */
   .requests-container {
     max-width: 100%;
@@ -1179,58 +1321,111 @@ textarea.form-control {
     max-width: 100%;
   }
 
-  /* Card View - Maximum Compact */
+  /* Card View - Maximum Compact with Vertical Layout */
   table tr {
-    margin-bottom: 0.4rem;
-    border-radius: 6px;
-    box-shadow: 0 0.5px 2px rgba(0, 0, 0, 0.04);
+    margin-bottom: 0.6rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     max-width: 100%;
+    padding: 0;
+    background: white;
+    overflow: hidden;
+  }
+
+  /* First row (checkbox + ID) as card header */
+  table td[data-label="Pilih"],
+  table td[data-label="ID"] {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-bottom: 2px solid var(--border);
+    padding: 0.5rem 0.75rem;
   }
 
   table td {
-    padding: 0.35rem 0.5rem;
-    gap: 0.3rem;
-    font-size: 0.75rem;
-    line-height: 1.3;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.8rem;
+    line-height: 1.4;
     max-width: 100%;
   }
 
+  table td:last-child {
+    border-bottom: none;
+  }
+
+  /* Label for each data cell - now positioned above value */
   table td::before {
+    content: attr(data-label);
     font-size: 0.65rem;
-    min-width: 70px;
-    max-width: 35%;
+    font-weight: 600;
+    color: #6B7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     flex-shrink: 0;
+    min-width: auto;
+    max-width: none;
+    margin-bottom: 0.15rem;
+  }
+
+  /* Checkbox and ID in same row as header */
+  table td[data-label="Pilih"] {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  table td[data-label="Pilih"]::before {
+    content: none;
+  }
+
+  table td[data-label="ID"]::before {
+    content: 'ID Permintaan';
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--primary);
   }
 
   table td.amount {
-    font-size: 0.8rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary);
   }
 
   table td .action-buttons {
-    gap: 0.3rem;
+    gap: 0.4rem;
+    flex-direction: row;
+    width: 100%;
+    margin-top: 0.2rem;
   }
 
   table td .btn-action {
-    padding: 0.25rem 0.3rem;
-    font-size: 0.65rem;
-    max-width: 85px;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.75rem;
+    flex: 1;
+    max-width: none;
     white-space: nowrap;
+    border-radius: 6px;
   }
 
   table td .seller-link {
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     word-break: break-word;
+    color: var(--primary);
+    font-weight: 600;
   }
 
   table td .status-badge {
-    font-size: 0.65rem;
-    padding: 0.1rem 0.35rem;
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
   }
 
   /* Checkbox */
   table td input[type="checkbox"] {
-    width: 0.9rem;
-    height: 0.9rem;
+    width: 1.1rem;
+    height: 1.1rem;
     flex-shrink: 0;
   }
 

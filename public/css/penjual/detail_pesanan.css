@@ -181,3 +181,462 @@
   background: var(--ak-primary);
   color: white;
 }
+
+/* Mobile Responsive - 768px */
+@media (max-width: 768px) {
+  .content-wrapper {
+    padding: 0 1rem;
+  }
+
+  .page-header {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .page-header h1 .btn-back {
+    width: 28px;
+    height: 28px;
+    font-size: 0.85rem;
+  }
+
+  .card {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .card-header {
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+  }
+
+  .info-row {
+    padding: 0.6rem 0;
+  }
+
+  .info-label {
+    font-size: 0.8rem;
+  }
+
+  .info-value {
+    font-size: 0.85rem;
+  }
+
+  .product-item {
+    padding: 0.75rem 0;
+  }
+
+  .product-thumb {
+    width: 44px;
+    height: 44px;
+  }
+
+  .product-name {
+    font-size: 0.85rem;
+  }
+
+  .product-variant {
+    font-size: 0.8rem;
+  }
+
+  .product-price {
+    font-size: 0.85rem;
+  }
+
+  .product-quantity {
+    font-size: 0.8rem;
+  }
+
+  .summary-row {
+    padding: 0.6rem 0;
+  }
+
+  .summary-label {
+    font-size: 0.85rem;
+  }
+
+  .summary-value {
+    font-size: 0.85rem;
+  }
+
+  .summary-total {
+    font-size: 1rem;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .action-buttons .btn {
+    width: 100%;
+  }
+
+  .action-buttons-right {
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .action-buttons-right .btn {
+    width: 100%;
+  }
+
+  .tracking-info {
+    width: 100%;
+  }
+
+  .status-badge {
+    padding: 0.2rem 0.6rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* Small Mobile - 425px */
+@media (max-width: 425px) {
+  .content-wrapper {
+    padding: 0 0.75rem;
+  }
+
+  .page-header {
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.1rem;
+    gap: 0.6rem;
+  }
+
+  .page-header h1 .btn-back {
+    width: 26px;
+    height: 26px;
+    font-size: 0.8rem;
+  }
+
+  .card {
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .card-header {
+    padding-bottom: 0.6rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .card-title {
+    font-size: 1rem;
+  }
+
+  .info-row {
+    padding: 0.5rem 0;
+  }
+
+  .info-label {
+    font-size: 0.75rem;
+  }
+
+  .info-value {
+    font-size: 0.8rem;
+  }
+
+  .product-item {
+    padding: 0.6rem 0;
+    gap: 0.6rem;
+  }
+
+  .product-thumb {
+    width: 40px;
+    height: 40px;
+  }
+
+  .product-name {
+    font-size: 0.8rem;
+  }
+
+  .product-variant {
+    font-size: 0.75rem;
+  }
+
+  .product-price {
+    font-size: 0.8rem;
+  }
+
+  .product-quantity {
+    font-size: 0.75rem;
+  }
+
+  .summary-row {
+    padding: 0.5rem 0;
+  }
+
+  .summary-label {
+    font-size: 0.8rem;
+  }
+
+  .summary-value {
+    font-size: 0.8rem;
+  }
+
+  .summary-total {
+    font-size: 0.95rem;
+  }
+
+  .action-buttons {
+    gap: 0.6rem;
+  }
+
+  .action-buttons-right {
+    gap: 0.6rem;
+  }
+
+  .btn {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .status-badge {
+    padding: 0.15rem 0.5rem;
+    font-size: 0.7rem;
+  }
+
+  .tracking-info p {
+    font-size: 0.8rem;
+  }
+}
+
+/* Very Small Mobile - 375px */
+@media (max-width: 375px) {
+  .content-wrapper {
+    padding: 0 0.6rem;
+  }
+
+  .page-header {
+    padding: 0.6rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .page-header h1 {
+    font-size: 1rem;
+    gap: 0.5rem;
+  }
+
+  .page-header h1 .btn-back {
+    width: 24px;
+    height: 24px;
+    font-size: 0.75rem;
+  }
+
+  .card {
+    padding: 0.6rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .card-header {
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .card-title {
+    font-size: 0.95rem;
+  }
+
+  .info-row {
+    padding: 0.45rem 0;
+  }
+
+  .info-label {
+    font-size: 0.7rem;
+  }
+
+  .info-value {
+    font-size: 0.75rem;
+  }
+
+  .product-item {
+    padding: 0.5rem 0;
+    gap: 0.5rem;
+  }
+
+  .product-thumb {
+    width: 36px;
+    height: 36px;
+  }
+
+  .product-name {
+    font-size: 0.75rem;
+  }
+
+  .product-variant {
+    font-size: 0.7rem;
+  }
+
+  .product-price {
+    font-size: 0.75rem;
+  }
+
+  .product-quantity {
+    font-size: 0.7rem;
+  }
+
+  .summary-row {
+    padding: 0.45rem 0;
+  }
+
+  .summary-label {
+    font-size: 0.75rem;
+  }
+
+  .summary-value {
+    font-size: 0.75rem;
+  }
+
+  .summary-total {
+    font-size: 0.9rem;
+  }
+
+  .action-buttons {
+    gap: 0.5rem;
+  }
+
+  .action-buttons-right {
+    gap: 0.5rem;
+  }
+
+  .btn {
+    padding: 0.55rem 0.65rem;
+    font-size: 0.75rem;
+  }
+
+  .status-badge {
+    padding: 0.15rem 0.45rem;
+    font-size: 0.65rem;
+  }
+
+  .tracking-info p {
+    font-size: 0.75rem;
+  }
+}
+
+/* Extra Small Mobile - 320px */
+@media (max-width: 320px) {
+  .content-wrapper {
+    padding: 0 0.5rem;
+  }
+
+  .page-header {
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .page-header h1 {
+    font-size: 0.95rem;
+    gap: 0.4rem;
+  }
+
+  .page-header h1 .btn-back {
+    width: 22px;
+    height: 22px;
+    font-size: 0.7rem;
+  }
+
+  .card {
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .card-header {
+    padding-bottom: 0.4rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .card-title {
+    font-size: 0.9rem;
+  }
+
+  .info-row {
+    padding: 0.4rem 0;
+  }
+
+  .info-label {
+    font-size: 0.65rem;
+  }
+
+  .info-value {
+    font-size: 0.7rem;
+  }
+
+  .product-item {
+    padding: 0.45rem 0;
+    gap: 0.45rem;
+  }
+
+  .product-thumb {
+    width: 32px;
+    height: 32px;
+  }
+
+  .product-name {
+    font-size: 0.7rem;
+  }
+
+  .product-variant {
+    font-size: 0.65rem;
+  }
+
+  .product-price {
+    font-size: 0.7rem;
+  }
+
+  .product-quantity {
+    font-size: 0.65rem;
+  }
+
+  .summary-row {
+    padding: 0.4rem 0;
+  }
+
+  .summary-label {
+    font-size: 0.7rem;
+  }
+
+  .summary-value {
+    font-size: 0.7rem;
+  }
+
+  .summary-total {
+    font-size: 0.85rem;
+  }
+
+  .action-buttons {
+    gap: 0.4rem;
+  }
+
+  .action-buttons-right {
+    gap: 0.4rem;
+  }
+
+  .btn {
+    padding: 0.5rem 0.6rem;
+    font-size: 0.7rem;
+  }
+
+  .status-badge {
+    padding: 0.12rem 0.4rem;
+    font-size: 0.6rem;
+  }
+
+  .tracking-info p {
+    font-size: 0.7rem;
+  }
+}

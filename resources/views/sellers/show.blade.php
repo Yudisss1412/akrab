@@ -202,7 +202,41 @@
       margin-bottom: 0.5rem;
     }
 
+    /* Mobile Responsive */
     @media (max-width: 768px) {
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .page-title {
+        font-size: 1.5rem;
+      }
+
+      .page-header .btn {
+        width: 100%;
+      }
+
+      .detail-content {
+        padding: 1.25rem;
+      }
+
+      .detail-section {
+        padding: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .detail-table th,
+      .detail-table td {
+        padding: 0.6rem 0.75rem;
+        font-size: 0.9rem;
+      }
+
+      .detail-table th {
+        width: 40%;
+      }
+
       .action-buttons {
         flex-direction: column;
       }
@@ -210,6 +244,185 @@
       .action-buttons .btn {
         width: 100%;
         margin-right: 0;
+      }
+
+      .row {
+        margin: 0;
+      }
+
+      .col-md-6 {
+        padding: 0;
+        margin-bottom: 1rem;
+      }
+    }
+
+    /* Small Mobile - 425px */
+    @media (max-width: 425px) {
+      .page-title {
+        font-size: 1.25rem;
+      }
+
+      .page-header .btn {
+        padding: 0.5rem;
+        font-size: 0.85rem;
+      }
+
+      .detail-content {
+        padding: 1rem;
+      }
+
+      .detail-section {
+        padding: 0.75rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .detail-header {
+        padding: 1rem;
+      }
+
+      .detail-title {
+        font-size: 1rem;
+      }
+
+      .detail-table th,
+      .detail-table td {
+        padding: 0.5rem 0.6rem;
+        font-size: 0.85rem;
+      }
+
+      .detail-table th {
+        width: 45%;
+        font-size: 0.8rem;
+      }
+
+      .badge {
+        padding: 0.35em 0.6em;
+        font-size: 0.75em;
+      }
+
+      .action-buttons {
+        gap: 0.5rem;
+        margin-top: 1rem;
+      }
+
+      .action-buttons .btn {
+        padding: 0.6rem;
+        font-size: 0.85rem;
+      }
+    }
+
+    /* Very Small Mobile - 375px */
+    @media (max-width: 375px) {
+      .page-title {
+        font-size: 1.1rem;
+      }
+
+      .page-header .btn {
+        padding: 0.45rem;
+        font-size: 0.8rem;
+      }
+
+      .detail-content {
+        padding: 0.75rem;
+      }
+
+      .detail-section {
+        padding: 0.6rem;
+        margin-bottom: 0.6rem;
+      }
+
+      .detail-header {
+        padding: 0.75rem;
+      }
+
+      .detail-title {
+        font-size: 0.95rem;
+      }
+
+      .detail-table th,
+      .detail-table td {
+        padding: 0.45rem 0.5rem;
+        font-size: 0.8rem;
+      }
+
+      .detail-table th {
+        width: 45%;
+        font-size: 0.75rem;
+      }
+
+      .badge {
+        padding: 0.3em 0.5em;
+        font-size: 0.7em;
+      }
+
+      .action-buttons {
+        gap: 0.4rem;
+        margin-top: 0.75rem;
+      }
+
+      .action-buttons .btn {
+        padding: 0.55rem;
+        font-size: 0.8rem;
+      }
+    }
+
+    /* Extra Small Mobile - 320px */
+    @media (max-width: 320px) {
+      .page-header {
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .page-title {
+        font-size: 1rem;
+      }
+
+      .page-header .btn {
+        padding: 0.4rem;
+        font-size: 0.75rem;
+      }
+
+      .detail-content {
+        padding: 0.5rem;
+      }
+
+      .detail-section {
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .detail-header {
+        padding: 0.6rem;
+      }
+
+      .detail-title {
+        font-size: 0.9rem;
+      }
+
+      .detail-table th,
+      .detail-table td {
+        padding: 0.4rem 0.45rem;
+        font-size: 0.75rem;
+      }
+
+      .detail-table th {
+        width: 48%;
+        font-size: 0.7rem;
+      }
+
+      .badge {
+        padding: 0.25em 0.45em;
+        font-size: 0.65em;
+      }
+
+      .action-buttons {
+        gap: 0.35rem;
+        margin-top: 0.5rem;
+      }
+
+      .action-buttons .btn {
+        padding: 0.5rem;
+        font-size: 0.75rem;
       }
     }
   </style>

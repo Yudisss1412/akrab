@@ -459,6 +459,11 @@ textarea.form-control {
 
 /* Mobile Responsive - All Components */
 @media (max-width: 768px) {
+  /* Ensure content wrapper has proper padding */
+  .admin-page-content {
+    padding: 1rem !important;
+  }
+
   /* Page Header Mobile */
   .page-header {
     flex-direction: column;
@@ -528,19 +533,23 @@ textarea.form-control {
 
   /* Table Responsive - Card View */
   .table-container {
-    margin: 0 -1rem;
+    margin: 0;
     padding: 0;
     overflow-x: visible;
+    width: 100%;
   }
 
   .requests-container {
     border-left: none;
     border-right: none;
     border-radius: 0;
+    width: 100%;
+    overflow: visible;
   }
 
   table {
     min-width: 100%;
+    width: 100%;
   }
 
   table thead {
@@ -559,7 +568,7 @@ textarea.form-control {
     padding: 0;
     background: white;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-    overflow: hidden;
+    overflow: visible;
   }
 
   table td {
@@ -567,7 +576,7 @@ textarea.form-control {
     flex-direction: row;
     justify-content: space-between;
     gap: 1rem;
-    padding: 0.75rem 1rem;
+    padding: 0.75rem 1.25rem;
     border-bottom: 1px solid var(--border);
     align-items: center;
     flex-wrap: wrap;

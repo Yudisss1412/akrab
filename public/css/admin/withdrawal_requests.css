@@ -1187,11 +1187,22 @@ textarea.form-control {
     font-size: 0.75rem;
   }
 
+  /* Card Container - Constrain width */
+  .requests-container {
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  table {
+    max-width: 100%;
+  }
+
   /* Card View - Maximum Compact */
   table tr {
     margin-bottom: 0.4rem;
     border-radius: 6px;
     box-shadow: 0 0.5px 2px rgba(0, 0, 0, 0.04);
+    max-width: 100%;
   }
 
   /* Hide bank detail and catatan on mobile */
@@ -1201,45 +1212,56 @@ textarea.form-control {
   }
 
   table td {
-    padding: 0.35rem 0.5rem;
-    gap: 0.3rem;
-    font-size: 0.7rem;
-    line-height: 1.25;
+    padding: 0.3rem 0.4rem;
+    gap: 0.2rem;
+    font-size: 0.65rem;
+    line-height: 1.2;
+    flex-wrap: nowrap;
+    max-width: 100%;
+    overflow: hidden;
   }
 
   table td::before {
-    font-size: 0.6rem;
-    min-width: 75px;
-    max-width: 42%;
+    font-size: 0.55rem;
+    min-width: 55px;
+    max-width: 32%;
+    flex-shrink: 1;
   }
 
   table td.amount {
-    font-size: 0.75rem;
-  }
-
-  table td .action-buttons {
-    gap: 0.3rem;
-  }
-
-  table td .btn-action {
-    padding: 0.25rem 0.3rem;
-    font-size: 0.65rem;
-    max-width: 90px;
-  }
-
-  table td .seller-link {
     font-size: 0.7rem;
   }
 
-  table td .status-badge {
+  table td .action-buttons {
+    gap: 0.2rem;
+  }
+
+  table td .btn-action {
+    padding: 0.2rem 0.25rem;
+    font-size: 0.6rem;
+    max-width: 70px;
+    white-space: nowrap;
+  }
+
+  table td .seller-link {
     font-size: 0.65rem;
-    padding: 0.1rem 0.35rem;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+  }
+
+  table td .status-badge {
+    font-size: 0.6rem;
+    padding: 0.08rem 0.3rem;
   }
 
   /* Checkbox */
   table td input[type="checkbox"] {
-    width: 0.95rem;
-    height: 0.95rem;
+    width: 0.85rem;
+    height: 0.85rem;
+    flex-shrink: 0;
   }
 
   /* Empty State */

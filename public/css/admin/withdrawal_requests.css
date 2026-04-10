@@ -618,8 +618,13 @@ textarea.form-control {
   table td[colspan] {
     display: block;
     text-align: center;
-    padding: 2rem 1rem;
+    padding: 2rem 1.5rem;
     grid-template-columns: 1fr;
+    min-height: 100px;
+    line-height: 1.6;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
   }
 
   table td[colspan]::before {

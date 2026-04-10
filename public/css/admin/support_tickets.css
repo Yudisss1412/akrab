@@ -379,10 +379,17 @@ textarea.form-control {
     width: 100%;
   }
 
+  /* Ensure full width on mobile */
+  .tickets-container {
+    width: 100%;
+    max-width: 100%;
+  }
+
   /* Filters Mobile */
   .filters {
     flex-direction: column;
     gap: 1rem;
+    width: 100%;
   }
 
   .filters form {
@@ -402,15 +409,16 @@ textarea.form-control {
 
   /* Table Responsive - Card View */
   .tickets-container {
-    overflow-x: auto;
+    overflow-x: visible;
     -webkit-overflow-scrolling: touch;
+    width: 100%;
   }
 
   table {
-    min-width: 700px; /* Force horizontal scroll on small screens */
+    min-width: 100%;
   }
 
-  /* Alternative: Card View for better mobile UX */
+  /* Card View for better mobile UX */
   table thead {
     display: none;
   }
@@ -423,19 +431,20 @@ textarea.form-control {
   table tr {
     margin-bottom: 1rem;
     border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 1rem;
+    border-radius: 12px;
+    padding: 0;
     background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
   }
 
   table td {
-    text-align: left;
-    padding: 0.5rem 0;
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 0;
+    padding: 0.75rem 1rem;
     border-bottom: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-    gap: 0.5rem;
   }
 
   table td:last-child {
@@ -445,17 +454,37 @@ textarea.form-control {
   table td::before {
     content: attr(data-label);
     font-weight: 600;
-    text-align: left;
-    color: var(--text);
-    flex-shrink: 0;
-    min-width: 100px;
+    font-size: 0.85rem;
+    color: #6B7280;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+  }
+
+  /* Style for value cells */
+  table td > * {
+    justify-self: start;
+  }
+
+  /* Select elements */
+  table td .status-select,
+  table td .priority-select {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Button in Aksi column */
+  table td .btn-outline {
+    width: 100%;
+    text-align: center;
+    padding: 0.5rem 1rem;
   }
 
   /* For empty state row */
   table td[colspan] {
     display: block;
     text-align: center;
-    padding: 1rem;
+    padding: 2rem 1rem;
+    grid-template-columns: 1fr;
   }
 
   table td[colspan]::before {
@@ -555,5 +584,19 @@ textarea.form-control {
 
   .conversation-content {
     height: 250px;
+  }
+
+  /* Table Card View Extra Small */
+  table td {
+    grid-template-columns: 90px 1fr;
+    padding: 0.6rem 0.75rem;
+  }
+
+  table td::before {
+    font-size: 0.75rem;
+  }
+
+  table tr {
+    border-radius: 10px;
   }
 }

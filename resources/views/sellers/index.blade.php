@@ -818,7 +818,7 @@
 
     /* Enhance hover state for better UX */
     .table-hover tbody tr:hover {
-      background-color: rgba(0, 110, 92, 0.08) !important;
+      background-color: rgba(57, 67, 66, 0.08) !important;
     }
 
     /* Responsive text sizing */

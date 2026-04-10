@@ -370,51 +370,490 @@ body {
   border-color: var(--ak-primary);
 }
 
-/* Responsive */
+/* Mobile Responsive - 768px */
 @media (max-width: 768px) {
-  .control-bar {
-    flex-direction: column;
+  .content-wrapper {
+    padding: 0 1rem;
   }
 
-  .date-filter, .bulk-action {
-    width: 100%;
+  .page-header {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.25rem;
   }
 
   .tab-nav {
-    justify-content: flex-start;
+    padding: 0.4rem;
+    margin-bottom: 1rem;
   }
 
   .tab-item {
-    min-width: 120px;
-    flex: 0 0 auto;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.8rem;
+    min-width: 100px;
   }
 
-  .search-box {
+  .tab-item .badge {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.7rem;
+  }
+
+  .control-bar {
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .search-box input,
+  .date-filter select,
+  .bulk-action select {
+    padding: 0.45rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .order-card {
+    margin-bottom: 0.75rem;
+  }
+
+  .order-header {
+    padding: 0.75rem;
+  }
+
+  .order-id {
+    font-size: 0.9rem;
+  }
+
+  .order-date {
+    font-size: 0.8rem;
+  }
+
+  .customer-name {
+    font-size: 0.85rem;
+  }
+
+  .order-content {
+    padding: 0.75rem;
+  }
+
+  .product-thumb {
+    width: 44px;
+    height: 44px;
+  }
+
+  .product-name {
+    font-size: 0.85rem;
+  }
+
+  .product-quantity {
+    font-size: 0.8rem;
+  }
+
+  .order-footer {
+    padding: 0.75rem;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .action-buttons .btn {
+    width: 100%;
+  }
+
+  .order-footer .action-buttons-right {
+    width: 100%;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .order-footer .action-buttons-right .btn {
+    width: 100%;
+  }
+
+  .order-footer .tracking-info {
     min-width: auto;
     width: 100%;
   }
 
   .pagination {
-    flex-direction: column;
-    text-align: center;
+    margin-top: 1rem;
   }
 
-  .pagination-nav {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    justify-content: flex-start;
-    padding: 0.5rem 0;
-    margin: 0 auto;
+  .pagination-info {
+    font-size: 0.8rem;
   }
 
   .pagination-btn {
-    min-width: 32px;
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Small Mobile - 425px */
+@media (max-width: 425px) {
+  .content-wrapper {
+    padding: 0 0.75rem;
   }
 
-  /* Ensure any remaining overflow is handled with horizontal scrolling */
+  .page-header {
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.1rem;
+  }
+
+  .tab-nav {
+    padding: 0.35rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .tab-item {
+    padding: 0.55rem 0.65rem;
+    font-size: 0.75rem;
+    min-width: 90px;
+  }
+
+  .tab-item .badge {
+    padding: 0.15rem 0.35rem;
+    font-size: 0.65rem;
+  }
+
   .control-bar {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    padding: 0.6rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .search-box input,
+  .date-filter select,
+  .bulk-action select {
+    padding: 0.4rem 0.65rem;
+    font-size: 0.75rem;
+  }
+
+  .search-box svg {
+    width: 16px;
+    height: 16px;
+    left: 0.65rem;
+  }
+
+  .order-card {
+    margin-bottom: 0.6rem;
+  }
+
+  .order-header {
+    padding: 0.6rem;
+  }
+
+  .order-id {
+    font-size: 0.85rem;
+  }
+
+  .order-date {
+    font-size: 0.75rem;
+  }
+
+  .customer-name {
+    font-size: 0.8rem;
+  }
+
+  .order-content {
+    padding: 0.6rem;
+  }
+
+  .product-thumb {
+    width: 40px;
+    height: 40px;
+  }
+
+  .product-item {
+    gap: 0.6rem;
+  }
+
+  .product-name {
+    font-size: 0.8rem;
+  }
+
+  .product-quantity {
+    font-size: 0.75rem;
+  }
+
+  .order-footer {
+    padding: 0.6rem;
+    gap: 0.6rem;
+  }
+
+  .status-badge {
+    padding: 0.2rem 0.6rem;
+    font-size: 0.7rem;
+  }
+
+  .btn {
+    padding: 0.45rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .pagination {
+    margin-top: 0.75rem;
+  }
+
+  .pagination-info {
+    font-size: 0.75rem;
+  }
+
+  .pagination-btn {
+    width: 26px;
+    height: 26px;
+    font-size: 0.75rem;
+  }
+}
+
+/* Very Small Mobile - 375px */
+@media (max-width: 375px) {
+  .content-wrapper {
+    padding: 0 0.6rem;
+  }
+
+  .page-header {
+    padding: 0.6rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .page-header h1 {
+    font-size: 1rem;
+  }
+
+  .tab-nav {
+    padding: 0.3rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .tab-item {
+    padding: 0.5rem 0.6rem;
+    font-size: 0.7rem;
+    min-width: 80px;
+  }
+
+  .tab-item .badge {
+    padding: 0.15rem 0.3rem;
+    font-size: 0.6rem;
+  }
+
+  .control-bar {
+    padding: 0.5rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .search-box input,
+  .date-filter select,
+  .bulk-action select {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.7rem;
+  }
+
+  .search-box svg {
+    width: 14px;
+    height: 14px;
+    left: 0.6rem;
+  }
+
+  .order-card {
+    margin-bottom: 0.5rem;
+  }
+
+  .order-header {
+    padding: 0.5rem;
+  }
+
+  .order-id {
+    font-size: 0.8rem;
+  }
+
+  .order-date {
+    font-size: 0.7rem;
+  }
+
+  .customer-name {
+    font-size: 0.75rem;
+  }
+
+  .order-content {
+    padding: 0.5rem;
+  }
+
+  .product-thumb {
+    width: 36px;
+    height: 36px;
+  }
+
+  .product-item {
+    gap: 0.5rem;
+  }
+
+  .product-name {
+    font-size: 0.75rem;
+  }
+
+  .product-quantity {
+    font-size: 0.7rem;
+  }
+
+  .order-footer {
+    padding: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .status-badge {
+    padding: 0.15rem 0.5rem;
+    font-size: 0.65rem;
+  }
+
+  .btn {
+    padding: 0.4rem 0.65rem;
+    font-size: 0.75rem;
+  }
+
+  .pagination {
+    margin-top: 0.6rem;
+  }
+
+  .pagination-info {
+    font-size: 0.7rem;
+  }
+
+  .pagination-btn {
+    width: 24px;
+    height: 24px;
+    font-size: 0.7rem;
+  }
+}
+
+/* Extra Small Mobile - 320px */
+@media (max-width: 320px) {
+  .content-wrapper {
+    padding: 0 0.5rem;
+  }
+
+  .page-header {
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .page-header h1 {
+    font-size: 0.95rem;
+  }
+
+  .tab-nav {
+    padding: 0.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .tab-item {
+    padding: 0.45rem 0.55rem;
+    font-size: 0.65rem;
+    min-width: 70px;
+  }
+
+  .tab-item .badge {
+    padding: 0.1rem 0.25rem;
+    font-size: 0.55rem;
+  }
+
+  .control-bar {
+    padding: 0.4rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .search-box input,
+  .date-filter select,
+  .bulk-action select {
+    padding: 0.3rem 0.55rem;
+    font-size: 0.65rem;
+  }
+
+  .search-box svg {
+    width: 14px;
+    height: 14px;
+    left: 0.55rem;
+  }
+
+  .order-card {
+    margin-bottom: 0.4rem;
+  }
+
+  .order-header {
+    padding: 0.45rem;
+  }
+
+  .order-id {
+    font-size: 0.75rem;
+  }
+
+  .order-date {
+    font-size: 0.65rem;
+  }
+
+  .customer-name {
+    font-size: 0.7rem;
+  }
+
+  .order-content {
+    padding: 0.45rem;
+  }
+
+  .product-thumb {
+    width: 32px;
+    height: 32px;
+  }
+
+  .product-item {
+    gap: 0.45rem;
+  }
+
+  .product-name {
+    font-size: 0.7rem;
+  }
+
+  .product-quantity {
+    font-size: 0.65rem;
+  }
+
+  .order-footer {
+    padding: 0.45rem;
+    gap: 0.45rem;
+  }
+
+  .status-badge {
+    padding: 0.15rem 0.45rem;
+    font-size: 0.6rem;
+  }
+
+  .btn {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.7rem;
+  }
+
+  .pagination {
+    margin-top: 0.5rem;
+  }
+
+  .pagination-info {
+    font-size: 0.65rem;
+  }
+
+  .pagination-btn {
+    width: 22px;
+    height: 22px;
+    font-size: 0.65rem;
   }
 }
 

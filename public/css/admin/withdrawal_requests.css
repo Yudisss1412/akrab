@@ -581,12 +581,6 @@ textarea.form-control {
     border-top: none;
   }
 
-  /* Hide bank detail and catatan on mobile to save space */
-  table td[data-label="Bank"],
-  table td[data-label="Catatan"] {
-    display: none;
-  }
-
   table td {
     display: flex;
     flex-direction: row;
@@ -863,12 +857,6 @@ textarea.form-control {
     border-radius: 8px;
   }
 
-  /* Hide bank detail and catatan on mobile */
-  table td[data-label="Bank"],
-  table td[data-label="Catatan"] {
-    display: none;
-  }
-
   table td {
     padding: 0.45rem 0.65rem;
     gap: 0.4rem;
@@ -1016,12 +1004,6 @@ textarea.form-control {
     margin-bottom: 0.5rem;
     border-radius: 7px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  }
-
-  /* Hide bank detail and catatan on mobile */
-  table td[data-label="Bank"],
-  table td[data-label="Catatan"] {
-    display: none;
   }
 
   table td {
@@ -1205,62 +1187,50 @@ textarea.form-control {
     max-width: 100%;
   }
 
-  /* Hide bank detail and catatan on mobile */
-  table td[data-label="Bank"],
-  table td[data-label="Catatan"] {
-    display: none;
-  }
-
   table td {
-    padding: 0.3rem 0.4rem;
-    gap: 0.2rem;
-    font-size: 0.65rem;
-    line-height: 1.2;
-    flex-wrap: nowrap;
+    padding: 0.35rem 0.5rem;
+    gap: 0.3rem;
+    font-size: 0.75rem;
+    line-height: 1.3;
     max-width: 100%;
-    overflow: hidden;
   }
 
   table td::before {
-    font-size: 0.55rem;
-    min-width: 55px;
-    max-width: 32%;
-    flex-shrink: 1;
+    font-size: 0.65rem;
+    min-width: 70px;
+    max-width: 35%;
+    flex-shrink: 0;
   }
 
   table td.amount {
-    font-size: 0.7rem;
+    font-size: 0.8rem;
   }
 
   table td .action-buttons {
-    gap: 0.2rem;
+    gap: 0.3rem;
   }
 
   table td .btn-action {
-    padding: 0.2rem 0.25rem;
-    font-size: 0.6rem;
-    max-width: 70px;
+    padding: 0.25rem 0.3rem;
+    font-size: 0.65rem;
+    max-width: 85px;
     white-space: nowrap;
   }
 
   table td .seller-link {
-    font-size: 0.65rem;
-    max-width: 100px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    display: inline-block;
+    font-size: 0.75rem;
+    word-break: break-word;
   }
 
   table td .status-badge {
-    font-size: 0.6rem;
-    padding: 0.08rem 0.3rem;
+    font-size: 0.65rem;
+    padding: 0.1rem 0.35rem;
   }
 
   /* Checkbox */
   table td input[type="checkbox"] {
-    width: 0.85rem;
-    height: 0.85rem;
+    width: 0.9rem;
+    height: 0.9rem;
     flex-shrink: 0;
   }
 

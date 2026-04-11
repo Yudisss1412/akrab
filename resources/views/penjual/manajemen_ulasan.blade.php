@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <title>Manajemen Ulasan — AKRAB</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ asset('css/admin_penjual/style.css') }}">
   <link rel="stylesheet" href="{{ asset('css/penjual/manajemen_ulasan.css') }}">
@@ -24,26 +25,28 @@
         <section class="stats-grid">
           <div class="stat-card">
             <p class="stat-title">Rating Rata-rata</p>
-            <div style="display: flex; align-items: center; gap: 2px;">
-              <span class="stat-value" style="margin-right: 0.5rem;">{{ number_format($averageRating, 1) }}</span>
-              <span class="star">@php
-                $fullStars = floor($averageRating);
-                $emptyStars = 5 - $fullStars;
-                for ($i = 0; $i < $fullStars; $i++) {
-                  echo '<svg width="20" height="20" viewBox="0 0 23 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.19074 18.8022L7.64565 12.5126L2.76611 8.28214L9.21247 7.72256L11.7194 1.79102L14.2263 7.72256L20.6727 8.28214L15.7931 12.5126L17.248 18.8022L11.7194 15.4671L6.19074 18.8022Z" fill="#FFF600"/></svg>';
-                }
-                for ($i = 0; $i < $emptyStars; $i++) {
-                  echo '<svg width="20" height="20" viewBox="0 0 23 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.87469 15.0642L11.695 13.3631L14.5153 15.0866L13.7766 11.8635L16.2611 9.71467L12.9932 9.42368L11.695 6.37957L10.3968 9.4013L7.12881 9.69228L9.61334 11.8635L8.87469 15.0642ZM6.16633 18.8022L7.62124 12.5126L2.7417 8.28214L9.18806 7.72256L11.695 1.79102L14.2019 7.72256L20.6483 8.28214L15.7687 12.5126L17.2236 18.8022L11.695 15.4671L6.16633 18.8022Z" fill="#FFF600"/></svg>';
-                }
-              @endphp</span>
+            <div class="stat-rating-display">
+              <span class="stat-value">{{ number_format($averageRating, 1) }}</span>
+              <div class="star-rating">
+                @php
+                  $fullStars = floor($averageRating);
+                  $emptyStars = 5 - $fullStars;
+                  for ($i = 0; $i < $fullStars; $i++) {
+                    echo '<svg width="20" height="20" viewBox="0 0 23 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.19074 18.8022L7.64565 12.5126L2.76611 8.28214L9.21247 7.72256L11.7194 1.79102L14.2263 7.72256L20.6727 8.28214L15.7931 12.5126L17.248 18.8022L11.7194 15.4671L6.19074 18.8022Z" fill="#FFF600"/></svg>';
+                  }
+                  for ($i = 0; $i < $emptyStars; $i++) {
+                    echo '<svg width="20" height="20" viewBox="0 0 23 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.87469 15.0642L11.695 13.3631L14.5153 15.0866L13.7766 11.8635L16.2611 9.71467L12.9932 9.42368L11.695 6.37957L10.3968 9.4013L7.12881 9.69228L9.61334 11.8635L8.87469 15.0642ZM6.16633 18.8022L7.62124 12.5126L2.7417 8.28214L9.18806 7.72256L11.695 1.79102L14.2019 7.72256L20.6483 8.28214L15.7687 12.5126L17.2236 18.8022L11.695 15.4671L6.16633 18.8022Z" fill="#FFF600"/></svg>';
+                  }
+                @endphp
+              </div>
             </div>
           </div>
-          
+
           <div class="stat-card">
             <p class="stat-title">Total Ulasan</p>
             <p class="stat-value">{{ $totalReviews }}</p>
           </div>
-          
+
           <div class="stat-card">
             <p class="stat-title">Rincian Ulasan</p>
             <div class="star-breakdown">
@@ -64,7 +67,7 @@
                 <div class="star-progress">
                   <div class="star-progress-bar" style="width: {{ $totalReviews > 0 ? ($count / $totalReviews) * 100 : 0 }}%"></div>
                 </div>
-                <span>{{ $count }}</span>
+                <span class="star-count">{{ $count }}</span>
               </div>
               @endforeach
             </div>
@@ -74,7 +77,12 @@
         <!-- Filter Row -->
         <div class="filter-row">
           <div class="filter-group">
-            <label for="filter-star">Filter berdasarkan Bintang</label>
+            <label for="filter-star" class="filter-label">
+              <svg class="filter-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+              Filter Bintang
+            </label>
             <select id="filter-star" class="filter-control" x-ref="filterStar"
                     @change="updateFilter('filterStar', $event.target.value);
                               console.log('Filter star changed and state updated to:', $event.target.value);
@@ -89,7 +97,12 @@
           </div>
 
           <div class="filter-group">
-            <label for="filter-reply">Filter berdasarkan Status Balasan</label>
+            <label for="filter-reply" class="filter-label">
+              <svg class="filter-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+              Status Balasan
+            </label>
             <select id="filter-reply" class="filter-control" x-ref="filterReply"
                     @change="updateFilter('filterReply', $event.target.value);
                               console.log('Filter reply changed and state updated to:', $event.target.value);
@@ -101,7 +114,12 @@
           </div>
 
           <div class="filter-group">
-            <label for="sort-by">Urutkan berdasarkan</label>
+            <label for="sort-by" class="filter-label">
+              <svg class="filter-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 6h18M3 12h12M3 18h6"/>
+              </svg>
+              Urutkan
+            </label>
             <select id="sort-by" class="filter-control" x-ref="sortBy"
                     @change="updateFilter('sortBy', $event.target.value);
                               console.log('Sort by changed and state updated to:', $event.target.value);
@@ -339,11 +357,12 @@
                   <h3 class="reviewer-name" x-text="review.name"></h3>
                   <p class="review-date" x-text="review.date"></p>
                 </div>
-
                 <div class="review-rating" x-html="generateStarRating(review.rating, 5)"></div>
               </div>
 
-              <div class="review-content" x-text="review.comment"></div>
+              <div class="review-content">
+                <p class="review-text" x-text="review.comment"></p>
+              </div>
 
               <div class="review-product">
                 <img :src="review.product.image" alt="Gambar Produk" class="product-image">
@@ -351,28 +370,40 @@
                   <h4 class="product-name">
                     <a href="#" @click.prevent="window.location.href = `/penjual/produk/${review.product.id}`" x-text="review.product.name"></a>
                   </h4>
+                  <div class="review-meta">
+                    <span class="meta-badge" x-show="review.replied">✓ Dibalas</span>
+                    <span class="meta-badge meta-badge--pending" x-show="!review.replied">⏳ Belum Dibalas</span>
+                  </div>
                 </div>
               </div>
 
-              <div class="review-info" style="margin-top: 0.5rem; padding: 0.5rem; background: #f9f9f9; border-radius: var(--ak-radius); font-size: 0.8rem;">
-                <strong>Info:</strong> Rating: <span x-text="review.rating"></span>, ID: <span x-text="review.id"></span>
-                <span x-show="review.replied" style="color: green;"> • Dibalas</span>
-                <span x-show="!review.replied" style="color: orange;"> • Belum Dibalas</span>
-
-                <!-- Tambahkan indikator filter untuk debugging -->
-                <div x-show="currentFilters.filterStar" style="margin-top: 0.2rem; font-weight: bold; color: blue;">
-                  Filter: <span x-text="'Bintang ' + currentFilters.filterStar"></span>
-                </div>
-                <div x-show="currentFilters.filterReply" style="margin-top: 0.2rem; font-weight: bold; color: purple;">
-                  Filter: <span x-text="currentFilters.filterReply === 'replied' ? 'Telah Dibalas' : 'Belum Dibalas'"></span>
-                </div>
+              <div class="review-actions">
+                <button class="reply-btn" @click="isReplying = !isReplying">
+                  <span x-show="!isReplying && !review.replied">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                    Balas Ulasan
+                  </span>
+                  <span x-show="!isReplying && review.replied">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                    Lihat Balasan
+                  </span>
+                  <span x-show="isReplying">Batal</span>
+                </button>
               </div>
-
-              <button class="reply-btn" @click="isReplying = !isReplying">
-                <span x-text="isReplying ? 'Batal' : (review.replied ? 'Lihat Balasan' : 'Balas')"></span>
-              </button>
 
               <div class="reply-form" x-show="isReplying" x-cloak>
+                <div class="reply-form-header">
+                  <h4>Balas Ulasan</h4>
+                  <button class="reply-form-close" @click="isReplying = false; replyText = ''">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                  </button>
+                </div>
                 <textarea
                   class="reply-textarea"
                   placeholder="Tulis balasan untuk ulasan ini..."
@@ -380,45 +411,75 @@
                   x-ref="replyTextarea"
                   x-effect="if (isReplying) $refs.replyTextarea.focus()"
                   maxlength="500"
+                  rows="4"
                 ></textarea>
 
-                <div class="char-count" x-text="`${replyText.length}/500 karakter`"></div>
-
-                <div class="reply-actions">
-                  <button class="btn-secondary" @click="isReplying = false; replyText = ''">Batal</button>
-                  <button class="reply-btn" @click="submitReply(review.id, replyText, (reply) => { review.reply = reply; review.replied = true; isReplying = false; replyText = ''; })">
-                    Kirim Balasan
-                  </button>
+                <div class="reply-form-footer">
+                  <div class="char-count" x-text="`${replyText.length}/500 karakter`"></div>
+                  <div class="reply-form-actions">
+                    <button class="btn-secondary" @click="isReplying = false; replyText = ''">Batal</button>
+                    <button class="reply-btn reply-btn-submit" @click="submitReply(review.id, replyText, (reply) => { review.reply = reply; review.replied = true; isReplying = false; replyText = ''; })">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                      </svg>
+                      Kirim Balasan
+                    </button>
+                  </div>
                 </div>
               </div>
 
-              <div x-show="review.replied && !isReplying" class="reply-display" style="margin-top: 1rem; padding: 1rem; background: #f0fdfa; border-left: 3px solid var(--ak-primary); border-radius: 0 var(--ak-radius) var(--ak-radius) 0;">
-                <strong>Balasan:</strong>
-                <p style="margin: 0.5rem 0 0;" x-text="review.reply"></p>
+              <div x-show="review.replied && !isReplying" class="reply-display">
+                <div class="reply-display-header">
+                  <h4>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                    </svg>
+                    Balasan Penjual
+                  </h4>
+                </div>
+                <p x-text="review.reply"></p>
               </div>
             </div>
           </template>
           
           <!-- Pagination with Alpine.js -->
-          <div class="pagination" x-show="!loading && lastPage > 1">
-            <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1" class="prev">‹ Sebelumnya</button>
-            
-            <template x-for="page in Array.from({length: Math.min(5, lastPage)}, (_, i) => {
-              let start = Math.max(1, currentPage - 2);
-              let end = Math.min(lastPage, start + 4);
-              if (end - start < 4) start = Math.max(1, end - 4);
-              return start + i;
-            }).filter(page => page >= 1 && page <= lastPage)">
-              <button 
-                :key="page" 
-                @click="changePage(page)" 
-                :class="{'active': page === currentPage}" 
-                x-show="page >= Math.max(1, currentPage - 2) && page <= Math.min(lastPage, currentPage + 2)"
-                x-text="page"
-              ></button>
-            </template>
-            
-            <button @click="changePage(currentPage + 1)" :disabled="currentPage === lastPage" class="next">Berikutnya ›</button>
+          <div class="pagination-container" x-show="!loading && lastPage > 1">
+            <div class="pagination-info">
+              <span x-text="`Halaman ${currentPage} dari ${lastPage}`"></span>
+              <span class="pagination-divider">•</span>
+              <span x-text="`${total} ulasan`"></span>
+            </div>
+            <div class="pagination">
+              <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1" class="pagination-btn pagination-btn--prev">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M15 18l-6-6 6-6"/>
+                </svg>
+                <span class="pagination-btn-text">Sebelumnya</span>
+              </button>
+
+              <template x-for="page in Array.from({length: Math.min(5, lastPage)}, (_, i) => {
+                let start = Math.max(1, currentPage - 2);
+                let end = Math.min(lastPage, start + 4);
+                if (end - start < 4) start = Math.max(1, end - 4);
+                return start + i;
+              }).filter(page => page >= 1 && page <= lastPage)">
+                <button
+                  :key="page"
+                  @click="changePage(page)"
+                  :class="{'pagination-btn--active': page === currentPage}"
+                  x-show="page >= Math.max(1, currentPage - 2) && page <= Math.min(lastPage, currentPage + 2)"
+                  x-text="page"
+                  class="pagination-btn pagination-btn--number"
+                ></button>
+              </template>
+
+              <button @click="changePage(currentPage + 1)" :disabled="currentPage === lastPage" class="pagination-btn pagination-btn--next">
+                <span class="pagination-btn-text">Berikutnya</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 18l6-6-6-6"/>
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </main>
@@ -426,18 +487,6 @@
   </div>
 
   @include('components.admin_penjual.footer')
-  
-  <script>
-    // CSRF token meta tag
-    const csrfToken = document.head.querySelector('meta[name=csrf-token]');
-    if (!csrfToken) {
-      // Create CSRF token meta tag if not exists
-      const meta = document.createElement('meta');
-      meta.name = 'csrf-token';
-      meta.content = '{{ csrf_token() }}';
-      document.head.appendChild(meta);
-    }
-  </script>
 
   <script>
     // Fungsi global untuk membuat bintang SVG

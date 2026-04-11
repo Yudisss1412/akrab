@@ -3883,3 +3883,42 @@ main[role="main"] {
     margin: 0.625rem;
   }
 }
+
+/* ========================================
+   MOBILE FILTER TOGGLE TRANSITIONS
+   ======================================== */
+
+/* Filter container transitions */
+.produk-filter-container {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+/* Show class for mobile filter toggle */
+.produk-filter-container.show {
+  display: block !important;
+  animation: slideDown 0.3s ease;
+}
+
+/* Active state for mobile filter button */
+.mobile-filter-toggle.active {
+  background: var(--primary-color-dark);
+  color: white;
+}
+
+/* Smooth scroll behavior for mobile */
+@media (max-width: 768px) {
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+      max-height: 0;
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+      max-height: 1000px;
+    }
+  }
+}
+

@@ -3888,16 +3888,24 @@ main[role="main"] {
    MOBILE FILTER TOGGLE TRANSITIONS
    ======================================== */
 
-/* Filter container transitions */
-.produk-filter-container {
-  transition: all 0.3s ease;
-  overflow: hidden;
-}
+/* Filter container default state - hidden on mobile */
+@media (max-width: 768px) {
+  .produk-filter-container {
+    display: none;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-10px);
+  }
 
-/* Show class for mobile filter toggle */
-.produk-filter-container.show {
-  display: block !important;
-  animation: slideDown 0.3s ease;
+  /* Show class for mobile filter toggle */
+  .produk-filter-container.show {
+    display: block !important;
+    max-height: 1000px;
+    opacity: 1;
+    transform: translateY(0);
+    animation: slideDown 0.3s ease;
+  }
 }
 
 /* Active state for mobile filter button */
@@ -3906,7 +3914,7 @@ main[role="main"] {
   color: white;
 }
 
-/* Smooth scroll behavior for mobile */
+/* Smooth animations for mobile */
 @media (max-width: 768px) {
   @keyframes slideDown {
     from {

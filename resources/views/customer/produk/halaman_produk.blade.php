@@ -203,8 +203,24 @@
         filterToggleBtn.addEventListener('click', function() {
           const isExpanded = filterToggleBtn.getAttribute('aria-expanded') === 'true';
 
-          // Toggle show/hide filter container
-          filterContainer.classList.toggle('show', !isExpanded);
+          if (isExpanded) {
+            // Hide with animation
+            filterContainer.style.animation = 'slideUp 0.3s ease forwards';
+            setTimeout(() => {
+              filterContainer.classList.remove('show');
+              filterContainer.style.animation = '';
+            }, 300);
+          } else {
+            // Show with animation
+            filterContainer.classList.add('show');
+            // Scroll ke filter container
+            setTimeout(() => {
+              filterContainer.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'nearest' 
+              });
+            }, 100);
+          }
 
           // Update aria-expanded attribute
           filterToggleBtn.setAttribute('aria-expanded', !isExpanded);
@@ -216,6 +232,24 @@
             filterToggleBtn.innerHTML = 'Filter & Urutkan 🔼';  // Arrow up when expanded
           }
         });
+
+        // Add slideUp animation keyframes dynamically
+        const style = document.createElement('style');
+        style.textContent = `
+          @keyframes slideUp {
+            from {
+              opacity: 1;
+              transform: translateY(0);
+              max-height: 1000px;
+            }
+            to {
+              opacity: 0;
+              transform: translateY(-10px);
+              max-height: 0;
+            }
+          }
+        `;
+        document.head.appendChild(style);
       }
     });
   </script>

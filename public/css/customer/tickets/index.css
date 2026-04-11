@@ -281,3 +281,269 @@
         padding: 0 1rem 1rem;
     }
 }
+
+/* ========================================
+   RESPONSIVE KHUSUS HALAMAN TIKET INDEX (BUYER)
+   Breakpoints: 425px, 375px, 320px
+   ======================================== */
+
+/* Breakpoint 425px - Mobile Medium */
+@media (max-width: 425px) {
+    .tickets-container {
+        padding: 1.25rem 1rem !important;
+    }
+
+    .tickets-header {
+        margin-bottom: 1.5rem !important;
+        gap: 0.875rem !important;
+    }
+
+    .tickets-title {
+        font-size: 1.375rem !important;
+    }
+
+    .create-ticket-btn {
+        padding: 0.7rem 1.25rem !important;
+        font-size: 0.9rem !important;
+        border-radius: 9px !important;
+    }
+
+    .tickets-grid {
+        gap: 1.25rem !important;
+        margin-bottom: 1.5rem !important;
+    }
+
+    .ticket-card {
+        border-radius: 14px !important;
+    }
+
+    .ticket-header {
+        padding: 0.875rem 1.25rem !important;
+    }
+
+    .ticket-id {
+        font-size: 0.85rem !important;
+    }
+
+    .ticket-date {
+        font-size: 0.75rem !important;
+    }
+
+    .ticket-subject {
+        padding: 1.125rem 1.25rem 0.4rem !important;
+        font-size: 1rem !important;
+    }
+
+    .ticket-meta {
+        padding: 0 1.25rem 0.875rem !important;
+        gap: 0.625rem !important;
+    }
+
+    .ticket-meta span {
+        padding: 0.2rem 0.625rem !important;
+        font-size: 0.7rem !important;
+    }
+
+    .ticket-actions {
+        padding: 0 1.25rem 1.25rem !important;
+    }
+
+    .btn-view-ticket {
+        padding: 0.55rem 1rem !important;
+        font-size: 0.85rem !important;
+        border-radius: 7px !important;
+    }
+
+    /* No tickets message */
+    .no-tickets {
+        padding: 2.5rem 1rem !important;
+        border-radius: 14px !important;
+    }
+
+    .no-tickets-icon {
+        font-size: 2.5rem !important;
+        margin-bottom: 0.875rem !important;
+    }
+
+    .no-tickets-title {
+        font-size: 1.25rem !important;
+        margin-bottom: 0.4rem !important;
+    }
+
+    .no-tickets-text {
+        font-size: 0.9rem !important;
+        margin-bottom: 1.25rem !important;
+    }
+}
+
+/* Breakpoint 375px - Mobile Small */
+@media (max-width: 375px) {
+    .tickets-container {
+        padding: 1rem 0.875rem !important;
+    }
+
+    .tickets-header {
+        margin-bottom: 1.375rem !important;
+        gap: 0.75rem !important;
+    }
+
+    .tickets-title {
+        font-size: 1.25rem !important;
+    }
+
+    .create-ticket-btn {
+        padding: 0.65rem 1.125rem !important;
+        font-size: 0.85rem !important;
+    }
+
+    .tickets-grid {
+        gap: 1.125rem !important;
+        margin-bottom: 1.375rem !important;
+    }
+
+    .ticket-card {
+        border-radius: 12px !important;
+    }
+
+    .ticket-header {
+        padding: 0.75rem 1.125rem !important;
+    }
+
+    .ticket-id {
+        font-size: 0.8rem !important;
+    }
+
+    .ticket-date {
+        font-size: 0.7rem !important;
+    }
+
+    .ticket-subject {
+        padding: 1rem 1.125rem 0.35rem !important;
+        font-size: 0.95rem !important;
+    }
+
+    .ticket-meta {
+        padding: 0 1.125rem 0.75rem !important;
+        gap: 0.5rem !important;
+    }
+
+    .ticket-meta span {
+        padding: 0.18rem 0.5rem !important;
+        font-size: 0.65rem !important;
+    }
+
+    .ticket-actions {
+        padding: 0 1.125rem 1.125rem !important;
+    }
+
+    .btn-view-ticket {
+        padding: 0.5rem 0.9rem !important;
+        font-size: 0.8rem !important;
+    }
+
+    /* No tickets message */
+    .no-tickets {
+        padding: 2.25rem 0.875rem !important;
+    }
+
+    .no-tickets-icon {
+        font-size: 2.25rem !important;
+    }
+
+    .no-tickets-title {
+        font-size: 1.15rem !important;
+    }
+
+    .no-tickets-text {
+        font-size: 0.85rem !important;
+    }
+}
+
+/* Breakpoint 320px - Mobile Extra Small */
+@media (max-width: 320px) {
+    .tickets-container {
+        padding: 0.875rem 0.75rem !important;
+    }
+
+    .tickets-header {
+        margin-bottom: 1.25rem !important;
+        gap: 0.625rem !important;
+    }
+
+    .tickets-title {
+        font-size: 1.125rem !important;
+    }
+
+    .create-ticket-btn {
+        padding: 0.6rem 1rem !important;
+        font-size: 0.8rem !important;
+        border-radius: 8px !important;
+    }
+
+    .tickets-grid {
+        gap: 1rem !important;
+        margin-bottom: 1.25rem !important;
+    }
+
+    .ticket-card {
+        border-radius: 10px !important;
+    }
+
+    .ticket-header {
+        padding: 0.625rem 1rem !important;
+    }
+
+    .ticket-id {
+        font-size: 0.75rem !important;
+    }
+
+    .ticket-date {
+        font-size: 0.65rem !important;
+    }
+
+    .ticket-subject {
+        padding: 0.875rem 1rem 0.3rem !important;
+        font-size: 0.9rem !important;
+    }
+
+    .ticket-meta {
+        padding: 0 1rem 0.625rem !important;
+        gap: 0.4rem !important;
+    }
+
+    .ticket-meta span {
+        padding: 0.15rem 0.4rem !important;
+        font-size: 0.6rem !important;
+    }
+
+    .ticket-actions {
+        padding: 0 1rem 1rem !important;
+    }
+
+    .btn-view-ticket {
+        padding: 0.45rem 0.8rem !important;
+        font-size: 0.75rem !important;
+        border-radius: 6px !important;
+    }
+
+    /* No tickets message */
+    .no-tickets {
+        padding: 2rem 0.75rem !important;
+        border-radius: 10px !important;
+    }
+
+    .no-tickets-icon {
+        font-size: 2rem !important;
+        margin-bottom: 0.75rem !important;
+    }
+
+    .no-tickets-title {
+        font-size: 1.05rem !important;
+        margin-bottom: 0.3rem !important;
+    }
+
+    .no-tickets-text {
+        font-size: 0.8rem !important;
+        margin-bottom: 1rem !important;
+    }
+}

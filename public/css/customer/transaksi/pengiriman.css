@@ -1355,3 +1355,743 @@ body {
   background: white !important;
   backdrop-filter: none !important;
 }
+
+/* ========================================
+   RESPONSIVE KHUSUS HALAMAN PENGIRIMAN (BUYER)
+   Breakpoints: 425px, 375px, 320px
+   ======================================== */
+
+/* Breakpoint 425px - Mobile Medium */
+@media (max-width: 425px) {
+  /* Container */
+  .container {
+    padding: 16px !important;
+  }
+
+  /* Header halaman */
+  .page-header {
+    margin-bottom: 24px !important;
+    padding: 18px !important;
+  }
+
+  .page-header h1 {
+    font-size: 1.4rem !important;
+    margin-bottom: 16px !important;
+  }
+
+  /* Progress steps desktop */
+  .progress-steps {
+    margin-bottom: 28px !important;
+  }
+
+  .progress-steps::before {
+    top: 16px !important;
+  }
+
+  .progress-steps .step-number {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 0.85rem !important;
+  }
+
+  .progress-steps .step-label {
+    font-size: 0.75rem !important;
+  }
+
+  /* Mobile step indicator */
+  .mobile-step-indicator {
+    font-size: 0.9rem !important;
+    padding: 8px 12px !important;
+  }
+
+  /* Layout pengiriman */
+  .pengiriman-content {
+    gap: 20px !important;
+  }
+
+  .pengiriman-left {
+    gap: 20px !important;
+  }
+
+  /* Section */
+  .alamat-section,
+  .pengiriman-section {
+    padding: 18px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .section-header {
+    margin-bottom: 1.25rem !important;
+    padding-bottom: 0.875rem !important;
+  }
+
+  .section-header h2 {
+    font-size: 1.1rem !important;
+  }
+
+  .section-header h3 {
+    font-size: 1.15rem !important;
+  }
+
+  /* Alamat card */
+  .alamat-card {
+    padding: 1.25rem !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  .alamat-content {
+    padding: 0.4rem 2.2rem 0.4rem 0.4rem !important;
+  }
+
+  .primary-badge {
+    font-size: 0.65rem !important;
+    padding: 0.2rem 0.5rem !important;
+    top: 0.4rem !important;
+    right: 0.4rem !important;
+  }
+
+  .alamat-content h3 {
+    font-size: 1rem !important;
+    margin-bottom: 0.4rem !important;
+  }
+
+  .alamat-content p,
+  .alamat-line {
+    font-size: 0.9rem !important;
+  }
+
+  .alamat-phone {
+    font-size: 0.9rem !important;
+  }
+
+  /* Shipping options */
+  .shipping-options {
+    gap: 14px !important;
+  }
+
+  .shipping-option {
+    padding: 14px !important;
+    border-radius: 10px !important;
+  }
+
+  .shipping-option.selected::after {
+    font-size: 16px !important;
+    top: 8px !important;
+    right: 8px !important;
+  }
+
+  .option-header {
+    margin-bottom: 6px !important;
+  }
+
+  .option-info h3 {
+    font-size: 0.95rem !important;
+    margin-bottom: 3px !important;
+  }
+
+  .option-info p {
+    font-size: 0.8rem !important;
+  }
+
+  .option-price {
+    font-size: 0.95rem !important;
+    margin-left: 8px !important;
+  }
+
+  .option-description {
+    font-size: 0.85rem !important;
+    line-height: 1.4 !important;
+  }
+
+  /* Ringkasan belanja */
+  .ringkasan-belanja {
+    padding: 18px !important;
+  }
+
+  .ringkasan-belanja .section-header h3 {
+    font-size: 1.15rem !important;
+  }
+
+  #toggleRingkasan {
+    font-size: 0.85rem !important;
+  }
+
+  /* Produk preview */
+  .produk-preview {
+    gap: 10px !important;
+    padding: 10px 0 !important;
+  }
+
+  .produk-preview img {
+    width: 55px !important;
+    height: 55px !important;
+    border-radius: 8px !important;
+  }
+
+  .produk-info h4 {
+    font-size: 0.95rem !important;
+    margin-bottom: 3px !important;
+  }
+
+  .produk-harga {
+    font-size: 0.85rem !important;
+  }
+
+  .produk-qty {
+    font-size: 0.9rem !important;
+  }
+
+  /* Total section */
+  .total-section {
+    margin-top: 18px !important;
+    padding-top: 18px !important;
+  }
+
+  .total-row {
+    padding: 6px 0 !important;
+    font-size: 0.9rem !important;
+  }
+
+  .total-amount {
+    font-size: 1.1rem !important;
+  }
+
+  /* Tombol lanjut pembayaran */
+  .total-section .btn-lanjut-pembayaran {
+    padding: 14px !important;
+    font-size: 0.95rem !important;
+    margin-top: 14px !important;
+  }
+
+  /* Sticky action bar */
+  .sticky-action-bar {
+    height: 75px !important;
+    padding: 10px 14px !important;
+  }
+
+  .sticky-action-bar .total-tagihan {
+    font-size: 1rem !important;
+  }
+
+  .sticky-action-bar .btn-proses-pesanan {
+    padding: 10px 20px !important;
+    font-size: 0.9rem !important;
+  }
+
+  /* Review section */
+  .review-section {
+    padding: 18px !important;
+    margin-top: 20px !important;
+  }
+
+  .review-section .section-title {
+    font-size: 1.1rem !important;
+    margin-bottom: 16px !important;
+  }
+
+  .product-review-card {
+    padding: 14px !important;
+    gap: 12px !important;
+  }
+
+  .product-info img {
+    width: 55px !important;
+    height: 55px !important;
+    border-radius: 7px !important;
+  }
+
+  .product-details h3 {
+    font-size: 0.95rem !important;
+  }
+
+  .product-details .shop-name {
+    font-size: 0.75rem !important;
+  }
+
+  .product-review-card .btn {
+    padding: 10px 16px !important;
+    font-size: 0.85rem !important;
+  }
+}
+
+/* Breakpoint 375px - Mobile Small */
+@media (max-width: 375px) {
+  /* Container */
+  .container {
+    padding: 14px !important;
+  }
+
+  /* Header halaman */
+  .page-header {
+    margin-bottom: 22px !important;
+    padding: 16px !important;
+  }
+
+  .page-header h1 {
+    font-size: 1.3rem !important;
+    margin-bottom: 14px !important;
+  }
+
+  /* Progress steps desktop */
+  .progress-steps {
+    margin-bottom: 26px !important;
+  }
+
+  .progress-steps .step-number {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 0.8rem !important;
+  }
+
+  .progress-steps .step-label {
+    font-size: 0.7rem !important;
+  }
+
+  /* Mobile step indicator */
+  .mobile-step-indicator {
+    font-size: 0.85rem !important;
+    padding: 7px 10px !important;
+  }
+
+  /* Layout pengiriman */
+  .pengiriman-content {
+    gap: 18px !important;
+  }
+
+  .pengiriman-left {
+    gap: 18px !important;
+  }
+
+  /* Section */
+  .alamat-section,
+  .pengiriman-section {
+    padding: 16px !important;
+    margin-bottom: 18px !important;
+  }
+
+  .section-header {
+    margin-bottom: 1.125rem !important;
+    padding-bottom: 0.75rem !important;
+  }
+
+  .section-header h2 {
+    font-size: 1.05rem !important;
+  }
+
+  .section-header h3 {
+    font-size: 1.1rem !important;
+  }
+
+  /* Alamat card */
+  .alamat-card {
+    padding: 1.125rem !important;
+    margin-bottom: 1.125rem !important;
+  }
+
+  .alamat-content {
+    padding: 0.35rem 2rem 0.35rem 0.35rem !important;
+  }
+
+  .primary-badge {
+    font-size: 0.6rem !important;
+    padding: 0.18rem 0.45rem !important;
+    top: 0.35rem !important;
+    right: 0.35rem !important;
+  }
+
+  .alamat-content h3 {
+    font-size: 0.95rem !important;
+    margin-bottom: 0.35rem !important;
+  }
+
+  .alamat-content p,
+  .alamat-line {
+    font-size: 0.85rem !important;
+  }
+
+  .alamat-phone {
+    font-size: 0.85rem !important;
+  }
+
+  /* Shipping options */
+  .shipping-options {
+    gap: 12px !important;
+  }
+
+  .shipping-option {
+    padding: 12px !important;
+    border-radius: 9px !important;
+  }
+
+  .shipping-option.selected::after {
+    font-size: 15px !important;
+  }
+
+  .option-info h3 {
+    font-size: 0.9rem !important;
+    margin-bottom: 3px !important;
+  }
+
+  .option-info p {
+    font-size: 0.75rem !important;
+  }
+
+  .option-price {
+    font-size: 0.9rem !important;
+    margin-left: 7px !important;
+  }
+
+  .option-description {
+    font-size: 0.8rem !important;
+  }
+
+  /* Ringkasan belanja */
+  .ringkasan-belanja {
+    padding: 16px !important;
+  }
+
+  .ringkasan-belanja .section-header h3 {
+    font-size: 1.1rem !important;
+  }
+
+  #toggleRingkasan {
+    font-size: 0.8rem !important;
+  }
+
+  /* Produk preview */
+  .produk-preview {
+    gap: 9px !important;
+    padding: 9px 0 !important;
+  }
+
+  .produk-preview img {
+    width: 50px !important;
+    height: 50px !important;
+    border-radius: 7px !important;
+  }
+
+  .produk-info h4 {
+    font-size: 0.9rem !important;
+  }
+
+  .produk-harga {
+    font-size: 0.8rem !important;
+  }
+
+  .produk-qty {
+    font-size: 0.85rem !important;
+  }
+
+  /* Total section */
+  .total-section {
+    margin-top: 16px !important;
+    padding-top: 16px !important;
+  }
+
+  .total-row {
+    padding: 5px 0 !important;
+    font-size: 0.85rem !important;
+  }
+
+  .total-amount {
+    font-size: 1.05rem !important;
+  }
+
+  /* Tombol lanjut pembayaran */
+  .total-section .btn-lanjut-pembayaran {
+    padding: 13px !important;
+    font-size: 0.9rem !important;
+    margin-top: 12px !important;
+  }
+
+  /* Sticky action bar */
+  .sticky-action-bar {
+    height: 72px !important;
+    padding: 9px 12px !important;
+  }
+
+  .sticky-action-bar .total-tagihan {
+    font-size: 0.95rem !important;
+  }
+
+  .sticky-action-bar .btn-proses-pesanan {
+    padding: 9px 18px !important;
+    font-size: 0.85rem !important;
+  }
+
+  /* Review section */
+  .review-section {
+    padding: 16px !important;
+    margin-top: 18px !important;
+  }
+
+  .review-section .section-title {
+    font-size: 1.05rem !important;
+    margin-bottom: 14px !important;
+  }
+
+  .product-review-card {
+    padding: 12px !important;
+    gap: 10px !important;
+  }
+
+  .product-info img {
+    width: 50px !important;
+    height: 50px !important;
+    border-radius: 6px !important;
+  }
+
+  .product-details h3 {
+    font-size: 0.9rem !important;
+  }
+
+  .product-details .shop-name {
+    font-size: 0.7rem !important;
+  }
+
+  .product-review-card .btn {
+    padding: 9px 14px !important;
+    font-size: 0.8rem !important;
+  }
+}
+
+/* Breakpoint 320px - Mobile Extra Small */
+@media (max-width: 320px) {
+  /* Container */
+  .container {
+    padding: 12px !important;
+  }
+
+  /* Header halaman */
+  .page-header {
+    margin-bottom: 20px !important;
+    padding: 14px !important;
+  }
+
+  .page-header h1 {
+    font-size: 1.2rem !important;
+    margin-bottom: 12px !important;
+  }
+
+  /* Progress steps desktop */
+  .progress-steps {
+    margin-bottom: 24px !important;
+  }
+
+  .progress-steps .step-number {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 0.75rem !important;
+  }
+
+  .progress-steps .step-label {
+    font-size: 0.65rem !important;
+  }
+
+  /* Mobile step indicator */
+  .mobile-step-indicator {
+    font-size: 0.8rem !important;
+    padding: 6px 9px !important;
+  }
+
+  /* Layout pengiriman */
+  .pengiriman-content {
+    gap: 16px !important;
+  }
+
+  .pengiriman-left {
+    gap: 16px !important;
+  }
+
+  /* Section */
+  .alamat-section,
+  .pengiriman-section {
+    padding: 14px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .section-header {
+    margin-bottom: 1rem !important;
+    padding-bottom: 0.625rem !important;
+  }
+
+  .section-header h2 {
+    font-size: 1rem !important;
+  }
+
+  .section-header h3 {
+    font-size: 1.05rem !important;
+  }
+
+  /* Alamat card */
+  .alamat-card {
+    padding: 1rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .alamat-content {
+    padding: 0.3rem 1.8rem 0.3rem 0.3rem !important;
+  }
+
+  .primary-badge {
+    font-size: 0.55rem !important;
+    padding: 0.15rem 0.4rem !important;
+    top: 0.3rem !important;
+    right: 0.3rem !important;
+  }
+
+  .alamat-content h3 {
+    font-size: 0.9rem !important;
+    margin-bottom: 0.3rem !important;
+  }
+
+  .alamat-content p,
+  .alamat-line {
+    font-size: 0.8rem !important;
+  }
+
+  .alamat-phone {
+    font-size: 0.8rem !important;
+  }
+
+  /* Shipping options */
+  .shipping-options {
+    gap: 10px !important;
+  }
+
+  .shipping-option {
+    padding: 11px !important;
+    border-radius: 8px !important;
+  }
+
+  .shipping-option.selected::after {
+    font-size: 14px !important;
+  }
+
+  .option-info h3 {
+    font-size: 0.85rem !important;
+    margin-bottom: 2px !important;
+  }
+
+  .option-info p {
+    font-size: 0.7rem !important;
+  }
+
+  .option-price {
+    font-size: 0.85rem !important;
+    margin-left: 6px !important;
+  }
+
+  .option-description {
+    font-size: 0.75rem !important;
+  }
+
+  /* Ringkasan belanja */
+  .ringkasan-belanja {
+    padding: 14px !important;
+  }
+
+  .ringkasan-belanja .section-header h3 {
+    font-size: 1.05rem !important;
+  }
+
+  #toggleRingkasan {
+    font-size: 0.75rem !important;
+  }
+
+  /* Produk preview */
+  .produk-preview {
+    gap: 8px !important;
+    padding: 8px 0 !important;
+  }
+
+  .produk-preview img {
+    width: 45px !important;
+    height: 45px !important;
+    border-radius: 6px !important;
+  }
+
+  .produk-info h4 {
+    font-size: 0.85rem !important;
+  }
+
+  .produk-harga {
+    font-size: 0.75rem !important;
+  }
+
+  .produk-qty {
+    font-size: 0.8rem !important;
+  }
+
+  /* Total section */
+  .total-section {
+    margin-top: 14px !important;
+    padding-top: 14px !important;
+  }
+
+  .total-row {
+    padding: 4px 0 !important;
+    font-size: 0.8rem !important;
+  }
+
+  .total-amount {
+    font-size: 1rem !important;
+  }
+
+  /* Tombol lanjut pembayaran */
+  .total-section .btn-lanjut-pembayaran {
+    padding: 12px !important;
+    font-size: 0.85rem !important;
+    margin-top: 10px !important;
+  }
+
+  /* Sticky action bar */
+  .sticky-action-bar {
+    height: 70px !important;
+    padding: 8px 10px !important;
+  }
+
+  .sticky-action-bar .total-tagihan {
+    font-size: 0.9rem !important;
+  }
+
+  .sticky-action-bar .btn-proses-pesanan {
+    padding: 8px 16px !important;
+    font-size: 0.8rem !important;
+  }
+
+  /* Review section */
+  .review-section {
+    padding: 14px !important;
+    margin-top: 16px !important;
+  }
+
+  .review-section .section-title {
+    font-size: 1rem !important;
+    margin-bottom: 12px !important;
+  }
+
+  .product-review-card {
+    padding: 10px !important;
+    gap: 8px !important;
+  }
+
+  .product-info img {
+    width: 45px !important;
+    height: 45px !important;
+    border-radius: 5px !important;
+  }
+
+  .product-details h3 {
+    font-size: 0.85rem !important;
+  }
+
+  .product-details .shop-name {
+    font-size: 0.65rem !important;
+  }
+
+  .product-review-card .btn {
+    padding: 8px 12px !important;
+    font-size: 0.75rem !important;
+  }
+}

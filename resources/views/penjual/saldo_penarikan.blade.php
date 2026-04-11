@@ -101,12 +101,12 @@
                   $formattedAmount = $amountSign . 'Rp ' . number_format($transaction['amount'], 0, ',', '.');
                   $formattedDate = \Carbon\Carbon::parse($transaction['date'])->format('d M Y');
                 @endphp
-                <tr data-dummy="true">
-                  <td>{{ $formattedDate }}</td>
-                  <td>{{ $transaction['description'] }}</td>
-                  <td><span class="{{ $amountClass }}">{{ $typeText }}</span></td>
-                  <td class="{{ $amountClass }}">{{ $formattedAmount }}</td>
-                  <td>Rp {{ number_format($transaction['amount'], 0, ',', '.') }}</td>
+                <tr data-dummy="true" class="transaction-card">
+                  <td data-label="Tanggal">{{ $formattedDate }}</td>
+                  <td data-label="Deskripsi">{{ $transaction['description'] }}</td>
+                  <td data-label="Jenis"><span class="{{ $amountClass }}">{{ $typeText }}</span></td>
+                  <td data-label="Jumlah" class="{{ $amountClass }}">{{ $formattedAmount }}</td>
+                  <td data-label="Saldo Akhir">Rp {{ number_format($transaction['amount'], 0, ',', '.') }}</td>
                 </tr>
                 @endforeach
               </tbody>
@@ -183,12 +183,12 @@
                   endswitch;
                   $formattedDate = \Carbon\Carbon::parse($withdrawal['request_date'])->format('d M Y');
                 @endphp
-                <tr data-dummy="true">
-                  <td>{{ $formattedDate }}</td>
-                  <td>{{ $withdrawal['id'] }}</td>
-                  <td>Rp {{ number_format($withdrawal['amount'], 0, ',', '.') }}</td>
-                  <td>{{ $withdrawal['bank_account'] }}</td>
-                  <td><span class="badge {{ $statusClass }}">{{ $statusText }}</span></td>
+                <tr data-dummy="true" class="withdrawal-card">
+                  <td data-label="Tanggal">{{ $formattedDate }}</td>
+                  <td data-label="ID Penarikan">{{ $withdrawal['id'] }}</td>
+                  <td data-label="Jumlah">Rp {{ number_format($withdrawal['amount'], 0, ',', '.') }}</td>
+                  <td data-label="Bank">{{ $withdrawal['bank_account'] }}</td>
+                  <td data-label="Status"><span class="badge {{ $statusClass }}">{{ $statusText }}</span></td>
                 </tr>
                 @endforeach
               </tbody>
@@ -412,6 +412,7 @@
 
       transactions.forEach(transaction => {
         const row = document.createElement('tr');
+        row.classList.add('transaction-card');
 
         // Format tanggal
         const date = new Date(transaction.date);
@@ -427,11 +428,11 @@
         const formattedAmount = `${amountSign}${formatRupiah(transaction.amount)}`;
 
         row.innerHTML = `
-          <td>${formattedDate}</td>
-          <td>${transaction.description || '-'}</td>
-          <td><span class="${isIncome ? 'text-green' : 'text-red'}">${typeText}</span></td>
-          <td class="${amountClass}">${formattedAmount}</td>
-          <td>${formatRupiah(transaction.amount || 0)}</td>
+          <td data-label="Tanggal">${formattedDate}</td>
+          <td data-label="Deskripsi">${transaction.description || '-'}</td>
+          <td data-label="Jenis"><span class="${isIncome ? 'text-green' : 'text-red'}">${typeText}</span></td>
+          <td data-label="Jumlah" class="${amountClass}">${formattedAmount}</td>
+          <td data-label="Saldo Akhir">${formatRupiah(transaction.amount || 0)}</td>
         `;
 
         tbody.appendChild(row);
@@ -453,6 +454,7 @@
 
       withdrawals.forEach(withdrawal => {
         const row = document.createElement('tr');
+        row.classList.add('withdrawal-card');
 
         // Format tanggal
         const date = new Date(withdrawal.request_date || withdrawal.created_at);
@@ -481,11 +483,11 @@
         }
 
         row.innerHTML = `
-          <td>${formattedDate}</td>
-          <td>${withdrawal.id || '-'}</td>
-          <td>${formatRupiah(withdrawal.amount || 0)}</td>
-          <td>${withdrawal.bank_account || withdrawal.account_number || '-'}</td>
-          <td><span class="badge ${statusClass}">${statusText}</span></td>
+          <td data-label="Tanggal">${formattedDate}</td>
+          <td data-label="ID Penarikan">${withdrawal.id || '-'}</td>
+          <td data-label="Jumlah">${formatRupiah(withdrawal.amount || 0)}</td>
+          <td data-label="Bank">${withdrawal.bank_account || withdrawal.account_number || '-'}</td>
+          <td data-label="Status"><span class="badge ${statusClass}">${statusText}</span></td>
         `;
 
         tbody.appendChild(row);

@@ -490,18 +490,66 @@ body {
     margin-bottom: 0.75rem;
   }
 
-  .data-table {
-    min-width: 550px;
+  /* Card View for Tables */
+  .card {
+    overflow-x: visible;
   }
 
-  .data-table th {
-    font-size: 0.7rem;
-    padding: 0.6rem 0.5rem;
+  .data-table {
+    min-width: 100%;
+  }
+
+  .data-table thead {
+    display: none;
+  }
+
+  .data-table, .data-table tbody, .data-table tr, .data-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .data-table tr.transaction-card,
+  .data-table tr.withdrawal-card {
+    margin-bottom: 0.75rem;
+    border: 1px solid var(--ak-border);
+    border-radius: 8px;
+    padding: 0;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+  }
+
+  .data-table tr.transaction-card:last-child,
+  .data-table tr.withdrawal-card:last-child {
+    margin-bottom: 0;
   }
 
   .data-table td {
-    padding: 0.6rem 0.5rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.55rem 0.65rem;
+    border-bottom: 1px solid var(--ak-border);
+    align-items: center;
     font-size: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .data-table td:last-child {
+    border-bottom: none;
+  }
+
+  .data-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    font-size: 0.7rem;
+    color: #6B7280;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    flex-shrink: 0;
+    min-width: 85px;
+    max-width: 40%;
   }
 
   .badge {
@@ -603,18 +651,22 @@ body {
     margin-bottom: 0.6rem;
   }
 
-  .data-table {
-    min-width: 500px;
-  }
-
-  .data-table th {
-    font-size: 0.65rem;
-    padding: 0.55rem 0.45rem;
+  /* Card View for Tables */
+  .data-table tr.transaction-card,
+  .data-table tr.withdrawal-card {
+    margin-bottom: 0.6rem;
+    border-radius: 7px;
   }
 
   .data-table td {
-    padding: 0.55rem 0.45rem;
+    padding: 0.5rem 0.6rem;
     font-size: 0.7rem;
+  }
+
+  .data-table td::before {
+    font-size: 0.65rem;
+    min-width: 80px;
+    max-width: 42%;
   }
 
   .badge {
@@ -731,18 +783,22 @@ body {
     margin-bottom: 0.5rem;
   }
 
-  .data-table {
-    min-width: 480px;
-  }
-
-  .data-table th {
-    font-size: 0.6rem;
-    padding: 0.5rem 0.4rem;
+  /* Card View for Tables */
+  .data-table tr.transaction-card,
+  .data-table tr.withdrawal-card {
+    margin-bottom: 0.5rem;
+    border-radius: 6px;
   }
 
   .data-table td {
-    padding: 0.5rem 0.4rem;
+    padding: 0.45rem 0.5rem;
     font-size: 0.65rem;
+  }
+
+  .data-table td::before {
+    font-size: 0.6rem;
+    min-width: 75px;
+    max-width: 45%;
   }
 
   .badge {

@@ -1308,3 +1308,504 @@ a:focus {
   outline: 2px solid var(--primary-color-dark);
   outline-offset: 2px;
 }
+
+/* ========================================
+   RESPONSIVE KHUSUS HALAMAN KERANJANG (BUYER)
+   Breakpoints: 425px, 375px, 320px
+   ======================================== */
+
+/* Breakpoint 425px - Mobile Medium */
+@media (max-width: 425px) {
+  /* Padding halaman keranjang */
+  .shell {
+    padding: 20px 16px 90px !important;
+  }
+
+  /* Header halaman */
+  .page-header {
+    flex-direction: column !important;
+    gap: 10px !important;
+    align-items: flex-start !important;
+    margin-bottom: 14px !important;
+  }
+
+  .page-title {
+    font-size: 1.5rem !important;
+  }
+
+  .continue-shopping-link {
+    padding: 0.55rem 1rem !important;
+    font-size: 0.9rem !important;
+    min-height: 42px !important;
+  }
+
+  /* Layout keranjang */
+  .cart-layout {
+    gap: 14px !important;
+    margin-top: 14px !important;
+  }
+
+  /* Card produk mobile */
+  .product-item-card {
+    padding: 10px !important;
+    gap: 10px !important;
+  }
+
+  /* Thumbnail produk */
+  .product-item-thumb {
+    width: 75px !important;
+    height: 75px !important;
+    min-width: 75px !important;
+    min-height: 75px !important;
+    border-radius: 7px !important;
+  }
+
+  .product-item-thumb-container {
+    margin-right: 0 !important;
+  }
+
+  /* Detail produk */
+  .product-item-details {
+    gap: 5px !important;
+  }
+
+  .product-item-name {
+    font-size: 0.9rem !important;
+    line-height: 1.35 !important;
+    -webkit-line-clamp: 2 !important;
+  }
+
+  .product-sku,
+  .product-variant {
+    font-size: 0.75rem !important;
+  }
+
+  .product-variant {
+    padding: 0.12rem 0.4rem !important;
+    margin-top: 0.2rem !important;
+  }
+
+  /* Harga produk */
+  .product-item-price {
+    font-size: 0.9rem !important;
+  }
+
+  /* Quantity controls */
+  .qty-controls {
+    gap: 0 !important;
+  }
+
+  .qty-btn {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
+    font-size: 13px !important;
+  }
+
+  .qty-input {
+    width: 32px !important;
+    height: 28px !important;
+    min-width: 32px !important;
+    min-height: 28px !important;
+    font-size: 12px !important;
+  }
+
+  /* Subtotal produk */
+  .product-item-subtotal {
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+  }
+
+  /* Tombol hapus mobile */
+  .delete-btn-mobile {
+    width: 26px !important;
+    height: 26px !important;
+    min-width: 26px !important;
+    min-height: 26px !important;
+    top: -6px !important;
+    right: -6px !important;
+    font-size: 11px !important;
+  }
+
+  /* Kartu ringkasan belanja */
+  .summary-card {
+    padding: 1.25rem !important;
+    border-radius: 14px !important;
+    gap: 0.875rem !important;
+  }
+
+  .summary-card h2 {
+    font-size: 1.15rem !important;
+    padding-bottom: 0.875rem !important;
+    margin-bottom: 0.875rem !important;
+  }
+
+  /* Detail ringkasan */
+  .summary-details {
+    gap: 0.625rem !important;
+  }
+
+  .summary-row {
+    padding: 0.45rem 0 !important;
+  }
+
+  .summary-row span:first-child {
+    font-size: 0.875rem !important;
+  }
+
+  .summary-row span:last-child {
+    font-size: 0.95rem !important;
+  }
+
+  /* Total */
+  .summary-total {
+    padding: 0.875rem 0 !important;
+    margin-top: 0.625rem !important;
+  }
+
+  .summary-total span:first-child {
+    font-size: 1rem !important;
+  }
+
+  .summary-total span:last-child {
+    font-size: 1.35rem !important;
+  }
+
+  /* Tombol checkout mobile */
+  .sticky-checkout-bar {
+    padding: 10px 14px !important;
+  }
+
+  .checkout-total {
+    font-size: 0.9rem !important;
+  }
+
+  .checkout-btn-mobile {
+    padding: 0.75rem 1rem !important;
+    font-size: 0.85rem !important;
+    min-height: 42px !important;
+  }
+}
+
+/* Breakpoint 375px - Mobile Small */
+@media (max-width: 375px) {
+  /* Padding halaman keranjang */
+  .shell {
+    padding: 18px 14px 85px !important;
+  }
+
+  /* Header halaman */
+  .page-header {
+    gap: 8px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .page-title {
+    font-size: 1.4rem !important;
+  }
+
+  .continue-shopping-link {
+    padding: 0.5rem 0.9rem !important;
+    font-size: 0.85rem !important;
+    min-height: 40px !important;
+  }
+
+  /* Layout keranjang */
+  .cart-layout {
+    gap: 12px !important;
+    margin-top: 12px !important;
+  }
+
+  /* Card produk mobile */
+  .product-item-card {
+    padding: 9px !important;
+    gap: 9px !important;
+  }
+
+  /* Thumbnail produk */
+  .product-item-thumb {
+    width: 70px !important;
+    height: 70px !important;
+    min-width: 70px !important;
+    min-height: 70px !important;
+    border-radius: 6px !important;
+  }
+
+  /* Detail produk */
+  .product-item-details {
+    gap: 4px !important;
+  }
+
+  .product-item-name {
+    font-size: 0.85rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .product-sku,
+  .product-variant {
+    font-size: 0.7rem !important;
+  }
+
+  .product-variant {
+    padding: 0.1rem 0.35rem !important;
+    margin-top: 0.15rem !important;
+  }
+
+  /* Harga produk */
+  .product-item-price {
+    font-size: 0.85rem !important;
+  }
+
+  /* Quantity controls */
+  .qty-btn {
+    width: 26px !important;
+    height: 26px !important;
+    min-width: 26px !important;
+    min-height: 26px !important;
+    font-size: 12px !important;
+  }
+
+  .qty-input {
+    width: 30px !important;
+    height: 26px !important;
+    min-width: 30px !important;
+    min-height: 26px !important;
+    font-size: 11px !important;
+  }
+
+  /* Subtotal produk */
+  .product-item-subtotal {
+    font-size: 0.8rem !important;
+  }
+
+  /* Tombol hapus mobile */
+  .delete-btn-mobile {
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    min-height: 24px !important;
+    font-size: 10px !important;
+  }
+
+  /* Kartu ringkasan belanja */
+  .summary-card {
+    padding: 1.125rem !important;
+    border-radius: 12px !important;
+    gap: 0.75rem !important;
+  }
+
+  .summary-card h2 {
+    font-size: 1.1rem !important;
+    padding-bottom: 0.75rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  /* Detail ringkasan */
+  .summary-details {
+    gap: 0.5rem !important;
+  }
+
+  .summary-row {
+    padding: 0.4rem 0 !important;
+  }
+
+  .summary-row span:first-child {
+    font-size: 0.825rem !important;
+  }
+
+  .summary-row span:last-child {
+    font-size: 0.9rem !important;
+  }
+
+  /* Total */
+  .summary-total {
+    padding: 0.75rem 0 !important;
+    margin-top: 0.5rem !important;
+  }
+
+  .summary-total span:first-child {
+    font-size: 0.95rem !important;
+  }
+
+  .summary-total span:last-child {
+    font-size: 1.25rem !important;
+  }
+
+  /* Tombol checkout mobile */
+  .sticky-checkout-bar {
+    padding: 9px 12px !important;
+  }
+
+  .checkout-total {
+    font-size: 0.85rem !important;
+  }
+
+  .checkout-btn-mobile {
+    padding: 0.7rem 0.9rem !important;
+    font-size: 0.8rem !important;
+    min-height: 40px !important;
+  }
+}
+
+/* Breakpoint 320px - Mobile Extra Small */
+@media (max-width: 320px) {
+  /* Padding halaman keranjang */
+  .shell {
+    padding: 16px 12px 80px !important;
+  }
+
+  /* Header halaman */
+  .page-header {
+    gap: 7px !important;
+    margin-bottom: 10px !important;
+  }
+
+  .page-title {
+    font-size: 1.3rem !important;
+  }
+
+  .continue-shopping-link {
+    padding: 0.45rem 0.8rem !important;
+    font-size: 0.8rem !important;
+    min-height: 38px !important;
+  }
+
+  /* Layout keranjang */
+  .cart-layout {
+    gap: 10px !important;
+    margin-top: 10px !important;
+  }
+
+  /* Card produk mobile */
+  .product-item-card {
+    padding: 8px !important;
+    gap: 8px !important;
+  }
+
+  /* Thumbnail produk */
+  .product-item-thumb {
+    width: 65px !important;
+    height: 65px !important;
+    min-width: 65px !important;
+    min-height: 65px !important;
+    border-radius: 5px !important;
+  }
+
+  /* Detail produk */
+  .product-item-details {
+    gap: 3px !important;
+  }
+
+  .product-item-name {
+    font-size: 0.8rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .product-sku,
+  .product-variant {
+    font-size: 0.65rem !important;
+  }
+
+  .product-variant {
+    padding: 0.08rem 0.3rem !important;
+    margin-top: 0.12rem !important;
+  }
+
+  /* Harga produk */
+  .product-item-price {
+    font-size: 0.8rem !important;
+  }
+
+  /* Quantity controls */
+  .qty-btn {
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    min-height: 24px !important;
+    font-size: 11px !important;
+  }
+
+  .qty-input {
+    width: 28px !important;
+    height: 24px !important;
+    min-width: 28px !important;
+    min-height: 24px !important;
+    font-size: 10px !important;
+  }
+
+  /* Subtotal produk */
+  .product-item-subtotal {
+    font-size: 0.75rem !important;
+  }
+
+  /* Tombol hapus mobile */
+  .delete-btn-mobile {
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 22px !important;
+    min-height: 22px !important;
+    top: -5px !important;
+    right: -5px !important;
+    font-size: 9px !important;
+  }
+
+  /* Kartu ringkasan belanja */
+  .summary-card {
+    padding: 1rem !important;
+    border-radius: 10px !important;
+    gap: 0.625rem !important;
+  }
+
+  .summary-card h2 {
+    font-size: 1.05rem !important;
+    padding-bottom: 0.625rem !important;
+    margin-bottom: 0.625rem !important;
+  }
+
+  /* Detail ringkasan */
+  .summary-details {
+    gap: 0.4rem !important;
+  }
+
+  .summary-row {
+    padding: 0.35rem 0 !important;
+  }
+
+  .summary-row span:first-child {
+    font-size: 0.775rem !important;
+  }
+
+  .summary-row span:last-child {
+    font-size: 0.85rem !important;
+  }
+
+  /* Total */
+  .summary-total {
+    padding: 0.625rem 0 !important;
+    margin-top: 0.4rem !important;
+  }
+
+  .summary-total span:first-child {
+    font-size: 0.9rem !important;
+  }
+
+  .summary-total span:last-child {
+    font-size: 1.15rem !important;
+  }
+
+  /* Tombol checkout mobile */
+  .sticky-checkout-bar {
+    padding: 8px 10px !important;
+  }
+
+  .checkout-total {
+    font-size: 0.8rem !important;
+  }
+
+  .checkout-btn-mobile {
+    padding: 0.65rem 0.8rem !important;
+    font-size: 0.75rem !important;
+    min-height: 38px !important;
+  }
+}

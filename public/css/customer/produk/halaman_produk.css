@@ -3930,3 +3930,462 @@ main[role="main"] {
   }
 }
 
+/* ========================================
+   RESPONSIVE KHUSUS HALAMAN PENCARIAN PRODUK (BUYER)
+   Breakpoints: 425px, 375px, 320px
+   ======================================== */
+
+/* Search result info styling */
+.search-result-info {
+  margin: 15px 0 !important;
+  padding: 12px 16px !important;
+  background-color: #ffffff !important;
+  border-radius: 8px !important;
+  border-left: 4px solid #006E5C !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08) !important;
+}
+
+.search-result-info h3 {
+  margin: 0 0 4px 0 !important;
+  font-size: 1.1rem !important;
+  color: #006E5C !important;
+}
+
+.search-result-info p {
+  margin: 0 !important;
+  font-size: 0.95rem !important;
+  color: #666 !important;
+}
+
+/* Breakpoint 425px - Mobile Medium */
+@media (max-width: 425px) {
+  /* Padding halaman pencarian */
+  .produk-page {
+    padding: 1.25rem 1rem 50px !important;
+  }
+
+  /* Info hasil pencarian */
+  .search-result-info {
+    margin: 12px 0 !important;
+    padding: 10px 14px !important;
+    border-radius: 7px !important;
+    border-left: 3px solid #006E5C !important;
+  }
+
+  .search-result-info h3 {
+    font-size: 1rem !important;
+    margin-bottom: 3px !important;
+  }
+
+  .search-result-info p {
+    font-size: 0.875rem !important;
+  }
+
+  /* Grid produk - horizontal scroll untuk search results */
+  .produk-page .produk-grid {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    gap: 14px !important;
+    padding: 0 10px !important;
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+    scroll-snap-type: x mandatory !important;
+  }
+
+  .produk-page .produk-grid::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /* Card produk di 425px */
+  .produk-page .produk-grid .produk-card {
+    min-width: 80vw !important;
+    max-width: 80vw !important;
+    margin-right: 14px !important;
+    scroll-snap-align: center !important;
+    flex: 0 0 auto !important;
+    padding: 10px !important;
+    min-height: 280px !important;
+  }
+
+  .produk-page .produk-grid .produk-card img {
+    height: 130px !important;
+    border-radius: 9px !important;
+  }
+
+  .produk-page .produk-card-name {
+    font-size: 14px !important;
+    margin: 6px 0 3px !important;
+    line-height: 1.3 !important;
+  }
+
+  .produk-page .produk-card-sub {
+    font-size: 11px !important;
+    margin-bottom: 4px !important;
+  }
+
+  .produk-page .produk-card-toko {
+    font-size: 11px !important;
+    margin-bottom: 4px !important;
+  }
+
+  .produk-page .produk-card-price {
+    font-size: 14px !important;
+    margin-bottom: 5px !important;
+  }
+
+  .produk-page .produk-card-stars svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  .produk-page .wish-small {
+    width: 32px !important;
+    height: 32px !important;
+    right: 8px !important;
+    top: 8px !important;
+  }
+
+  .produk-page .produk-card-actions .btn-lihat,
+  .produk-page .produk-card-actions .btn-add {
+    padding: 0.5rem 0 !important;
+    font-size: 12px !important;
+    min-height: 36px !important;
+    border-radius: 7px !important;
+  }
+
+  /* Tombol filter mobile */
+  .mobile-filter-toggle {
+    padding: 0.6rem 0.9rem !important;
+    font-size: 0.85rem !important;
+    min-height: 38px !important;
+  }
+
+  /* Section recommendation & popular */
+  .produk-page .produk-rekomendasi,
+  .produk-page .produk-populer {
+    margin-top: 24px !important;
+  }
+
+  .produk-page .rekomendasi-header,
+  .produk-page .produk-populer-header {
+    margin-bottom: 12px !important;
+  }
+
+  .produk-page .rekomendasi-header h3,
+  .produk-page .produk-populer-header h3 {
+    font-size: 1.15rem !important;
+  }
+
+  .produk-page .produk-see-all {
+    font-size: 0.85rem !important;
+  }
+
+  /* Grid untuk rekomendasi & populer - horizontal scroll */
+  .produk-page #rekom-grid,
+  .produk-page #populer-grid {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    gap: 14px !important;
+    padding: 0 10px !important;
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+    scroll-snap-type: x mandatory !important;
+  }
+
+  .produk-page #rekom-grid::-webkit-scrollbar,
+  .produk-page #populer-grid::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .produk-page #rekom-grid .produk-card,
+  .produk-page #populer-grid .produk-card {
+    min-width: 80vw !important;
+    max-width: 80vw !important;
+    margin-right: 14px !important;
+    scroll-snap-align: center !important;
+    flex: 0 0 auto !important;
+  }
+
+  /* No results message */
+  .no-results-message {
+    padding: 20px 16px !important;
+    text-align: center !important;
+    font-size: 0.95rem !important;
+    color: #666 !important;
+    background: #fff !important;
+    border-radius: 8px !important;
+    margin: 10px 0 !important;
+  }
+}
+
+/* Breakpoint 375px - Mobile Small */
+@media (max-width: 375px) {
+  /* Padding halaman pencarian */
+  .produk-page {
+    padding: 1rem 0.875rem 45px !important;
+  }
+
+  /* Info hasil pencarian */
+  .search-result-info {
+    margin: 10px 0 !important;
+    padding: 9px 12px !important;
+    border-radius: 6px !important;
+    border-left: 3px solid #006E5C !important;
+  }
+
+  .search-result-info h3 {
+    font-size: 0.95rem !important;
+    margin-bottom: 3px !important;
+  }
+
+  .search-result-info p {
+    font-size: 0.825rem !important;
+  }
+
+  /* Grid produk - horizontal scroll untuk search results */
+  .produk-page .produk-grid {
+    gap: 12px !important;
+    padding: 0 8px !important;
+  }
+
+  /* Card produk di 375px */
+  .produk-page .produk-grid .produk-card {
+    min-width: 82vw !important;
+    max-width: 82vw !important;
+    margin-right: 12px !important;
+    padding: 9px !important;
+    min-height: 265px !important;
+  }
+
+  .produk-page .produk-grid .produk-card img {
+    height: 120px !important;
+    border-radius: 8px !important;
+  }
+
+  .produk-page .produk-card-name {
+    font-size: 13px !important;
+    margin: 5px 0 3px !important;
+    line-height: 1.25 !important;
+  }
+
+  .produk-page .produk-card-sub {
+    font-size: 10px !important;
+    margin-bottom: 3px !important;
+  }
+
+  .produk-page .produk-card-toko {
+    font-size: 10px !important;
+    margin-bottom: 3px !important;
+  }
+
+  .produk-page .produk-card-price {
+    font-size: 13px !important;
+    margin-bottom: 4px !important;
+  }
+
+  .produk-page .produk-card-stars svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .produk-page .wish-small {
+    width: 30px !important;
+    height: 30px !important;
+    right: 7px !important;
+    top: 7px !important;
+  }
+
+  .produk-page .produk-card-actions .btn-lihat,
+  .produk-page .produk-card-actions .btn-add {
+    padding: 0.45rem 0 !important;
+    font-size: 11px !important;
+    min-height: 34px !important;
+    border-radius: 6px !important;
+  }
+
+  /* Tombol filter mobile */
+  .mobile-filter-toggle {
+    padding: 0.55rem 0.8rem !important;
+    font-size: 0.8rem !important;
+    min-height: 36px !important;
+  }
+
+  /* Section recommendation & popular */
+  .produk-page .produk-rekomendasi,
+  .produk-page .produk-populer {
+    margin-top: 22px !important;
+  }
+
+  .produk-page .rekomendasi-header,
+  .produk-page .produk-populer-header {
+    margin-bottom: 11px !important;
+  }
+
+  .produk-page .rekomendasi-header h3,
+  .produk-page .produk-populer-header h3 {
+    font-size: 1.1rem !important;
+  }
+
+  .produk-page .produk-see-all {
+    font-size: 0.8rem !important;
+  }
+
+  /* Grid untuk rekomendasi & populer - horizontal scroll */
+  .produk-page #rekom-grid,
+  .produk-page #populer-grid {
+    gap: 12px !important;
+    padding: 0 8px !important;
+  }
+
+  .produk-page #rekom-grid .produk-card,
+  .produk-page #populer-grid .produk-card {
+    min-width: 82vw !important;
+    max-width: 82vw !important;
+    margin-right: 12px !important;
+  }
+
+  /* No results message */
+  .no-results-message {
+    padding: 18px 14px !important;
+    font-size: 0.875rem !important;
+  }
+}
+
+/* Breakpoint 320px - Mobile Extra Small */
+@media (max-width: 320px) {
+  /* Padding halaman pencarian */
+  .produk-page {
+    padding: 0.875rem 0.75rem 40px !important;
+  }
+
+  /* Info hasil pencarian */
+  .search-result-info {
+    margin: 8px 0 !important;
+    padding: 8px 10px !important;
+    border-radius: 5px !important;
+    border-left: 2px solid #006E5C !important;
+  }
+
+  .search-result-info h3 {
+    font-size: 0.875rem !important;
+    margin-bottom: 2px !important;
+  }
+
+  .search-result-info p {
+    font-size: 0.775rem !important;
+  }
+
+  /* Grid produk - horizontal scroll untuk search results */
+  .produk-page .produk-grid {
+    gap: 10px !important;
+    padding: 0 6px !important;
+  }
+
+  /* Card produk di 320px */
+  .produk-page .produk-grid .produk-card {
+    min-width: 85vw !important;
+    max-width: 85vw !important;
+    margin-right: 10px !important;
+    padding: 8px !important;
+    min-height: 250px !important;
+  }
+
+  .produk-page .produk-grid .produk-card img {
+    height: 110px !important;
+    border-radius: 7px !important;
+  }
+
+  .produk-page .produk-card-name {
+    font-size: 12px !important;
+    margin: 4px 0 2px !important;
+    line-height: 1.2 !important;
+  }
+
+  .produk-page .produk-card-sub {
+    font-size: 9px !important;
+    margin-bottom: 3px !important;
+  }
+
+  .produk-page .produk-card-toko {
+    font-size: 9px !important;
+    margin-bottom: 3px !important;
+  }
+
+  .produk-page .produk-card-price {
+    font-size: 12px !important;
+    margin-bottom: 4px !important;
+  }
+
+  .produk-page .produk-card-stars svg {
+    width: 13px !important;
+    height: 13px !important;
+  }
+
+  .produk-page .wish-small {
+    width: 28px !important;
+    height: 28px !important;
+    right: 6px !important;
+    top: 6px !important;
+  }
+
+  .produk-page .produk-card-actions .btn-lihat,
+  .produk-page .produk-card-actions .btn-add {
+    padding: 0.4rem 0 !important;
+    font-size: 10px !important;
+    min-height: 32px !important;
+    border-radius: 6px !important;
+  }
+
+  /* Tombol filter mobile */
+  .mobile-filter-toggle {
+    padding: 0.5rem 0.7rem !important;
+    font-size: 0.75rem !important;
+    min-height: 34px !important;
+  }
+
+  /* Section recommendation & popular */
+  .produk-page .produk-rekomendasi,
+  .produk-page .produk-populer {
+    margin-top: 20px !important;
+  }
+
+  .produk-page .rekomendasi-header,
+  .produk-page .produk-populer-header {
+    margin-bottom: 10px !important;
+  }
+
+  .produk-page .rekomendasi-header h3,
+  .produk-page .produk-populer-header h3 {
+    font-size: 1.05rem !important;
+  }
+
+  .produk-page .produk-see-all {
+    font-size: 0.75rem !important;
+  }
+
+  /* Grid untuk rekomendasi & populer - horizontal scroll */
+  .produk-page #rekom-grid,
+  .produk-page #populer-grid {
+    gap: 10px !important;
+    padding: 0 6px !important;
+  }
+
+  .produk-page #rekom-grid .produk-card,
+  .produk-page #populer-grid .produk-card {
+    min-width: 85vw !important;
+    max-width: 85vw !important;
+    margin-right: 10px !important;
+  }
+
+  /* No results message */
+  .no-results-message {
+    padding: 16px 12px !important;
+    font-size: 0.8rem !important;
+  }
+}
+

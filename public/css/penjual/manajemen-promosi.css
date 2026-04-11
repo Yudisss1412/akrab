@@ -823,6 +823,73 @@ nav[aria-label*="Navigasi halaman"] {
     padding: 0.2rem 0.6rem;
     font-size: 0.7rem;
   }
+
+  /* Card View for Mobile - Show all table data */
+  .table-responsive {
+    overflow-x: visible;
+  }
+
+  table {
+    min-width: 100%;
+  }
+
+  table thead {
+    display: none;
+  }
+
+  table, table tbody, table tr, table td {
+    display: block;
+    width: 100%;
+  }
+
+  table tr.promotion-card {
+    margin-bottom: 0.75rem;
+    border: 1px solid var(--ak-border);
+    border-radius: 8px;
+    padding: 0;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+  }
+
+  table tr.promotion-card:last-child {
+    margin-bottom: 0;
+  }
+
+  table td {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--ak-border);
+    align-items: center;
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+
+  table td:last-child {
+    border-bottom: none;
+  }
+
+  /* Label for each data cell */
+  table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    font-size: 0.75rem;
+    color: #6B7280;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    flex-shrink: 0;
+    min-width: 100px;
+    max-width: 40%;
+  }
+
+  /* Action buttons in card */
+  .action-buttons {
+    justify-content: flex-end;
+    gap: 0.4rem;
+  }
 }
 
 /* Small Mobile - 425px */
@@ -852,10 +919,15 @@ nav[aria-label*="Navigasi halaman"] {
     font-size: 0.95rem;
   }
 
-  .table th,
-  .table td {
-    padding: 0.45rem;
+  table td {
+    padding: 0.55rem 0.65rem;
     font-size: 0.75rem;
+  }
+
+  table td::before {
+    font-size: 0.7rem;
+    min-width: 90px;
+    max-width: 42%;
   }
 
   .action-btn {
@@ -976,10 +1048,15 @@ nav[aria-label*="Navigasi halaman"] {
     font-size: 0.9rem;
   }
 
-  .table th,
-  .table td {
-    padding: 0.4rem;
+  table td {
+    padding: 0.5rem 0.6rem;
     font-size: 0.7rem;
+  }
+
+  table td::before {
+    font-size: 0.65rem;
+    min-width: 85px;
+    max-width: 45%;
   }
 
   .action-btn {
@@ -1100,10 +1177,15 @@ nav[aria-label*="Navigasi halaman"] {
     font-size: 0.85rem;
   }
 
-  .table th,
-  .table td {
-    padding: 0.35rem;
+  table td {
+    padding: 0.45rem 0.5rem;
     font-size: 0.65rem;
+  }
+
+  table td::before {
+    font-size: 0.6rem;
+    min-width: 80px;
+    max-width: 48%;
   }
 
   .action-btn {

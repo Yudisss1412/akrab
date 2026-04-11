@@ -258,20 +258,20 @@
                   <tbody>
                     <!-- Voucher Promotions -->
                     @foreach($vouchers as $voucher)
-                    <tr>
-                      <td>{{ $voucher->name }}</td>
-                      <td>Voucher</td>
-                      <td>-</td>
-                      <td>{{ \Carbon\Carbon::parse($voucher->start_date)->format('d M Y') }} - {{ \Carbon\Carbon::parse($voucher->end_date)->format('d M Y') }}</td>
-                      <td>
-                        <span class="status-badge 
-                          @if($voucher->status === 'active') status-completed 
-                          @elseif($voucher->status === 'inactive') status-upcoming 
+                    <tr class="promotion-card">
+                      <td data-label="Nama Promosi">{{ $voucher->name }}</td>
+                      <td data-label="Tipe">Voucher</td>
+                      <td data-label="Produk">-</td>
+                      <td data-label="Periode">{{ \Carbon\Carbon::parse($voucher->start_date)->format('d M Y') }} - {{ \Carbon\Carbon::parse($voucher->end_date)->format('d M Y') }}</td>
+                      <td data-label="Status">
+                        <span class="status-badge
+                          @if($voucher->status === 'active') status-completed
+                          @elseif($voucher->status === 'inactive') status-upcoming
                           @else status-expired @endif">
                           {{ ucfirst($voucher->status) }}
                         </span>
                       </td>
-                      <td>
+                      <td data-label="Aksi">
                         <div class="action-buttons d-flex justify-content-end gap-2">
                           <a href="{{ route('penjual.promosi.edit', ['id' => $voucher->id]) }}" class="action-btn btn-edit rounded-circle bg-light p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Edit">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
@@ -302,15 +302,15 @@
                       </td>
                     </tr>
                     @endforeach
-                    
+
                     <!-- Product Discount Promotions -->
                     @foreach($productDiscounts as $productPromotion)
-                    <tr>
-                      <td>{{ $productPromotion->product ? $productPromotion->product->name . ' - Diskon' : 'Produk tidak ditemukan' }}</td>
-                      <td>Diskon Produk</td>
-                      <td>{{ $productPromotion->product ? $productPromotion->product->name : '-' }}</td>
-                      <td>{{ \Carbon\Carbon::parse($productPromotion->start_date)->format('d M Y') }} - {{ \Carbon\Carbon::parse($productPromotion->end_date)->format('d M Y') }}</td>
-                      <td>
+                    <tr class="promotion-card">
+                      <td data-label="Nama Promosi">{{ $productPromotion->product ? $productPromotion->product->name . ' - Diskon' : 'Produk tidak ditemukan' }}</td>
+                      <td data-label="Tipe">Diskon Produk</td>
+                      <td data-label="Produk">{{ $productPromotion->product ? $productPromotion->product->name : '-' }}</td>
+                      <td data-label="Periode">{{ \Carbon\Carbon::parse($productPromotion->start_date)->format('d M Y') }} - {{ \Carbon\Carbon::parse($productPromotion->end_date)->format('d M Y') }}</td>
+                      <td data-label="Status">
                         <span class="status-badge
                           @if($productPromotion->status === 'active') status-completed
                           @elseif($productPromotion->status === 'inactive') status-upcoming
@@ -318,7 +318,7 @@
                           {{ ucfirst($productPromotion->status) }}
                         </span>
                       </td>
-                      <td>
+                      <td data-label="Aksi">
                         <div class="action-buttons d-flex justify-content-end gap-2">
                           @if($productPromotion->product)
                           <a href="{{ route('penjual.promosi.edit', ['id' => $productPromotion->id]) }}" class="action-btn btn-edit rounded-circle bg-light p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Edit">
@@ -378,20 +378,20 @@
                   </thead>
                   <tbody>
                     @foreach($productDiscounts as $productPromotion)
-                    <tr>
-                      <td>{{ $productPromotion->product->name }} - Diskon</td>
-                      <td>Diskon Produk</td>
-                      <td>{{ $productPromotion->product->name }}</td>
-                      <td>{{ \Carbon\Carbon::parse($productPromotion->start_date)->format('d M Y') }} - {{ \Carbon\Carbon::parse($productPromotion->end_date)->format('d M Y') }}</td>
-                      <td>
-                        <span class="status-badge 
-                          @if($productPromotion->status === 'active') status-completed 
-                          @elseif($productPromotion->status === 'inactive') status-upcoming 
+                    <tr class="promotion-card">
+                      <td data-label="Nama Promosi">{{ $productPromotion->product->name }} - Diskon</td>
+                      <td data-label="Tipe">Diskon Produk</td>
+                      <td data-label="Produk">{{ $productPromotion->product->name }}</td>
+                      <td data-label="Periode">{{ \Carbon\Carbon::parse($productPromotion->start_date)->format('d M Y') }} - {{ \Carbon\Carbon::parse($productPromotion->end_date)->format('d M Y') }}</td>
+                      <td data-label="Status">
+                        <span class="status-badge
+                          @if($productPromotion->status === 'active') status-completed
+                          @elseif($productPromotion->status === 'inactive') status-upcoming
                           @else status-expired @endif">
                           {{ ucfirst($productPromotion->status) }}
                         </span>
                       </td>
-                      <td>
+                      <td data-label="Aksi">
                         <div class="action-buttons d-flex justify-content-end gap-2">
                           <a href="{{ route('penjual.promosi.edit', ['id' => $productPromotion->id]) }}" class="action-btn btn-edit rounded-circle bg-light p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Edit">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
@@ -448,26 +448,26 @@
                   </thead>
                   <tbody>
                     @foreach($vouchers as $voucher)
-                    <tr>
-                      <td>{{ $voucher->name }}<br><small class="text-muted">{{ $voucher->code }}</small></td>
-                      <td>
+                    <tr class="promotion-card">
+                      <td data-label="Nama / Kode">{{ $voucher->name }}<br><small class="text-muted">{{ $voucher->code }}</small></td>
+                      <td data-label="Tipe">
                         @if($voucher->type === 'free_shipping') Voucher Pengiriman
                         @elseif($voucher->type === 'percentage') Voucher Diskon Persen
                         @else Voucher Diskon Tetap
                         @endif
                       </td>
-                      <td>Rp {{ number_format($voucher->min_order_amount, 0, ',', '.') }}</td>
-                      <td>{{ $voucher->used_count }}/{{ $voucher->usage_limit ?: '∞' }}</td>
-                      <td>{{ \Carbon\Carbon::parse($voucher->start_date)->format('d M Y') }} - {{ \Carbon\Carbon::parse($voucher->end_date)->format('d M Y') }}</td>
-                      <td>
-                        <span class="status-badge 
-                          @if($voucher->status === 'active') status-completed 
-                          @elseif($voucher->status === 'inactive') status-upcoming 
+                      <td data-label="Min. Pembelian">Rp {{ number_format($voucher->min_order_amount, 0, ',', '.') }}</td>
+                      <td data-label="Kuota">{{ $voucher->used_count }}/{{ $voucher->usage_limit ?: '∞' }}</td>
+                      <td data-label="Periode">{{ \Carbon\Carbon::parse($voucher->start_date)->format('d M Y') }} - {{ \Carbon\Carbon::parse($voucher->end_date)->format('d M Y') }}</td>
+                      <td data-label="Status">
+                        <span class="status-badge
+                          @if($voucher->status === 'active') status-completed
+                          @elseif($voucher->status === 'inactive') status-upcoming
                           @else status-expired @endif">
                           {{ ucfirst($voucher->status) }}
                         </span>
                       </td>
-                      <td>
+                      <td data-label="Aksi">
                         <div class="action-buttons d-flex justify-content-end gap-2">
                           <a href="{{ route('penjual.promosi.edit', ['id' => $voucher->id]) }}" class="action-btn btn-edit rounded-circle bg-light p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Edit">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">

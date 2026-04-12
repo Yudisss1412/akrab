@@ -148,9 +148,50 @@ document.addEventListener('DOMContentLoaded', function() {
       return; // Keluar jika bukan halaman profil pembeli
     }
     
-    // Get all navigation links and content sections
-    const navItems = document.querySelectorAll('.profile-navigation .nav-item');
+    // Get all navigation links (both desktop sidebar and mobile bottom nav) and content sections
+    const navItems = document.querySelectorAll('.profile-navigation .nav-item, .mobile-bottom-nav .nav-item');
     const contentSections = document.querySelectorAll('.main-content section');
+
+    // Function to sync active state between desktop and mobile navigation
+    function syncActiveState(clickedItem) {
+      const targetId = clickedItem.getAttribute('data-target');
+
+      // Remove active class from ALL navigation items (both desktop and mobile)
+      document.querySelectorAll('.profile-navigation .nav-item, .mobile-bottom-nav .nav-item').forEach(navItem => {
+        navItem.classList.remove('active');
+      });
+
+      // Add active class to ALL matching navigation items (both desktop and mobile with same target)
+      document.querySelectorAll(`.nav-item[data-target="${targetId}"]`).forEach(navItem => {
+        navItem.classList.add('active');
+      });
+
+      // Hide all content sections
+      contentSections.forEach(section => {
+        section.classList.remove('active-content');
+        section.classList.add('hidden-content');
+      });
+
+      // Show the target content section
+      const targetSection = document.getElementById(targetId);
+      if (targetSection) {
+        targetSection.classList.remove('hidden-content');
+        targetSection.classList.add('active-content');
+
+        // Initialize modal listeners when account settings is shown
+        if (targetId === 'account-settings') {
+          initializeModalListeners();
+        }
+      }
+    }
+
+    // Add click event listeners to ALL navigation items (desktop and mobile)
+    navItems.forEach(item => {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        syncActiveState(this);
+      });
+    });
     
     // Function to initialize modal event listeners (can be called when needed)
     function initializeModalListeners() {
@@ -337,54 +378,23 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
     
-    // Add click event listeners to navigation items
-    navItems.forEach(item => {
-      item.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        // Get the target content ID from data attribute
-        const targetId = this.getAttribute('data-target');
-        
-        // Remove active class from all navigation items
-        navItems.forEach(navItem => {
-          navItem.classList.remove('active');
-        });
-        
-        // Add active class to clicked navigation item
-        this.classList.add('active');
-        
-        // Hide all content sections
-        contentSections.forEach(section => {
-          section.classList.remove('active-content');
-          section.classList.add('hidden-content');
-        });
-        
-        // Show the target content section
-        const targetSection = document.getElementById(targetId);
-        if (targetSection) {
-          targetSection.classList.remove('hidden-content');
-          targetSection.classList.add('active-content');
-          
-          // Initialize modal listeners when account settings is shown
-          if (targetId === 'account-settings') {
-            initializeModalListeners();
-          }
-        }
-      });
-    });
-    
     // Set default active content (Riwayat Pesanan) on page load
     contentSections.forEach(section => {
       section.classList.remove('active-content');
       section.classList.add('hidden-content');
     });
-    
+
     const defaultSection = document.getElementById('order-history');
     if (defaultSection) {
       defaultSection.classList.remove('hidden-content');
       defaultSection.classList.add('active-content');
     }
-    
+
+    // Sync active state for default section
+    document.querySelectorAll(`.nav-item[data-target="order-history"]`).forEach(navItem => {
+      navItem.classList.add('active');
+    });
+
     // Initialize modal listeners for the default section if it's account settings
     if (defaultSection?.id === 'account-settings') {
       initializeModalListeners();

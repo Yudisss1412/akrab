@@ -203,3 +203,331 @@ form{margin-top:18px}
 .suffix-icon svg{
   width:100%;height:100%;display:block;
 }
+
+/* ========================================
+   RESPONSIVE KHUSUS HALAMAN EDIT PROFIL (BUYER)
+   Breakpoints: 425px, 375px, 320px
+   ======================================== */
+
+/* Breakpoint 425px - Mobile Medium */
+@media (max-width: 425px) {
+  .page {
+    padding: 1.25rem 1rem !important;
+  }
+
+  .form-card {
+    padding: 1.25rem !important;
+    border-radius: 14px !important;
+  }
+
+  .form-head {
+    gap: 12px !important;
+    padding-bottom: 14px !important;
+  }
+
+  .form-head h1 {
+    font-size: 1.4rem !important;
+  }
+
+  .avatar-preview {
+    width: 64px !important;
+    height: 64px !important;
+  }
+
+  .avatar-preview svg {
+    width: 42px !important;
+    height: 42px !important;
+  }
+
+  form {
+    margin-top: 14px !important;
+  }
+
+  .form-group {
+    margin-bottom: 14px !important;
+  }
+
+  .form-group label {
+    font-size: 13px !important;
+    left: 12px !important;
+    top: 11px !important;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    height: 42px !important;
+    padding: 0 12px !important;
+    padding-top: 12px !important;
+    border-radius: 8px !important;
+  }
+
+  .form-group input:focus + label,
+  .form-group input:not(:placeholder-shown) + label,
+  .form-group textarea:focus + label,
+  .form-group textarea:not(:placeholder-shown) + label {
+    top: 4px !important;
+    left: 12px !important;
+    font-size: 11px !important;
+  }
+
+  .error-message {
+    font-size: 11px !important;
+    padding-left: 8px !important;
+    padding-top: 4px !important;
+  }
+
+  .error-message.visible {
+    max-height: 18px !important;
+  }
+
+  .form-actions {
+    margin-top: 6px !important;
+    gap: 10px !important;
+  }
+
+  .btn {
+    height: 40px !important;
+    padding: 0 16px !important;
+    border-radius: 10px !important;
+    font-size: 0.9rem !important;
+  }
+
+  .custom-alert {
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+    border-radius: 7px !important;
+    margin-bottom: 10px !important;
+  }
+
+  .custom-alert .close-btn {
+    top: 6px !important;
+    right: 10px !important;
+    width: 22px !important;
+    height: 22px !important;
+    font-size: 16px !important;
+  }
+
+  .toast {
+    right: 14px !important;
+    bottom: 14px !important;
+    padding: 8px 12px !important;
+    border-radius: 8px !important;
+    font-size: 13px !important;
+  }
+}
+
+/* Breakpoint 375px - Mobile Small */
+@media (max-width: 375px) {
+  .page {
+    padding: 1rem 0.875rem !important;
+  }
+
+  .form-card {
+    padding: 1.125rem !important;
+    border-radius: 12px !important;
+  }
+
+  .form-head {
+    gap: 10px !important;
+    padding-bottom: 12px !important;
+  }
+
+  .form-head h1 {
+    font-size: 1.3rem !important;
+  }
+
+  .avatar-preview {
+    width: 58px !important;
+    height: 58px !important;
+  }
+
+  .avatar-preview svg {
+    width: 38px !important;
+    height: 38px !important;
+  }
+
+  form {
+    margin-top: 12px !important;
+  }
+
+  .form-group {
+    margin-bottom: 12px !important;
+  }
+
+  .form-group label {
+    font-size: 12px !important;
+    left: 10px !important;
+    top: 10px !important;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    height: 40px !important;
+    padding: 0 10px !important;
+    padding-top: 10px !important;
+    border-radius: 7px !important;
+  }
+
+  .form-group input:focus + label,
+  .form-group input:not(:placeholder-shown) + label,
+  .form-group textarea:focus + label,
+  .form-group textarea:not(:placeholder-shown) + label {
+    top: 3px !important;
+    left: 10px !important;
+    font-size: 10px !important;
+  }
+
+  .error-message {
+    font-size: 10px !important;
+    padding-left: 6px !important;
+    padding-top: 3px !important;
+  }
+
+  .error-message.visible {
+    max-height: 16px !important;
+  }
+
+  .form-actions {
+    margin-top: 4px !important;
+    gap: 8px !important;
+  }
+
+  .btn {
+    height: 38px !important;
+    padding: 0 14px !important;
+    border-radius: 8px !important;
+    font-size: 0.85rem !important;
+  }
+
+  .custom-alert {
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+    border-radius: 6px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .custom-alert .close-btn {
+    top: 5px !important;
+    right: 8px !important;
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 14px !important;
+  }
+
+  .toast {
+    right: 12px !important;
+    bottom: 12px !important;
+    padding: 7px 10px !important;
+    border-radius: 7px !important;
+    font-size: 12px !important;
+  }
+}
+
+/* Breakpoint 320px - Mobile Extra Small */
+@media (max-width: 320px) {
+  .page {
+    padding: 0.875rem 0.75rem !important;
+  }
+
+  .form-card {
+    padding: 1rem !important;
+    border-radius: 10px !important;
+  }
+
+  .form-head {
+    gap: 8px !important;
+    padding-bottom: 10px !important;
+  }
+
+  .form-head h1 {
+    font-size: 1.2rem !important;
+  }
+
+  .avatar-preview {
+    width: 52px !important;
+    height: 52px !important;
+  }
+
+  .avatar-preview svg {
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  form {
+    margin-top: 10px !important;
+  }
+
+  .form-group {
+    margin-bottom: 10px !important;
+  }
+
+  .form-group label {
+    font-size: 11px !important;
+    left: 8px !important;
+    top: 9px !important;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    height: 38px !important;
+    padding: 0 8px !important;
+    padding-top: 8px !important;
+    border-radius: 6px !important;
+  }
+
+  .form-group input:focus + label,
+  .form-group input:not(:placeholder-shown) + label,
+  .form-group textarea:focus + label,
+  .form-group textarea:not(:placeholder-shown) + label {
+    top: 2px !important;
+    left: 8px !important;
+    font-size: 9px !important;
+  }
+
+  .error-message {
+    font-size: 9px !important;
+    padding-left: 5px !important;
+    padding-top: 2px !important;
+  }
+
+  .error-message.visible {
+    max-height: 14px !important;
+  }
+
+  .form-actions {
+    margin-top: 2px !important;
+    gap: 6px !important;
+    flex-direction: column !important;
+  }
+
+  .btn {
+    height: 36px !important;
+    padding: 0 12px !important;
+    border-radius: 6px !important;
+    font-size: 0.8rem !important;
+    width: 100% !important;
+  }
+
+  .custom-alert {
+    padding: 7px 10px !important;
+    font-size: 11px !important;
+    border-radius: 5px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .custom-alert .close-btn {
+    top: 4px !important;
+    right: 6px !important;
+    width: 18px !important;
+    height: 18px !important;
+    font-size: 12px !important;
+  }
+
+  .toast {
+    right: 10px !important;
+    bottom: 10px !important;
+    padding: 6px 8px !important;
+    border-radius: 6px !important;
+    font-size: 11px !important;
+  }
+}

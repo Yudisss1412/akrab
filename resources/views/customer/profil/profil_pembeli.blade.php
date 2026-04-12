@@ -308,6 +308,30 @@
       </form>
     </div>
   </div>
+
+  <!-- MOBILE BOTTOM NAVIGATION (Fixed) -->
+  <nav class="mobile-bottom-nav">
+    <a href="#" class="nav-item active" data-target="order-history">
+      <i class="bi bi-bag-check"></i>
+      <span>Pesanan</span>
+    </a>
+    <a href="#" class="nav-item" data-target="wishlist-section">
+      <i class="bi bi-heart"></i>
+      <span>Wishlist</span>
+    </a>
+    <a href="#" class="nav-item" data-target="review-history">
+      <i class="bi bi-chat-left-text"></i>
+      <span>Ulasan</span>
+    </a>
+    <a href="#" class="nav-item" data-target="ticket-support">
+      <i class="bi bi-ticket-detailed"></i>
+      <span>Tiket</span>
+    </a>
+    <a href="#" class="nav-item" data-target="account-settings">
+      <i class="bi bi-gear"></i>
+      <span>Setting</span>
+    </a>
+  </nav>
 @endsection
 
 @push('scripts')

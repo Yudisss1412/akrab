@@ -2564,3 +2564,76 @@ a.btn{
     font-size: 0.8rem !important;
   }
 }
+
+/* ==========================================================================
+   MOBILE BOTTOM NAVIGATION
+   ========================================================================== */
+.mobile-bottom-nav {
+  display: none; /* Hidden on desktop */
+}
+
+/* Hide horizontal scroll nav and show bottom nav on mobile */
+@media (max-width: 980px) {
+  /* Hide the old horizontal scroll nav */
+  .profile-navigation.mobile-horizontal-scroll {
+    display: none !important;
+  }
+
+  /* Show fixed bottom navigation */
+  .mobile-bottom-nav {
+    display: flex !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px; /* Standard height */
+    background: #fff;
+    border-top: 1px solid var(--border-color);
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+    z-index: 1050;
+    justify-content: space-around;
+    align-items: center;
+    padding-bottom: env(safe-area-inset-bottom); /* Support for iPhone X+ */
+  }
+
+  .mobile-bottom-nav .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none !important;
+    color: #6c757d; /* Muted color */
+    font-size: 0.7rem;
+    padding: 0;
+    border: none;
+    background: transparent;
+    flex: 1;
+    height: 100%;
+    transition: color 0.2s ease, transform 0.2s ease;
+  }
+
+  .mobile-bottom-nav .nav-item i {
+    font-size: 1.35rem;
+    margin-bottom: 3px;
+    transition: transform 0.2s ease;
+  }
+
+  /* Active state styling */
+  .mobile-bottom-nav .nav-item.active {
+    color: var(--primary-color-dark) !important;
+    font-weight: 600;
+  }
+
+  .mobile-bottom-nav .nav-item.active i {
+    transform: translateY(-2px);
+  }
+
+  .mobile-bottom-nav .nav-item:active {
+    transform: scale(0.95);
+  }
+
+  /* Add padding to main content so it's not hidden behind the nav */
+  .profile-layout {
+    padding-bottom: 75px !important;
+  }
+}

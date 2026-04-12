@@ -611,4 +611,42 @@ class ReviewController extends Controller
         // Return view dengan data order & status review
         return view('customer.ulasan.create_for_order', compact('order', 'itemsWithReviewStatus'));
     }
+
+    /**
+     * Menampilkan halaman daftar semua ulasan (public)
+     *
+     * ==========================================================================
+     * FITUR: HALAMAN ULASAN - PUBLIC REVIEWS PAGE
+     * ==========================================================================
+     * UNTUK SIDANG:
+     * - Method ini menampilkan halaman daftar semua ulasan
+     * - Berbeda dengan index() yang menampilkan ulasan milik user login
+     * - Halaman ini bersifat public (bisa diakses semua orang)
+     *
+     * KEGUNAAN:
+     * - Social proof: Customer lain bisa lihat ulasan buyer sebelumnya
+     * - Transparency: Semua ulasan ditampilkan secara terbuka
+     * - Trust: Meningkatkan kepercayaan customer baru
+     *
+     * @return \Illuminate\View\View View halaman ulasan public
+     */
+    public function halamanUlasan()
+    {
+        // ========================================
+        // STEP 1: QUERY SEMUA ULASAN
+        // ========================================
+        // Ambil semua ulasan yang sudah disetujui (approved)
+        // Load relasi user, product, order untuk info lengkap
+        // Sort: Terbaru dulu (desc)
+        $reviews = Review::with(['user', 'product', 'order'])
+                        ->where('status', 'approved')  // Hanya ulasan yang disetujui
+                        ->orderBy('created_at', 'desc')  // Urutkan dari yang terbaru
+                        ->paginate(12);  // Pagination 12 per halaman
+
+        // ========================================
+        // STEP 2: RETURN VIEW
+        // ========================================
+        // Return view dengan daftar ulasan
+        return view('customer.koleksi.halaman_ulasan', compact('reviews'));
+    }
 }

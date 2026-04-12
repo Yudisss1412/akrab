@@ -202,22 +202,264 @@
     align-items: flex-start;
     gap: 0.25rem;
   }
-  
+
   .order-amount {
     align-self: flex-end;
   }
-  
+
   .order-items {
     flex-direction: column;
     align-items: stretch;
     gap: 1rem;
   }
-  
+
   .item-preview {
     justify-content: center;
   }
-  
+
   .order-actions {
     justify-content: center;
+  }
+}
+
+/* ========================================
+   RESPONSIVE KHUSUS HALAMAN RIWAYAT PESANAN (BUYER)
+   Breakpoints: 425px, 375px, 320px
+   ======================================== */
+
+/* Breakpoint 425px - Mobile Medium */
+@media (max-width: 425px) {
+  .order-list-section {
+    padding: 1rem !important;
+  }
+
+  .order-list {
+    gap: 0.875rem !important;
+  }
+
+  .order-card {
+    padding: 0.875rem !important;
+    border-radius: 10px !important;
+  }
+
+  .order-header {
+    margin-bottom: 0.4rem !important;
+    padding-bottom: 0.4rem !important;
+  }
+
+  .order-id {
+    font-size: 0.85rem !important;
+  }
+
+  .order-status {
+    padding: 0.2rem 0.625rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  .order-details {
+    margin-bottom: 0.875rem !important;
+    font-size: 0.8rem !important;
+  }
+
+  .order-amount {
+    font-size: 0.85rem !important;
+  }
+
+  .item-preview img {
+    width: 55px !important;
+    height: 55px !important;
+    border-radius: 6px !important;
+  }
+
+  .item-count {
+    font-size: 0.75rem !important;
+  }
+
+  .order-actions {
+    gap: 0.4rem !important;
+  }
+
+  .btn {
+    padding: 0.45rem 0.875rem !important;
+    font-size: 0.8rem !important;
+    border-radius: 6px !important;
+  }
+
+  .empty-state {
+    padding: 2.5rem 1rem !important;
+  }
+
+  .empty-img svg {
+    width: 70px !important;
+    height: 70px !important;
+  }
+
+  .empty-text {
+    font-size: 0.9rem !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  .empty-state .btn {
+    max-width: 180px !important;
+    padding: 0.5rem 1rem !important;
+    font-size: 0.85rem !important;
+  }
+}
+
+/* Breakpoint 375px - Mobile Small */
+@media (max-width: 375px) {
+  .order-list-section {
+    padding: 0.875rem !important;
+  }
+
+  .order-list {
+    gap: 0.75rem !important;
+  }
+
+  .order-card {
+    padding: 0.75rem !important;
+    border-radius: 8px !important;
+  }
+
+  .order-header {
+    margin-bottom: 0.35rem !important;
+    padding-bottom: 0.35rem !important;
+  }
+
+  .order-id {
+    font-size: 0.8rem !important;
+  }
+
+  .order-status {
+    padding: 0.18rem 0.5rem !important;
+    font-size: 0.7rem !important;
+  }
+
+  .order-details {
+    margin-bottom: 0.75rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  .order-amount {
+    font-size: 0.8rem !important;
+  }
+
+  .item-preview img {
+    width: 50px !important;
+    height: 50px !important;
+    border-radius: 5px !important;
+  }
+
+  .item-count {
+    font-size: 0.7rem !important;
+  }
+
+  .order-actions {
+    gap: 0.35rem !important;
+  }
+
+  .btn {
+    padding: 0.4rem 0.75rem !important;
+    font-size: 0.75rem !important;
+    border-radius: 5px !important;
+  }
+
+  .empty-state {
+    padding: 2.25rem 0.875rem !important;
+  }
+
+  .empty-img svg {
+    width: 65px !important;
+    height: 65px !important;
+  }
+
+  .empty-text {
+    font-size: 0.85rem !important;
+    margin-bottom: 1.125rem !important;
+  }
+
+  .empty-state .btn {
+    max-width: 170px !important;
+    padding: 0.45rem 0.875rem !important;
+    font-size: 0.8rem !important;
+  }
+}
+
+/* Breakpoint 320px - Mobile Extra Small */
+@media (max-width: 320px) {
+  .order-list-section {
+    padding: 0.75rem !important;
+  }
+
+  .order-list {
+    gap: 0.625rem !important;
+  }
+
+  .order-card {
+    padding: 0.625rem !important;
+    border-radius: 6px !important;
+  }
+
+  .order-header {
+    margin-bottom: 0.3rem !important;
+    padding-bottom: 0.3rem !important;
+  }
+
+  .order-id {
+    font-size: 0.75rem !important;
+  }
+
+  .order-status {
+    padding: 0.15rem 0.4rem !important;
+    font-size: 0.65rem !important;
+  }
+
+  .order-details {
+    margin-bottom: 0.625rem !important;
+    font-size: 0.7rem !important;
+  }
+
+  .order-amount {
+    font-size: 0.75rem !important;
+  }
+
+  .item-preview img {
+    width: 45px !important;
+    height: 45px !important;
+    border-radius: 4px !important;
+  }
+
+  .item-count {
+    font-size: 0.65rem !important;
+  }
+
+  .order-actions {
+    gap: 0.3rem !important;
+  }
+
+  .btn {
+    padding: 0.35rem 0.625rem !important;
+    font-size: 0.7rem !important;
+    border-radius: 4px !important;
+  }
+
+  .empty-state {
+    padding: 2rem 0.75rem !important;
+  }
+
+  .empty-img svg {
+    width: 60px !important;
+    height: 60px !important;
+  }
+
+  .empty-text {
+    font-size: 0.8rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .empty-state .btn {
+    max-width: 160px !important;
+    padding: 0.4rem 0.75rem !important;
+    font-size: 0.75rem !important;
   }
 }
